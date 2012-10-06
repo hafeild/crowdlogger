@@ -1,5 +1,4 @@
-#!/usr/bin/ruby
-
+#!/Users/niranjan/.rvm/rubies/ruby-1.9.2-p290/bin/ruby
 ################################################################################
 ## File:    configure.rb
 ## Author:  Henry Feild
@@ -45,7 +44,7 @@ OPTIONAL_CONFIG = "override.conf"
 ################################################################################
 def readConfigFile( file )
     contents = ""
-    fd = File.open( file, "r" )
+    fd = File.open( file, "r:utf-8" )
     while line = fd.gets
         unless line =~ /^\s*$/ or line =~ /^#/
             columns = line.chomp.split(/=/)
@@ -60,6 +59,39 @@ def readConfigFile( file )
     end
     return JSON.parse( "{#{contents}}".gsub!(/,\}$/, "}") )
 end
+
+
+################################################################################
+## Searches and replaces each of the key value pairs in the given hash in the
+## contents of the given file. The file is overwritten.
+##
+## @param file  The path of the file in which to perform the search and replace. 
+##              This file is overwritten.
+## @param searchAndReplacehash  The hash of key/value pairs to search and replace.
+################################################################################
+def searchAndReplaceInFile( file, searchAndReplaceHash )
+    contents = ""
+    fd = File.open( file, "r:utf-8" )
+    while line = fd.gets
+        contents += line
+    end
+    fd.close
+    
+    if( contents.valid_encoding? )
+        for (k,v) in searchAndReplaceHash
+            find = "%%#{k}%%"
+            replace = v
+            contents.gsub!( /#{find}/, replace )
+        end
+        fd = File.open( file, "w:utf-8" )
+        fd.print( contents )
+        fd.close
+    #else
+    #    puts "Couldn't process #{file}"
+    end
+
+end
+
 
 ################################################################################
 ## Merges two hashes.
@@ -102,9 +134,9 @@ end
 ##    search and replace everything.
 
 ## Check the args.
-if ARGV.size > 0 and ARGV[0] =~ /^-{0,1}-h/
-    die( usage )
-end
+#if ARGV.size > 0 and ARGV[0] =~ /^-{0,1}-h/
+#    die( usage )
+#end
 
 ## Defaults...
 outputDir = OUTPUT_DIR
@@ -157,8 +189,11 @@ FileUtils.cp_r( inputDir, outputDir )
 
 
 ## Replace each of the variables.
-files = Dir.glob( "#{outputDir}/**/*" ).keep_if{|f| File.file?(f)}.join(" ")
-for (k,v) in variableHash
-#    puts "ruby -pi -e \"gsub( /%%#{k}%%/, '#{v.gsub(/'/, "\\'")}' )\" #{files}"
-    `ruby -pi -e "gsub(/%%#{k}%%/, '#{v.gsub(/'/, "\\'").gsub(/"/, "\\\"")}')" #{files}`
+files_a = []
+Dir.glob( "#{outputDir}/**/*" ).each do |f|
+    if File.file?(f)
+        searchAndReplaceInFile( f, variableHash ) 
+    end
 end
+
+
