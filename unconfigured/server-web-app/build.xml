@@ -1,0 +1,60 @@
+<project name="CrowdLogger Java Web Application" default="all" basedir=".">
+
+
+<target name="init">
+    <property name="build" location="build"/>
+    <property name="src" location="src"/>
+    <property name="warDir" location="WebContent"/>
+    <property name="classdir" location="${warDir}/WEB-INF/classes"/>
+    <property name="lib" location="${warDir}/WEB-INF/lib"/>
+    <!-- These are jars that are needed for compilation, but don't need to
+     be included with the WAR. -->
+    <property name="lib2" location="lib"/>
+    
+	<!-- This specifies the WAR file name. -->
+    <property name="warFile" value="crowdlogger.war"/>
+    
+	<!-- This specifies the JAR file name. -->
+    <property name="jarFile" value="crowdlogger.jar"/>
+    
+    
+    
+    <!-- Create Web-inf and classes directories -->
+<!--
+    <mkdir dir="${classdir}"/>
+    <mkdir dir="${warDir}/WEB-INF"/>
+-->
+    <mkdir dir="${warDir}/WEB-INF/classes"/>
+
+</target>
+
+<!-- Main target -->
+<target name="all" depends="init,build,buildWar,buildJar"/>
+
+
+<!-- Compile Java Files and store in /build/src directory -->
+<target name="build" >
+    <path id="projectClassPath">
+        <fileset dir="${lib}" includes="*.jar"/>
+        <fileset dir="${lib2}" includes="*.jar"/>
+        <pathelement location="${java.class.path}"/>
+    </path>
+
+    <javac srcdir="${src}" destdir="${classdir}" debug="true" includes="**/*.java">
+        <classpath refid="projectClassPath"/>
+    </javac>
+</target>
+
+<!-- Create the War File -->
+<target name="buildWar" depends="init">
+    <jar jarfile="${warFile}" basedir="${warDir}" />
+</target>
+
+<!-- Create the War File -->
+<target name="buildJar" depends="init">
+    <jar jarfile="${jarFile}" basedir="${classdir}" />
+</target>
+
+
+
+</project>

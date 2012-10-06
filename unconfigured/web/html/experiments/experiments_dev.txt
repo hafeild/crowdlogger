@@ -1,0 +1,3 @@
+#orderNumber    jobID   minVersion  n   k   startDate   endDate frequency(seconds)  className   arguments
+# Before trying things out in experiments.txt, you can point your dev extension's 'experiment_update_url' to 'http:/.../experiments_dev.php' and the 'server_status_url' to 'http://..../serverStatus_dev'; make sure to type 'up' in that file.
+x	query.2011-oct-18.006	1.6.2	200	5	Oct 18 12:00:00 2011 EDT	Oct 19 12:00:00 2011 EDT	0	query

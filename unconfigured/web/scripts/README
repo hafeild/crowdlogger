@@ -1,0 +1,27 @@
+README
+crowdlogger/web/scripts
+
+
+A quick overview of the scripts; you can find out the usage by executing each
+with no parameters, e.g.,
+
+    %> php addWin.php
+    ...
+
+Scripts:
+
+    addWin.php
+        Takes a registration id and the base name of a pdf file, e.g., a pdf
+        Amazon gift card, and adds that filename to the 'drawing' table in
+        the database. This will (eventually) be communicated to the user
+        and they will be able to redeem the gift card. The gift card should
+        be placed in ../include/retrieve/
+
+    draw.php
+        Performs a raffle. Takes as input a list of job (i.e., experiment) ids.
+        Only users that participated in those experiments are considered. Users
+        have a greater chance of winning if they referred other users.
+
+    updateCrowdLogger.sh 
+        Given new CrowdLogger.{xpi,crx} files, this script will update the
+        user facing web pages for the new version.

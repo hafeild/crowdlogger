@@ -1,0 +1,172 @@
+/* 
+%%LICENSE%%
+*/
+
+ul.flush{
+    margin: 0px;
+    padding: 0px;
+    padding-left: 5px;
+}
+body.chrome-menu {
+    min-width: 300px;
+    margin-bottom:   25px;
+}
+
+.menu-iconic-left {
+     visibility: visible!important;
+ }
+
+
+.crowdlogger-logging-off-button {
+    list-style-image: url("img/startLogging.png");
+}
+
+.crowdlogger-logging-on-button {
+    list-style-image: url("img/pauseLogging.png");
+}
+
+.crowdlogger-logging-off_low_alert-button {
+    list-style-image: url("img/startLoggingAlertLow.png");
+}
+
+.crowdlogger-logging-on_low_alert-button {
+    list-style-image: url("img/pauseLoggingAlertLow.png");
+}
+
+.crowdlogger-logging-off_high_alert-button {
+    list-style-image: url("img/startLoggingAlertHigh.png");
+}
+
+.crowdlogger-logging-on_high_alert-button {
+    list-style-image: url("img/pauseLoggingAlertHigh.png");
+}
+.crowdlogger-mine-log-button {
+    list-style-image: url("img/mineLog.png");
+}
+
+.crowdlogger-new-mine-log {
+  list-style-image: url("img/mineLogAlert.png");
+}
+
+.crowdlogger-register-button {
+  list-style-image: url("img/register.png");
+}
+
+.crowdlogger-run-now-button {
+  list-style-image: url("img/ok.png");
+}
+
+.crowdlogger-run-later-button {
+  list-style-image: url("img/no.png");
+}
+
+
+.crowdlogger-refer-a-friend-button {
+  list-style-image: url("img/refer.png");
+}
+
+.crowdlogger-settings-button {
+    list-style-image: url("img/config.png");
+}
+
+.crowdlogger-help-button {
+    list-style-image: url("img/help.png");
+}
+
+.crowdlogger-show-messages-button {
+    list-style-image: url("img/messages.png");
+}
+
+.crowdlogger-view-log-button {
+    list-style-image: url("img/view.png");
+}
+
+.ppserachlogtoolbar-notification-button {
+	list-style-image: url("img/messages.png");
+}
+
+.ppserachlogtoolbar-consent-button {
+	list-style-image: url("img/notification.png");
+}
+
+
+.crowdlogger-check-wins-button {
+    list-style-image: url("img/win.png");
+}
+
+
+.crowdlogger_groupbox {
+    /*width: 700px;*/
+    height: 200px;
+    overflow: auto;
+    border: 1px tan solid;
+}
+
+.crowdlogger_groupbox2 {
+    
+    height: 400px;
+    overflow: auto;
+    border: 1px gray dotted;
+}
+
+.crowdlogger_dialog {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+
+.crowdlogger_label {
+    white-space: normal;
+/*    font-weight: bold;*/
+    font-size: 1.2em;
+}
+
+.crowdloggerlogtoolber-head-label{
+    white-space: normal;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: red;
+}
+
+
+li.menu{
+    margin:       0px;
+    padding:      1px;
+    padding-left: 5px;
+    border: 1px white solid;
+    list-style-position: inside;
+}
+
+
+li.menu:hover {
+    color: black;
+    cursor: default;
+    background-color: lightblue;
+    border: 1px gray solid; 
+}
+
+.crowdlogger-dynamic-highlight-menu-item-end {
+/*    color:        black;*/
+    text-decoration: underline;
+    font-weight:    bold;
+}
+
+li.crowdlogger-dynamic-highlight-menu-item-end {
+    background-color: #FFCC66;
+    margin:       0px;
+    padding:      1px;
+    padding-left: 5px;
+    border:         2px orange solid;
+    list-style-position: inside;
+}
+
+li.crowdlogger-dynamic-highlight-menu-item-end:hover {
+    color: black;
+    cursor: default;
+    background-color: #FFCC66;
+    border:         2px darkorange solid;
+    font-weight:    bold;
+}
+
+

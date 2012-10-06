@@ -1,0 +1,128 @@
+<!--
+ File:      registration.html
+ Author:    Henry Feild
+ Date:      01-Apr-2011
+ Purpose:   Provides a registration GUI for the user.
+
+%%LICENSE%%
+-->
+
+<html>
+<head>
+    <title>%%PROJECT_NAME%% Preferences Page</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        // Checks if this page has been initialized yet.
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm && init_elm.innerHTML === "" ){
+                CROWDLOGGER.gui.preferences.refresh_preference_page( document );
+            }
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+
+        /*
+        window.addEventListener( "change", function(){
+            CROWDLOGGER.study.registration.check_form( document );
+        }, false );
+        window.addEventListener( "command", function(){
+            CROWDLOGGER.study.registration.check_form( document );
+        }, false );
+        window.addEventListener( "click", function(){
+            CROWDLOGGER.study.registration.check_form( document );
+        }, false );
+        */
+    -->
+    </script>
+</head>
+<body id="status_page_body">
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Preferences Page</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+    
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+
+    Below are preferences you can set. 
+    
+
+    <p>
+
+    <span class="note" name="required"><span name="required" class="required">*</span> denotes required fields.</span>
+
+    <p>
+
+    <span class="alertMessage hidden" id="missing_fields_alert">
+        There are one or more required preferences that have not been set!
+        Please set them and then click the save button at the bottom of the
+        page.
+        <p></p>
+    </span>
+
+    <form name="preferences" onsubmit="return false;">
+
+        <!-- Prior Registration -->
+        <h1>Pass phrase</h1>
+
+        Set your pass-phrase here. This should be some phrase that you think would be unlikely to be entered by someone else. You are strongly encouraged to use this same phrase across all of your installations of this extension. This is what guards your information from being revealed unless there are many other people with the same information.
+        <ul>
+            Pass phrase:<span name="required" class="required">*</span>
+                <input type="text" name="pass_phrase" size="30" />
+        </ul> 
+
+        <p>
+
+        <h1>Experiments</h1>
+        Would you like to have experiments run automatically when they are
+        available?
+        <ul>
+            <input type="radio" name="run_experiments_automatically" 
+                value="true"/>Yes<br>
+            <input type="radio" name="run_experiments_automatically" 
+                value="false"/>No<br>
+        </ul>
+
+        <p>
+
+        <span class="buttonPanel" id="save_button_panel">
+            <span class="button" id="save_button"
+                onclick="CROWDLOGGER.gui.preferences.submit_preferences(
+                  document ); return false;">Save</span>
+            <span class="button" id="save_and_close_button"
+                onclick="CROWDLOGGER.gui.preferences.submit_preferences(
+                  document, window ); return false;">Save and close</span>
+        </span>
+    </form>
+
+    <p>
+
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

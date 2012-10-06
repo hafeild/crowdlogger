@@ -1,0 +1,98 @@
+<html>
+<head>
+    <title>About %%PROJECT_NAME%%</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="style/style.css">
+</head>
+<body>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title">
+            <span class="titleMain">%%PROJECT_NAME%%</span><br>
+            <span id="subtitle">
+                <span class="titleSub">About</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+
+<div id="iframe">
+   <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
+        height=70px>
+   </iframe>
+</div>
+
+<h1>About the %%PROJECT_NAME%% study</h1>
+
+%%FULL_PROJECT_NAME%% is a study of a new system that helps researchers use information about people's search behavior on the Web, but simultaneously protecting the privacy of the users who contribute the data.
+
+<p>
+
+A crucial element of the system is that the only information that is revealed to researchers is information that is shared by many <i>different</i> individuals. In the current study, we consider "many" to be five. Any data this is not shared by many different individuals is undecipherable.
+
+<p>
+
+The system involves a Web browser extension that you will install. The
+way it works is that your search behavior is logged on your
+computer. Search behavior includes actions such as entering searches
+on Web search engines, clicking on results for those searches, and
+navigating through web sites. For sensitive sites&mdash;e.g., bank websites&mdash;%%PROJECT_NAME%% does not log any information other than the name of the site.
+<!--<b>We do not collect data about sensitive
+sites, such as bank websites.</b>-->  We will periodically ask you to run
+experiments on your search logs by clicking on a button that is part
+of the browser extension. These experiments will extract information
+from your logs and encrypt them. The encrypted information is then sent to a server, where
+it's combined with encrypted information from other users and
+decrypted if the same information comes from several different users.
+
+<br><br>
+<h2>So what kind of information is extracted?</h2>
+An example experiment that we may run is to have the extension extract the individual searches you submit to Web search engines. Let's suppose you have entered the following searches:
+
+<ol>
+  <li>facebook</li>
+  <li>blueberry pie recipes</li>
+  <li>toe fungus ointment</li>
+</ol>
+
+Let's also suppose that 70 other people also entered searches 1 and 3. Your
+second search for blueberry pie recipes will be ignored -- never seen by
+researchers. The other two will be revealed, but we will:
+
+<ol>
+  <li><i>not</i> know that <i>you</i> entered them</li>
+  <li><i>not</i> know that they were entered by the <i>same person</i></li>
+</ol>
+
+Because we can only see information that is common among many different people,
+your sensitive searchers are not revealed. Because the two conditions above
+hold true, your identity and privacy are preserved.
+
+<br><br>
+<h2>Why do this?</h2>
+As researchers in the field of search technologies, we are interested in data pertaining to Web search. This data helps us develop new search algorithms and tools to improve your search experience. However, user search data is not readily available. We would like to collect this data, but we realize that privacy is of great concern to the users of a search logging system. That is why we have built the system described above -- it is a win-win for both the users (who will benefit from the research) and the researchers (who will be able to continue researching).
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+
+<div id="iframe">
+   <iframe width="100%" src="copyright.html" scrolling=no 
+           frameborder=0 marginheight=0 height=40px>
+   </iframe>
+</div>
+
+</div>
+
+<div class="emptyFooter">
+</div>
+    
+</body>
+</html>
+</body>
+</html>

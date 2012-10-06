@@ -1,0 +1,98 @@
+<!--
+%%VERSION%%
+-->
+<html>
+<head>
+    <title>Search Histogram</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+
+    <!-- For sorting our histogram. -->
+    <script src="../js/external_lib/sorttable.js"></script>
+    <script src="../js/dialog.js"></script>
+
+    <style>
+        /* Sortable tables */
+        table.sortable thead {
+            background-color:#eee;
+            color:#666666;
+            font-weight: bold;
+            cursor: default;
+        }
+
+    </style>
+
+    <script>
+        <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when the CROWDLOGGER variable is found. Checks if this page 
+         * has been initialized yet.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ) {
+                if( init_elm.innerHTML === "" ){
+                    CROWDLOGGER.gui.tools.diplay_search_histogram( document );
+                }
+            }
+        }
+
+        /**
+         * Refreshes the contents of the page.
+         */
+        function refresh_page(){
+            CROWDLOGGER.gui.tools.diplay_search_histogram( document );
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+
+        -->
+    </script>
+
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title">
+            <span class="titleMain">Search histogram</span><br>
+            <span id="subtitle">
+                <span class="titleSub">%%PROJECT_NAME%% Tools</span>
+                <br>
+            </span>
+        </div>
+        <span class="refreshLink">
+            <a href="#" onclick="refresh_page(); return false;">Refresh</a>
+        </span>
+    </div>
+ 
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <p>
+
+    <div class="tools">
+        <table class='sortable'>
+            <thead><tr> <th>Search</th> <th class="sorttable_numeric">Count</th> </tr></thead>
+            <tbody id="contents">
+    
+            </tbody>
+        </table>
+    </div>
+
+    <div class="buffer">
+    </div>
+
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+    "name": "%%PROJECT_NAME%%",
+    "version": "%%VERSION%%",
+    "description": "%%DESCRIPTION%% %%LICENSE%%",
+    "browser_action": {
+        "default_icon": "css/img/pauseLogging.png",
+        "popup": "html/chrome_menu.html"
+    },
+    "update_url": "%%SERVER_BASE_URL%%/updates/chrome/update.xml",
+    "options_page": "html/preferences.html",
+    "background_page": "html/chrome_main.html",
+    "permissions": [
+        "notifications",
+        "unlimitedStorage",
+        "tabs",
+        "<all_urls>"
+    ]
+}

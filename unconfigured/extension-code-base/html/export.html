@@ -1,0 +1,80 @@
+<!--
+ File:      export.html
+ Author:    Henry Feild
+ Date:      14-Oct-2011
+ Purpose:   Displays log data and allows it to be saved. 
+
+%%LICENSE%%
+-->
+
+<html>
+<head>
+    <title>%%PROJECT_NAME%% Search Log</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when the page loads, after the CROWDLOGGER object is found.
+         * Can be used (as below) to check if the init_elm has had any text
+         * or html added within it -- this is a sign that the page has been
+         * loaded already, and thus no initialization needs to take place.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ){
+                if( init_elm.innerHTML === "" ){
+                }
+            }
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+    -->
+    </script>
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Search Log</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">made by</span><br>
+                <span class="titleSub">%%PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+   
+ 
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <a id="save-log" href="#">Save file</a> 
+
+    <br>
+
+    <div id="log-area">
+    </div>
+
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+            %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

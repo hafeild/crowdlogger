@@ -1,0 +1,65 @@
+<html>
+<head>
+    <title>Download %%PROJECT_NAME%%</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="style/style.css">
+
+
+</head>
+<body>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title">
+            <span class="titleMain">%%FULL_PROJECT_NAME%%</span><br>
+            <span id="subtitle">
+                <span class="titleSub">Download</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+
+<div id="iframe">
+   <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
+        height=70px>
+   </iframe>
+</div>
+
+<h1>Downloading %%PROJECT_NAME%%</h1>
+
+To use %%PROJECT_NAME%% and participate in the study, you must:
+<ol>
+    <li>download the %%PROJECT_NAME%% extension for <a href="http://www.google.com/chrome/">Google Chrome</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a></li>
+    <li>agree to the informed consent form (the form will be shown to you after the extension installation is complete)</li>
+</ol>
+<i><b>%%PROJECT_NAME%% will not be activated until you agree to the terms of the informed consent form.</b></i>
+<p>
+<span class="buttonPanel" style="height: 5em">
+    <span id="chrome_download" class="button" onclick=" location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Chrome</b></span>
+    <span id="ff_download" class="button" onclick="if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Firefox</b></span>
+</span>
+
+
+<br><br>
+The extension will notify of you any important messages from the project researches. 
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+
+<div id="iframe">
+   <iframe width="100%" src="copyright.html" scrolling=no 
+           frameborder=0 marginheight=0 height=40px>
+   </iframe>
+</div>
+
+</div>
+
+<div class="emptyFooter">
+</div>
+</body>
+</html>

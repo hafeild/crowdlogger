@@ -1,0 +1,278 @@
+<!--
+ File:      status.html
+ Author:    Henry Feild
+ Date:      29-Mar-2011
+ Purpose:   This is the shell for a dynamically populated status page for the
+            %%PROJECT_NAME%%.
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>%%FULLPROJECT_NAME%% Status Page</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+        var experimentRefreshActivated = false;
+        var experimentRefreshInterval  = 5 * 1000; // 5 sec.
+        var experimentElm = undefined;
+        
+
+        /**
+         * In FF, launches a custom event (crowdlogger_status_page_refresh) that
+         * the %%PROJECT_NAME%% extension is listening for. In Chrome, refreshes
+         * via the CROWDLOGGER object directly.
+         */
+        function refresh_page(){
+            if( CROWDLOGGER !== undefined ){
+                CROWDLOGGER.gui.study.pages.refresh_status_page(document);
+            }
+        }
+
+        /**
+         * Called when the CROWDLOGGER variable has been found. Checks if this 
+         * page has been initialized yet.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ){
+                if( init_elm.innerHTML === "" ){
+                    CROWDLOGGER.gui.study.pages.refresh_status_page( document );
+                }
+            }
+
+            if( experimentRefreshActivated === false ) {
+                experimentRefreshActivated = true;
+                refreshExperimentStats();
+            }
+        }
+
+
+        /**
+         * Refreshes just the experiments section, every few seconds.
+         */
+        function refreshExperimentStats() {
+            //CROWDLOGGER.debug.log( "In refreshExperimentStats!\n" );
+
+            if( experimentElm === undefined ) {
+                experimentElm = document.getElementById( 'experiments' );
+            }
+            CROWDLOGGER.gui.study.pages.populate_experiments_status(
+                document, experimentElm ); 
+
+            setTimeout( refreshExperimentStats, experimentRefreshInterval );
+        }
+
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+
+
+
+    -->
+    </script>
+</head>
+<body id="status_page_body">
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Status Page</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%FULL_PROJECT_NAME%% <span name="version_no"></span></span>
+                <br>
+            </span>
+        </div>
+        <span class="refreshLink">
+            [<a href="#" onclick="refresh_page(); return false;">Refresh</a>] 
+            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+        </span>
+    </div>
+    
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <span id="update_message" class="update_message hidden">
+
+        %%PROJECT_NAME%% has been updated to <span
+name="version_no"></span>. <a name="whatsnew" href="#" onclick="return false;">Click here</a> to see what's new in this version of %%PROJECT_NAME%%. 
+<br>
+Please take a look at the <a
+href="#notifications">notifications section</a> to be aware of and address any
+outstanding issues concerning %%FULL_PROJECT_NAME%%.
+        
+    </span>
+
+
+    <p>
+
+    <span class="note">Note: This page can be accessed by going to the %%PROJECT_NAME%%
+menu, which appears on the navigation bar, denoted by
+a pause or play button (<img src="../css/img/pauseLogging.png"/>/<img
+src="../css/img/startLogging.png"/>), and clicking "Go to status page".
+    </span>
+
+    <div class="content">
+   
+
+ 
+        <div class="notifications section">
+            <a name="notifications"></a>
+            <h1>Notifications</h1>
+            <div id="notifications">
+            
+            </div>
+        </div>
+    
+        <p>
+    
+        <div class="messages section">
+            <a name="messages"></a>
+            <h1>Recent Messages</h1>
+            <div id="messages">
+    
+            </div>
+        </div> 
+    
+        <p>
+    
+        <div class="experiments section">
+            <a name="experiments"></a>
+            <h1>Experiment Status</h1>
+            <div id="experiments">
+                <table>
+                    <tr>
+                        <td class='label'>Running experiments:</td>
+                        <td id=running_experiments><span class='note'>None</span></td>
+                    </tr>
+
+                    <tr>
+                        <td class='label'>Upcoming experiments:</td>
+                        <td id=upcoming_experiments><span class='note'>None</span></td>
+                    </tr>
+
+                    <tr>
+                        <td class='label'>Last completed experiment:</td>
+                        <td id=last_completed_experiment><span class='note'>N/A</span></td>
+                    </tr>
+
+                    <tr>
+                        <td class='label'>Number of completed experiments:</td>
+                        <td id=number_completed_experiments><span class='note'>0</span></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>        
+
+        <p>
+ 
+        <div class="raffleWins section">
+            <a name="rafleWins"></a>
+            <h1>Raffle Wins</h1>
+            <div id="raffleWins">
+    
+            </div>
+        </div> 
+    
+        <p>
+     
+        <div class="tools section">
+            <a name="tools"></a>
+            <h1>Tools</h1>
+            <div id="tools">
+                <ul>
+                    <h2><a href="#" 
+                        onclick="CROWDLOGGER.gui.tools.diplay_search_histogram();
+                                 return false;">Search histogram</a>
+                    </h2>
+                    See the searches you have entered and how frequently. You
+                    can sort by search or frequency.
+
+                    <p>
+
+                    <h2><a href="#" 
+                        onclick="CROWDLOGGER.gui.tools.diplay_search_trails();
+                                 return false;">Search trails</a>
+                    </h2>
+                    See the searches you have conducted and pages you've visited in
+                    chronological order.
+
+                    <p>
+                    <h2><a href="#"
+                        onclick="CROWDLOGGER.gui.tools.export_log();
+                                 return false;">Export search log</a>
+                    </h2>
+                    View the raw search log and save it to disk.
+
+                    <p>
+
+
+                    <h2><a href="#" onclick="
+                            document.getElementById('confirm_clear').
+                                style.display = 'inline-block'; 
+                            document.getElementById('cleared').
+                                    style.display = 'none';
+                            return false;"
+                            >Clear log</a>
+                            <span id="confirm_clear"
+                                style="color:red; display: none"
+                                >Are you sure?
+                            <a href="#"
+                                onclick="CROWDLOGGER.io.log.clear_activity_log();
+                                  document.getElementById('cleared').
+                                    style.display = '';
+                                  document.getElementById('confirm_clear').
+                                    style.display = 'none';
+                                return false;">Yes</a></span>
+                        <span id="cleared" 
+                                style="display: none" class="cleared">
+                            &ndash; Cleared
+                        </span>
+                    </h2>
+                    Remove everything&mdash;all of your searches, visited 
+                    pages, etc.&mdash;from your search log.
+                </ul>
+                
+            </div>
+        </div>
+
+        <p>
+
+        <div class="feedback section">
+            <a name="feedback"></a>
+            <h1>Feedback</h1>
+            <p>
+            If you have any comments or suggestions about the %%PROJECT_NAME%% system
+            or the study that you would like to let us know, you can email us at            hfeild@cs.umass.edu  or 
+            <a href="#" onclick="window.open('https://crowdlogger.cs.umass.edu/feedback/leaveFeedback.html'); return false;">leave an anonymous message at this web page</a>.
+            
+        </div> 
+        <p>
+    </div>
+
+    <div class="header">
+        <span class="refreshLink">
+            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+        </span>
+    </div>
+                
+
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

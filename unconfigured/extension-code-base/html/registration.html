@@ -1,0 +1,400 @@
+<!--
+ File:      registration.html
+ Author:    Henry Feild
+ Date:      01-Apr-2011
+ Purpose:   Provides a registration GUI for the user.
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>%%PROJECT_NAME%% Registration Page</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when we have found the CROWDLOGGER object. 
+         * Checks if this page has been initialized yet and adds the listeners.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            CROWDLOGGER.debug.log( "init_elm: " + init_elm.innerHTML + "\n" );
+            if( init_elm && ( init_elm.innerHTML === "" ||
+                              init_elm.innerHTML === "no listeners" ) ){
+                init_listeners();
+            }
+        }
+
+        /**
+         * This will add listeners to the form to check if the register button 
+         * should be dis/en-abled.
+         */
+        function init_listeners(){
+            var buttons = [document.getElementById( "register_button_enabled" ),
+                          document.getElementById( "register_button_disabled" )];
+
+            window.addEventListener( "change", function(){
+                if( CROWDLOGGER ){
+                    CROWDLOGGER.study.registration.check_form( document, buttons );
+                }
+            }, false );
+            window.addEventListener( "command", function(){
+                if( CROWDLOGGER ){
+                    CROWDLOGGER.study.registration.check_form( document, buttons );
+                }
+            }, false );
+            window.addEventListener( "click", function(){
+                if( CROWDLOGGER ){
+                    CROWDLOGGER.study.registration.check_form( document, buttons );
+                }
+            }, false );
+    
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+    -->
+    </script>
+</head>
+<body id="status_page_body">
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Registration Page</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+    
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <p>
+
+    <span class='hidden alreadyRegistered' id="alreadyRegistered">
+
+        You have already registered. If you would like to update any portion of
+        your registration, you may do so here. Leave blank any field you do not
+        wish to update.  
+        
+        <p></p> 
+     </span>
+
+
+        Please provide the following information. This information  will not be
+        tied to any of the data extracted from experiments on your search data.
+        Given the goal of this study, your privacy is extremely important to
+        us. We are collecting this data to help us understand our user
+        population.  The data will be stored separately from any logged browser
+        activity with no connection between them saved even temporarily.
+
+        <p>
+
+        <span class="note" name="required">
+<span name="required" class="required">*</span> denotes required fields, though all fields allow "prefer not to answer".</span>
+    
+        <p>
+        <form name="registration" onsubmit="return false;">
+
+        <!-- Prior Registration -->
+        <h1>Prior registration</h1>
+
+<span name="required" class="required">*</span>
+        Are you using or do you plan to use this extension in multiple places,
+e.g., more than one computer?
+        <ul>
+            <input type="radio" name="multiple_installs" value="yes"/>Yes <br>
+            <input type="radio" name="multiple_installs" value="no"/>No <br>
+            <input type="radio" name="multiple_installs" value="pna"/>I prefer not to answer <br>
+            <input type="radio" name="multiple_installs" value="default" checked 
+                class='hidden' />
+            
+        </ul> 
+
+        <p>
+
+<span name="required" class="required">*</span>
+        Select one of your installation locations as your primary location. Is
+this your primary location? 
+<br>
+        <span class="note">Note: We are asking this so we
+can get a more accurate count on the number of users signed up for this
+study. We do not keep track of this information in any logged data.</span>
+        <ul>
+            <input type="radio" name="primary_location" value="yes"/>Yes<span class="note hidden" id="is_primary_message">&mdash;do not forget to use the same pass phrase (asked for later) on all of your computers!</span><br>
+            <input type="radio" name="primary_location" value="no"/>No<span class="note hidden" id="not_primary_message">&mdash;you don't have to complete the rest of the registration if this is not your primary location, but don't forget to set the pass phrase for this computer to be the same as your primary!</span><br>
+            <input type="radio" name="primary_location" value="pna"/>I prefer not to answer <br>
+            <input type="radio" name="primary_location" value="default" checked 
+                class='hidden' />
+        </ul>
+
+        <p></p>
+
+<span id="primary_location_questions">
+
+        <!-- Demographics -->
+        <h1>Demographics</h1>
+        <h2>Basics</h2>
+ 
+<span name="required" class="required">*</span>
+        What is your gender?
+        <ul>
+            <input type="radio" name="gender" value="male"/>Male <br>
+            <input type="radio" name="gender" value="female"/>Female <br>
+            <input type="radio" name="gender" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="gender" value="default" checked 
+                class='hidden' />
+        </ul> 
+
+        <p></p>
+
+<span name="required" class="required">*</span>
+        What is your age?
+        <ul>
+            <input type="radio" name="age" value="18-24"/>18&ndash;24 <br>
+            <input type="radio" name="age" value="25-29"/>25&ndash;29<br>
+            <input type="radio" name="age" value="30-39"/>30&ndash;39<br>
+            <input type="radio" name="age" value="40-49"/>40&ndash;49<br>
+            <input type="radio" name="age" value="50-59"/>50&ndash;59<br>
+            <input type="radio" name="age" value="60-69"/>60&ndash;69<br>
+            <input type="radio" name="age" value="70plus"/>70+<br>
+            <input type="radio" name="age" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="age" value="default" checked 
+                class='hidden' />
+            
+        </ul> 
+
+        <p></p>
+
+<span name="required" class="required">*</span>
+        What is your occupation (e.g., [grad] student, professor, administrative staff, accountant, etc.)?
+        <ul>
+            Occupation: <input type="text" name="occupation" size="16" />
+            <a href="#" onclick="document.registration.occupation.value='PNA';
+                return false;">I prefer not to answer</a>
+        </ul>
+
+        <p></p>
+
+        <!-- Random -->
+        <h2>Random question</h2>
+
+<span name="required" class="required">*</span>
+        Do you consider yourself a part of the Information Retrieval community
+(if you are not sure what this means, select 'no')?
+
+        <ul>
+            <input type="radio" name="ir_community" value="yes"/>Yes <br>
+            <input type="radio" name="ir_community" value="no"/>No <br>                       <input type="radio" name="ir_community" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="ir_community" value="default" checked 
+                class='hidden' />
+        </ul>
+       
+        <p></p>
+
+        <!-- Education -->
+        <h2>Education</h2>
+<span name="required" class="required">*</span>
+        What is the highest educational degree you have completed?
+        <ul>
+            <input type="radio" name="education" value="lessTHanHighSchool"/>
+                Less than high school degree<br>
+            <input type="radio" name="education" value="highSchool"/>
+                High school graduate (High school diploma, GED, etc.)<br>
+            <input type="radio" name="education" value="associates"/>
+                Associate degree (AA, AS, etc.)<br>
+            <input type="radio" name="education" value="bachelors"/>
+                Bachelor's degree (BA, AB, BS, etc.)<br>
+            <input type="radio" name="education" value="masters"/>
+                Masters or equivalent (MS, MA, MEng, etc.)<br>
+            <input type="radio" name="education" value="professional"/>
+                Professional (MD, DDS, etc.)<br>
+            <input type="radio" name="education" value="doctoral"/>
+                Doctorate degree (PhD, EdD, etc.)<br>
+            <input type="radio" name="education" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="education" value="default" checked 
+                class='hidden' />
+        </ul>
+
+<!--
+http://blog.vovici.com/blog/bid/18176/Demographic-Questions-Sample-Survey-Template
+Q. Education
+What is the highest degree or level of school you have completed? If currently enrolled, mark the previous grade or highest degree received.
+o No schooling completed
+o Nursery school to 8th grade
+o 9th, 10th or 11th grade
+o 12th grade, no diploma
+o High school graduate - high school diploma or the equivalent (for example: GED)
+o Some college credit, but less than 1 year
+o 1 or more years of college, no degree
+o Associate degree (for example: AA, AS)
+o Bachelor's degree (for example: BA, AB, BS)
+o Master's degree (for example: MA, MS, MEng, MEd, MSW, MBA)
+o Professional degree (for example: MD, DDS, DVM, LLB, JD)
+o Doctorate degree (for example: PhD, EdD)
+
+-->
+
+        <p></p>
+
+        If you are currently a student, what is your concentration? If you are
+        not a student, leave this blank.
+        <ul>
+            Concentration: <input type="text" name="concentration" size="16" />
+            <a href="#" 
+                onclick="document.registration.concentration.value='PNA';
+                return false;">I prefer not to answer</a>
+        </ul>         
+
+        <p></p>
+
+        <!-- Nationality and dwelling -->
+        <h2>Nationality and dwelling</h2>
+
+<span name="required" class="required">*</span>
+        What is your nationality?
+        <ul>
+            Nationality: <input type="text" name="nationality" size="16" />
+            <a href="#" 
+                onclick="document.registration.nationality.value='PNA';
+                return false;">I prefer not to answer</a>
+        </ul>
+
+        <p></p>
+
+<span name="required" class="required">*</span>
+        In what country and state/province do you currently live?
+        <ul>
+            <table class="clean">
+            <tr>
+                <td>Country:</td>
+                <td> <input type="text" name="country" size="16" /></td>
+                <td>
+            <a href="#" 
+                onclick="document.registration.country.value='PNA';
+                return false;">I prefer not to answer</a>
+                </td>
+            </tr><tr>
+                <td>Province/state:</td>
+                <td><input type="text" name="state" size="16" /></td>
+                <td>
+            <a href="#" 
+                onclick="document.registration.state.value='PNA';
+                return false;">I prefer not to answer</a>
+                </td>
+            </tr>
+            </table>
+        </ul>
+               
+        <!-- Internet/search usage -->
+        <h2>Internet/search usage</h2>
+
+<span name="required" class="required">*</span>
+        How often do you use the internet on average?  This includes activities
+such as checking/sending email, shopping, using social networking sites, and
+browsing the Web.
+
+        <ul>
+            <input type="radio" name="internet_usage" value="ltOnceADay"/>
+                Less than once a day<br>
+            <input type="radio" name="internet_usage" value="onceADay"/>
+                Once a day<br>
+            <input type="radio" name="internet_usage" value="gtOnceADay"/>
+                Many times a day <br>
+            <input type="radio" name="internet_usage" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="internet_usage" value="default" checked 
+                class='hidden' />
+        </ul>
+
+        <p></p>
+
+<span name="required" class="required">*</span>
+         How often do you engage in  Web searches on average? This includes
+submitting searches to Web search engines such as Goolge, Yahoo!, Bing, as well
+as specialty sites, such as Amazon, Wikipedia, and YouTube.
+
+        <ul>
+            <input type="radio" name="web_search_usage" value="ltOnceADay"/>
+                Less than once a day<br>
+            <input type="radio" name="web_search_usage" value="onceADay"/>
+                Once a day<br>
+            <input type="radio" name="web_search_usage" value="gtOnceADay"/>
+                Many times a day <br>
+            <input type="radio" name="web_search_usage" value="pna"/>
+                I prefer not to answer <br>
+            <input type="radio" name="web_search_usage" value="default" checked 
+                class='hidden' />
+        </ul>
+
+        <p></p>
+
+    </span>    
+        <!-- Raffle -->
+        <h1>Raffle</h1>
+    
+                As a "thank you" for participating in this study, we will
+periodically select one active registrant at random and provide him or her with
+an on-line gift certificate.  If you prefer not to be part of that process,
+check below to opt out of the prize.
+
+        <ul>
+            <input type="checkbox" name="optOut" value="true"/>
+             I would like to opt out of the prize drawing.
+        </ul>
+
+        <p></p>
+
+        <!-- Referred by a friend -->
+        <h1>Referred by a friend</h1>
+
+        Where you referred by a friend to check out this study? If so,
+please enter the code they gave you here:
+        <ul>
+            Code: <input type="text" name="referrer" size="30" />
+        </ul>
+
+        <p></p>
+
+    </form>
+        <span class="buttonPanel" id="register_button_panel">
+<!--            <input type="Submit" value="Register"  name="register" disabled  -->
+            <span class="button disabled" id="register_button_disabled">
+                Register
+            </span>
+            <span class="button" id="register_button_enabled" 
+                onclick="
+                CROWDLOGGER.study.registration.submit(document, window);
+                CROWDLOGGER.study.launch_refer_a_friend_dialog( true ); 
+                return false;">
+            Register</span>
+        </span>
+
+    <p>
+
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

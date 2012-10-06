@@ -1,0 +1,7 @@
+README
+crowdlogger/web/html/experiments/
+
+To manage experiments, edit experiments.txt (or, in development,
+experiments_dev.txt). To 'turn the server on' (i.e., to indicate that
+experiments should be run), make sure the 'serverStatus' file contains the work
+'up'. To turn it off, replace 'up' with 'down'.

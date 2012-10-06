@@ -1,0 +1,381 @@
+/*
+ * Author:  Henry Feild
+ * File:    dialog.css
+ * Date:    29-Mar-2011
+ * Purpose: Provides style definitions for dialog pages.
+ *
+ * %%LICENSE%%
+ */
+
+
+
+body {
+    background-color:       lightsteelblue; 
+    height:                 100%;
+    padding-bottom:         10px;
+    /*width:                  850px;*/
+}
+
+body.welcome {
+    background-color:       white;
+    margin:                 0;
+    padding:                0;    
+}
+
+.welcome table, .welcome tr, .welcome td{
+    margin:                 0;
+    padding:                0;
+}
+
+.bodyWrapper {
+    width:                  800px;
+    border:                 1px gray solid;
+    margin-left:            auto;
+    margin-right:           auto;
+    margin-top:             20px;
+    margin-bottom:          30px;
+    background-color:       white;
+    padding-left:           20px;
+    padding-right:          20px;
+    padding-top:            30px;
+    position:               relative;
+}
+
+.uninstall .bodyWrapper {
+    width:                  350px;
+}
+
+
+.title {
+    float:                  left;
+}
+
+.titleMain{ 
+    font-size:              2.0em;
+    font-weight:            normal;
+    font-family:            sans-serif;
+    color:                  black;
+    /*font-style:             italic;*/
+    
+}
+
+.titleSmall{ 
+    font-size:              1.1em;
+    line-height:            8px;
+    padding-left:           60px;
+    font-style:             italic;
+    color:                  lightgray;
+}
+
+
+.titleSub{ 
+    font-size:              1.5em;
+    padding-left:           25px;
+    font-weight:            normal;
+    font-style:             italic;
+    color:                  lightgray;
+}
+
+.headerBuffer {
+    margin-bottom:          30px;
+}
+
+.content {
+    width:                  80%;    
+}
+
+.refreshLink {
+    float:                  right;
+    font-family:            sans-serif;
+}
+
+.refreshLink:hover {
+}
+
+a {
+    color:                  blue;
+    text-decoration:        underline;
+}
+
+.button {
+    background-color:       lightgray;
+    color:                  black;
+    border:                 1px steelblue solid;
+    padding:                4px;
+    display:                inline-block;
+    /*width:                  100%;
+    display:                table-cell;*/
+    text-align:             center;
+    height:                 100%;
+    vertical-align:         middle;
+}
+
+
+span.button:hover {
+    background-color:       lightsteelblue;
+    color:                  black;
+    cursor:                 pointer;
+}
+
+span.button:active {
+    background-color:       steelblue;
+    border-color:           white;
+}
+
+span.disabled {
+    background-color:       lightgray;
+    color:                  gray;
+    border:                 1px gray solid;
+    padding:                4px;
+    display:                inline-block;
+    text-align:             center;
+    vertical-align:         middle;
+    height:                 100%;
+}
+
+span.disabled:hover {
+    cursor:                 default;
+    background-color:       lightgray;
+    color:                  gray;
+    border:                 1px gray solid;
+
+}
+
+span.disabled:active {
+    cursor:                 default;
+}
+
+.buttonPanel {
+    text-align:             center;
+    display:                block;
+    margin-left:            auto;
+    margin-right:           auto;
+    height:                 1.5em;
+}
+.footer {
+    position:               absolute;
+    bottom:                 0;
+    width:                  100%;
+    margin-top:             25px;
+}
+.copyright{
+    position:               static;
+    margin-left:            auto;
+    margin-right:           auto;
+    font-size:              .8em;
+    font-style:             italic;
+    color:                  lightgray;
+    text-align:             center;
+}
+
+
+h1, h2 {
+    font-size:              1.3em;
+    font-family:            sans-serif;
+    font-weight:            normal;
+/*    width:                  80%;*/
+    border-bottom:          1px lightsteelblue solid;
+}
+
+h2 {
+    font-size:              1.1em;
+}
+
+h2 a {
+    text-decoration:        none;
+}
+
+.section {
+    margin-bottom:          25px;
+}
+
+.buffer {
+    height:                 100px;
+}
+
+td, tr, table {
+    margin:                 0px;
+}
+
+td {
+    padding-left:           3px;
+    padding-right:          3px;
+}
+
+tr:nth-child(even) {
+    background-color:       #EEE;
+}
+
+tr:nth-child(odd) {
+    background-color:       #FFF
+}
+
+.clean tr:nth-child(even) {
+    background-color:       #FFF;
+}
+
+.clean tr:nth-child(odd) {
+    background-color:       #FFF
+}
+
+
+.tools table {
+    margin-left:            auto;
+    margin-right:           auto;
+}
+
+tr.newMessage {
+/*    color:                  #FF9900;*/
+    color:                  #CC9900;
+}
+
+td.date {
+    width:                  90px;
+    vertical-align:         text-top;
+    font-style:             italic;
+}
+
+.alert {
+    width:                  16px;
+    background-image:       url("img/notification.png");
+    background-repeat:      no-repeat;
+    background-position:    center; 
+}
+
+.emptyFooter {
+    height:                 30px;
+}
+
+.cleared {
+    color:                  gray;
+    font-style:             italic;
+}
+
+
+
+.alreadyRegistered {
+    color:                  red;
+}
+
+.required {
+    color:                  red;
+}
+
+.note{
+    font-style:             italic;
+    color:                  gray;
+}
+
+.post_registration {
+    border:                 2px steelblue solid;
+    padding:                5px;
+    display:                block;
+    margin-bottom:          20px;
+}
+
+.emailBox{
+    width:                  100%;
+    height:                 400px;
+    margin-left:            auto;
+    margin-right:           auto;
+}
+
+.alertMessage {
+    color:                  red;
+}
+
+.hidden {
+    display:                none;
+}
+
+span.date {
+    font-weight:    bold;
+}
+
+span.messageSummary {
+    color:          gray;
+}
+
+
+.update_message {
+    /*font-weight:            bold;*/
+    text-size:              1.1em;
+    color:                  steelblue;
+    padding:                10px;
+    border:                 2px orange solid;
+}
+
+.consentBody
+{
+    height:                 auto; /*300px;*/
+    width:                  780px;
+    overflow:               visible;
+    border:                 steelblue 1px solid;
+    padding:                5px;
+}
+
+
+
+
+.click, .click a {
+    color:                  maroon;
+}
+
+
+.search, .search a {
+    color:                  #C35617; 
+}
+
+.serpClick, .serpClick a {
+    color:                  steelblue;
+}
+
+.search .searchEngine, .search .searchEngine a {
+    font-size:              7pt;
+    color:                  gray;
+    font-style:             italic;
+}
+
+td.search {
+    padding-left:           10px;
+}
+
+td.click, td.serpClick {
+    padding-left:           15px;
+}
+
+.searchTrails tr:nth-child(even),
+.searchTrails tr:nth-child(odd)  {
+    background-color:       transparent;
+}
+
+
+.searchTrails .time {
+    color:                  gray;
+    text-align:             right;
+    font-style:             italic;
+}
+
+
+.searchTrails .date {
+    padding-top:            50px;
+    font-size:              1.3em;
+    color:                  steelblue;
+    border-bottom:          2px steelblue solid;
+}
+
+#log-area {
+    font-family:    fixed-width, courier, "courier new";
+    overflow:       auto;
+    white-space:    nowrap;
+    font-size:      10pt;
+    border:         1px lightgray solid;
+}
+
+.inProgress {
+    color: #ffcc66;
+}
+
+.success {
+    color: darkgreen;
+}

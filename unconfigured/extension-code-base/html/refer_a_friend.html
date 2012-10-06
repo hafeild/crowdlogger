@@ -1,0 +1,195 @@
+<!--
+ File:      refer-a-friend.html
+ Author:    Henry Feild
+ Date:      29-Mar-2011
+ Purpose:   Allows users to refer users. 
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>%%PROJECT_NAME%% Refer-a-friend Page</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        // In FF, launches a custom event (crowdlogger_status_page_refresh) that
+        // the %%PROJECT_NAME%% extension is listening for. In Chrome, refreshes
+        // via the CROWDLOGGER object directly.
+        function refresh_page(){
+            if( CROWDLOGGER !== undefined ){
+                
+                //CROWDLOGGER.gui.study.pages.refresh_status_page(document);
+            }
+                /*
+                var refresh_event = document.createEvent( "Event" );
+                refresh_event.initEvent( "crowdlogger_status_page_refresh", 
+                    true, false);
+                refresh_event.doc = document;
+                document.dispatchEvent( refresh_event );
+                */
+        }
+
+        // Checks if this page has been initialized yet.
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ){
+/*                alert( init_elm.innerHTML );
+                if( init_elm.innerHTML === "" ){
+                    var form = document.forms['auto_emails'];
+                    var form_elms = [form.sender, form.emails];
+                    if( CROWDLOGGER.preferences.get_bool_pref( 
+                            "registered", false ) ){
+                        for( input in form_elms ){
+                            input.disabled = false;
+                            alert( input );
+                        }
+                    }
+                    init_elm.innerHTML = "done";
+                }
+*/
+            }
+
+            var use_server_email = %%USE_SERVER_EMAIL%%;
+            if( use_server_email  ) {
+                document.getElementById("email_disabled").style.display="none";
+            } else {
+                document.getElementById("email_enabled").style.display="none";
+                document.forms['auto_email'].style.display = "none";
+            }
+
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+    -->
+    </script>
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Refer-A-Friend Page</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%FULL_PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+        <span class="refreshLink">
+            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+        </span>
+    </div>
+    
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <div id="post_registration" class="post_registration hidden">
+        Thank you for registering or updating your registration.
+        Don't forget that you can refer friends to this study. This has two
+        benefits: 1) we get more participants and 2) it will boost your 
+        chances of winning the weekly raffles.
+    </div>
+
+    <span id="not_registered_alert" class="hidden alertMessage">
+        You must be registered before you can refer friends.
+    </span>
+
+    <span id="email_enabled">
+    To refer your friends or colleagues, please enter their email addresses and
+your name (to be used as a signature). We do not store any of this
+information&mdash;it is strictly for sending out the emails. Alternatively, you can use the copy function at the bottom of this page to copy the email below to your clipboard, and then send emails out yourself.
+    </span>
+    <span id="email_disabled">
+        To refer a friend, please copy the email below and email.
+    </span>
+
+
+ If your friend(s) register using this referral code, you will receive some
+extra chances of winning the raffle (if you participate).
+
+    <p> 
+
+Note: you can see this screen at any time by going to "Refer-a-friend" in the %%PROJECT_NAME%% menu.
+
+    <p>
+
+    <form name="auto_email">
+        <span class="hidden inProgress" id="sending">Sending to: <span id="cleaned_emails"></span>...<br></span>
+        <span class="hidden alertMessage" id="missingName">Please fill in the name field.<br></span>
+        <span class="hidden alertMessage" id="missingEmails">Please provide at least one email.<br></span>
+        <span class="hidden success" id="success">Emails sent successfully to: <span id="successful_emails"></span><br></span>
+        <span class="hidden alertMessage" id="failure">There was a problem sending the emails; please check your list of emails and try again later.<br></span>
+        <span class="hidden alertMessage" id="custom_failure"><br></span>
+
+        <table>
+        <tr>
+            <td>Your name:</td>
+            <td><input type="text" name="sender"</td>
+        </tr><tr>
+            <td>Friends' emails*:</td>
+            <td><textarea name="emails" cols="50" rows="3"></textarea></td>
+        </tr>
+        </table> <br>
+
+        <div class="buttonPanel">
+            <span class="button" onclick="CROWDLOGGER.gui.study.pages.send_auto_email(document, document.forms.auto_email);">Send</span>
+        </div>
+
+        <br>
+
+        <span class="note">(* Emails should be separated by commas; you can use the same format you would use in an email client, e.g., <tt>"%%PROJECT_NAME%%" &lt;info@crowdlogger.org&gt;, "Hank" &lt;hfeild@crowdlogger.org&gt;, nobody@nowhere.com</tt>)</span>
+
+    </form>
+    <p>
+
+    <form name="email">
+        This is what the email will look like (with [your name] filled in):<br>
+        <textarea class="emailBox" name="email_box"></textarea>
+    </form> 
+
+    <div class="buttonPanel">
+        <span class="button" onclick="CROWDLOGGER.util.copy_to_clipboard(document.forms.email.email_box);">Copy to clipboard</span>
+    </div>
+
+    <p>
+
+    <!-- This has the text we want to display. It's in a hidden block so that
+         the user can't see it, but our javascript still has access to it.
+    -->
+    <span class="hidden">
+        <span id="message">
+Message goes here.
+
+    Code:  ADD_CODE_HERE
+
+-[your name]
+        </span>
+    </span>
+
+    <div class="header">
+        <span class="refreshLink">
+            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+        </span>
+    </div>
+
+ 
+    <div class="buffer">
+    </div>
+    
+   
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

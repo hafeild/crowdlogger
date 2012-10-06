@@ -1,0 +1,33 @@
+README
+crowdlogger/web/
+
+The subdirectories are as follows:
+
+    html/
+        These are the html and php files that should be publicly available.
+        E.g., you could stick these in /var/www/html/.
+
+    scripts/
+        Scripts to help out with things.
+        
+
+    include/
+        Contains the php scripts that list secret things, like the MySQL
+        password and db/table names. This should *NOT* be put in a public
+        space. Ideally, it should be owned by a dummy apache user, but
+        placed outside of where it can be directly viewed.
+
+
+One thing you might do is copy this web/ directory to /var/www/, so you'd get
+a directory structure like:
+
+    /var/www/
+        html/ 
+        include/
+        scripts/
+
+
+Make sure that you see ../setup/db_create.mysql to see how to create the
+database.
+
+

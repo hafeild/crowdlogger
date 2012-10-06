@@ -1,0 +1,671 @@
+SETUP
+crowdlogger/setup/
+
+There are three things to set up:
+
+    1. Extension environment
+    2. Main web enviornment (assorted php/html)
+    3. Experiment server (Java)
+    4. Running experiments
+
+We'll cover each in turn.
+
+
+################################################################################
+
+PREFACE
+################################################################################
+
+1. We will assume in all of the documentation that the name of the git clone
+(or export) is: crowdlogger/
+
+2. To override configuration settings, make a new configuration file:
+
+    crowdlogger/conf/override.conf
+
+Add your settings to this. 
+
+
+
+
+################################################################################
+
+CONFIGURATION
+################################################################################
+All of the remaining sections in this document will tell you to run the
+configuration. Here's a quick summary of how to do this and what is happening.
+
+Configuration is a fairly straight forward process: the
+crowdlogger/unconfigured/ directory is copied to a directory called
+crowdlogger/configured/ -- if this directory already exists, it is deleted --
+then all of the variables listed in crowdlogger/config/defaults.conf and
+crowdlogger/config/override.conf (if it exists; if it does, its values
+overwrite values in the defaults.conf file) are replaced with their values in
+the file within the crowdlogger/configured/ directory.
+
+To perform configuration, you can run the configur.rb script. Assuming you
+want the default options, do:
+
+    %> cd crowdlogger/
+    %> ruby scripts/configure.rb ## Requires Ruby >= 1.9
+
+This will generate
+a directory called 'configured', which all the same sub-directories as
+'crowdlogger/unconfigured/'.
+
+You can also specify a different input, output, or configuration directory.
+Try  `ruby scripts/configure.rb -h` to see more options.
+
+
+
+
+################################################################################
+
+EXTENSION ENVIRONMENT
+################################################################################
+
+To set up the extension environment, you need to do three things:
+
+    1. Configure your settings, namely the web and
+       experiment server urls. THIS INCLUDES GENERATING RSA PUBLIC/PRIVATE
+       KEYS -- VERY IMPORTANT FOR CROWDLOGGING EXPERIMENTS.
+    2. Modify default preference if they are not already handled.
+    3. Generate a Chrome .pem file to sign your extension.
+    4. Building extension files.
+
+Then you can generate your extension files.
+
+
+Configure Firefox & Chrome
+--------------------------
+The main settings you need to worry about are in:
+
+    crowdlogger/conf/defaults.conf
+
+To override these, make a new file called
+
+    crowdlogger/conf/override.conf
+
+The main variables of interest are:
+
+LICENSE
+    This text will be added to the top of most source files.
+
+LICENSE_WEB
+    This will be seen at the bottom of most HTML pages.
+
+VERSION
+    The current version.
+
+PROJECT_NAME
+    The project name; what you want to call the extension, e.g. CrowdLogger.
+
+FULL_PROJECT_NAME
+    The full project name, e.g., The CrowdLogger Project.
+
+EXTENSION_FILE_NAME
+    The name you plan to give to your xpi and crx files, e.g., CrowdLogger.
+
+DESCRIPTION
+    A description to appear in the Firefox and Chrome installation manifests.
+
+CREATOR
+    This is added to the Firefox install.rdf file.
+
+HOMEPAGE
+    The homepage to add to the Firefox/Chrome  manifests.
+
+ID
+    An id in the Firefox install.rdf file.
+
+FF_MIN_VERSION
+    The minimum Firefox version that the extension is compatible with.
+
+FF_MAX_VERSION
+    The maximum Firefox version that the extension is compatible with.
+
+SERVER_BASE_URL
+    **IMPORTANT** This is the base url where the extension will look for
+    server communications. This should point to the url of the
+    crowdlogger/web/html directory.
+
+USE_SERVER_EMAIL
+    Should be either 'true' or 'false'. If 'true', then the interface for
+    referring friends to the project will be activated.
+
+EMAIL_SUBJECT
+    If you set USE_SERVER_EMAIL, then this specifies what the email subject
+    should be.
+
+EMAIL_FROM
+    If you set USE_SERVER_EMAIL, then this specifies what the 'from' and
+    'reply-to' email addresses should be.
+
+ANONYMIZERS
+    **IMPORTANT** If you plan to use the experiment feature, then you need to
+    specify where the anonymizers are. This should be a comma separated list
+    of quoted urls. Each should correspond to the url of an anonymizer, which
+    you can find the the crowdlogger/server-web-app/ directory (we'll cover
+    this more later on).
+
+    Later on, you will be shown how to set up the Java experiment server. This
+    involves installing a Java web server like Tomcat on one or more servers
+    and uploading a WAR file to it. This starts a service on that machine,
+    usually on port 8080. The name of the CrowdLogging component is:
+    crowdlogger/deposit.
+
+    For example, if you have the servers:
+    
+        http://myserver1.org
+        http://myserver2.org
+        http://myserver3.org
+
+    and you have set up your Java web server (e.g., Tomcat) in a default
+    manner, then you would set the 'ANONYMIZERS' preference as follows:
+
+        ANONYMIZERS = "http://myserver1.org:8080/crowdlogger/deposit", "http://myserver2.org:8080/crowdlogger/deposit",  "http://myserver3.org:8080/crowdlogger/deposit"
+
+PUBLIC_KEY
+    **IMPORTNAT** If you plan to use the experiment feature, then you need to
+    generate an RSA public/private key pair. We'll explain this more next.
+
+For the public_key, you must have public and private RSA keys. Here's how
+you generate them (see http://ciir.cs.umass.edu/~hfeild/ssss/ for an example).
+Make sure you have openssl installed. This assumes you're doing things in
+a terminal:
+
+Step 1: Generate a private key
+==============================
+
+    %> openssl genrsa -out private.pem 2048
+    enerating RSA private key, 2048 bit long modulus
+    ........+++
+    ..+++
+    e is 65537 (0x10001)
+    $ cat private.pem
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEAr...
+    ...
+
+Now you have a file private.pem.
+
+Step 2: Generate a public key for the private key
+=================================================
+
+    %> openssl rsa -in private.pem -pubout
+    writing RSA key
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0V86BxxU+giF0s0fxJW
+    unDad/NUFUqfiStGhREbb6u5TvTbWMyDbCW8Xj/WMC+qZoGD0eLi0NhGSMnqn+4A
+    dQGnSRdtXePIq+1o784/RjsHgTjKqgh685iiAeSfWYrMth3KMS5GPKjCC7egsGHg
+    B7Lvu2XvXfnyMiVAI5fxx1UKPPHl4IpUlSXb9Uqia5rVurDbQuICk4DEK21POtvU
+    C5wqnkc1OY//SSHeU6aKvVupaGbo6jv3FM178mByX9Q6jJUoyVvtYcxYCg3eeLzN
+    uUz+IKepUZZauyUNSo321rTIiibbLyQNloUeZIgYynR20EPuPDExN96s1eG8RMn4
+    IwIDAQAB
+    -----END PUBLIC KEY-----
+
+This doesn't save to anywhere, so you'll have to copy it from the terminal.
+Also, jut so we're all on the same page, both of these keys are random (well,
+the public key relies on the private key), which means that everytime you
+issue these commands, you'll get different values. Note that the public key
+will ONLY work for the private key you gave as input.
+
+
+Step 3: Update the PUBLIC_KEY config variable
+=============================================
+
+Take the public key and convert it into on long string. Then set the
+'PUBLIC_KEY' config option to this. For example, using the public key generated
+above, this would be:
+
+    PUBLIC_KEY = MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0V86BxxU+giF0s0fxJWgunDad/NUFUqfiStGhREbb6u5TvTbWMyDbCW8Xj/WMC+qZoGD0eLi0NhGSMnqn+4AgdQGnSRdtXePIq+1o784/RjsHgTjKqgh685iiAeSfWYrMth3KMS5GPKjCC7egsGHggB7Lvu2XvXfnyMiVAI5fxx1UKPPHl4IpUlSXb9Uqia5rVurDbQuICk4DEK21POtvUgC5wqnkc1OY//SSHeU6aKvVupaGbo6jv3FM178mByX9Q6jJUoyVvtYcxYCg3eeLzNguUz+IKepUZZauyUNSo321rTIiibbLyQNloUeZIgYynR20EPuPDExN96s1eG8RMn4gIwIDAQAB
+
+Hold on to your private key -- keep it somewhere safe, not necessarily on you
+web server. You'll need this to decrypt the results from CrowdLogging
+experiments.
+
+
+Set default preferences
+-----------------------
+The default preferences are located in: 
+
+    crowdlogger/unconfigured/extension-code-base/js/preferences.defaults.js
+
+The automatic configuration process takes care of certain parts of this file
+(and a couple other .js files). If you need to add a new preference that is
+not covered by the configuration file and is not already present in the
+preferences.defaults.js file, then that file is where you'd add it.
+
+
+You can add additional preferences and you can override existing ones. Users
+are able to edit these (they have to be pretty savvy to know how, but it's
+possible nonetheless). Also, some preferences are set by the extension or via
+settings specified by the user. In light of that, if you need to override one
+of these, set the version number next to it to the newest release (that is,
+the release in which it will be reset).
+
+
+Generate a Chrome .pem file
+---------------------------
+First, configure things -- see the section: CONFIGURATION. Next, you need to
+create a copy of the crowdlogger/configured/chrome-extension/ directory, since
+the original contains symlinks that will throw off Chrome. In crowdlogger, do
+(this assumes we're in the 'crowdlogger/' directory):
+
+    %> rm -rf chrome_tmp && cp -RL configured/chrome-extension chrome_tmp
+
+In Chrome, click the wrench and select "Tools" -> "Extensions". Once there,
+click "Developer mode" to view the developer tools. There should be a button
+or option to "Pack extension". Click that. Select the crowdlogger/chrome_tmp 
+directory. Leave the "Private key file" box empty. Now you should have a file
+called:
+
+    crowdlogger/chrome_tmp.pem
+
+Go ahead and rename this chrome-extension.pem. That's all there is to this
+step.
+
+
+
+Generate extension files
+------------------------
+The current scripts only work on OS' that support symlinks, i.e., everything
+but Windows. The fix is simple, but I haven't implemented it yet.
+
+For Firefox, we're going to generate an XPI file. In crowdlogger/, do:
+
+    %> ./scripts/genXPI.sh configured/firefox-extension CrowdLogger
+
+That will produce CrowdLogger.xpi. For Chrome, we're going to generate a CRX
+file. In crowdlogger/, do:
+
+    %> ./scripts/genCRX.sh configured/chrome-extension \
+            chrome-extension.pem CrowdLogger
+
+That will produce CrowdLogger.crx. Note that we had to pass in the .pem file.
+NOTE: You will want to make the file name the same as the value you set for
+EXTENSION_FILE_NAME in the config files.
+
+To upload these to the web server (we'll talk about the web server next),
+copy the xpi and crx files to the server (anywhere) and then run the following
+script from within the base web directory:
+
+    %> bash scripts/updateCrowdLogger.sh \
+            <html dir> <in dir> <old version> <new version>
+
+This will search <in dir> for your extension files (same name as sepcified
+by EXTENSION_FILE_NAME) and will place them in the correct place with in
+the <html dir>: <html dir>/updates/{chrome,ff}/latest. It also will update
+the <html dir>/download.html file with the newest versions.
+
+You can place a change log in <html dir>/updates/changelog/<version>.
+
+
+Notes for developing with Chrome and Firefox
+--------------------------------------------
+- For Firefox, you should first create a new profile:
+
+    %> firefox -ProfileManager -no-remote
+
+Pick a name for the new profile, say "crowdlogger-dev". Once Firefox starts
+up, go to "Help"->"Troubleshoot"; in there should be a way of displaying your
+profile directory. Close Firefox and navigate to your profile directory.
+Inside should be a directory called 'extensions/' -- if it doesn't exist,
+create it. Inside, add a file called 'crowdlogger@crowdlog.org' (or whatever
+you want to call it). Edit the file and type out the path to your configured
+extension directory. In Windows, this will probably suck b/c it doesn't know
+what a symbolic link is. I don't use Windows, so you're on your own. Now
+restart Firefox and your extension should appear. Everytime you make a change
+to the javascript or XUL base that you'd like to check out, restart Firefox
+(there are extension available to restart quickly, so take a look). Most html
+files don't require that you restart, so keep that in mind.
+
+See
+https://developer.mozilla.org/en/Setting_up_extension_development_environment
+for more info.
+
+- For Chrome, you can load an extension from an unpacked directory. First,
+you need to copy the crowdlogger/chrome-extension/ directory because it
+contains symlinks and Chrome can't handle them. So, on unix systems, do
+this (in crowdlogger/):
+
+    %> rm -rf chrome_tmp && cp -RL configured/chrome-extension chrome_tmp
+
+Now, in Chrome go to the wrench and click "Tools" -> "Extensions". Click the 
+"Developer mode" link to expose the developer tools. One of the options that
+will appear is "Load unpacked extension". Now select the chrome_tmp directory.
+Every time you make a change to the code base that you want reflected, include
+to html files, run the rm/cp command above and then click "Reload" under the 
+extension name in Chrome's extensions view.
+
+NOTE: Any time you change the values of variables in the config directory,
+you will need to run the configuration script again.
+
+
+################################################################################
+
+MAIN WEB
+################################################################################
+
+There are four parts here:
+
+    1. Set up the database on the server.
+    2. Add the database access information to the config file
+    3. Add content for certain web pages (i.e., consent.html and 
+       study-ad.html).
+    4. Configure
+    5. Copy the crowdlogger/web/ directory to the server.
+
+The database
+------------
+
+On the serer, assuming you have sudo access, set up the database. First,
+if there is no database, do:
+
+    %> sudo mysql_install_db
+    %> cd /usr ; /usr/bin/mysqld_safe &
+    %> /usr/bin/mysqladmin -u root password 'ADD A PASSWORD HERE'
+    %> mysql -u root -p
+    [enter password]
+    mysql> create database userInfo;
+
+
+Next, create the tables. We have supplied these in 
+crowdlogger/setup/db_create.mysql.
+
+    %> mysql -u root -p userInfo < crowdlogger/setup/db_create.mysql
+    [enter password]
+
+(this should prompt you for the password you just added up above).
+
+Now you need to grant permission for a particular user on the local server
+with a password. This is how the PHP scripts will access the database:
+
+    %> mysql -uroot -p
+    [enter password]
+    mysql> grant select, insert, update, delete, lock tables on userInfo.* to
+     -> USERNAME@127.0.0.1 identified by 'PASSWORD';
+
+Where you select USERNAME and PASSWORD. You should be all set on the database
+now.
+
+
+Add database info to the config file
+-------------------------------------
+**IMPORTANT**: In the config/override.conf file, set the DB_USER_NAME and
+DB_PASSWORD accordingly.
+
+
+Add content to crowdlogger/web/html/{study-ad,consent}.html
+-----------------------------------------------------------
+These two files contain information that is too specific to the user study
+we are (or were, depending on when you're reading this) running at UMass
+Amherst. Thus, we've removed the content of these files and you should feel
+free to add your own. You can edit either the unconfigured or the configured
+versions. If you edit the unconfigured, then the configuration process will
+honor your changes. However, if you update from the CrowdLogger repository,
+you may have to manually merge changes with files that you've updated if they
+overlap with changes the contributors have made.
+
+
+Configure
+---------
+Run the configuration script. See the CONFIGURATION section.
+
+
+Copy the crowdlogger/web/ directory to the server
+-------------------------------------------------
+The optimal place to stick these files is in /var/www/. So, for example:
+
+    %> scp -r crowdlogger/web/ <server>:/var/www/
+    
+On the remote server, you should see the following structure:
+
+    %> ls -1 /var/www/
+    html/
+    include/
+    scripts/
+
+The scripts in html/ and scripts/ use relative paths to include/db.php. If you
+change this, edit the file:
+
+    crowdlogger/web/html/import.php
+
+so that $include is set to the proper directory.
+
+Note that you need to have PHP5 and MySQL running in order for these services
+to work.
+
+
+
+################################################################################
+
+JAVA EXPERIMENT SERVER
+################################################################################
+
+The Java experiments server is responsible for two things. It represents
+anonymizer nodes and the master node used during CrowdLogging experiments.
+The gist is, when a users run an experiment, such as extracting queries from
+their search logs, each encrypts the _artifact_ in two ways. The inner layer
+is a special encryption based on Shamir Secret Sharing -- this mandates that
+the inner layer of encryption can only be removed if the decryptor has a
+sufficient number of keys, i.e., that the artifact was extracted by a sufficient
+number of distinct users. The outer layer is just RSA public/private key 
+encryption.
+
+Once the artifact is encrypted, it is randomly uploaded to one of several
+anonymizers. Each anonymizer will then send the artifact to another anonymizer,
+or, with some probability, to the master server. The outer layer of encryption
+prevents the anonymizers from learning anything about the data. The use
+of anonymizers prevents the master server from knowing where the artifacts
+originated. 
+
+The Java code takes care of that. It also has classes for aggregating and
+decrypting artifacts, removing the outer layer of encryption for all
+artifacts and removing the inner layer when possible. We'll talk about that
+at the end.
+
+This portion of the project should really use Maven, which takes care of
+Jars. However, for now there is a bash script that will fetch all of the
+dependencies. It lists them, too, so you can get them manually if need be.
+
+Here are the steps:
+
+    1. Set urls
+    2. Get jars
+    3. Build WAR
+    4. Install Tomcat (or equivalent)
+    5. Install WAR
+    6. Aggregate/decrypt artifacts
+
+
+1. Set the anonymizer and master node URLs and write path
+----------------------------------------------------------
+If you have set the ANONYMIZER variable in the config file, do that now. 
+See the "Configure Firefox & Chrome" section for info about that variable.
+
+You also need to set a few other variables:
+
+MASTER_SERVER
+
+MAX_EARTIFACTS_PER_FILE
+    The number of artifacts, roughly, to write per output file. If a file is
+    full, another will be created with an incremented number at the end, e.g.,
+         eartifacts.<date>.001
+         eartifacts.<date>.002
+         ...
+
+EARTIFACT_WRITE_FILE
+    This the absolute path to the directory where you would like the encrypted
+    artifacts to be written. You need to have write access to the directory.
+    Java web servers have the permissions of the user that started the server.
+    For security reasons, it probably makes the most sense to run it under
+    your own user name rather than root. 
+
+
+Once these are set, you can configure the direcotry (see the CONFIGURATION
+section).
+
+
+2. Get the jars
+----------------
+Run the bash script:
+
+    %> crowdlogger/configured/server-web-app/scripts/get-jars \
+            crowdlogger/configured/web-server-app/
+
+That will download all of the necessary jars.
+
+
+
+3. Build WAR
+-------------
+Now, build the web-application arhive (WAR) file like this:
+
+    %> cd crowdlogger/configured/server-web-app/
+    %> ant
+
+That will create two files:
+
+    crowdlogger.war
+    crowdlogger.jar
+
+The first is used for the actual web application (see step 5. below). The jar
+is necessary for the artifact aggregation (see step 6. below).
+
+
+4. Install Tomcat 
+-----------------
+See crowdlogger/configured/server-web-app/README for this information.
+
+
+5. Install WAR
+--------------
+See crowdlogger/configured/server-web-app/README for this information.
+
+
+6. Aggregate/decrypt artifacts
+------------------------------
+Once an experiment has been run, you should find some files in the write 
+directory on the master server. For ease of explanation, assume that the
+master server is: 
+
+    myserver4.org
+
+and the write directory is:
+
+    /experiment-logs/
+
+That means that we should see files in myserver4.org:/experiment-logs/ that
+look something like:
+
+    eartifacts.11-Jul-2011.001
+    eartifacts.11-Jul-2011.002
+    eartifacts.11-Jul-2011.003
+    eartifacts.12-Jul-2011.001
+
+
+What do these mean? First, 'eartifacts' stands for 'encrypted artifacts'.
+Second, the date tells you the day the data was written -- all eartifacts 
+recieved on <date> will be in a file called eartifacts.<date>.<part>. Third,
+the <part> porition is determined by the total number of eartifacts received.
+Each file will only store roughly 250,000 eartifacts. If the current file
+is full, a new one is created.
+
+These files can contain artifacts from any number of CrowdLogger experiments.
+In order to sort things out and properly aggregate, you need the aid of
+the aggregator.
+
+Copy they eartifact files to wherever you would like to decrypt them. In order
+to decrypt them, you need access to:
+
+    1. the compiled crowdlogger/configured/server-web-app/ directory
+    2. the eartifact files
+    3. the private key file for which the eartifacts were encrypted
+
+Lets say that you create the directory crowdlogs and copy the eartifact files
+there. now run:
+
+    %> crowdlogger/configured/server-web-app/scripts/slog2clog.sh \
+            private.pem crowdlogs crowdlogs/eartifacts*
+
+(note: the name stands for 'server log to crowdlog'). This may take a while,
+but eventually, the logs will be decrypted and you will one file per
+experiment with the naming scheme:
+
+    <experiment name>.clog
+
+The <experiment name> is the name given on the web server in
+crowdlogger/web/html/experiments/experiments.txt. The clog format uses JSON.
+To make it human readable, use the clog2html.rb script. Note that this
+requires that you have Ruby 1.9.1 installed; we'll convert this to Java or
+Scala in the future:
+
+    %> crowdlogger/configured/server-web-app/scripts/clog2html.rb \
+            <clog1> [<clog2>...]  > clog-summary.html
+
+This will generate an html file, which we're storing in clog-summary.html,
+that consists of a summary of each of the given crowdlogs.
+
+
+
+################################################################################
+
+RUNNING EXPERIMENTS
+################################################################################
+
+Experiments are defined in the extension file:
+
+    crowdlogger/unconfigured/extension-code-base/js/experiments.artifact_extractors.js
+
+There are currently 5 available experiments (see the CROWDLOGGER.experiments.artifact_extractors.extractors object in the file listed above to see if more have
+been added since this writing):
+
+    query_pair
+        Mines pairs of adjacent queries; queries are term-order normalized.
+    query
+        Mines individual queries, which are term-order normalized.
+    query_simple_norm
+        Same as query, but only case and space conflates (i.e., not term
+        order normalization).
+    query_url
+        Mines query -> click pairs (query is term-order normalized).
+    query_visit
+        Mines query -> url visit pairs (query is term-order normalized).
+        How does this differ from query_url? These visits include any
+        pages clicked between when a query is issued and the next time
+        a query is issued or the session runs out (26 minutes of inactivity).
+
+
+Before you run your experiment, make sure that your server web app (i.e.,
+Tomcat) is up and running. 
+
+To run an experiment, you need to head over to your web server (the one with
+the php files) and edit:
+
+    web/html/experiments/experiments.txt
+    web/html/experiments/serverStatus
+
+The first file needs to be filled out. See the example that is in there.
+Job ids should be unique. The start and end dates need to be set properly.
+Finally, the second to last column (which is usually the last column...the
+true last column isn't really used) should be set to name of the exact artifact
+extractor you would like to use, e.g.:
+
+    query_pair
+
+Once you have this the way you want it, edit the scond file. Theis file should
+have only the text "up" inside:
+
+    %> echo "up" > web/html/experiments/serverStatus
+
+The users will be notified that an experiment is pending and then they'll run
+them. You should start to see artifacts pooring into the write directory on
+the MASTER_SERVER.
+
+NOTE: There is a small bug in the anonymizer code that results in some
+artifacts being duplicated. This doesn't violate any privacy mechanisms, but
+it will inflate the number of uploaded artifacts. You can run your slog files
+though `sort -u` first to get rid of these cases. A fix will be forthcoming.
+
+

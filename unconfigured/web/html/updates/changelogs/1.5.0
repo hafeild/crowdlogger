@@ -1,0 +1,5 @@
+<ul>
+    <li>Most status page notification now have a 'dismiss' button</li>
+    <li>Dismissing notifications or clicking on experiments to run will now remove just that notification without refreshing the entire status page</li>
+    <li>The experiment statistics section of the status page auto refreshes every 5 seconds</li>
+</ul>

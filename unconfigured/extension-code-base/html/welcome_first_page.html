@@ -1,0 +1,98 @@
+<!--
+ File:      welcome_first_page.html
+ Author:    Henry Feild
+ Date:      06-Apr-2011
+ Purpose:   This is the page that will be displayed as the first screen in the
+            welcome wizard.
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>%%FULL_PROJECT_NAME%%&mdash;Welcome!</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when the page loads, after the CROWDLOGGER object is found.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ){
+                if( init_elm.innerHTML === "" ){
+                }
+            }
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+    -->
+    </script>
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <!--
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain"></span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+    -->
+
+    <!-- Brings us down to just below the title. -->
+    <!--
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+    -->
+
+    <h1>Getting started</h1>
+    <span id="new_install">
+
+    Welcome and congratulations! You have successfully installed the newest
+version of %%PROJECT_NAME%%. There are a few more things we
+need for you to get started using the logger. This wizard will take you
+through those steps.
+
+    <p></p>
+
+    The steps include, among other things, giving consent to participate in our study, registering, and setting some initial preferences. If this is an upgrade as opposed to a fresh install, some of these steps may be skipped, such as showing you the consent form.
+
+    <p></p>
+    </span>
+
+    <span id="update" class="hidden">
+    Thank you for upgrading to the latest version of %%PROJECT_NAME%%. We would like to take this opportunity to have you update your registration and preferences. If there is a new version of the consent form, we ask you take a look at it, as well.
+    <p></p>
+    </span>
+
+    <h1>Next step</h1>
+
+    To proceed, simply click the "Continue" button above.
+
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+            %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

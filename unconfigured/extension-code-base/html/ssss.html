@@ -1,0 +1,180 @@
+<!--
+ File:      ssss.html
+ Author:    Henry Feild
+ Date:      06-Apr-2011
+ Purpose:   A test bed for Shamir's Secret Sharing Scheme.
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>Shamir's Secret Sharing Scheme</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/external_lib/bignumber.js"></script>
+    <script src="../js/external_lib/pidcrypt/jsbn.js"></script> 
+    <script src="../js/external_lib/pidcrypt/pidcrypt.js"></script> 
+    <script src="../js/external_lib/pidcrypt/pidcrypt_util.js"></script> 
+    <script src="../js/external_lib/pidcrypt/sha1.js"></script> 
+    <script src="../js/external_lib/pidcrypt/sha256.js"></script> 
+    <script src="../js/external_lib/pidcrypt/md5.js"></script> 
+    <script src="../js/external_lib/pidcrypt/aes_core.js"></script>
+    <script src="../js/external_lib/pidcrypt/aes_cbc.js"></script>
+    <script src="../js/external_lib/pidcrypt/asn1.js"></script>
+    <script src="../js/external_lib/pidcrypt/rng.js"></script>
+    <script src="../js/external_lib/pidcrypt/prng4.js"></script>
+    <script src="../js/external_lib/pidcrypt/rsa.js"></script>
+    <script src="../js/ssss.js"></script>
+
+    <script>
+    <!--
+        
+        function compute_ssss(){
+            var form = document.forms.ssss;
+            var primary_data = form.primary_data.value;
+            var secondary_data = form.secondary_data.value;
+            var n = parseInt( form.n.value );
+            var k = parseInt( form.k.value );
+            var k_prime = parseInt( form.k_prime.value );
+            var job_salt = form.job_salt.value;
+            var job_id = form.job_id.value;
+            var passphrase = form.passphrase.value;
+
+
+            //form.output.value = CROWDLOGGER.secret_sharing.string_to_bin(input);
+            var data = CROWDLOGGER.secret_sharing.generate_shares( 
+                primary_data, secondary_data, n, k, job_salt, job_id, 
+                passphrase );
+
+            form.output_shares.value = JSON.stringify( data.shares );
+
+            form.output_user_share.value = data.user_share_index;
+
+            form.output_password.value = data.password;
+
+            form.output_primary_cipher_text.value = data.primary_cipher_text;
+            form.output_secondary_cipher_text.value = data.secondary_cipher_text;
+
+
+            // Just to test, try reconstructing the intercept using k shares.
+            var used = [];
+            var xy_pairs = [];
+            for( var i = 0; i < k_prime; i++ ){
+                var index;
+                do{
+                    index = Math.round(Math.random()*(data.shares.length-1));
+                } while( used[index] === 1 );
+
+                used[index] = 1;
+                xy_pairs[i] = data.shares[index]; //[data, data.shares[index]];
+            }
+            var intercept = CROWDLOGGER.secret_sharing.lagrange_interpolate( 
+                    xy_pairs );
+            form.reconstructed_intercept.value = intercept;
+
+            form.for_server.value = JSON.stringify(
+                CROWDLOGGER.secret_sharing.encrypt_for_server( data,
+                    CROWDLOGGER.secret_sharing.PUBLIC_KEY ));
+
+            form.output_shares_used_for_reconstruction.value = JSON.stringify(
+                xy_pairs );
+        }
+
+
+        function decrypt_ssss(){
+/*            var form = document.forms.ssss;
+            var output_key = form.output_key.value;
+            var output_message = form.output_message.value;
+            //form.input.value = SSSS.bin_to_string(SSSS.string_to_array(output));
+            form.input.value = SSSS.coef_to_secret(output_key, output_message);
+*/
+        }
+
+    -->
+    </script>
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Shamir's Secret Sharing Scheme</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">for</span><br>
+                <span class="titleSub">%%PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <form name="ssss">
+        <h1>The input message</h1>
+        <table>
+            <tr><td>pass phrase:</td><td><input type="text" name="passphrase" value="bunny"/></td></tr>
+            <tr><td>job salt:</td><td><input type="text" name="job_salt" value="job_1 aslkjfslkdfj29urruijklwefklwjekjasf"/></td></tr>
+            <tr><td>job id:</td><td><input type="text" name="job_id" value="job_1"/></td></tr>
+            <tr><td>n:</td><td><input type="text" name="n" value="10"/></td></tr>
+            <tr><td>k:</td><td> <input type="text" name="k" value="5"/></td></tr>
+            <tr><td>k':</td><td> <input type="text" name="k_prime" value="5"/> (the number of parts we should use to try to re-establish the private key; k'&geq;k should work; k'&lt;k should not)</td></tr>
+            <tr><td>Primary data:</td><td><input type="text" name="primary_data" size="50" value="mary had a little lamb"/></td></tr>
+            <tr><td>Secondary data:</td><td><input type="text" name="secondary_data" size="50" value="Mary had a Little Lamb"/></td></tr>
+        </table>
+        <a href="#" onclick="compute_ssss(); return false;">Compute shards</a>
+<!--        <a disabled href="#" onclick="decrypt_ssss(); return false;">Decrypt</a>
+-->
+        <p>
+        <h1>The output shards</h1>
+        <table>
+        <tr>
+            <td>Password (y-intercept for SSSS polynomial):</td>
+            <td><input type="text" name="output_password" size=80 /></td>   
+        </tr><tr>
+            <td>Reconstructed key (using k' random shares):</td>
+            <td><input type="text" name="reconstructed_intercept" size=80 /></td>
+          </tr><tr>
+            <td>User share:</td>
+            <td><input type="text" name="output_user_share" size=80 /></td>
+        </tr><tr>
+            <td>All shares:</td>
+            <td><textarea name="output_shares" cols=50 rows=10>
+                </textarea></td>
+        </tr><tr>
+            <td>Shares used in reconstruction:</td>
+            <td><textarea name="output_shares_used_for_reconstruction" cols=50
+                rows=10></textarea></td>
+       </tr><tr>
+            <td>Encrypted primary data (AES encryption):</td>
+            <td><textarea name="output_primary_cipher_text" cols=50 rows=10>
+                </textarea></td>
+        </tr><tr>
+            <td>Encrypted secondary data (AES encryption):</td>
+            <td><textarea name="output_secondary_cipher_text" cols=50 rows=10>
+                </textarea></td>
+       </tr><tr>
+            <td>Data as handed off to server (RSA+AES encryption):</td>
+            <td><textarea name="for_server" cols=50 rows=10></td>
+        </textarea>
+        </tr>
+        </table>
+    </form>
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

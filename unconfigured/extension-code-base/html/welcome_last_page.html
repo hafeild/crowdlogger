@@ -1,0 +1,87 @@
+<!--
+ File:      welcome_last_page.html
+ Author:    Henry Feild
+ Date:      06-Apr-2011
+ Purpose:   This is a blank template for html files in this extension.
+
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>%%FULL_PROJECT_NAME%%&mdash;Welome</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <script src="../js/dialog.js"></script>
+    <script>
+    <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when the page loads, after the CROWDLOGGER object is found.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ){
+                if( init_elm.innerHTML === "" ){
+                }
+            }
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+    -->
+    </script>
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title"> 
+            <span class="titleMain">Important Information</span><br>
+            <span id="subtitle">
+                <span class="titleSmall">about</span><br>
+                <span class="titleSub">%%FULL_PROJECT_NAME%%</span>
+                <br>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <h1>Using the logger</h1>
+
+    Before you exit this wizard, we just want to let you know how to interact with the logger. Here are some important notes:
+
+    <ul>
+        <li>You can access the %%PROJECT_NAME%% menu by clicking on the blue pause or play button (<img src="../css/img/pauseLogging.png"/>/<img src="../css/img/startLogging.png"/>) on the navigation bar.</li>
+        <li>From the %%PROJECT_NAME%% menu, you can:</li>
+        <ul>
+            <li>Start or pause logging (see below)</li>
+            <li>Register or update your registration</li>
+            <li>Get the text of an email to send to a friend (refer-a-friend)</li>
+            <li>Access settings for the logger</li>
+            <li>Access the study's status page (see below)</li>
+        </ul>
+        <li>You can pause or resume logging by clicking the pause or play button (<img src="../css/img/pauseLogging.png"/>/<img src="../css/img/startLogging.png"/>) in the menu.</li>
+        <li>Nothing is logged while in private/incognito browsing mode.</li>
+        <li>You can access the current status of the logger as well as access an ever growing list of tools that allow you to use your explore your search history in the <a href="javascript:CROWDLOGGER.gui.study.pages.launch_status_page();">Status Page</a>.</li>
+    </ul>
+
+    <!-- Everything below here is for the footer. -->
+    <div class="buffer">
+    </div>
+        
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+</div>
+<div class="emptyFooter">
+</div>
+</body>
+</html>

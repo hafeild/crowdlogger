@@ -1,0 +1,22 @@
+<ul>
+
+    <li>No more desktop notifications! We've added icon notifications: the play
+    and pause button icon on the toolbar will display a small colored dot when
+    there are pending notifications.</li>
+
+    <li>Automatic refer-a-friend invites! Now Crowdlogger takes care of sending
+    emails&mdash;all you've got to do is specify the email addresses. See the
+    "Refer-a-friend" page for details.</li>
+
+    <li>The search log stored by CrowdLogger can now be exported as a
+    tab-separated-values file.</li>
+
+    <li>The patterns to remove sensitive numbers from searches and urls (e.g.,
+    SSN and phone numbers) have been made more restrictive as they were
+    blocking too many numbers that were not in fact sensitive.</li>
+
+    <li>Fixed an issue with experiment notifications being displayed while
+    experiments were running.</li>
+
+    <li>Running experiments display their progress on the status page.</li>
+</ul>

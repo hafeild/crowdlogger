@@ -1,0 +1,119 @@
+<!--
+%%VERSION%%
+-->
+
+<html>
+<head>
+    <title>Search Trails</title>
+    <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+
+    <!-- For sorting our histogram. -->
+    <script src="../js/external_lib/sorttable.js"></script>
+    <script src="../js/dialog.js"></script>
+
+    <style>
+        /* Sortable tables */
+        table.sortable thead {
+            background-color:#eee;
+            color:#666666;
+            font-weight: bold;
+            cursor: default;
+        }
+
+    </style>
+
+    <script>
+        <!--
+        var CROWDLOGGER;
+
+        /**
+         * Called when the CROWDLOGGER variable is found. Checks if this page 
+         * has been initialized yet.
+         */
+        function check_if_initialized(){
+            var init_elm = document.getElementById( "init" );
+            if( init_elm ) {
+                if( init_elm.innerHTML === "" ){
+                    CROWDLOGGER.gui.tools.diplay_search_trails( document );
+                }
+            }
+        }
+
+        /**
+         * Refreshes the contents of the page.
+         */
+        function refresh_page(){
+            CROWDLOGGER.gui.tools.diplay_search_trails( document );
+        }
+
+        // Initialize the search for the CROWDLOGGER variable.
+        init_crowdlogger();
+
+        -->
+    </script>
+
+</head>
+<body>
+<span class="hidden" id="init"></span>
+<div class="bodyWrapper">
+
+    <div class="header">
+        <div class="title">
+            <span class="titleMain">Search trails</span><br>
+            <span id="subtitle">
+                <span class="titleSub">%%PROJECT_NAME%% Tools</span>
+                <br>
+            </span>
+        </div>
+        <span class="refreshLink">
+            <a href="#" onclick="refresh_page(); return false;">Refresh</a>
+        </span>
+    </div>
+ 
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+    <p>
+    This is a tool similar to your browser's web history tool. However, this is different in that we
+    make a distinction between three levels of activities: searches, search result clicks, and non-search
+    result clicks. We also do not currently display pages that were not visited via a click (that will change
+    in future releases).
+    <p>
+    This is a first pass on what will hopefully become a very useful tool to explore your search and 
+    browsing history. We plan to add additional functionality, such as task identification. If you have
+    suggestions for things to add to the search trails tool or for other %%PROJECT_NAME%% tools, please email
+    <a mailto="info@crowdlogger.org">info@crowdlogger.org</a>.
+
+    <p>
+
+    <table class="searchTrails" style="width: 400px">
+    <tr><td class="date">Key:</td></tr>
+    <tr><td style="padding-left: 50px;">
+        <span class="search">Search <span class="searchEngine">(search engine)</span></span><br>
+        <span class="serpClick"> &gt; Search result click</span><br>
+        <span class="click"> &gt;&gt; Non-search result click</span>
+    </td></tr>
+    </table>
+
+    <p>
+
+    <div class="searchTrails" id="contents">
+        Loading...
+    </div>
+
+    <div class="buffer">
+        <table>
+            
+        </table>
+    </div>
+
+    <div class="footer" >
+        <div class="copyright">
+        %%LICENSE_WEB%%
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>

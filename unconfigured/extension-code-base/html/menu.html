@@ -1,0 +1,93 @@
+<!--
+ File:      menu.html
+ Author:    Henry Feild
+ Date:      29-Mar-2011
+ Purpose:   Provides a menu for the %%PROJECT_NAME%% in
+            Google Chrome.
+%%LICENSE%%
+-->
+
+<link href="../css/crowdlogger.css" rel="stylesheet" type="text/css">
+
+<script>
+    var CROWDLOGGER;
+
+    // If this is Chrome, below is how we'll get a hold of the CROWDLOGGER
+    // object.
+    try{
+        CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
+    } catch( e ) {
+        // No need to do anything.
+    }
+</script>
+
+<html>
+<body class="chrome-menu" 
+    onload="CROWDLOGGER.gui.buttons.update_logging_buttons();">
+<ul class="flush">
+    <li id="crowdlogger-logging-button" 
+        class="crowdlogger-logging-off-button menu" 
+        onclick="CROWDLOGGER.logging.toggle_logging(event);"
+        title="Turn logging on for %%FULL_PROJECT_NAME%%">
+            [Off] Turn logging on
+    </li>
+
+    <li id="crowdlogger-registration-launch-button" 
+        class="crowdlogger-register-button menu" 
+        onclick="CROWDLOGGER.study.launch_registration_dialog();"
+        title="Register -- your privacy is still maintained!">
+            Register
+    </li>
+
+    <li id="crowdlogger-refer-a-friend-button" 
+        class="crowdlogger-refer-a-friend-button menu" 
+        onclick="CROWDLOGGER.study.launch_refer_a_friend_dialog();"
+        title="Refer friends to this study.">
+            Refer a friend
+    </li>
+
+    <li id="crowdlogger-mine-log-button" 
+        class="crowdlogger-mine-log-button menu" 
+        onclick="CROWDLOGGER.experiments.run_available_experiments();"
+        title="Run the latest experiments over your log for %%FULL_PROJECT_NAME%%">
+            Run available experiments
+    </li>
+
+
+    <li id="crowdlogger-settings-button" 
+        class="crowdlogger-settings-button menu" 
+        onclick="clicked('settings clicked');"
+        title="Settings options for %%FULL_PROJECT_NAME%%">
+            Settings
+    </li>
+
+    <li id="crowdlogger-view-log-button" 
+        class="crowdlogger-view-log-button menu" 
+        onclick="CROWDLOGGER.gui.tools.diplay_search_histogram();"
+        title="View your search log">
+            View search log
+    </li>
+
+    <li id="crowdlogger-show-messages-button" 
+        class="crowdlogger-show-messages-button menu" 
+        onclick="CROWDLOGGER.study.launch_notifications_available_alert();"
+        title="Show messages from the study researchers">
+            Show messages
+    </li>
+
+    <li id="crowdlogger-check-wins-button" 
+        class="crowdlogger-check-wins-button menu" 
+        onclick="clicked('check wins clicked');"
+        title="Check and redeem your winnings from the periodic drawings">
+            Check/redeem winnings
+    </li>
+
+    <li id="crowdlogger-help-button" 
+        class="crowdlogger-help-button menu" 
+        onclick="clicked('help clicked');"
+        title="Information for %%FULL_PROJECT_NAME%%">
+            Help
+    </li>
+</ul>
+</body>
+</html>

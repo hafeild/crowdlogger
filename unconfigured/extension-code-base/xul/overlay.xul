@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+
+<!-- 
+%%LICENSE%%
+-->
+
+<?xml-stylesheet 
+  href="chrome://crowdlogger/content/css/crowdlogger.css"
+  type="text/css" 
+?>
+
+<overlay 
+  id="crowdlogger-Overlay"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+>
+
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/main.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/version.info.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/debug.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/io.network.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/io.file.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/io.web_sql.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/preferences.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/version.util.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/preferences.defaults.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/logging.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/uninstall.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/experiments.js" />  
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.buttons.js" />      
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/session_data.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/study.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/crypto.sjcl.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/crypto.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.windows.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/io.log.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/logging.event_listeners.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.tools.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.notifications.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/notifications.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.study.pages.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.preferences.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/study.registration.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/util.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/gui.study.pages.welcome.js" /> 
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/experiments.artifact_extractors.js" />
+
+  <!-- For encryption and Shamir's Secret Sharing: -->
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/bignumber.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/jsbn.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/pidcrypt.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/pidcrypt_util.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/sha1.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/sha256.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/md5.js"/> 
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/aes_core.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/aes_cbc.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/asn1.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/rng.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/prng4.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/external_lib/pidcrypt/rsa.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/ssss.js"/>
+  <script type="application/x-javascript"
+    src="chrome://crowdlogger/content/js/log.operations.js"/>
+ 
+  
+ <toolbarpalette id="BrowserToolbarPalette">
+        <toolbarbutton
+          id="crowdlogger-start-button" 
+          tooltiptext="Toggle search activity logging."
+          label="Toggle Logging" 
+          onload="CROWDLOGGER.gui.buttons.update_logging_buttons()" 
+          class="menu-iconic  crowdlogger-logging-off-button chromeclass-toolbar-additional"
+          type="menu"
+        >
+
+    <menupopup id="crowdloggertoolbarmenupopup"> 
+
+       <menuitem 
+          class="menuitem-iconic crowdlogger-logging-off-button"
+          id="crowdlogger-logging-toggle-menu-button" 
+          tooltiptext="Start logging for CrowdLogger"
+          label="Start logging"
+          disabled="false"
+          oncommand="CROWDLOGGER.logging.toggle_logging(event)"
+          onload="CROWDLOGGER.gui.buttons.update_logging_buttons()" 
+        />
+
+       <menuitem 
+          id="crowdlogger-registration-launch-button"
+          class="menuitem-iconic crowdlogger-register-button" 
+          tooltiptext="Register for CrowdLogger"
+          label="Register"
+          disabled="false"
+          oncommand="CROWDLOGGER.study.launch_registration_dialog();"
+        />
+
+       <menuitem 
+          id="crowdlogger-refer-a-friend-launch-button"
+          class="menuitem-iconic crowdlogger-refer-a-friend-button" 
+          label="Refer a friend"
+          tooltiptext="Refer a friend to download CrowdLogger"
+          disabled="false"
+          oncommand="CROWDLOGGER.study.launch_refer_a_friend_dialog();"
+        />
+
+        <menuitem 
+          class="menuitem-iconic crowdlogger-settings-button" 
+          id="crowdlogger-settings-button" 
+          tooltiptext="Settings options for CrowdLogger"
+          label="Settings"
+          oncommand="CROWDLOGGER.gui.preferences.launch_preference_dialog();"
+        />
+
+ 		<menuitem class="menuitem-iconic crowdlogger-show-messages-button" 
+          id="crowdlogger-show-status-page-button" 
+          tooltiptext="Show the study's status page."
+          label="Go to status page"
+          oncommand="CROWDLOGGER.gui.study.pages.launch_status_page();"
+        />
+       
+        <menuitem class="menuitem-iconic crowdlogger-help-button" 
+          id="crowdlogger-help-button" 
+          tooltiptext="Information for CrowdLogger"
+          label="Help" 
+          oncommand="CROWDLOGGER.gui.study.pages.launch_help_page()"
+        />
+	
+		<!--
+        <menuitem  
+          id="crowdlogger-welcome-button" 
+          tooltiptext="Launches the Welcome Wizard for CrowdLogger"
+          label="Launch the Welcome Wizard" 
+          oncommand="CROWDLOGGER.version.util.launch_welcome_page()"
+        />
+
+        <menuitem  
+          id="crowdlogger-uninstall-button" 
+          tooltiptext="Displays the uninstall dialog"
+          label="Launch the uninstall dialog" 
+          oncommand="CROWDLOGGER.uninstall.launch_uninstall_dialog()"
+        />
+
+
+        <menuitem  
+          id="crowdlogger-welcome-button" 
+          tooltiptext="Run test experiment"
+          label="Run test experiment" 
+          oncommand="CROWDLOGGER.experiments.run_test()"
+        />
+        -->
+	
+		<!--
+		<menuitem class="menuitem-iconic" 
+          id="crowdlogger-Consent-Button" 
+          tooltiptext="Consent form for CrowdLogger"
+          label="Consent Form" 
+          oncommand="crowdlogger_LaunchConsent(event)" 
+        />
+        -->
+		
+        </menupopup>
+    </toolbarbutton>
+ </toolbarpalette>
+
+<!--
+  <statusbar id="status-bar">
+     <statusbarpanel id="crowdlogger-status-bar-progress"
+        label="1 of 2 experiments running"
+        tooltiptext="1 of 2 experiments running for CrowdLogger"
+        hidden="true"
+     />
+     <statusbarpanel id="crowdlogger-status-bar-stop"
+        class="statusbarpanel-iconic-text"
+        tooltiptext="Stop pending experiments for CrowdLogger"
+        label="Stop pending experiments"
+        src="chrome://crowdlogger/content/css/img/stop.png"
+        hidden="true"
+     />
+  </statusbar>
+-->
+
+<script>
+
+//B_DEBUG
+//dump( "CROWDLOGGER.session_data.initialization_performed: " +
+//    CROWDLOGGER.session_data.initialization_performed + "\n" );
+//E_DEBUG
+
+if( CROWDLOGGER.session_data.initialization_performed === undefined ) {    
+    CROWDLOGGER.initialize();
+    //B_DEBUG
+    dump( "Initialization HAS NOT been performed.\n" );
+    //E_DEBUG
+} else {
+    //B_DEBUG
+    dump( "Initialization HAS been performed.\n" );
+    //E_DEBUG
+}
+
+</script>
+</overlay>

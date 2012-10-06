@@ -1,0 +1,14 @@
+
+
+<ul>
+    <li>"New message" notifications no longer pop up despite having checked all new messages</li>
+    <li>Notifications no longer appear for each open Firefox window after a restart</li>
+    <li>Firefox now honors meta refreshes</li>
+    <li>Search histogram:
+        <ul>
+            <li>the count column is now numerically sorted (it was alphabetically sorted before)</li>
+            <li>there must be a longer delay between two consecutive queries for them to both show up in the histogram (this gets rid of many of the pesky Google instant queries, like "f", "fo", "foo", "foot"..."football"; now you should, for the most part, just see "football"...unless you entered each letter very slowly)</li>
+        </ul>
+    </li>
+    <li>Added a new tool: search trails; check it out on under "Tools" on the Status Page.</li>
+</ul>
