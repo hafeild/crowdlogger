@@ -214,7 +214,7 @@ will ONLY work for the private key you gave as input.
 Step 3: Update the PUBLIC_KEY config variable
 =============================================
 
-Take the public key and convert it into on long string. Then set the
+Take the public key and convert it into one long string. Then set the
 'PUBLIC_KEY' config option to this. For example, using the public key generated
 above, this would be:
 
