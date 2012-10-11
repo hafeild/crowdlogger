@@ -9,7 +9,7 @@ if test $# -ne 3; then
 fi
 
 dir_orig=$1
-dir="._tmp_$dir_orig"
+dir="._tmp_$RANDOM"
 key=$2
 #name=$(basename "$dir")
 name=`echo $3 | perl -pe 's/.crx$//'`
@@ -19,7 +19,11 @@ sig="$name.sig"
 zip="$name.zip"
 trap 'rm -f "$pub" "$sig" "$zip"' EXIT
 
-`rm -rf $dir && cp -RL $dir_orig $dir`
+if [ -d $dir ]; then
+	rm -rf $dir
+fi
+
+`cp -RL $dir_orig $dir`
 
 # zip up the crx dir
 cwd=$(pwd -P)
