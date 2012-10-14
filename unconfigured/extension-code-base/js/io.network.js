@@ -43,7 +43,22 @@ CROWDLOGGER.io.network = {};
  *                        data.
  */
 CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error, 
-            method ){
+            method, bypass_firewall_check ){
+
+    // Check if this url is https -- if so, we need to ping the 'ping server'
+    // first to make sure there is an internet connection. This is a precaution
+    // in the event that the user's computer has pulled an ip address, but is
+    // behind a firewall (e.g., at a hotel with a sign-in page).
+    if( !bypass_firewall_check && url.match( /^https/ ) !== null ){
+        CROWDLOGGER.io.network.send_data( 
+            CROWDLOGGER.preferences.get_char_pref( "ping_server_url", 
+                                                   "http://www.google.com" ),
+            "", function(){ 
+                CROWDLOGGER.io.network.send_data( 
+                    url, data, on_success, on_error, method, true ); 
+            }, on_error, "GET", true );
+        return true;
+    }
 
     //data = encodeURI( data );
     var httpReq = new XMLHttpRequest();

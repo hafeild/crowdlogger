@@ -39,6 +39,7 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     // char preferences.
     server_base_url: [CROWDLOGGER.preferences.defaults.server_base_url,
          "1.4.2"],
+    ping_server_url: ["%%PING_SERVER_BASE_URL%%", "1.7.3"],
     pass_phrase: ["", "1.4.2"],
     experiment_list: ["{}" , "1.4.2"],
     ran_experiments: ["{}" , "1.4.2"],
