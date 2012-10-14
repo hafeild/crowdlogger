@@ -436,7 +436,7 @@ CROWDLOGGER.log.operations.filter.query_items = function( options ){
 
 
 /**
- * Filters query rewrite pairs; emits items: { value: [query2, query2] }
+ * Filters query rewrite pairs; emits items: { value: [query1, query2] }
  *
  * @param {object} options Options that can contain the following field:
  *      apply:  the function to apply to each item. 
