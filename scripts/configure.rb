@@ -7,9 +7,10 @@ usage = "
 Usage:  configure.rb [options]
 
 Copies the contents of the given input directory and replaces the variable names
-specified in the configuration directory files (default.conf and, optionally,
-override.conf) with their values. These are writing to the output directory.
-See below for options. NOTE: this will delete the output directory first.
+specified in the configuration directory files (default.conf.yaml and, 
+optionally, override.conf.yaml) with their values. These are writing to the 
+output directory. See below for options. NOTE: this will delete the output 
+directory first.
 
 Options: 
     -h
@@ -23,17 +24,19 @@ Options:
 
     -c=<config dir>
         Uses <config dir> as the configuration directory (which should have a
-        file called 'default.conf' and optionally one called 'override.conf').
+        file called 'default.conf.yaml' and optionally one called 
+        'override.conf.yaml').
 "
 ################################################################################ 
-require 'json'
+#require 'json'
 require 'fileutils'
+require 'psych'
 
 INPUT_DIR = "unconfigured"
 OUTPUT_DIR = "configured"
 CONFIG_DIR = "config"
-DEFAULT_CONFIG = "defaults.conf"
-OPTIONAL_CONFIG = "override.conf"
+DEFAULT_CONFIG = "defaults.conf.yaml"
+OPTIONAL_CONFIG = "override.conf.yaml"
 
 ################################################################################
 ## Reads in a configuration file.
@@ -43,21 +46,8 @@ OPTIONAL_CONFIG = "override.conf"
 ##
 ################################################################################
 def readConfigFile( file )
-    contents = ""
-    fd = File.open( file, "r:utf-8" )
-    while line = fd.gets
-        unless line =~ /^\s*$/ or line =~ /^#/
-            columns = line.chomp.split(/=/)
-            if columns.size > 1
-                contents += "\"#{columns[0].gsub(/(^\s*)|(\s*$)/, "")}\" : \"" +
-                    "#{columns[1..-1].join("=").gsub(/(^\s*)|(\s*$)/, "").
-                        gsub(/"/, "\\\"")}\","
-            else
-                contents += columns[0]
-            end
-        end
-    end
-    return JSON.parse( "{#{contents}}".gsub!(/,\}$/, "}") )
+    ## Loads the given file in as YAML and converts it into Ruby objects.
+    Psych.load(IO.read(file, {"open_args"=>"r:utf-8"}))
 end
 
 
@@ -80,7 +70,11 @@ def searchAndReplaceInFile( file, searchAndReplaceHash )
     if( contents.valid_encoding? )
         for (k,v) in searchAndReplaceHash
             find = "%%#{k}%%"
-            replace = v
+
+            ## If the value is an array, this serializes them. E.g., 
+            ##      [a,b,c] => '"a","b","c"'
+            replace = v.is_a?(Array) ? v.map{|x| "\"#{x}\""}.join(",") : v.to_s
+
             contents.gsub!( /#{find}/, replace )
         end
         fd = File.open( file, "w:utf-8" )

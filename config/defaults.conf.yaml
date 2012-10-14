@@ -1,0 +1,57 @@
+## YAML
+
+## Global information
+LICENSE: Copyright (c) 2012 The CrowdLogger Project. University of Massachusetts.  All rights reserved. BSD Liscense (http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt).
+LICENSE_WEB: Copyright &copy; 2012 The CrowdLogger Project. &laquo; University of Massachusetts &laquo; All rights reserved. &laquo; <a href="http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt">BSD Liscense</a>
+VERSION: 1.7.2
+PROJECT_NAME: CrowdLogger
+FULL_PROJECT_NAME: The CrowdLogger Project
+EXTENSION_FILE_NAME: CrowdLogger
+DESCRIPTION: An extension that logs user behavior in a privacy preserving manner.
+CREATOR: CIIR
+HOMEPAGE: http://code.google.com/p/crowdlogger/
+ID: crowdlogger@myurl.org
+FF_MIN_VERSION: 3.5
+FF_MAX_VERSION: 16.0.*
+
+
+## Server info. The url does not need to be https.
+SERVER_BASE_URL: https://localhost
+## The ping server is used to ensure that the server is up. This should not be
+## https! This is particularly useful if using https for SERVER_BASE_URL, since
+## not being able to connect to a secure page can raise exceptions and thus
+## awful error messages. 
+PING_SERVER_BASE_URL: http://localhost
+
+## If you want email hosting. 
+USE_SERVER_EMAIL: false
+EMAIL_SUBJECT: Invitation to participate in a study
+EMAIL_FROM: x@y.org
+
+
+## This can be contain as many anonymizers as you want; each one should be
+## on it's own line with a dash at the beginning (use consistent spacing).
+ANONYMIZERS: 
+    - http://localhost:8080/crowdlogger/deposit
+    - http://localhost:8181/crowdlogger/deposit
+
+MASTER_SERVER: http://localhost:8080/crowdlogger/write
+
+##
+#    Example (but not this one, because you don't have the private key for it).
+#    See the crowdlogger/setup/SETUP.txt file for information about generating
+#    this. Or, see http://ciir.cs.umass.edu/~hfeild/ssss/ and scroll
+#    down to the bottom.
+#
+PUBLIC_KEY: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0V86BxxU+giF0s0fxJWunDad/NUFUqfiStGhREbb6u5TvTbWMyDbCW8Xj/WMC+qZoGD0eLi0NhGSMnqn+4AdQGnSRdtXePIq+1o784/RjsHgTjKqgh685iiAeSfWYrMth3KMS5GPKjCC7egsGHgB7Lvu2XvXfnyMiVAI5fxx1UKPPHl4IpUlSXb9Uqia5rVurDbQuICk4DEK21POtvUC5wqnkc1OY//SSHeU6aKvVupaGbo6jv3FM178mByX9Q6jJUoyVvtYcxYCg3eeLzNuUz+IKepUZZauyUNSo321rTIiibbLyQNloUeZIgYynR20EPuPDExN96s1eG8RMn4IwIDAQAB
+
+## Artifact web server app settings.
+MAX_EARTIFACTS_PER_FILE: 250000 
+EARTIFACT_WRITE_FILE: /eartifacts
+
+
+## Database stuff
+DB_USER_NAME: cl
+DB_PASSWORD : cr0wd1ogger
+
+
