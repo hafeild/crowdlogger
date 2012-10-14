@@ -401,7 +401,7 @@ CROWDLOGGER.experiments.artifact_extractors.extract_query_pairs =
                                 CROWDLOGGER.log.operations.
                                     term_order_normalize( item.value[0] ), 
                                 CROWDLOGGER.log.operations.
-                                    term_order_normalize( item.value[0] )
+                                    term_order_normalize( item.value[1] )
                                 ].join("\t" ) }, 
                           gen_secondary: function(item){
                             return item.value.join("\t") }
