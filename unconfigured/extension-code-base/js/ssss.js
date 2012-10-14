@@ -305,9 +305,10 @@ CROWDLOGGER.secret_sharing.compute_user_share = function(
         secret_key = "";
     }
 
-    return parseInt( (new BigInteger( 
-        pidCrypt.SHA1( secret_key + passphrase ), 16 )).
-            modInt( n ).toString(10) ); 
+    var big_int = new BigInteger( 
+        pidCrypt.SHA1( secret_key + passphrase ), 16 )
+    return parseFloat( big_int.modInt(n).
+            toString(10) +"."+ big_int.toString(10).slice(0,2) ); 
 
 };
 
@@ -324,15 +325,17 @@ CROWDLOGGER.secret_sharing.compute_user_share = function(
  * @return A function of the polynomial with parameter i.
  */
 CROWDLOGGER.secret_sharing.get_polynomial = function( intercept, k, seed ){
-    var coefficients = [intercept];
+    var coefficients = [new BigNumber(intercept)];
     var random_generator = CROWDLOGGER.secret_sharing.random( seed );
+
     for( var i = 1; i < k; i++ ){
-        coefficients[i] = random_generator.next();
+        coefficients[i] = new BigNumber(random_generator.next().toString(10));
     }
 
     var polynomial = function( x ){
-        x = new BigInteger( x.toString(), 10 );
-        var y = new BigInteger( intercept, 10 );
+        x = new BigNumber( x );
+        var y = coefficients[0]; 
+        
         for( var i = 1; i < k; i++ ){
             y = y.add( coefficients[i].multiply( x.pow( i ) ) );
         }
@@ -341,7 +344,6 @@ CROWDLOGGER.secret_sharing.get_polynomial = function( intercept, k, seed ){
     };
 
     return polynomial;
-    
 };
 
 /**
@@ -394,9 +396,12 @@ CROWDLOGGER.secret_sharing.random = function( seed ) {
  */
 CROWDLOGGER.secret_sharing.lagrange_interpolate = function( xy_pairs ) {
 
-    // Calculate P_k(x) = \sum_{i=0}^{i<k} y_i * l_i(x)
+    // BigNumber precision.
+    var p = 100;
+
+    // Calculate P_k(x) = \sum_{j=0}^{j<k} y_j * l_j(x)
     // We're only interested in P_k(0).
-    var intercept = new BigNumber( "0" );
+    var intercept = new BigNumber( 0, p );
 
     // Need to compute the lagrange bases.
     // Formula: l_j(x) = \prod_{i=0, i!=j}^{k} (x - x_i)/(x_j - x_i)
@@ -405,33 +410,33 @@ CROWDLOGGER.secret_sharing.lagrange_interpolate = function( xy_pairs ) {
         var pair_j = xy_pairs[j];
 
         // The x value from the pair.
-        var x_j = new BigNumber( pair_j[0] );
+        var x_j = new BigNumber( pair_j[0], p );
 
         // To keep track of the numerator and denominator of the Lagrange basis.
-        var l_numerator = new BigNumber("1");
-        var l_denominator = new BigNumber("1");
+        var l_numerator = new BigNumber(1, p);
+        var l_denominator = new BigNumber(1, p);
 
         // Loop through all of the other pairs to make the Lagrange basis l_j.
         for( var i = 0; i < xy_pairs.length; i++ ){
             var pair_i = xy_pairs[i];
             // The x value from the pair.
-            var x_i = new BigNumber( pair_i[0] );
+            var x_i = new BigNumber( pair_i[0], p );
 
             // We don't want to look at pairs that are the same.
             if( i !== j ){
                 // Using BigNumbers here helps with precision.
                 // We only care about x = 0, so we do 0-x_i rather than x-x_i. 
                 l_numerator = l_numerator.multiply( 
-                    new BigNumber( (-x_i).toString() ) );
+                    new BigNumber( x_i.negate() ) );
                 l_denominator = l_denominator.multiply( 
-                    new BigNumber( (x_j - x_i).toString() ) );
+                    new BigNumber( x_j.subtract(x_i), p ) );
             }
         }
 
         // We are multiply this way to minimize the amount of error we get from
         // dividing a smaller number by the denominator.
-        var to_add = new BigNumber( pair_j[1] ).    
-                multiply( l_numerator ).divide( l_denominator );
+        var to_add = new BigNumber( pair_j[1], p ).divide( l_denominator ).    
+                multiply( l_numerator );
 
         intercept = intercept.add( to_add );
     }
