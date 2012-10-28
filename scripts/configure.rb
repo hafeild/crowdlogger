@@ -1,4 +1,5 @@
-#!/Users/niranjan/.rvm/rubies/ruby-1.9.2-p290/bin/ruby
+#!/usr/bin/ruby
+
 ################################################################################
 ## File:    configure.rb
 ## Author:  Henry Feild
