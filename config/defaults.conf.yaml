@@ -27,6 +27,7 @@ PING_SERVER_BASE_URL: http://localhost
 USE_SERVER_EMAIL: false
 EMAIL_SUBJECT: Invitation to participate in a study
 EMAIL_FROM: x@y.org
+## You can specify the email body text below in the "Files" section.
 
 
 ## This can be contain as many anonymizers as you want; each one should be
@@ -55,3 +56,17 @@ DB_USER_NAME: cl
 DB_PASSWORD : cr0wd1ogger
 
 
+## Files:
+##
+## Files to read in. Should be in the format: 
+##   variable-name : file-containing-variable-value
+## File paths should be relative to the config directory.
+files : 
+    ## Use "ADD_CODE_HERE" to insert the user's public code. If the user's 
+    ## friends(s) enter that code during registration, the user will get bonus 
+    ## points. Use "YOUR_NAME_HERE" as a placeholder for the user's name. They will
+    ## have the opportunity to copy this text and send the email themselves or send
+    ## it automatically through the server.
+    EMAIL_BODY: email_body.txt
+
+    CONSENT_FORM: consent_form.html

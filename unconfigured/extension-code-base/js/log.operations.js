@@ -5,7 +5,7 @@
  * 
  * See the  CROWDLOGGER.log.operations namespace.<p>
  * 
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

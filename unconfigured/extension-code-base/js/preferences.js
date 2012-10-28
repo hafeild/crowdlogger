@@ -3,7 +3,7 @@
  * 
  * See the CROWDLOGGER.preferences namespace.<p>
  * 
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

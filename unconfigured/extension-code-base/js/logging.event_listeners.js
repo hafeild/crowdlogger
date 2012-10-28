@@ -4,7 +4,7 @@
  * 
  * See CROWDLOGGER.logging.event_listeners namespace.<p>
  * 
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

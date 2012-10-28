@@ -3,7 +3,7 @@
  * 
  * See the  CROWDLOGGER.io.web_sql namespace.<p>
  *
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

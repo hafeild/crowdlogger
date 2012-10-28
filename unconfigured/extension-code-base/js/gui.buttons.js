@@ -4,7 +4,7 @@
  * 
  * See CROWDLOGGER.gui.buttons namespace.<p>
  *
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

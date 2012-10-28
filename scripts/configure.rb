@@ -9,8 +9,8 @@ Usage:  configure.rb [options]
 Copies the contents of the given input directory and replaces the variable names
 specified in the configuration directory files (default.conf.yaml and, 
 optionally, override.conf.yaml) with their values. These are writing to the 
-output directory. See below for options. NOTE: this will delete the output 
-directory first.
+output directory. See below for options. NOTE: THIS WILL DELETE THE OUTPUT 
+DIRECTORY FIRST.
 
 Options: 
     -h
@@ -50,6 +50,30 @@ def readConfigFile( file )
     Psych.load(IO.read(file, {"open_args"=>"r:utf-8"}))
 end
 
+
+################################################################################
+## Searches and replaces each of the key value pairs in the given hash over the
+## hash values. This way one value can refer to another key.
+##
+## @param searchAndReplacehash  The hash of key/value pairs to search and replace.
+################################################################################
+def searchAndReplaceInHash( searchAndReplaceHash )
+    2.times do |i|
+        for (key,contents) in searchAndReplaceHash
+            contents = contents.to_s
+            for (k,v) in searchAndReplaceHash
+                find = "%%#{k}%%"
+
+                ## If the value is an array, this serializes them. E.g., 
+                ##      [a,b,c] => '"a","b","c"'
+                replace = v.is_a?(Array) ? v.map{|x| "\"#{x}\""}.join(",") : v.to_s
+
+                contents.gsub!( /#{find}/, replace )
+            end
+            searchAndReplaceHash[key] = contents
+        end
+    end
+end
 
 ################################################################################
 ## Searches and replaces each of the key value pairs in the given hash in the
@@ -136,8 +160,7 @@ end
 outputDir = OUTPUT_DIR
 inputDir  = INPUT_DIR
 configDir = CONFIG_DIR
-defaultConfigFile = "#{configDir}#{File::SEPARATOR}#{DEFAULT_CONFIG}"
-optionalConfigFile = "#{configDir}#{File::SEPARATOR}#{OPTIONAL_CONFIG}"
+
 variableHash = nil
 
 ## Read in the options, if any were provided.
@@ -153,7 +176,17 @@ for arg in ARGV
     end
 end
 
-## Check that all the directories exist or do not exist.
+defaultConfigFile = "#{configDir}#{File::SEPARATOR}#{DEFAULT_CONFIG}"
+optionalConfigFile = "#{configDir}#{File::SEPARATOR}#{OPTIONAL_CONFIG}"
+
+STDERR.puts "Input dir: #{inputDir}"
+STDERR.puts "Output dir: #{outputDir}"
+STDERR.puts "Config dir: #{configDir}"
+STDERR.puts "Default config file: #{defaultConfigFile}"
+STDERR.puts "Optional config file: #{optionalConfigFile}"
+
+
+## Check that all the directories exist.
 for d in [inputDir, configDir]
     unless File.directory?( d )
         die( "The following directory does not exist: [#{d}] #{usage}" )
@@ -181,8 +214,19 @@ end
 ## Copy the input directory to the output directory.
 FileUtils.cp_r( inputDir, outputDir )
 
+## Read in any of the files that have variable values.
+if variableHash.has_key? "files"
+    variableHash["files"].each do |key,filename|
+        variableHash[key] = IO.read("#{configDir}/#{filename}", 
+            {"open_args"=>"r:utf-8"})
+    end
+end
+
+variableHash.delete("files")
 
 ## Replace each of the variables.
+searchAndReplaceInHash(variableHash)
+
 files_a = []
 Dir.glob( "#{outputDir}/**/*" ).each do |f|
     if File.file?(f)

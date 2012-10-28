@@ -149,7 +149,7 @@ Note: you can see this screen at any time by going to "Refer-a-friend" in the %%
     <p>
 
     <form name="email">
-        This is what the email will look like (with [your name] filled in):<br>
+        This is what the email will look like (with <b>YOUR_NAME_HERE</b> filled in):<br>
         <textarea class="emailBox" name="email_box"></textarea>
     </form> 
 
@@ -163,13 +163,7 @@ Note: you can see this screen at any time by going to "Refer-a-friend" in the %%
          the user can't see it, but our javascript still has access to it.
     -->
     <span class="hidden">
-        <span id="message">
-Message goes here.
-
-    Code:  ADD_CODE_HERE
-
--[your name]
-        </span>
+        <span id="message">%%EMAIL_BODY%%</span>
     </span>
 
     <div class="header">

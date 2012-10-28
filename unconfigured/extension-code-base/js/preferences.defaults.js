@@ -5,7 +5,7 @@
  * 
  * See the  CROWDLOGGER.preferences.defaults namespace.<p>
  * 
- * %%VERSION_WEB%%
+ * %%VERSION%%
  * 
  * @author hfeild
  * @version %%VERSION%%

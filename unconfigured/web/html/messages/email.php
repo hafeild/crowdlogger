@@ -72,11 +72,11 @@ else
 {
 
     $fullMessage = <<<EOT
-Blah blah blah...message goes here...
-    Code:  $code
-
--$sender
+%%EMAIL_BODY%%
 EOT;
+
+    $fullMessage = preg_replace("/ADD_CODE_HERE/", $code, $fullMessage);
+    $fullMessage = preg_replace("/YOUR_NAME_HERE/", $sender, $fullMessage);
 
     $successful_emails = "";
     $num_successful_emails = 0;
