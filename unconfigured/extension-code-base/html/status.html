@@ -12,6 +12,10 @@
 <head>
     <title>%%FULL_PROJECT_NAME%% Status Page</title>
     <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+
+    <!-- Load jQuery first. -->
+    <script src="../js/external_lib/jquery.min.js"></script>
+    
     <script src="../js/dialog.js"></script>
     <script>
     <!--
@@ -37,8 +41,8 @@
          * page has been initialized yet.
          */
         function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            if( init_elm ){
+            var init_elm = jQuery("#init");
+            if( init_elm.length > 0 ){
                 if( init_elm.innerHTML === "" ){
                     CROWDLOGGER.gui.study.pages.refresh_status_page( document );
                 }
@@ -58,7 +62,7 @@
             //CROWDLOGGER.debug.log( "In refreshExperimentStats!\n" );
 
             if( experimentElm === undefined ) {
-                experimentElm = document.getElementById( 'experiments' );
+                experimentElm = jQuery("#experiments")[0];
             }
             CROWDLOGGER.gui.study.pages.populate_experiments_status(
                 document, experimentElm ); 

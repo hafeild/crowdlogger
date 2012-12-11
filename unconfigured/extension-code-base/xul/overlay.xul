@@ -14,6 +14,12 @@
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 >
 
+  <!-- Load jQuery first. -->
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/external_lib/jquery.min.js" />
+  <script type="application/x-javascript" 
+    src="chrome://crowdlogger/content/js/external_lib/jquery-ui.min.js" />
+
   <script type="application/x-javascript" 
     src="chrome://crowdlogger/content/js/main.js" />
   <script type="application/x-javascript" 

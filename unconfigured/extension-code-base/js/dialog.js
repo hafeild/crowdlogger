@@ -57,8 +57,9 @@ function init(){
  */
 function init_crowdlogger() {
     // Make sure we have the CROWDLOGGER object.
-    window.addEventListener( "load", 
-        function(){ setTimeout( init, 5 ); }, false );
+    jQuery(document).ready( function(){ 
+        setTimeout( init, 5 ); 
+    })
 }
 
 

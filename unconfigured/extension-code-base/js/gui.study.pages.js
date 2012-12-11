@@ -176,6 +176,7 @@ CROWDLOGGER.gui.study.pages.launch_status_page = function(){
 
 CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // TODO Implement all the dynamic things to stick on the page.
+    var jq = doc.defaultView.jQuery; 
 
     // Get the elements we need to populate.
     var notification_elm = doc.getElementById( "notifications" );
@@ -183,6 +184,9 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     var experiments_elm  = doc.getElementById( "experiments" );
     var raffle_wins_elm  = doc.getElementById( "raffleWins" );
     var init_elm         = doc.getElementById( "init" );
+    
+    // This tells the page that it's been initialized.
+    init_elm.innerHTML = "starting";
 
     // For the special update notifications (shown after an update is installed).
     var clear_update_notification_delay = 30*1000; // 30-seconds
@@ -492,7 +496,9 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     }
 
     // This tells the page that it's been initialized.
-    init_elm.innerHTML = " ";
+    init_elm.innerHTML = "done";
+
+
 };
 
 /**

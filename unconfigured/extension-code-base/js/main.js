@@ -37,11 +37,17 @@ var CROWDLOGGER = {
     extension_name: "crowdlogger@crowdlogger.org",
     initialization_in_progress:  false,
     initialized: false,
-    window: window
+    window: window,
+    jq: jQuery,
+    messages: null
 };
 
 
 CROWDLOGGER.check_if_new_instance = function() {
+    CROWDLOGGER.jq(document).ready(function(){
+        CROWDLOGGER.messages = jQuery("#messages");
+    });
+    
     //B_DEBUG
     //dump( "Checking if CROWDLOGGER exists...\n" );    
     //E_DEBUG
