@@ -16,34 +16,8 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
-    <script>
-    <!--
-        var CROWDLOGGER;
+    <script src="../html-js/preferences.js"></script>
 
-        // Checks if this page has been initialized yet.
-        function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            if( init_elm && init_elm.innerHTML === "" ){
-                CROWDLOGGER.gui.preferences.refresh_preference_page( document );
-            }
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-
-        /*
-        window.addEventListener( "change", function(){
-            CROWDLOGGER.study.registration.check_form( document );
-        }, false );
-        window.addEventListener( "command", function(){
-            CROWDLOGGER.study.registration.check_form( document );
-        }, false );
-        window.addEventListener( "click", function(){
-            CROWDLOGGER.study.registration.check_form( document );
-        }, false );
-        */
-    -->
-    </script>
 </head>
 <body id="status_page_body">
 <span class="hidden" id="init"></span>
@@ -106,12 +80,9 @@
         <p>
 
         <span class="buttonPanel" id="save_button_panel">
-            <span class="button" id="save_button"
-                onclick="CROWDLOGGER.gui.preferences.submit_preferences(
-                  document ); return false;">Save</span>
+            <span class="button" id="save_button">Save</span>
             <span class="button" id="save_and_close_button"
-                onclick="CROWDLOGGER.gui.preferences.submit_preferences(
-                  document, window ); return false;">Save and close</span>
+                >Save and close</span>
         </span>
     </form>
 

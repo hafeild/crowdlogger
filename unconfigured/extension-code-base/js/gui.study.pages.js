@@ -179,7 +179,7 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     var jq = doc.defaultView.jQuery; 
 
     // Get the elements we need to populate.
-    var notification_elm = doc.getElementById( "notifications" );
+    var notification_elm = jq('#notifications');
     var messages_elm     = doc.getElementById( "messages" );
     var experiments_elm  = doc.getElementById( "experiments" );
     var raffle_wins_elm  = doc.getElementById( "raffleWins" );
@@ -240,59 +240,58 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     }
 
     // Insert the notifications.
-    if( notification_elm ){
-        var notifications = "<table class='notifications'>";
-            // This will keep track of how many notifications have
-            // been posted.
-            var notifications_posted = 0;
-            var note_board = CROWDLOGGER.notifications;
+    if( notification_elm.size() > 0 ){
+        var notifications = jq('<table class="notifications">');
+        // This will keep track of how many notifications have
+        // been posted.
+        var notifications_posted = 0;
+        var note_board = CROWDLOGGER.notifications;
 
             // Check for notifications about an available update.
             if( note_board.extension_update > 0 ){
                 notifications_posted++;
-                notifications += "<tr><td class=\"alert\"></td>" +
-                    "<td>There is a new version of %%PROJECT_NAME%% " +
-                    "available. Please download and install it "+
-                    "as soon as you can.</td><td><span class=\"button\" " +
-                    "style=\"width: 100%\" onclick=\"" +
-                    "CROWDLOGGER.gui.study.pages.launch_update_help(); " +
-                    "return false;\">See how to update</span></td><td></td></tr>";
+                notifications.append('<tr><td class="alert"></td>' +
+                    '<td>There is a new version of %%PROJECT_NAME%% ' +
+                    'available. Please download and install it '+
+                    'as soon as you can.</td><td><span class="button" ' +
+                    'style="width: 100%" id="launch_update_help>'+
+                    'See how to update</span></td><td></td></tr>');
+
+                notifications.find('#launch_update_help').click(function(){
+                    CROWDLOGGER.gui.study.pages.launch_update_help(); 
+                    return false;
+                });
             }
 
             
             // Check for notifications about a new consent form.
             if( note_board.consent > 0 ){
                 notifications_posted++;
-                notifications += "<tr><td class=\"alert\"></td>" +
-                    "<td>There is a new consent form that "+
-                    "you must read and accept before more data can be " +
-                    "logged and mined.</td><td><span class=\"button\" " +
-                    "style=\"width: 100%\" " +
-                    "onclick=\"CROWDLOGGER.gui.study.pages." +
-                        "launch_consent_form_page()\">"+
-                    "Read consent form</span></td><td></td></tr>";
+                notifications.append('<tr><td class="alert"></td>' +
+                    '<td>There is a new consent form that '+
+                    'you must read and accept before more data can be ' +
+                    'logged and mined.</td><td><span class="button" ' +
+                    'style="width: 100%" id="launch_consent_form">' +
+                    'Read consent form</span></td><td></td></tr>');
+
+                jq('#launch_consent_form').click(function(){
+                    CROWDLOGGER.gui.study.pages.launch_consent_form_page();
+                });
             }
 
             // Register.
             if( note_board.register > 0 ) {
                 notifications_posted++;
-                notifications += "<tr id='register_notification'>" +
-                "<td class=\"alert\"></td>"+
-                "<td>You have not registered yet, would you like to now?" +
-                "</td><td><span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.study.launch_registration_dialog();" +
-                  "CROWDLOGGER.notifications.set_registration_dismissed(false);"+
-                  "hide_element('register_notification');\">"+
-                    "Register</span></td><td>"+
-                "<span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.notifications.unset_notification(" +
-                    "'register'); " +
-                    "hide_element('register_notification'); " +
-                    "CROWDLOGGER.notifications.set_registration_dismissed" +
-                    "(true);" +
-                    "return false;\">Dismiss</span></td></tr>";
+                notifications.append('<tr id="register_notification">' +
+                    '<td class="alert"></td>'+
+                    '<td>You have not registered yet, would you like to now?' +
+                    '</td><td><span class="button" ' +
+                      'style="width: 100%" id="launch_registration_dialog">' +
+                        'Register</span></td><td>'+
+                    '<span class="button" ' +
+                      'style="width: 100%" id="dismiss_registration_notification">'+
+                      'Dismiss</span></td></tr>');
+
                 // Clear this after a minute.
                 setTimeout(
                     function(){
@@ -302,35 +301,58 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
             } else if( note_board.registration_dismissed() ) {
                 notifications_posted++;
-                notifications += "<tr id='register_notification'>" +
-                "<td class=\"alert\"></td>"+
-                "<td>You have not registered yet, would you like to now?" +
-                "</td><td><span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.study.launch_registration_dialog();" +
-                  "CROWDLOGGER.notifications.set_registration_dismissed(false);"+
-                  "hide_element('register_notification');\">"+
-                    "Register</span></td><td></td></tr>";
+                notifications.append('<tr id="register_notification">' +
+                    '<td class="alert"></td>'+
+                    '<td>You have not registered yet, would you like to now?' +
+                    '</td><td><span class="button" ' +
+                        'style="width: 100%" id="launch_registration_dialog">'+
+                    'Register</span></td><td></td></tr>');
             }
+
+            // For the registration.
+            jq('#launch_registration_dialog').click(function(){
+                CROWDLOGGER.study.launch_registration_dialog();
+                CROWDLOGGER.notifications.set_registration_dismissed(false);
+                hide_element('register_notification');
+            });
+
+            jq('#dismiss_registration_notification').click(function(){
+                CROWDLOGGER.notifications.unset_notification('register');
+                hide_element('register_notification');
+                CROWDLOGGER.notifications.set_registration_dismissed(true);
+                return false;
+            });            
+
 
             // Update Registration.
             if( note_board.update_registration > 0 ) {
                 notifications_posted++;
-                notifications += "<tr id='update_registration_notification'>"+
-                "<td class=\"alert\"></td>"+
-                "<td>Would you like to update your registration?" +
-                "</td><td><span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.study.launch_registration_dialog();" +
-                        "CROWDLOGGER.notifications.unset_notification(" +
-                            "'update_registration'); return false;\">"+
-                    "Update registration</span> </td><td>" +
-                "<span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.notifications.unset_notification(" +
-                    "'update_registration'); " +
-                    "hide_element('update_registration_notification'); " +
-                    "return false;\">Dismiss</span></td></tr>";
+                notifications.append('<tr id="update_registration_notification">'+
+                    '<td class="alert"></td>'+
+                    '<td>Would you like to update your registration?' +
+                    '</td><td><span class="button" ' +
+                      'style="width: 100%" id="update_registration">' +
+                        'Update registration</span> </td><td>' +
+                    '<span class="button" ' +
+                      'style="width: 100%" '+
+                      'id="dismiss_update_registration_notification">' +
+                    'Dismiss</span></td></tr>');
+
+                notifications.find('#update_registration').click(function(){
+                    CROWDLOGGER.study.launch_registration_dialog();
+                    CROWDLOGGER.notifications.unset_notification(
+                        'update_registration'); 
+                    return false;
+                });
+
+                notifications.find(
+                  '#dismiss_update_registration_notification').click(function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                            'update_registration');
+                    jq('#update_registration_notification').hide();
+                    return false;
+                });
+
                 // Clear this after a minute.
                 setTimeout( 
                     function(){
@@ -342,22 +364,31 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             // Refer a friend.
             if( note_board.refer_a_friend > 0 ) {
                 notifications_posted++;
-                notifications += "<tr id='refer_a_friend_notification'>" +
-                "<td class=\"alert\"></td>"+
-                "<td>Would you like to refer a friend to this study?" +
-                "</td><td><span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.study." +
-                    "launch_refer_a_friend_dialog();" +
-                    "CROWDLOGGER.notifications.unset_notification(" +
-                            "'refer_a_friend'); return false;\">"+
-                    "Refer a friend</span></td><td>" +
-                "<span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.notifications.unset_notification(" +
-                    "'refer_a_friend'); " +
-                    "hide_element('refer_a_friend_notification'); " +
-                    "return false;\">Dismiss</span></td></tr>";
+                notifications.append('<tr id="refer_a_friend_notification">' +
+                    '<td class="alert"></td>'+
+                    '<td>Would you like to refer a friend to this study?' +
+                    '</td><td><span class="button" ' +
+                      'style="width: 100%" id="launch_refer_a_friend">' +
+                      'Refer a friend</span></td><td>' +
+                    '<span class="button" ' +
+                      'style="width: 100%" id="unset_refer_a_friend_notification">'+
+                      'Dismiss</span></td></tr>');
+
+                notifications.find('#launch_refer_a_friend').click(function(){
+                    CROWDLOGGER.study.launch_refer_a_friend_dialog();
+                    CROWDLOGGER.notifications.unset_notification(
+                       'refer_a_friend'); 
+                    return false; 
+                });
+
+                notifications.find(
+                        '#unset_refer_a_friend_notification').click(function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'refer_a_friend');
+                    jq('#refer_a_friend_notification').hide();
+                    return false;
+                });
+
                 // Clear this after a minute.
                 setTimeout( 
                     function(){
@@ -370,44 +401,58 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             // Set a pass phrase.
             if( note_board.set_passphrase > 0 ) {
                 notifications_posted++;
-                notifications += "<tr id='set_passphrase_notification'>" +
-                "<td class=\"alert\"></td>"+
-                "<td>You have not set a pass phrase yet. This means we " +
-                "cannot run experiments on your search log.</td><td>" +
-                "<span class=\"button\" " +
-                    "style=\"width: 100%\" " +
-                    "onclick=\"CROWDLOGGER.gui.preferences." +
-                        "launch_preference_dialog();" +
-                        "hide_element('set_passphrase_notification'); \">"+
-                    "Set pass phrase</span></td><td>" +
-                "<span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.notifications.unset_notification(" +
-                    "'set_passphrase'); " +
-                    "hide_element('set_passphrase_notification'); " +
-                    "return false;\">Dismiss</span></td></tr>";
+                notifications.append('<tr id="set_passphrase_notification">' +
+                    '<td class="alert"></td>'+
+                    '<td>You have not set a pass phrase yet. This means we ' +
+                    'cannot run experiments on your search log.</td><td>' +
+                    '<span class="button" ' +
+                        'style="width: 100%" id="set_passphrase">' +
+                        'Set pass phrase</span></td><td>' +
+                    '<span class="button" ' +
+                      'style="width: 100%" id="dismiss_passphrase_notification">' +
+                      'Dismiss</span></td></tr>');
 
+                notifications.find('#set_passphrase').click(function(){
+                    CROWDLOGGER.gui.preferences.launch_preference_dialog();
+                    jq('#set_passphrase_notification').hide(); 
+                });
+
+                notifications.find('#dismiss_passphrase_notification').click(function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'set_passphrase');
+                    jq('#set_passphrase_notification').hide();
+                    return false;
+                });
             }
 
             // Update settings.
             if( note_board.update_settings > 0 ) {
                 notifications_posted++;
-                notifications += "<tr id='update_settings_notification'>" +
-                "<td class=\"alert\"></td>"+
-                "<td>Would you like to update your settings?</td><td>" +
-                "<span class=\"button\" " +
-                    "style=\"width: 100%\" " +
-                    "onclick=\"CROWDLOGGER.gui.preferences." +
-                        "launch_preference_dialog(); " +
-                        "CROWDLOGGER.notifications.unset_notification(" +
-                            "'update_settings'); return false;\">"+
-                    "Update settings</span></td><td>" +
-                "<span class=\"button\" " +
-                  "style=\"width: 100%\" " +
-                  "onclick=\"CROWDLOGGER.notifications.unset_notification(" +
-                    "'update_settings'); " +
-                    "hide_element('update_settings_notification'); " +
-                    "return false;\">Dismiss</span></td></tr>";
+                notifications.append('<tr id="update_settings_notification">' +
+                    '<td class="alert"></td>'+
+                    '<td>Would you like to update your settings?</td><td>' +
+                    '<span class="button" ' +
+                        'style="width: 100%" id="launch_preference_dialog">' +
+                        'Update settings</span></td><td>' +
+                    '<span class="button" ' +
+                      'style="width: 100%" '+
+                      'id="unset_update_settings_notification">'+
+                      'Dismiss</span></td></tr>');
+
+                notifications.find('#launch_preference_dialog').click(function(){
+                    CROWDLOGGER.gui.preferences.launch_preference_dialog(); 
+                    CROWDLOGGER.notifications.unset_notification(
+                        'update_settings'); 
+                    return false;
+                });
+
+                notifications.find('#launch_preference_dialog').click(function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'update_settings');
+                    jq('#update_settings_notification').hide();
+                    return false;
+                });
+
                 // Clear this after a minute.
                 setTimeout( 
                     function(){
@@ -418,60 +463,80 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
             // Check for notifications about new experiments.
             if( note_board.new_experiments > 0 ) {
-                CROWDLOGGER.debug.log( "Posting experiment" );
+                CROWDLOGGER.debug.log( 'Posting experiment' );
                 notifications_posted++;
-                notifications += "<tr id='new_experiments_notification'>" +
-                    "<td class=\"alert\"></td>" +
-                    "<td>There are new experiments to run!</td><td>" +
-                    "<span class=\"buttonPanel\" style=\"height: auto;\">" +
-                    "<span class=\"button\" style=\"width: 100%\" onclick=\"" +
-                       "CROWDLOGGER.experiments.run_available_experiments();"+
-                       "CROWDLOGGER.notifications.unset_notification('new_experiments');" +
-                       "hide_element('new_experiments_notification');" +
-                    "\">Run experiments now</span><p>" +
-                    "<span class=\"button\" style=\"width: 100%\" onclick=\"" +
-                      "CROWDLOGGER.preferences.set_bool_pref( " +
-                           "'run_experiments_automatically', true ); " +
-                      "CROWDLOGGER.experiments.run_available_experiments(); "+
-                       "CROWDLOGGER.notifications.unset_notification('new_experiments');" +
-                       "hide_element('new_experiments_notification');" +
-                    "\">"+
-                        "Run now and run automatically in the future</span>"+
-                    "</span><p>" +
-                    "<span class=\"button\" style=\"width: 100%\" onclick=\"" +
-                       "CROWDLOGGER.notifications.unset_notification('new_experiments');" +
-                       "hide_element('new_experiments_notification');" +
-                    "\">Run experiments later</span></td><td>" +
-                    "</td></tr>";
+                notifications.append('<tr id="new_experiments_notification">' +
+                    '<td class="alert"></td>' +
+                    '<td>There are new experiments to run!</td><td>' +
+                    '<span class="buttonPanel" style="height: auto;">' +
+                    '<span class="button" style="width: 100%" '+
+                       'id="run_new_experiments">'+
+                       'Run experiments now</span><p>' +
+                    '<span class="button" style="width: 100%" '+
+                        'id="run_experiments_automatically">'+
+                        'Run now and run automatically in the future</span>'+
+                    '</span><p>' +
+                    '<span class="button" style="width: 100%" '+
+                        'id="run_experiments_later">'+
+                        'Run experiments later</span></td><td>' +
+                    '</td></tr>');
+
+                notifications.find('#run_new_experiments').click(function(){
+                    CROWDLOGGER.experiments.run_available_experiments();
+                    CROWDLOGGER.notifications.unset_notification(
+                        'new_experiments');
+                    jq('#new_experiments_notification').hide();
+                });
+
+                notifications.find(
+                        '#run_experiments_automatically').click(function(){
+                    CROWDLOGGER.preferences.set_bool_pref(
+                       'run_experiments_automatically', true );
+                    CROWDLOGGER.experiments.run_available_experiments();
+                    CROWDLOGGER.notifications.unset_notification(
+                        'new_experiments');
+                    jq('#new_experiments_notification').hide();
+                });
+
+                notifications.find('#run_experiments_later').click(function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'new_experiments');
+                    jq('#new_experiments_notification').hide();
+                });
             }
 
             // Check for notifications about unread messages.
             if( note_board.new_messages > 0 ){
                 notifications_posted++;
-                notifications += "<tr><td class=\"alert\"></td>" +
+                notifications.append("<tr><td class=\"alert\"></td>" +
                     "<td>There are <a href=\"#messages\">new messages</a> " +
-                    " from the project researchers.</td><td></td></tr>";
+                    " from the project researchers.</td><td></td></tr>");
             }
 
             // Check for notifications about raffle wins.
             if( note_board.unredeemed_raffle_win > 0 ){
                 notifications_posted++;
-                notifications += "<tr><td class=\"alert\"></td>" +
+                notifications.append("<tr><td class=\"alert\"></td>" +
                     "<td>You have <a href=\"#raffleWins\">un-redeemed</a> " + 
-                    " raffle wins.</td><td></td></tr>";
+                    " raffle wins.</td><td></td></tr>");
             }
 
             if( notifications_posted === 0 ){
-                notification_elm.innerHTML = "No new notifications";
+                notification_elm.html("No new notifications");
                 note_board.new_notifications = 0;
             } else {
-                notifications += "</table>";
+                //notifications += "</table>";
                 //B_DEBUG   
                 CROWDLOGGER.debug.log( "Added " + notifications + 
                     " to the status page.\n" );
                 //E_DEBUG
-                notification_elm.innerHTML = notifications;
+                //notification_elm.innerHTML = notifications;
+                notification_elm.append(notifications);
             }
+
+
+            // Place listeners.
+            
 //        }
     }
 
@@ -479,7 +544,7 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     if( messages_elm ){
         messages_elm.innerHTML = "<span class=\"loading\">Loading ...</span>";
         setTimeout( function(){
-            CROWDLOGGER.gui.study.pages.populate_messages( messages_elm );
+            CROWDLOGGER.gui.study.pages.populate_messages( jq(messages_elm), jq);
         }, 5 );
     }
 
@@ -629,16 +694,16 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
  * @param {object} doc_element  The document element to which the messages 
  *      should be added. 
  */
-CROWDLOGGER.gui.study.pages.populate_messages = function( doc_element ){
+CROWDLOGGER.gui.study.pages.populate_messages = function( doc_jq, jq ){
 
     // Called when we hear back from the server.
     var on_server_response = function( response ){
-        var html_to_add = "";
+        var html_to_add;
 
         // Check if there are new messages.
         var most_recent_message_id = parseInt(
             CROWDLOGGER.preferences.get_char_pref(
-                "most_recent_message_id", "0" ) );
+                'most_recent_message_id', '0' ) );
 
         // Split the message up into lines.
         var messages = response.split( /\n/ );
@@ -649,32 +714,12 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_element ){
             if( parseInt( messages[0] ) > parseInt( most_recent_message_id )){
                 var new_message_id = messages[0];
                 CROWDLOGGER.preferences.set_char_pref(
-                    "most_recent_message_id", new_message_id );
+                    'most_recent_message_id', new_message_id );
             }
         }
-
 
         // Print out the messages. Start with the second line -- that's where
         // the messages start.
-/*        for( var i = 1; messages !== undefined && i < messages.length; i++ ){
-
-            var parts = messages[i].split(/\t/);
-            var the_date  = new Date( parts[1] );
-            var entry = "<td class=\"date\">" +
-                CROWDLOGGER.gui.study.pages.months[the_date.getMonth()] + " " + 
-                the_date.getDate() + ", " + the_date.getFullYear()+"</td><td>"+
-                parts[2] + "</td>";
-
-            // If the current message is new, we should highlight it.
-            if( parseInt( parts[0] ) > most_recent_message_id ){
-                entry = "<tr class=\"newMessage\">" + entry + "</tr>";
-            } else {
-                entry = "<tr>" + entry + "</tr>";
-            }
-
-            html_to_add += entry;
-        }
-*/
         if( messages !== undefined && messages.length > 0 ) {
             var parts = messages[1].split(/\t/);
             var the_date  = new Date( parts[1] );
@@ -685,72 +730,50 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_element ){
                     CROWDLOGGER.gui.study.pages.MESSAGE_SUMMARY_SIZE ) + "...";
             }
 
-/*            var entry = "<td class=\"date\">" +
-                CROWDLOGGER.gui.study.pages.months[the_date.getMonth()] + " " + 
-                the_date.getDate() + ", " + the_date.getFullYear()+"</td><td>"+
-                message_summary + "</td>";
-*/
-            var entry = "The most recent message is from " +
-                "<span class=\"date\">" +
+            var entry = jq(
+                '<span>The most recent message is from ' +
+                '<span class="date">' +
                 CROWDLOGGER.gui.study.pages.months_long[the_date.getMonth()] + 
-                " " + the_date.getDate() + "</span> " +
-                "(<span class=\"messageSummary\">\"" + message_summary + 
-                "\"</span>).";
+                ' ' + the_date.getDate() + '</span> ' +
+                '(<span class="messageSummary">"' + message_summary + 
+                '"</span>).</span>');
 
             // If the current message is new, we should highlight it.
             if( parseInt( parts[0] ) > most_recent_message_id ){
-                entry = "<tr class=\"newMessage\">" + entry + "</tr>";
+                entry = jq("<span> class=\"newMessage\">").append(entry);
             } else {
-                entry = "<tr>" + entry + "</tr>";
+                entry = jq("<span>").append(entry);
             }
 
-            html_to_add += entry;
+            html_to_add = entry;
 
             var message_url = CROWDLOGGER.preferences.get_char_pref(
-                "show_messages_url", "" );
+                'show_messages_url', '' );
             var total_message_count = parseInt( parts[0] );
             var new_message_count = total_message_count- most_recent_message_id;
-            var message_info = "There are <u>no new messages</u> of ";
+            var message_info = '<span>There are <u>no new messages</u> of ';
             if( new_message_count > 0 ) {
-                message_info = "There are <u>" + new_message_count + 
-                    "</u> new messages of ";
+                message_info = '<span>There are <u>' + new_message_count + 
+                    '</u> new messages of ';
             }
-            message_info += "<u>" + total_message_count + "</u> total messages.";
+            message_info += '<u>'+ total_message_count +
+                '</u> total messages.</span>';
 
-            html_to_add = message_info + "<br>" + html_to_add + "<br>" +
-                "<a href=\"#\" " +
-                "onclick=\"CROWDLOGGER.gui.windows.open_tab('" + message_url +
-                "');\">Click here to see all messages.</a>";
+            html_to_add = jq(message_info).append('<br>').append(html_to_add).
+                append('<br><a href="#" id="see_messages">'+
+                'Click here to see all messages.</a></span>');
 
-            /*html_to_add = "<table class=\"messages\">" + html_to_add + 
-                "<table><p><a href=\"#\" " +
-                "onclick=\"CROWDLOGGER.gui.windows.open_tab('" + message_url +
-                "');\">Click here to see all " + new_message_count +
-                " new messages of " + total_message_count + 
-                " total messages.</a>";
-            */
+            html_to_add.find('#see_messages').click(function(){
+                CROWDLOGGER.gui.windows.open_tab(message_url);
+            });
 
         } else {
-            html_to_add = "No messages at this time.";
+            html_to_add = jq('<span>No messages at this time.</span>');
         }
 
-        // If there are no messages, mention that.
-/*        if( messages === undefined || messages.length == 0 ){
-            html_to_add = "No messages at this time.";
-        } else {
-            var message_url = CROWDLOGGER.preferences.get_char_pref(
-                "show_messages_url", "" );
-            html_to_add = "<table class=\"messages\">" + html_to_add + 
-                "<table><p><a href=\"#\" " +
-                "onclick=\"CROWDLOGGER.gui.windows.open_tab('" + message_url +
-                "');\">Click here to see all " +
-                 + " of " +  + " messages.</a>";
-        }
-*/
-
-        doc_element.innerHTML = html_to_add;
-
-        CROWDLOGGER.notifications.unset_notification( "new_messages" );
+        doc_jq.html('');
+        doc_jq.append(html_to_add);
+        CROWDLOGGER.notifications.unset_notification( 'new_messages' );
     };
 
     // Check for messages.
@@ -776,6 +799,8 @@ CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_element ){
 
         // Check if there are any winnings.
         if( response !== "" && response !== "false" ){
+            CROWDLOGGER.debug.log('Raffle response: '+ response);
+
             var html_to_add = "The drawings you have won are listed below " +
              "along with the date on which the drawing took place. " +
              "Click on the 'View' button to redeem and view your Amazon.com " +

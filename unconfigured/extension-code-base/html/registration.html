@@ -16,53 +16,8 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
-    <script>
-    <!--
-        var CROWDLOGGER;
+    <script src="../html-js/registration.js"></script>
 
-        /**
-         * Called when we have found the CROWDLOGGER object. 
-         * Checks if this page has been initialized yet and adds the listeners.
-         */
-        function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            CROWDLOGGER.debug.log( "init_elm: " + init_elm.innerHTML + "\n" );
-            if( init_elm && ( init_elm.innerHTML === "" ||
-                              init_elm.innerHTML === "no listeners" ) ){
-                init_listeners();
-            }
-        }
-
-        /**
-         * This will add listeners to the form to check if the register button 
-         * should be dis/en-abled.
-         */
-        function init_listeners(){
-            var buttons = [document.getElementById( "register_button_enabled" ),
-                          document.getElementById( "register_button_disabled" )];
-
-            window.addEventListener( "change", function(){
-                if( CROWDLOGGER ){
-                    CROWDLOGGER.study.registration.check_form( document, buttons );
-                }
-            }, false );
-            window.addEventListener( "command", function(){
-                if( CROWDLOGGER ){
-                    CROWDLOGGER.study.registration.check_form( document, buttons );
-                }
-            }, false );
-            window.addEventListener( "click", function(){
-                if( CROWDLOGGER ){
-                    CROWDLOGGER.study.registration.check_form( document, buttons );
-                }
-            }, false );
-    
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-    -->
-    </script>
 </head>
 <body id="status_page_body">
 <span class="hidden" id="init"></span>
@@ -185,8 +140,7 @@ study. We do not keep track of this information in any logged data.</span>
         What is your occupation (e.g., [grad] student, professor, administrative staff, accountant, etc.)?
         <ul>
             Occupation: <input type="text" name="occupation" size="16" />
-            <a href="#" onclick="document.registration.occupation.value='PNA';
-                return false;">I prefer not to answer</a>
+            <a href="#" class="pna">I prefer not to answer</a>
         </ul>
 
         <p></p>
@@ -258,9 +212,7 @@ o Doctorate degree (for example: PhD, EdD)
         not a student, leave this blank.
         <ul>
             Concentration: <input type="text" name="concentration" size="16" />
-            <a href="#" 
-                onclick="document.registration.concentration.value='PNA';
-                return false;">I prefer not to answer</a>
+            <a href="#" class="pna">I prefer not to answer</a>
         </ul>         
 
         <p></p>
@@ -272,9 +224,7 @@ o Doctorate degree (for example: PhD, EdD)
         What is your nationality?
         <ul>
             Nationality: <input type="text" name="nationality" size="16" />
-            <a href="#" 
-                onclick="document.registration.nationality.value='PNA';
-                return false;">I prefer not to answer</a>
+            <a href="#" class="pna">I prefer not to answer</a>
         </ul>
 
         <p></p>
@@ -287,17 +237,15 @@ o Doctorate degree (for example: PhD, EdD)
                 <td>Country:</td>
                 <td> <input type="text" name="country" size="16" /></td>
                 <td>
-            <a href="#" 
-                onclick="document.registration.country.value='PNA';
-                return false;">I prefer not to answer</a>
+                    <a href="#" class="pna2" data-name="country"
+                        >I prefer not to answer</a>
                 </td>
             </tr><tr>
                 <td>Province/state:</td>
                 <td><input type="text" name="state" size="16" /></td>
                 <td>
-            <a href="#" 
-                onclick="document.registration.state.value='PNA';
-                return false;">I prefer not to answer</a>
+                    <a href="#" class="pna2" data-name="state"
+                        >I prefer not to answer</a>
                 </td>
             </tr>
             </table>
@@ -379,12 +327,7 @@ please enter the code they gave you here:
             <span class="button disabled" id="register_button_disabled">
                 Register
             </span>
-            <span class="button" id="register_button_enabled" 
-                onclick="
-                CROWDLOGGER.study.registration.submit(document, window);
-                CROWDLOGGER.study.launch_refer_a_friend_dialog( true ); 
-                return false;">
-            Register</span>
+            <span class="button" id="register_button_enabled">Register</span>
         </span>
 
     <p>

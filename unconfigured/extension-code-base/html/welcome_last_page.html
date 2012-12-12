@@ -16,25 +16,8 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
-    <script>
-    <!--
-        var CROWDLOGGER;
+    <script src="../html-js/welcome_last_page.js"></script>
 
-        /**
-         * Called when the page loads, after the CROWDLOGGER object is found.
-         */
-        function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            if( init_elm ){
-                if( init_elm.innerHTML === "" ){
-                }
-            }
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-    -->
-    </script>
 </head>
 <body>
 <span class="hidden" id="init"></span>
@@ -72,7 +55,7 @@
         </ul>
         <li>You can pause or resume logging by clicking the pause or play button (<img src="../css/img/pauseLogging.png"/>/<img src="../css/img/startLogging.png"/>) in the menu.</li>
         <li>Nothing is logged while in private/incognito browsing mode.</li>
-        <li>You can access the current status of the logger as well as access an ever growing list of tools that allow you to use your explore your search history in the <a href="javascript:CROWDLOGGER.gui.study.pages.launch_status_page();">Status Page</a>.</li>
+        <li>You can access the current status of the logger as well as access an ever growing list of tools that allow you to use your explore your search history in the <a href="#" id="launch_status_page">Status Page</a>.</li>
     </ul>
 
     <!-- Everything below here is for the footer. -->

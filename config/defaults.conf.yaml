@@ -11,6 +11,7 @@ DESCRIPTION: An extension that logs user behavior in a privacy preserving manner
 CREATOR: CIIR
 HOMEPAGE: http://code.google.com/p/crowdlogger/
 ID: crowdlogger@myurl.org
+CONTACT_EMAIL: name@email
 FF_MIN_VERSION: 3.5
 FF_MAX_VERSION: 16.0.*
 

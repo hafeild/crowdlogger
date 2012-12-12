@@ -13,6 +13,7 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
+    <script src="../html-js/search_histogram.js"></script>
 
     <style>
         /* Sortable tables */
@@ -25,35 +26,6 @@
 
     </style>
 
-    <script>
-        <!--
-        var CROWDLOGGER;
-
-        /**
-         * Called when the CROWDLOGGER variable is found. Checks if this page 
-         * has been initialized yet.
-         */
-        function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            if( init_elm ) {
-                if( init_elm.innerHTML === "" ){
-                    CROWDLOGGER.gui.tools.diplay_search_histogram( document );
-                }
-            }
-        }
-
-        /**
-         * Refreshes the contents of the page.
-         */
-        function refresh_page(){
-            CROWDLOGGER.gui.tools.diplay_search_histogram( document );
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-
-        -->
-    </script>
 
 </head>
 <body>
@@ -68,8 +40,8 @@
                 <br>
             </span>
         </div>
-        <span class="refreshLink">
-            <a href="#" onclick="refresh_page(); return false;">Refresh</a>
+        <span class="refreshlink">
+            <a href="#">Refresh</a>
         </span>
     </div>
  

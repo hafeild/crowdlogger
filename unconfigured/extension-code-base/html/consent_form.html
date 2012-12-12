@@ -16,52 +16,8 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
-    <script>
-    <!--
-        var CROWDLOGGER;
+    <script src="../html-js/consent_form.js"></script>
 
-        /**
-         * Called when the CROWDLOGGER variable is found; currently not really 
-         * needed.
-         */
-        function check_if_initialized(){
-        }  
- 
-        /**
-         * Called when the user clicks on "I Agree". Sends a message to
-         * the server saying that the user has accepted the consent form.
-         */
-        function on_accept(){
-            if( CROWDLOGGER ){
-                CROWDLOGGER.study.user_accepted_consent_form();
-                window.close();
-            } else {
-                setTimeout( on_accept, 5 );
-            }
-        }
-
-        function read_form(){
-            var agree_button = document.getElementById( "agree_button" );
-            if( agree_button ){
-                var classes = agree_button.getAttribute( "class" );
-                classes = classes.replace( /\bdisabled\b/, " " );
-                agree_button.setAttribute( "class", classes );
-                agree_button.setAttribute( "onclick", "on_accept()");
-                
-            }
-        }
-
-        /**
-         * Called when the user clicks the "I do not agree" button.
-         */
-        function on_reject(){
-            window.close();
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-    -->
-    </script>
 </head>
 <body>
 <div class="bodyWrapper">
@@ -111,9 +67,8 @@
          >I have read this form.</a></span>
         -->
         <div class="buttonPanel" id="button_panel">
-            <span class="button" id="agree_button" 
-                onclick="on_accept();">I agree</span>
-            <span class="button" onclick="on_reject()" id="decline_button">I do not agree</span>
+            <span class="button" id="agree_button">I agree</span>
+            <span class="button" id="decline_button">I do not agree</span>
         </div>
 
 <!--    <iframe id="consent_frame" height="300px" width="780px"></iframe> -->

@@ -311,86 +311,97 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
     // The function to call when the page loads.
     /** @ignore */
     var search_trail_handler = function( doc ){
-            // This points to the container on the web page where we will
-            // place the search trail.
-            var contents_element = doc.getElementById("contents");
+        var jq = doc.defaultView.jQuery;
 
-            // Clear the contents.
-            contents_element.innerHTML = "";
-           
-            var se_shortener = function( se ) {
-                if( se.match( /google/ ) !== null ) {
-                    return "Google";
-                } else if( se.match( /bing/ ) !== null ) {
-                    return "Bing";
-                } else if( se.match( /yahoo/ ) !== null ) {
-                    return "Y!";
-                }
-            } 
+        // This points to the container on the web page where we will
+        // place the search trail.
+        var contents_element = jq('#contents');
 
-            // This will be called when the file is finished being read.
-            var on_file_read = function( file_contents ){
+        // Clear the contents.
+        contents_element.html('');
+       
+        var se_shortener = function( se ) {
+            if( se.match( /google/ ) !== null ) {
+                return "Google";
+            } else if( se.match( /bing/ ) !== null ) {
+                return "Bing";
+            } else if( se.match( /yahoo/ ) !== null ) {
+                return "Y!";
+            }
+        } 
 
-                // Get the search histogram for the log.
-                var search_trails = log_to_search_trails_by_day( file_contents );
+        // This will be called when the file is finished being read.
+        var on_file_read = function( file_contents ){
+
+            // Get the search histogram for the log.
+            var search_trails = log_to_search_trails_by_day( file_contents );
 
 
-                // The header.
-                var html = "<table>";
+            // The header.
+            var html = jq('<table>');
 
-                // Now iterate through the array of search trails in reverse order,
-                // separating days with a ruler.
-                for( var i = search_trails.length-1; i >= 0; i-- ){
-                    //B_DEBUG
-                    //CROWDLOGGER.debug.log( "Analyzing search trail " + i + "\n" );
-                    //E_DEBUG
+            // Now iterate through the array of search trails in reverse order,
+            // separating days with a ruler.
+            for( var i = search_trails.length-1; i >= 0; i-- ){
+                //B_DEBUG
+                //CROWDLOGGER.debug.log( "Analyzing search trail " + i + "\n" );
+                //E_DEBUG
 
-                    html += "<tr><td colspan=\"2\" class=\"date\">" +
-                        search_trails[i].to_key() + "</td></tr>"; // The date.
+                html.append('<tr><td colspan="2" class="date">'+
+                    search_trails[i].to_key() +'</td></tr>'); // The date.
 
-                    for( var j = 0; j < search_trails[i].events.length; j++ ) {
-                        var cur_event = search_trails[i].events[j];
-                        var the_date = new Date(cur_event.time );
-                        html += "<tr><td class=\"time\">" + 
-                            CROWDLOGGER.util.date_to_time_of_day(the_date) +
-                            "</td><td class=\"" + cur_event.type + "\">";
+                for( var j = 0; j < search_trails[i].events.length; j++ ) {
+                    var cur_event = search_trails[i].events[j];
+                    var the_date = new Date(cur_event.time );
+                    var row = jq('<tr>').appendTo(html);
+                    row.append('<td class="time">' + 
+                        CROWDLOGGER.util.date_to_time_of_day(the_date) +
+                        '</td>');
+                    var td = jq('<td class="'+ cur_event.type + '">').
+                        appendTo(row);
 
-                        if( cur_event.type === "serpClick" ) {
-                            html += "<span class=\"serpClick\">&gt;</span> ";
-                        } else if( cur_event.type === "click" ) {
-                            html += "<span class=\"click\">&gt;&gt;</span> ";
-                        }
-
-                        if( cur_event.link !== "" ) {
-                            html += "<a href=\"\" onclick=\"CROWDLOGGER.gui.windows.open_tab('"+
-                                cur_event.link + "'); return false;\">" + 
-                               (cur_event.display.length > 50 ? 
-                                    cur_event.display.substring(0, 50)+"..." : 
-                                    cur_event.display ) + 
-                               "</a>"; 
-                        } else {
-                            html += 
-                               (cur_event.display.length > 50 ? 
-                                    cur_event.display.substring(0, 50)+"..." : 
-                                    cur_event.display );
-                        }
-
-                        if( cur_event.type=="search" ) {
-                            html += " <span class=\"searchEngine\">("+
-                                se_shortener(cur_event.se) + ")</span>";
-                        }
-
-                        html +=  "</td></tr>\n"; 
+                    if( cur_event.type === "serpClick" ) {
+                        td.append('<span class="serpClick">&gt; </span>');
+                    } else if( cur_event.type === "click" ) {
+                        td.append('<span class="click">&gt;&gt; </span>');
                     }
-                }
-                html += "</table>";
 
-                // Place the html.
-                contents_element.innerHTML = html;
-            };
-            
-            // Read the activity file in and then call the function above.
-            CROWDLOGGER.io.log.read_activity_log( on_file_read );
+                    if( cur_event.link !== "" ) {
+                        var link = jq('<a href="">');
+                        link.click((function(link_text){ 
+                            return function(){
+                                CROWDLOGGER.gui.windows.open_tab(link_text); 
+                                return false;
+                            }
+                        })(cur_event.link));
+                        link.html(' '+ cur_event.display.length > 50 ? 
+                                cur_event.display.substring(0, 50)+'...' : 
+                                cur_event.display );
+                        link.attr('title', cur_event.link);
+                        td.append(link);
+
+                    } else {
+                        td.append('<span> '+ 
+                           (cur_event.display.length > 50 ? 
+                                cur_event.display.substring(0, 50)+'...' : 
+                                cur_event.display ) +'</span>');
+                    }
+
+                    if( cur_event.type=="search" ) {
+                        td.append('<span class="searchEngine"> ('+
+                            se_shortener(cur_event.se) + ')</span>');
+                    }
+
+                    //html +=  "</td></tr>\n"; 
+                }
+            }
+
+            // Place the html.
+            contents_element.append(html);
+        };
+        
+        // Read the activity file in and then call the function above.
+        CROWDLOGGER.io.log.read_activity_log( on_file_read );
             
     };
 

@@ -27,6 +27,7 @@ CROWDLOGGER.gui.study.pages.welcome = {};
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_start_page = function(  welcome_doc,
         starter_doc ){
+    var jq = welcome_doc.defaultView.jQuery;
     
     // Change the next/skip buttons on the wizard.
     var register_button_enabled =
@@ -39,7 +40,8 @@ CROWDLOGGER.gui.study.pages.welcome.modify_start_page = function(  welcome_doc,
 
     if( register_button_enabled && register_button_disabled ){
         register_button_enabled.innerHTML = "Continue";
-        register_button_enabled.setAttribute( "onclick", "next();" );
+        jq(register_button_enabled).unbind('click').click(
+            welcome_doc.defaultView.next);
 
         CROWDLOGGER.util.enable_button( [register_button_enabled, 
             register_button_disabled] );
@@ -70,6 +72,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_start_page = function(  welcome_doc,
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_last_page = function(
         welcome_doc, closer_doc ){
+    var jq = welcome_doc.defaultView.jQuery;
 
     // Change the welcome wizard so that there is a "show status"
     // and "exit" button.
@@ -83,16 +86,18 @@ CROWDLOGGER.gui.study.pages.welcome.modify_last_page = function(
 
     if( register_button_enabled && register_button_disabled ){
         register_button_enabled.innerHTML = "Show the status page";
-        register_button_enabled.setAttribute( "onclick", 
-            "CROWDLOGGER.gui.study.pages.launch_status_page();" );
+        jq(register_button_enabled).unbind('click').click( 
+            CROWDLOGGER.gui.study.pages.launch_status_page);
 
         CROWDLOGGER.util.enable_button( [register_button_enabled,
             register_button_disabled] );
     }
     if( skip_button ){
         skip_button.innerHTML = "Finished";
-        skip_button.setAttribute( "onclick", 
-            "window.open('', '_self', ''); window.close();" );
+        jq(skip_button).unbind('click').click(function(){ 
+            welcome_doc.defaultView.open('', '_self', ''); 
+            welcome_doc.defaultView.close();
+        });
         skip_button.style.display = "";
     }
 };
@@ -121,6 +126,7 @@ CROWDLOGGER.gui.study.pages.welcome.should_consent_form_be_shown = function(){
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_consent_form = function( welcome_doc,
         consent_doc ){
+    var jq = welcome_doc.defaultView.jQuery;
 
     // Populate the consent page.
     CROWDLOGGER.gui.study.pages.refresh_consent_page( consent_doc );
@@ -156,14 +162,16 @@ CROWDLOGGER.gui.study.pages.welcome.modify_consent_form = function( welcome_doc,
         "CROWDLOGGER.study.user_accepted_consent_form(); parent.next();";
     var next_button = consent_doc.getElementById( "agree_button" );
     if( next_button ){
-        next_button.setAttribute( "onclick", on_accept ); 
+        jq(next_button).unbind('click').click( welcome_doc.defaultView.on_accept ); 
         next_button.innerHTML = "Accept and continue";
     }
     // Decline button:
-    var on_decline = "parent.open('', '_self', ''); parent.close();";
     var decline_button = consent_doc.getElementById( "decline_button" );
     if( decline_button ){
-        decline_button.setAttribute( "onclick", on_decline );
+        jq(decline_button).unbind('click').click( function(){
+            welcome_doc.defaultView.parent.open('', '_self', ''); 
+            welcome_doc.defaultView.parent.close();
+        });            
         decline_button.innerHTML = "Decline and exit";
     }
 
@@ -211,7 +219,8 @@ CROWDLOGGER.gui.study.pages.welcome.modify_consent_form = function( welcome_doc,
  * Determines if the registration page should be shown. Right now, we will
  * always show it. 
  */
-CROWDLOGGER.gui.study.pages.welcome.should_registration_page_be_shown = function(){
+CROWDLOGGER.gui.study.pages.welcome.should_registration_page_be_shown=function()
+{
     return true;
 };
 
@@ -224,6 +233,8 @@ CROWDLOGGER.gui.study.pages.welcome.should_registration_page_be_shown = function
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_registration_page = function(
         welcome_doc, registration_doc ){
+    var jq = welcome_doc.defaultView.jQuery;
+
     var register_button_enabled = 
         welcome_doc.getElementById( "welcome_wizzard_next_button" );
     var register_button_disabled =
@@ -239,8 +250,11 @@ CROWDLOGGER.gui.study.pages.welcome.modify_registration_page = function(
     // Change the button text.
     register_button_enabled.innerHTML = "Register and continue";
     register_button_disabled.innerHTML = "Register and continue";
-    register_button_enabled.setAttribute( "onclick", 
-        "CROWDLOGGER.study.registration.submit(frame.contentDocument); next();" );
+    jq(register_button_enabled).unbind('click').click( function(){ 
+        CROWDLOGGER.study.registration.submit(
+            welcome_doc.defaultView.frame.contentDocument); 
+        next();
+    });
 
     // Make sure the wizard button panel is displayed. 
     var welcome_wizard_button_panel = welcome_doc.getElementById(
@@ -255,7 +269,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_registration_page = function(
         welcome_doc.getElementById( "welcome_wizzard_skip_button" );
     if( skip_button ){
         skip_button.innerHTML = "Skip this step";
-        skip_button.setAttribute( "onclick", "next();" );
+        jq(skip_button).unbind('click').click( welcome_doc.defaultView.next );
         skip_button.style.display = "";
     }
 
@@ -302,9 +316,10 @@ CROWDLOGGER.gui.study.pages.welcome.modify_registration_page = function(
 /**
  * Determines if the refer-a-friend page should be shown.
  */
-CROWDLOGGER.gui.study.pages.welcome.should_refer_a_friend_page_be_shown = function(){
+CROWDLOGGER.gui.study.pages.welcome.should_refer_a_friend_page_be_shown = 
+        function(){
     return true;
-}
+};
 
 /**
  * Populates the refer_a_friend page and modifies it for the welcome wizard.
@@ -314,6 +329,8 @@ CROWDLOGGER.gui.study.pages.welcome.should_refer_a_friend_page_be_shown = functi
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_refer_a_friend_page = function(
         welcome_doc, refer_a_friend_doc ){
+
+    var jq = welcome_doc.defaultView.jQuery;
 
     var register_button_enabled =
         welcome_doc.getElementById( "welcome_wizzard_next_button" );
@@ -330,7 +347,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_refer_a_friend_page = function(
 
     // Change the button text.
     register_button_enabled.innerHTML = "Continue";
-    register_button_enabled.setAttribute( "onclick", "next();" );
+    jq(register_button_enabled).unbind('click').click( welcome_doc.defaultView.next );
 
 
     // Make sure the correct button are enabled.
@@ -352,9 +369,9 @@ CROWDLOGGER.gui.study.pages.welcome.modify_refer_a_friend_page = function(
 /**
  * Determines if the preference page should be shown in the welcome wizard.
  */
-CROWDLOGGER.gui.study.pages.welcome.should_preference_page_be_shown = function(){
+CROWDLOGGER.gui.study.pages.welcome.should_preference_page_be_shown=function(){
     return true;
-}
+};
 
 
 /**
@@ -365,6 +382,7 @@ CROWDLOGGER.gui.study.pages.welcome.should_preference_page_be_shown = function()
  */
 CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page = function(
         welcome_doc, preferences_doc ){
+    var jq = welcome_doc.defaultView.jQuery;
 
     var register_button_enabled =
         welcome_doc.getElementById( "welcome_wizzard_next_button" );
@@ -389,9 +407,12 @@ CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page = function(
 
     // Change the button text.
     register_button_enabled.innerHTML = "Save and continue";
-    register_button_enabled.setAttribute( "onclick",
-        "if( CROWDLOGGER.gui.preferences.submit_preferences( " +
-            "frame.contentDocument) ){ next(); }" );
+    jq(register_button_enabled).unbind('click').click(function(){
+        if( CROWDLOGGER.gui.preferences.submit_preferences( 
+                welcome_doc.defaultView.frame.contentDocument) ){ 
+            next(); 
+        }
+    });
 
     // Make sure the buttons are enabled.
     CROWDLOGGER.util.enable_button( [register_button_enabled,
@@ -400,7 +421,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page = function(
     // Take care of the skip button.
     if( skip_button ){
         skip_button.innerHTML = "Skip this step";
-        skip_button.setAttribute( "onclick", "next();" );
+        jq(skip_button).unbind('click').click( welcome_doc.defaultView.next );
         skip_button.style.display = "";
     }
 
@@ -418,8 +439,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page = function(
     }
 
     // Populate the preferences page.
-    CROWDLOGGER.gui.preferences.referesh_preference_page( preferences_doc );
-
+    CROWDLOGGER.gui.preferences.refresh_preference_page( preferences_doc );
 };
 
 } // END CROWDLOGGER.gui.study.pages.welcome NAMESPACE

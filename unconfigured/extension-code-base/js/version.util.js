@@ -114,7 +114,7 @@ CROWDLOGGER.version.util.init = function(){
     // The error function will write a message to the error log.
     /** @ignore */
     on_error = function( error ){
-        CROWDLOGGER.io.file.write_to_error_log(
+        CROWDLOGGER.io.log.write_to_error_log(
             "In CROWDLOGGER.version.info.check_for_new_version: " + error );
     }
 

@@ -17,67 +17,8 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
-    <script>
-    <!--
-        var CROWDLOGGER;
-        var experimentRefreshActivated = false;
-        var experimentRefreshInterval  = 5 * 1000; // 5 sec.
-        var experimentElm = undefined;
-        
+    <script src="../html-js/status.js"></script>
 
-        /**
-         * In FF, launches a custom event (crowdlogger_status_page_refresh) that
-         * the %%PROJECT_NAME%% extension is listening for. In Chrome, refreshes
-         * via the CROWDLOGGER object directly.
-         */
-        function refresh_page(){
-            if( CROWDLOGGER !== undefined ){
-                CROWDLOGGER.gui.study.pages.refresh_status_page(document);
-            }
-        }
-
-        /**
-         * Called when the CROWDLOGGER variable has been found. Checks if this 
-         * page has been initialized yet.
-         */
-        function check_if_initialized(){
-            var init_elm = jQuery("#init");
-            if( init_elm.length > 0 ){
-                if( init_elm.innerHTML === "" ){
-                    CROWDLOGGER.gui.study.pages.refresh_status_page( document );
-                }
-            }
-
-            if( experimentRefreshActivated === false ) {
-                experimentRefreshActivated = true;
-                refreshExperimentStats();
-            }
-        }
-
-
-        /**
-         * Refreshes just the experiments section, every few seconds.
-         */
-        function refreshExperimentStats() {
-            //CROWDLOGGER.debug.log( "In refreshExperimentStats!\n" );
-
-            if( experimentElm === undefined ) {
-                experimentElm = jQuery("#experiments")[0];
-            }
-            CROWDLOGGER.gui.study.pages.populate_experiments_status(
-                document, experimentElm ); 
-
-            setTimeout( refreshExperimentStats, experimentRefreshInterval );
-        }
-
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-
-
-
-    -->
-    </script>
 </head>
 <body id="status_page_body">
 <span class="hidden" id="init"></span>
@@ -93,8 +34,8 @@
             </span>
         </div>
         <span class="refreshLink">
-            [<a href="#" onclick="refresh_page(); return false;">Refresh</a>] 
-            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+            [<a href="#" id="refresh_button">Refresh</a>] 
+            [<a href="#" class="close_button">Close page</a>]
         </span>
     </div>
     
@@ -104,7 +45,9 @@
     <span id="update_message" class="update_message hidden">
 
         %%PROJECT_NAME%% has been updated to <span
-name="version_no"></span>. <a name="whatsnew" href="#" onclick="return false;">Click here</a> to see what's new in this version of %%PROJECT_NAME%%. 
+name="version_no"></span>. 
+<a name="whatsnew" href="#" id="whatsnew">Click here</a> 
+to see what's new in this version of %%PROJECT_NAME%%. 
 <br>
 Please take a look at the <a
 href="#notifications">notifications section</a> to be aware of and address any
@@ -192,8 +135,7 @@ src="../css/img/startLogging.png"/>), and clicking "Go to status page".
             <div id="tools">
                 <ul>
                     <h2><a href="#" 
-                        onclick="CROWDLOGGER.gui.tools.diplay_search_histogram();
-                                 return false;">Search histogram</a>
+                        id="search_histogram_button">Search histogram</a>
                     </h2>
                     See the searches you have entered and how frequently. You
                     can sort by search or frequency.
@@ -201,39 +143,27 @@ src="../css/img/startLogging.png"/>), and clicking "Go to status page".
                     <p>
 
                     <h2><a href="#" 
-                        onclick="CROWDLOGGER.gui.tools.diplay_search_trails();
-                                 return false;">Search trails</a>
+                        id="search_trails_button">Search trails</a>
                     </h2>
-                    See the searches you have conducted and pages you've visited in
-                    chronological order.
+                    See the searches you have conducted and pages you've visited 
+                    in chronological order.
 
                     <p>
                     <h2><a href="#"
-                        onclick="CROWDLOGGER.gui.tools.export_log();
-                                 return false;">Export search log</a>
+                        id="export_log_button">Export search log</a>
                     </h2>
                     View the raw search log and save it to disk.
 
                     <p>
 
 
-                    <h2><a href="#" onclick="
-                            document.getElementById('confirm_clear').
-                                style.display = 'inline-block'; 
-                            document.getElementById('cleared').
-                                    style.display = 'none';
-                            return false;"
-                            >Clear log</a>
+                    <h2><a href="#" 
+                        id="clear_log_button">Clear log</a>
                             <span id="confirm_clear"
                                 style="color:red; display: none"
                                 >Are you sure?
                             <a href="#"
-                                onclick="CROWDLOGGER.io.log.clear_activity_log();
-                                  document.getElementById('cleared').
-                                    style.display = '';
-                                  document.getElementById('confirm_clear').
-                                    style.display = 'none';
-                                return false;">Yes</a></span>
+                                id="clear_log_confirm_button">Yes</a></span>
                         <span id="cleared" 
                                 style="display: none" class="cleared">
                             &ndash; Cleared
@@ -252,9 +182,12 @@ src="../css/img/startLogging.png"/>), and clicking "Go to status page".
             <a name="feedback"></a>
             <h1>Feedback</h1>
             <p>
-            If you have any comments or suggestions about the %%PROJECT_NAME%% system
-            or the study that you would like to let us know, you can email us at            hfeild@cs.umass.edu  or 
-            <a href="#" onclick="window.open('https://crowdlogger.cs.umass.edu/feedback/leaveFeedback.html'); return false;">leave an anonymous message at this web page</a>.
+
+            If you have any comments or suggestions about the %%PROJECT_NAME%%
+            system or the study that you would like to let us know, you can
+            email us at %%CONTACT_EMAIL%% or  <a href="#"
+            id="feedback_button">leave an anonymous message at this web
+            page</a>.
             
         </div> 
         <p>
@@ -262,7 +195,7 @@ src="../css/img/startLogging.png"/>), and clicking "Go to status page".
 
     <div class="header">
         <span class="refreshLink">
-            [<a href="#" onclick="window.open('', '_self', ''); window.close(); return false;">Close page</a>]
+            [<a href="#" class="close_button">Close page</a>]
         </span>
     </div>
                 

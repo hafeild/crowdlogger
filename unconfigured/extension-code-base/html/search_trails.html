@@ -14,6 +14,7 @@
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
+    <script src="../html-js/search_trails.js"></script>
 
     <style>
         /* Sortable tables */
@@ -25,37 +26,6 @@
         }
 
     </style>
-
-    <script>
-        <!--
-        var CROWDLOGGER;
-
-        /**
-         * Called when the CROWDLOGGER variable is found. Checks if this page 
-         * has been initialized yet.
-         */
-        function check_if_initialized(){
-            var init_elm = document.getElementById( "init" );
-            if( init_elm ) {
-                if( init_elm.innerHTML === "" ){
-                    CROWDLOGGER.gui.tools.diplay_search_trails( document );
-                }
-            }
-        }
-
-        /**
-         * Refreshes the contents of the page.
-         */
-        function refresh_page(){
-            CROWDLOGGER.gui.tools.diplay_search_trails( document );
-        }
-
-        // Initialize the search for the CROWDLOGGER variable.
-        init_crowdlogger();
-
-        -->
-    </script>
-
 </head>
 <body>
 <span class="hidden" id="init"></span>
@@ -69,8 +39,8 @@
                 <br>
             </span>
         </div>
-        <span class="refreshLink">
-            <a href="#" onclick="refresh_page(); return false;">Refresh</a>
+        <span class="refreshlink">
+            <a href="#">Refresh</a>
         </span>
     </div>
  
@@ -78,24 +48,32 @@
     <div class="headerBuffer"></div>
 
     <p>
-    This is a tool similar to your browser's web history tool. However, this is different in that we
-    make a distinction between three levels of activities: searches, search result clicks, and non-search
-    result clicks. We also do not currently display pages that were not visited via a click (that will change
+
+    This is a tool similar to your browser's web history tool. However, this is
+    different in that we make a distinction between three levels of activities:
+    searches, search result clicks, and non-search result clicks. We also do not
+    currently display pages that were not visited via a click (that will change
     in future releases).
+
     <p>
-    This is a first pass on what will hopefully become a very useful tool to explore your search and 
-    browsing history. We plan to add additional functionality, such as task identification. If you have
-    suggestions for things to add to the search trails tool or for other %%PROJECT_NAME%% tools, please email
-    <a mailto="info@crowdlogger.org">info@crowdlogger.org</a>.
+
+    This is a first pass on what will hopefully become a very useful tool to
+    explore your search and  browsing history. We plan to add additional
+    functionality, such as task identification. If you have suggestions for
+    things to add to the search trails tool or for other %%PROJECT_NAME%% tools,
+    please email <a mailto="%%CONTACT_EMAIL%%">%%CONTACT_EMAIL%%</a>.
 
     <p>
 
     <table class="searchTrails" style="width: 400px">
     <tr><td class="date">Key:</td></tr>
     <tr><td style="padding-left: 50px;">
-        <span class="search">Search <span class="searchEngine">(search engine)</span></span><br>
+
+        <span class="search">Search 
+            <span class="searchEngine">(search engine)</span></span><br>
         <span class="serpClick"> &gt; Search result click</span><br>
         <span class="click"> &gt;&gt; Non-search result click</span>
+
     </td></tr>
     </table>
 

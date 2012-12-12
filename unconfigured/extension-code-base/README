@@ -24,6 +24,11 @@ This directory contains several prominent sub-directories:
     html/
         Contains HTML files for use with Chrome and Firefox.
 
+    html-js/
+        Contains JavaScript files that correspond directly to the HTML files
+        in html/. These scripts would usually go in <script> tags, but Chrome
+        no longer allows that as of manifest version 2.
+
     js/
         Contains JavaScript files for use with Chrome and Firefox.
 

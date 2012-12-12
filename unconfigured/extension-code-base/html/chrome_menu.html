@@ -10,43 +10,8 @@
 
 <link href="../css/crowdlogger.css" rel="stylesheet" type="text/css">
 
-<script>
-    var CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
-
-    function clicked( x ) {
-        console.log( x );
-        // Create a simple text notification:
-        var notification = webkitNotifications.createHTMLNotification(
-          //'img/pauseLogging.png',  // icon url - can be relative
-          //'Test',  // notification title
-          'notification.html?message=test+message&title=test+title'  // notification body text
-        );
-        
-        // Then show the notification.
-        notification.show();
-    }          
-
-    function store_message(){
-        CROWDLOGGER.message = "Hmmm";
-    }
-
-    function display_message(){
-        var notification = webkitNotifications.createHTMLNotification(
-          '', // Image.
-          'Test',  // notification title
-          '<a href="http://www.google.com">' + CROWDLOGGER.message  + '</a>'// notification body text
-        );
-        
-        // Then show the notification.
-        notification.show();
-
-    }
-
-    function ext(){
-            document.getElementById('my_text').value = 
-                chrome.extension.getURL("");
-    }
-</script>
+<script src="../js/external_lib/jquery.min.js"></script>
+<script src="../html-js/chrome_menu.js"></script>
 
 <html>
 <body class="chrome-menu" 
@@ -57,28 +22,24 @@
 <ul class="flush">
     <li id="crowdlogger-logging-button" 
         class="crowdlogger-logging-off-button menu" 
-        onclick="CROWDLOGGER.logging.toggle_logging(event);"
         title="Turn logging on for %%FULL_PROJECT_NAME%%">
             [Logging: off] Click to start logging
     </li>
 
     <li id="crowdlogger-registration-launch-button" 
         class="crowdlogger-register-button menu" 
-        onclick="CROWDLOGGER.study.launch_registration_dialog(); self.close()"
         title="Register -- your privacy is still maintained!">
             Register
     </li>
  
     <li id="crowdlogger-refer-a-friend-button" 
         class="crowdlogger-refer-a-friend-button menu" 
-        onclick="CROWDLOGGER.study.launch_refer_a_friend_dialog(); self.close()"
         title="Refer friends to this study.">
             Refer a friend
     </li>
  
     <li id="crowdlogger-settings-button" 
         class="crowdlogger-settings-button menu" 
-        onclick="CROWDLOGGER.gui.preferences.launch_preference_dialog(); self.close();"
         title="Settings options for %%PROJECT_NAME%%">
             Settings
     </li>
@@ -86,33 +47,27 @@
 
     <li id="crowdlogger-show-status-page-button" 
         class="crowdlogger-show-messages-button menu" 
-        onclick="CROWDLOGGER.gui.study.pages.launch_status_page(); self.close();"
         title="Show the status page for %%FULL_PROJECT_NAME%%">
             Status page
     </li>
 
     <li id="crowdlogger-help-button" 
         class="crowdlogger-help-button menu" 
-        onclick="CROWDLOGGER.gui.study.pages.launch_help_page(); self.close();"
         title="Information for  %%FULL_PROJECT_NAME%%">
             Help
     </li>
 
-<!--
     <li id="crowdlogger-welcome-wizard-button"
         class="menu" 
-        onclick="CROWDLOGGER.version.util.launch_welcome_page(); self.close();"
         title="Launch the Welcome Wizard for %%FULL_PROJECT_NAME%%">
             Welcome Wizard
     </li>
 
     <li id="crowdlogger-welcome-wizard-button"
         class="menu" 
-        onclick="CROWDLOGGER.experiments.run_test(); self.close();"
         title="Run an experiment">
         Run test experiment
     </li>
--->
 </ul>
 
 </body>
