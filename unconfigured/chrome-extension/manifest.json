@@ -2,6 +2,11 @@
     "name": "%%PROJECT_NAME%%",
     "version": "%%VERSION%%",
     "manifest_version": 2,
+    "icons": {
+        "16": "css/img/crowdlogger-logo.001.16x16.png",
+        "48": "css/img/crowdlogger-logo.001.48x48.png",
+        "128": "css/img/crowdlogger-logo.001.128x128.png"
+    },
     "description": "%%DESCRIPTION%% %%LICENSE%%",
     "browser_action": {
         "default_icon": "css/img/pauseLogging.png",
