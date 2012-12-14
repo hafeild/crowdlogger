@@ -51,7 +51,7 @@ while( $row =  mysql_fetch_array( $result ) )
 
     // Check that the row is not expired!!
     if( time() < strtotime( $row['exp_date'] ) ) 
-        printf( "%s\t%s\t%s\n", $row['date'], $row['url'], $row['redeemed'] );
+        printf( "GO\t%s\t%s\t%s\n", $row['date'], $row['url'], $row['redeemed'] );
 }
 
 // Unlock the table.

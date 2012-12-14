@@ -792,13 +792,13 @@ CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_element ){
 
     // Called when we hear back from the server.
     var on_server_response = function( response ){
-        var DATE     = 0;
-        var URL      = 1;
-        var REDEEMED = 2;
+        var DATE     = 1;
+        var URL      = 2;
+        var REDEEMED = 3;
 
 
         // Check if there are any winnings.
-        if( response !== "" && response !== "false" ){
+        if( response !== "" && response.match(/^GO\t/) !== null ){
             CROWDLOGGER.debug.log('Raffle response: '+ response);
 
             var html_to_add = "The drawings you have won are listed below " +
