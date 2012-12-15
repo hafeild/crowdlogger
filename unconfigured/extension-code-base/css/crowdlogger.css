@@ -2,6 +2,21 @@
 %%LICENSE%%
 */
 
+@font-face {
+font-family: "Open Sans Condensed";
+src: url('fonts/open-sans-condensed/OpenSans-CondLight.ttf')
+}
+
+@font-face {
+font-family: "Open Sans";
+src: url('fonts/open-sans/OpenSans-Regular.ttf')
+}
+
+html {
+    /*font-family: "Open Sans Condensed", arial;*/
+    font-family: "Open Sans", arial;
+}
+
 ul.flush{
     margin: 0px;
     padding: 0px;
