@@ -9,7 +9,11 @@
  * All Rights Reserved
  */
 
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
+html {
+    font-family: "Open Sans", arial;
+}
 
 body {
     background-color:       lightsteelblue; 
@@ -108,7 +112,7 @@ a {
     text-decoration:        underline;
 }
 
-.button {
+/*.button {
     background-color:       lightgray;
     color:                  black;
     border:                 1px steelblue solid;
@@ -129,7 +133,52 @@ span.button:hover {
 span.button:active {
     background-color:       steelblue;
     border-color:           white;
+}*/
+
+.button {
+    background-color:       lightgray;
+    color:                  #444;
+    border:                 1px steelblue solid;
+    padding:                4px;
+    display:                inline-block;
+    /*width:                  100%;
+    display:                table-cell;*/
+    text-align:             center;
+    height:                 100%;
+    vertical-align:         middle;
+    border-radius:          5px;
+    margin-left:            2px;
+    margin-right:           2px;
+    font-size:              90%;
+
+background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%); /* W3C */
+
 }
+
+
+span.button:hover {
+    background-color:       lightsteelblue;
+
+    background: -moz-linear-gradient(top, #ffffff 0%, lightsteelblue 100%); /* FF3.6+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, lightsteelblue 100%); /* Chrome10+,Safari5.1+ */
+    background: linear-gradient(to bottom, #ffffff 0%, lightsteelblue 100%); /* W3C */
+
+    color:                  black;
+    cursor:                 pointer;
+}
+
+span.button:active {
+    background-color:       steelblue;
+    /*border-color:           white;*/
+    background: -moz-linear-gradient(top, #ffffff 0%, steelblue 100%); /* FF3.6+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, steelblue 100%); /* Chrome10+,Safari5.1+ */
+    background: linear-gradient(to bottom, #ffffff 0%, steelblue 100%); /* W3C */
+
+    color:                 #222;
+}
+
 
 span.disabled {
     background-color:       lightgray;

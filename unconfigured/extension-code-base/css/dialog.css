@@ -112,7 +112,7 @@ a {
 
 .button {
     background-color:       lightgray;
-    color:                  black;
+    color:                  #444;
     border:                 1px steelblue solid;
     padding:                4px;
     display:                inline-block;
@@ -121,18 +121,37 @@ a {
     text-align:             center;
     height:                 100%;
     vertical-align:         middle;
+    border-radius:          5px;
+    margin-left:            2px;
+    margin-right:           2px;
+    font-size:              90%;
+
+background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%); /* W3C */
+
 }
 
 
 span.button:hover {
     background-color:       lightsteelblue;
+
+    background: -moz-linear-gradient(top, #ffffff 0%, lightsteelblue 100%); /* FF3.6+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, lightsteelblue 100%); /* Chrome10+,Safari5.1+ */
+    background: linear-gradient(to bottom, #ffffff 0%, lightsteelblue 100%); /* W3C */
+
     color:                  black;
     cursor:                 pointer;
 }
 
 span.button:active {
     background-color:       steelblue;
-    border-color:           white;
+    /*border-color:           white;*/
+    background: -moz-linear-gradient(top, #ffffff 0%, steelblue 100%); /* FF3.6+ */
+    background: -webkit-linear-gradient(top, #ffffff 0%, steelblue 100%); /* Chrome10+,Safari5.1+ */
+    background: linear-gradient(to bottom, #ffffff 0%, steelblue 100%); /* W3C */
+
+    color:                 #222;
 }
 
 span.disabled {
@@ -391,4 +410,9 @@ td.click, td.serpClick {
 
 .success {
     color: darkgreen;
+}
+
+table.notifications {
+    border-collapse: separate;
+    border-spacing: 10px 4px;
 }
