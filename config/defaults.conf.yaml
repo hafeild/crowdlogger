@@ -71,3 +71,5 @@ files :
     EMAIL_BODY: email_body.txt
 
     CONSENT_FORM: consent_form.html
+
+    INDEX_BODY: index_body.html
