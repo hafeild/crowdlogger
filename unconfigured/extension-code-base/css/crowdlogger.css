@@ -184,4 +184,7 @@ li.crowdlogger-dynamic-highlight-menu-item-end:hover {
     font-weight:    bold;
 }
 
+.hidden {
+    display:                none;
+}
 

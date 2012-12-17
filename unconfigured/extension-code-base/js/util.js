@@ -155,7 +155,6 @@ CROWDLOGGER.util.cleanse_string = function( data ){
 
 };
 
-
 /**
  * Randomly shuffles an array of objects (doesn't matter what they are) in 
  * place.
@@ -175,7 +174,6 @@ CROWDLOGGER.util.shuffle = function( array ) {
         array[j] = tmp;
     }
 };
-
 
 /**
  * Compares two version numbers. The version numbers should be in the format
@@ -401,5 +399,233 @@ CROWDLOGGER.util.clean_mixed_emails = function(mixed) {
     } 
     return email; 
 }; 
+
+/**
+ * Creates an entry for a tool listing, e.g., see the Dev Tools page.
+ *
+ * @param {obj}      jq           The jQuery object for the page on which the 
+ *                                entry will be added.
+ * @param {function} on_click     The function to call when the heading is 
+ *                                clicked.
+ * @param {string}   heading      The heading to display.
+ * @param {string}   description  The description to display under the heading.
+ *
+ * @return An entry as a jQuery object. 
+ */
+CROWDLOGGER.util.format_entry = function(jq, on_click, heading, description) {
+
+    var entry = jq("<div>").addClass("entry");
+    var heading_elm = jq("<h2>");
+    var heading_link_elm = jq("<a href='#'>").click(function(){
+        on_click(); 
+        return false;
+    }).html(heading);
+
+    entry.append(heading_elm);
+    heading_elm.append(heading_link_elm);
+    entry.append(description);
+
+    return entry;
+};
+
+/**
+ * Creates a simple html table from a hash table. The key's will be displayed
+ * in the left-most column and the values in the right-most column.
+ *
+ * @param {associative array} map    The map.
+ * 
+ * @return A string html table.
+ */
+CROWDLOGGER.util.make_table = function( map ) {
+    var output = ["<table>"];
+    for( key in map ){
+        output.push("<tr><td>"+key+"</td><td>"+
+            JSON.stringify(map[key]).replace(",", ", ")+"</td></tr>");        
+    }
+    output.push("</table>");
+    return output.join("\n");
+};
+
+/**
+ * Performs a binary search over the given array. The comp_func is used to 
+ * compare the the current element in the array with the item. 
+ *
+ * Based on http://jsfromhell.com/array/search [rev. #2] by 
+ * Carlos R. L. Rodrigues
+ *
+ * @param {array} array   An array of anything.
+ * @param {anything} item The item being searched for.
+ * @param {function} comp_func A comparison function. Should take two items of
+ *    the types given (the first arg will be from the array, the second will
+ *    be the item to find) and return -1, 0, or 1 if the first arg is less than,
+ *    equal to, or greater than the second arg.
+ * @param {boolean} insert Optional. If true and the item is not found, the
+ *    index where it should be inserted is returned.
+ */
+CROWDLOGGER.util.binary_search = function( array, item, comp_func, insert ){
+    insert = insert === undefined ? false : insert;
+
+    if( array.length === 0 ){
+        return insert ? 0 : -1;
+    }
+
+    var high = array.length, low = -1, middle;
+    while( high - low > 1 ){
+        if( comp_func( array[middle = high+low >> 1], item ) < 0 ){
+            low = middle;
+        } else {
+            high = middle;
+        }
+    }
+
+    if( comp_func(array[high], item) !== 0 ){
+        return insert ? high : -1;
+    } else {
+        return high;
+    }
+};
+
+/**
+ * A comparison of two ints. Returns -1, 0, or 1 if x is less than, equal to,
+ * or greater than y, respectively.
+ *
+ * @param {integer} x The first number.
+ * @param {integer} y The second number.
+ * @return -1, 0, or 1 if x is less than, equal to, or greater than y, 
+ *     respectively.
+ */
+CROWDLOGGER.util.int_compare = function(x, y){
+    if( x < y ){
+        return -1;
+    } else if( x == y ){
+        return 0;
+    } else {
+        return 1;
+    }
+};
+
+/**
+ * A comparison of two ints. Returns -1, 0, or 1 if x is less than, equal to,
+ * or greater than y, respectively.
+ *
+ * @param {array} x An array formatted [key, int value].
+ * @param {array} y An array formatted [key, int value].
+ * @return -1, 0, or 1 if x[1] is less than, equal to, or greater than y[1], 
+ *     respectively.
+ */
+CROWDLOGGER.util.key_value_compare = function(x, y){
+    try{
+        if( x[1] < y[1] ){
+            return -1;
+        } else if( x[1] == y[1] ){
+            return 0;
+        } else {
+            return 1;
+        }
+    } catch(err){
+        console.log(x);
+        console.log(y);
+        return -1;
+    } 
+};
+
+/**
+ * Converts an array into an object where each element is set to 'true'.
+ * 
+ * @param  {array} array An array of anything.
+ * @return {object} An object where each element of the given array is a key.
+ */
+CROWDLOGGER.util.objectify_array = function(array){
+    var object = {};
+    CROWDLOGGER.jq.each(array, function(i,entry){
+        object[entry] = true;
+    });
+    return object;
+};
+
+/**
+ * Selects a subset of the given array.
+ * 
+ * @param  {array} array           An array of anything.
+ * @param  {function} select_func  A function that takes an element of the given
+ *      array and returns 'true' if the element should be selected.
+ * @return {array} An array of the selected elements of the given array.
+ */
+CROWDLOGGER.util.select = function(array, select_func){
+    var result = [];
+    CROWDLOGGER.jq.each(array, function(i,entry){
+        if( select_func(entry) ) {
+            result.push(entry);
+        }
+    });
+    return result;
+};
+
+/**
+ * Formats a query into a URL for the corresponding search engine. Currently
+ * only supports Google.
+ * 
+ * @param  {string} se    Search engine.
+ * @param  {string} query The query string.
+ * @return {string} The search URL for the given query and search engine.
+ */
+CROWDLOGGER.util.format_search_url = function(se, query){
+    if( se.match(/google/) !== null ){
+        return se.replace(/\/$/, '') +'/search?q='+ query;
+    }
+};
+
+/**
+ * Truncates a URL down to the domain, including the http{s} at the beginning.
+ * 
+ * @param  {string} url The URL to truncate.
+ * @return {string} A truncated URL.
+ */
+CROWDLOGGER.util.truncate_url = function(url){
+    return url.replace(/(https{0,1}:\/\/[^\/]*)\/.*$/, '$1');
+};
+
+/**
+ * Tests whether two timestamps are from the same day (in terms of UTC date).
+ * 
+ * @param  {timestamp} t1 The first timestamp; needs to be parsable by Date.
+ * @param  {timestamp} t2 The second timestamp; needs to be parsable by Date.
+ * @return {boolean} True if t1 and t2 are from the same UTC day.
+ */
+CROWDLOGGER.util.are_same_day = function(t1, t2){
+    return( new Date(t1).toDateString() === new Date(t2).toDateString() );
+};
+
+/**
+ * Applies the function fn to each element in the array.
+ * 
+ * @param  {Array}    array   An array.
+ * @param  {Function} fn      A function which takes an index and the element
+ *                            at array[index].
+ * @param  {boolean}  reverse If true, the array will be traversed in reverse
+ *                            order.
+ */
+CROWDLOGGER.util.foreach = function(array, fn, reverse){
+    var i;
+    if( reverse === true ){ 
+        for(i = array.length-1; i >= 0; i-- ){ fn(i, array[i]); }
+    } else {
+        for(i = 0; i < array.length; i++ ){ fn(i, array[i]); }
+    }
+};
+
+/**
+ * Returns a copy of the given array.
+ * 
+ * @param  {Array} array The array to copy.
+ * @return {Array} A duplicate of the given array.
+ */
+CROWDLOGGER.util.copy = function(array){
+    var copy = [], i;
+    for(i = 0; i < array.length; i++){
+        copy.push( array[i] );
+    }
+    return copy;
+};
 
 } // END CROWDLOGGER.util NAMESPACE

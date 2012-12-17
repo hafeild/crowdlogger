@@ -12,6 +12,17 @@ var CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
 
 jQuery(document).ready(function(){
     // Place listeners.
+    add_listeners();
+
+    if( CROWDLOGGER.preferences.get_bool_pref('dev_mode', false) ){
+        jQuery('.dev').show();
+    }
+});
+
+/**
+ * Places listeners on each of the links.
+ */
+function add_listeners(){
     jQuery('#crowdlogger-logging-button').click(
         CROWDLOGGER.logging.toggle_logging);
 
@@ -41,8 +52,8 @@ jQuery(document).ready(function(){
 
     jQuery('#crowdlogger-welcome-wizard-button').click(function(){
         CROWDLOGGER.experiments.run_test(); self.close();
-    });        
-});
+    }); 
+}
 
 function clicked( x ) {
     console.log( x );

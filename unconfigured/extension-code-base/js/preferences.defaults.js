@@ -101,6 +101,7 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     firefox_3_update_help_url: ["firefox_3_update_help.html", "1.4.2"],
     firefox_4_update_help_url: ["firefox_4_update_help.html", "1.4.2"],
     chrome_update_help_url: ["chrome_update_help.html", "1.4.2"],
+    dev_tools_url: ["dev_tools.html", "1.7.3"],
     version: ["", "0"],
     "crowdlogger-logging-off-button": 
         ["startLogging.png", "1.7.0"],
@@ -135,7 +136,8 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     registered:                      [false, "1.4.2"],
     run_experiments_automatically:   [false, "1.4.2"],
     consent_required:                [true, "1.4.2"],
-    first_load:                      [true, "1.4.2"]
+    first_load:                      [true, "1.4.2"],
+    dev_mode:                        [false, "1.7.3"]
 };
 
 
@@ -164,8 +166,11 @@ CROWDLOGGER.preferences.defaults.set_defaults = function(){
     } else {
         //B_DEBUG
         CROWDLOGGER.debug.log( "This IS the first load after an update." );
-        CROWDLOGGER.debug.log( "\tcurrent version: " + CROWDLOGGER.version.info.get_extension_version() + "\n" );
-        CROWDLOGGER.debug.log( "\tstored version:  " + CROWDLOGGER.preferences.get_char_pref( "version", "----not set----" ) + "\n");
+        CROWDLOGGER.debug.log( "\tcurrent version: " + 
+            CROWDLOGGER.version.info.get_extension_version() + "\n" );
+        CROWDLOGGER.debug.log( "\tstored version:  " + 
+            CROWDLOGGER.preferences.get_char_pref( 
+                "version", "----not set----" ) + "\n");
         //E_DEBUG
     }
 
@@ -225,7 +230,7 @@ CROWDLOGGER.preferences.defaults.set_defaults = function(){
 
         if( !pref_is_set( x, default_prefs[x][PREF_VAL] ) ||
                 CROWDLOGGER.util.compare_version_numbers(
-                    last_version, default_prefs[x][VERSION] ) <= 0 ){
+                    last_version, default_prefs[x][VERSION] ) < 0 ){
 
             CROWDLOGGER.debug.log( "Setting preference for " + x + "\n");
             set_pref( x, default_prefs[x][PREF_VAL] );

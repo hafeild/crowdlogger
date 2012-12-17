@@ -48,4 +48,15 @@ CROWDLOGGER.debug.init = function(){
     CROWDLOGGER.debug.log = logging_function;
 };
 
+/**
+ * To be called after preferences have been loaded. Checks if in dev mode;
+ * if not, deactiviates the logging function.
+ */
+CROWDLOGGER.debug.reinit = function(){
+    if( !CROWDLOGGER.preferences.get_bool_pref( "dev_mode", false ) ){
+        CROWDLOGGER.debug.log("Not in dev mode; disabling console logging.");
+        CROWDLOGGER.debug.log = function( message ){};
+    }
+}
+
 } // END CROWDLOGGER.debug NAMESPACE
