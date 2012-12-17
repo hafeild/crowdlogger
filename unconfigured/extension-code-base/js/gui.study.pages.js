@@ -310,15 +310,16 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             }
 
             // For the registration.
-            jq('#launch_registration_dialog').click(function(){
+            notifications.find('#launch_registration_dialog').click(function(){
                 CROWDLOGGER.study.launch_registration_dialog();
                 CROWDLOGGER.notifications.set_registration_dismissed(false);
-                hide_element('register_notification');
+                jq('#register_notification').hide();
             });
 
-            jq('#dismiss_registration_notification').click(function(){
+            notifications.find('#dismiss_registration_notification').
+                      click(function(){
                 CROWDLOGGER.notifications.unset_notification('register');
-                hide_element('register_notification');
+                jq('#register_notification').hide();
                 CROWDLOGGER.notifications.set_registration_dismissed(true);
                 return false;
             });            
