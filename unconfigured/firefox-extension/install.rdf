@@ -16,7 +16,13 @@
       </Description>
     </em:targetApplication>
 
+    <!-- Eliminates the need to restart Firefox after updating the extension.-->
+    <em:bootstrap>true</em:bootstrap>
+
+    <!-- Where updates can be found. Ignoring this for now... -->
+    <!--
     <em:updateURL>%%SERVER_BASE_URL%%/updates/ff/update.rdf<em:updateURL>
+    -->
 
     <!-- Front End MetaData -->
     <em:name>%%PROJECT_NAME%%</em:name>

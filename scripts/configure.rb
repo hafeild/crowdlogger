@@ -51,7 +51,6 @@ def readConfigFile( file )
     Psych.load(IO.read(file, {"open_args"=>"r:utf-8"}))
 end
 
-
 ################################################################################
 ## Searches and replaces each of the key value pairs in the given hash over the
 ## hash values. This way one value can refer to another key.

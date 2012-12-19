@@ -331,7 +331,7 @@ span.messageSummary {
 
 .update_message {
     /*font-weight:            bold;*/
-    text-size:              1.1em;
+    font-size:              1.1em;
     color:                  steelblue;
     padding:                10px;
     border:                 2px orange solid;
