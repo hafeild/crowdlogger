@@ -12,14 +12,17 @@ js/sortable.js, which is a product of Stuart Langridge
 This directory contains several prominent sub-directories:
 
     doc/
-        Documentation for the files in the js/ directory.
-        To create the documentation, you need to run JSDoc
-        (http://code.google.com/p/jsdoc-toolkit/). I created a
-        script to hold the actual command to run it. Assuming the
-        jsdoc install dir is stored in $JSDIR,
+        remote-module-api/
+            Documentation for the remote module API. These are in HTML.
 
-        java -jar $JSDIR/jsrun.jar $JSDIR/app/run.js -a \
-            -t=$JSDOC/tmplates/jsdoc -d=doc -p js
+        crowdlogger-api/
+            Documentation for the files in the js/ directory.
+            To create the documentation, you need to run JSDoc
+            (http://code.google.com/p/jsdoc-toolkit/). Assuming the
+            jsdoc install dir is stored in $JSDIR, run:
+
+            java -jar $JSDIR/jsrun.jar $JSDIR/app/run.js -a \
+                -t=$JSDIR/tmplates/jsdoc -d=doc/crowdlogger-api -p js
 
     html/
         Contains HTML files for use with Chrome and Firefox.
