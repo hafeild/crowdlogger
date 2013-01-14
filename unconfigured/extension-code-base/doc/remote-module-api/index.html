@@ -8,27 +8,148 @@
 -->
 
 <html>
-<head>
+<head>    
+    <link rel="shortcut icon" type="image/png"
+        href="../../css/img/crowdlogger-logo.001.16x16.png">
+
     <title>Remote Module API</title>
     <link href="../../css/dialog.css" rel="stylesheet" type="text/css">
     <link href="css/page.css" rel="stylesheet" type="text/css">
-
+    <link href="js/external/google-code-prettify/prettify.css" rel="stylesheet" type="text/css">
     <script src="../../js/external_lib/jquery.min.js"></script>
+    <script src="js/external/google-code-prettify/prettify.js"></script>
     <script src="js/page.js"></script>
+
 </head>
 <body>
 <span class="hidden" id="init"></span>
+
+
+<div class="menu">
+    <!-- Home -->
+    <div class="menu-item">
+        <span class="non-trigger">&#9658;</span>
+        <a href="#home">Home</a>
+    </div>
+
+    <!-- Implementing -->
+    <div class="menu-item">
+        <span class="non-trigger">&#9658;</span>
+        <a href="#implement">Implementing</a>
+    </div>
+
+    <!-- Executing -->
+    <div class="menu-item">
+        <span class="trigger toggle expanded hidden">&#9660;</span>
+        <span class="trigger toggle collapsed">&#9658;</span>         
+        <a href="#execute">Using a CLRM</a>
+        <div class="sublist toggle expanded hidden">
+            <span class="menu-item">
+                <a href="#execute:which-crowdlogger">Which CrowdLogger</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#execute:development">Development</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#execute:published">Publishing</a>
+            </span>
+        </div>
+    </div>    
+
+    <h2>API</h2>
+    <!-- User API -->
+    <div class="menu-item">
+        <span class="trigger toggle expanded hidden">&#9660;</span>
+        <span class="trigger toggle collapsed">&#9658;</span> 
+        <a href="#user">User</a>
+        <div class="sublist toggle expanded hidden">
+            <span class="menu-item">
+                <a href="#user:history">User history</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#user:realtime">User real-time</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#user:save">Save data</a>
+            </span>
+        </div>
+    </div>
+
+    <!-- Global Data API -->
+    <div class="menu-item">
+        <span class="non-trigger">&#9658;</span>
+        <a href="#global-data">Global Data</a>
+    </div>
+
+    <!-- User Interface API -->
+    <div class="menu-item">
+        <span class="trigger toggle expanded hidden">&#9660;</span>
+        <span class="trigger toggle collapsed">&#9658;</span> 
+        <a href="#ui">User Interface</a>
+        <div class="sublist toggle expanded hidden">
+            <span class="menu-item">
+                <a href="#ui:crowdlogger">CrowdLogger UI</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#ui:standalone">Stand-alone app</a>
+            </span>
+            <span class="menu-item">
+                <a href="#ui:page">Visited web page</a>
+            </span>
+        </div>
+    </div>            
+
+    <!-- User Interface API -->
+    <div class="menu-item">
+        <span class="trigger toggle expanded hidden">&#9660;</span>
+        <span class="trigger toggle collapsed">&#9658;</span> 
+        <a href="#privacy">Privacy</a>
+        <div class="sublist toggle expanded hidden">
+            <span class="menu-item">
+                <a href="#privacy:encryption">Encryption</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#privacy:ss">Secret sharing</a>
+            </span>
+            <span class="menu-item">
+                <a href="#privacy:anonymization">Anonymized uploading</a>
+            </span>
+        </div>
+    </div> 
+
+    <!-- Server-side communication -->
+    <div class="menu-item">
+        <span class="trigger toggle expanded hidden">&#9660;</span>
+        <span class="trigger toggle collapsed">&#9658;</span> 
+        <a href="#server-side">Server-side access</a>
+        <div class="sublist toggle expanded hidden">
+            <span class="menu-item">
+                <a href="#server-side:data">Data resource</a>
+            </span><br/>
+            <span class="menu-item">
+                <a href="#server-side:computation">Computations</a>
+            </span>
+        </div>
+    </div> 
+
+    <!-- Examples -->
+    <h2>Examples</h2>
+    <!-- Search Task Assitant -->
+    <div class="menu-item">
+        <span class="non-trigger">&#9658;</span>
+        <a href="#examples/sta">Search Task Assistant</a>
+    </div>
+
+</div>
+
+
 <div class="bodyWrapper">
 
     <!-- The header. -->
     <div class="header">
         <div class="title"> 
+            <img class="logo" src="../../css/img/crowdlogger-logo.002.png"/>
             <span class="titleMain">Remote Module API</span><br>
-            <span id="subtitle">
-                <span class="titleSmall">for</span><br>
-                <span class="titleSub">%%PROJECT_NAME%%</span>
-                <br>
-            </span>
         </div>
     </div>
     
@@ -36,23 +157,13 @@
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-    <div class="menu">
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-        Hey!<br>
-    </div>
 
-
-    <iframe id="contents" style="border: none">
+    <iframe id="tmp-contents" style="border: none" class="hidden">
     </iframe>
 
-
+    <div id="contents">
+        here
+    </div>
 
     <!-- Everything below here is for the footer. -->
     <div class="buffer">

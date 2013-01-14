@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script src="../../js/external_lib/jquery.min.js"></script>
+    <script src="js/content-page.js"></script>
+</head>
+<body>
+<h1>Home</h1>
+<p>
+Welcome and thanks for visiting the CrowdLogger Remote Module documentation.
+First, lets take a minute to define exactly what a <i>remote module</i> is.
+This is the name we give to a set of JavaScript/HTML code that a researcher 
+writes for use with a specific set of CrowdLogger APIs. 
+</p>
+
+<h2>Why use CrowdLogger Remote Modules</h2>
+<p> An example serves well here. Say you, as a researcher, would like to
+implement a new system for re-ranking search results on a search engine results
+page. This system relies on a user profile built up over time from a user's
+search and browsing activity. One way to do this is to create an extension for
+multiple browsers that takes care of logging a user's activity and modifies any
+visited search result pages. You need users to download this extension and use
+it for a while before any meaningful personalization can occur. This is time
+consuming, expensive, and a huge pain (worrying about implementing on multiple
+systems, etc.). </p>
+
+<p>
+Another option is to use CrowdLogger, where all of the foundational work has
+already been done. You just need to implement two things: generating the profile
+and re-ranking results. An intuitive API provided to CrowdLogger Remote Modules
+prevents you from having to worry about the particulars of working with Chrome
+or Firefox. 
+</p>
+
+<h2>Benefits of CrowdLogger Remote Modules</h2>
+<p>
+CrowdLogger Remote Modules are extremely powerful for a number of reasons:
+<ul>
+    <li><span class="highlight">abstraction:</span> no need to worry about the particulars of any one browser
+    <li><span class="highlight">low overhead:</span> a powerful array of logging and privacy features are already
+        in place within CrowdLogger, such as support extracting Google Instant
+        queries and allowing for k-anonymous data uploads
+    <li><span class="highlight">simplicity:</span> the API includes shortcuts for a number of mundane, but
+        sometimes complicated, tasks such as opening a new window for use with
+        extension code
+</ul>
+</p>
+
+<p>
+The purpose of this documentation is to give you a solid feel for how to 
+<a href="#implement">implement</a> and <a href="#execute">execute</a> a CrowdLogger Remote Module.
+</p>
+</body>
+</html>

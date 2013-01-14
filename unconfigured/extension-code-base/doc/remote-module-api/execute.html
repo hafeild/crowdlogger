@@ -1,0 +1,60 @@
+<html>
+<head>
+    <script src="../../js/external_lib/jquery.min.js"></script>
+    <script src="js/content-page.js"></script>
+</head>
+<body>
+<h1>Using a CrowdLogger Remote Module</h1>
+
+<p> 
+<a name="which-crowdlogger"></a>
+<h2>Which CrowdLogger</h2>
+
+If you want to program a CLRM for use with a large network of users via,
+e.g., the UMass CrowdLogger Project or one you are hosting, then you can <a
+href="#execute/published">publish your module</a>. This basically means your
+module gets placed on a server and is loaded from there. Note that publishing
+within the UMass CrowdLogger Project requires having your module inspected in
+much the same way as an app submitted to the Apple App Store or Google Market
+Place would be. </p>
+
+<p> If your developing or only need a module for a local clone of CrowdLogger,
+then you can also use the <a href="#execute/published">CLRM development or local
+mode</a>. Your modules will look exactly the same, but they are stored
+locally on your computer rather than a server. </p>
+
+<p>
+<a name="development"></a>
+<h2>Development/Local Mode</h2>
+
+When just developing or using CrowdLogger in a lab setting, we don't want to
+worry about setting up a server&mdash;even a local one. All you need to do 
+to use a CLRM in local or development mode is to set the <code>CLRM_LOCAL_DIR</code>
+to the path of the directory containing your CLRM&mdash;that's it! 
+CrowdLogger will make all CLRMs in that directory available to the user.
+</p>
+
+<pre class="prettyprint">
+{
+    "CLRM_LOCAL_DIR": "/path/to/dir"
+}
+</pre>
+
+
+<p> TODO: discuss how to refresh this, or will CrowdLogger take care of that
+automatically? </p>
+
+<p>
+<a name="published"></a>
+<h2>Published Mode</h2>
+
+To make your CLRM available to a large user base and avoid the need to constantly push out extension updates, you can use the published mode. This involves placing your CLRM's directory in the <tt>web/remote-modules/</tt> directory in the web server.</p>
+
+<p>If you are hosting your own CrowdLogger server, this is easy. However,
+if you want to publish your CLRM in the UMass CrowdLogger Network, then you will
+need to have it inspected to ensure that your CLRM meets our security and
+privacy standards. <a href="http://www.crowdlogger.org">See the CrowdLogger
+website for more information</a>.</p>
+
+</body>
+</html>
