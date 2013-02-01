@@ -10,9 +10,6 @@
  * @version %%VERSION%%
  */
 
-
-
-
 if( CROWDLOGGER.io.log === undefined ){
 
 /**
@@ -22,7 +19,6 @@ if( CROWDLOGGER.io.log === undefined ){
  */
 CROWDLOGGER.io.log = {};
 
-
 /**
  * Writes a message to the activity log. Appends a newline at the end.
  * @function
@@ -31,35 +27,37 @@ CROWDLOGGER.io.log = {};
  *      placed at the end.
  */
 CROWDLOGGER.io.log.init = function(){
-    if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null ){
-        CROWDLOGGER.io.log.write_to_activity_log = 
-            CROWDLOGGER.io.file.write_to_activity_log;
-        CROWDLOGGER.io.log.write_to_error_log = 
-            CROWDLOGGER.io.file.write_to_error_log;
-        CROWDLOGGER.io.log.read_activity_log =
-            CROWDLOGGER.io.file.read_activity_log;
-        CROWDLOGGER.io.log.read_error_log =
-            CROWDLOGGER.io.file.read_error_log;
-        CROWDLOGGER.io.log.clear_error_log =
-            CROWDLOGGER.io.file.clear_error_log;
-        CROWDLOGGER.io.log.clear_activity_log =
-            CROWDLOGGER.io.file.clear_activity_log;
+    // Writers.
+    // Specialized writers.
+    CROWDLOGGER.io.log.write_to_activity_log = 
+        CROWDLOGGER.io.indexed_db.write_to_activity_log;
+    CROWDLOGGER.io.log.write_to_error_log = 
+        CROWDLOGGER.io.indexed_db.write_to_error_log;
+    CROWDLOGGER.
+    // Generic writer. Note that this may have some restrictions.
+    CROWDLOGGER.io.log.write_to_log =
+        CROWDLOGGER.io.indexed_db.write_to_generic_log
 
-    } else if( CROWDLOGGER.version.info.get_browser_name() === "chrome" ) {
-        CROWDLOGGER.io.log.write_to_activity_log = 
-            CROWDLOGGER.io.web_sql.write_to_activity_log;
-        CROWDLOGGER.io.log.write_to_error_log = 
-            CROWDLOGGER.io.web_sql.write_to_error_log;
-        CROWDLOGGER.io.log.read_activity_log =
-            CROWDLOGGER.io.web_sql.read_activity_log;
-        CROWDLOGGER.io.log.read_error_log =
-            CROWDLOGGER.io.web_sql.read_error_log;
-        CROWDLOGGER.io.log.clear_error_log =
-            CROWDLOGGER.io.web_sql.clear_error_log;
-        CROWDLOGGER.io.log.clear_activity_log =
-            CROWDLOGGER.io.web_sql.clear_activity_log;
-    }
+    // Updaters.
+    // Generic updaters.
+    CROWDLOGGER.io.log.update_search = 
+        CROWDLOGGER.io.indexed_db.update_search;
+    CROWDLOGGER.io.log.update_task = 
+        CROWDLOGGER.io.indexed_db.update_task;
+
+    // Readers.
+    CROWDLOGGER.io.log.read_activity_log =
+        CROWDLOGGER.io.indexed_db.read_activity_log;
+    CROWDLOGGER.io.log.read_error_log =
+        CROWDLOGGER.io.indexed_db.read_error_log;
+    CROWDLOGGER.io.log.read_search_log =
+
+
+    // Clearers.
+    CROWDLOGGER.io.log.clear_error_log =
+        CROWDLOGGER.io.indexed_db.clear_error_log;
+    CROWDLOGGER.io.log.clear_activity_log =
+        CROWDLOGGER.io.indexed_db.clear_activity_log;
 };
-
 
 } // END CROWDLOGGER.io.log NAMESPACE
