@@ -113,6 +113,10 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If the required opts fields are not present.
      */
     this.write_to_error_log = function( opts ){
+        if( opts && typeof opts === "string" ){
+            opts = {data: opts};
+        }
+
         opts = copy_obj(opts);
         if( !opts.data ){
             return raise_error(
@@ -868,7 +872,11 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
+     *    <li>{Function} on_success:   Invoked when everything has been read
+     *                                 and processed by on_chunk.
+     *                                 Note that the 'next' function needs to
+     *                                 be invoked from the on_chunk function
+     *                                 in order for this to trigger.
      *    <li>{Function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
@@ -929,7 +937,12 @@ CROWDLOGGER.io.IndexedDB = function(){
         // Process one chunk.
         function next_chunk(){
             // Just in case this gets called after everything has been read.
-            if( finished ){ return; }
+            if( finished ){ 
+                if( opts.on_success ){
+                    setTimeout(opts.on_success, T);
+                }
+                return; 
+            }
 
             // This will hold the batches of items. It's essentially a buffer.
             var batch = [];
@@ -964,9 +977,7 @@ CROWDLOGGER.io.IndexedDB = function(){
                     // time.
                     if( !opts.chunk_size || batch.length < opts.chunk_size ){
                         finished = true;
-                        if( opts.on_success ){
-                            setTimeout(opts.on_success, T);
-                        }
+                        
                         if( batch.length > 0 ){
                             setTimeout(on_chunk(batch), T);
                         }

@@ -42,7 +42,7 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
 
     // Takes a dump of the log and converts it to an object that contains
     // pairs of (normalized) searches and frequencies.
-    var log_to_query_counts = function( log_data, make_array ){
+    var log_to_query_counts = function( log_entries, make_array ){
         var histogram = {};
         var threshold = 2000; // 2 seconds.
 
@@ -65,10 +65,9 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
         };
 
         // Go through the log, looking for Search events.
-        var lines = log_data.split( /\n/ );
-        for( var i = 0; i < lines.length; i++ ){
+        for( var i = 0; i < log_entries.length; i++ ){
             // The log entries should be tab-delimited.
-            var line_parts = lines[i].split( /\t/ );
+            //var line_parts = lines[i].split( /\t/ );
 
             // Is this a search?
             if( line_parts[0] === "Search" ){
@@ -115,7 +114,7 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
             
 
             // This will be called when the file is finished being read.
-            var on_file_read = function( file_contents ){
+            var on_file_read = function( entries ){
 
                 // Get the search histogram for the log.
                 var query_counts = log_to_query_counts( file_contents, true );
@@ -139,7 +138,7 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
             };
             
             // Read the activity file in and then call the function above.
-            CROWDLOGGER.io.log.read_activity_log( on_file_read );
+            CROWDLOGGER.io.log.read_activity_log( {on_chunk: on_file_read} );
             
     };
 

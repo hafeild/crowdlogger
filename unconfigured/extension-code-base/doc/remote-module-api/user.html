@@ -6,33 +6,330 @@
 <body>
 <h1>User API</h1>
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
 
 <a name="history"></a>
 <h2>Accessing User History</h2>
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+<p>
+The user's browsing history, as logged by CrowdLogger, can be accessed via the
+<code>CROWDLOGGER.io.log</code> interface. Currently, this uses IndexedDB as a 
+backend, which is important if you want to store your own data 
+(<a href="#user:save">see below</a>). CrowdLogger has two default logs:
+the <i>activity log</i> and the <i>error log</i>. The former contains all 
+browsing and search activity, including clicks, queries, tab events, and
+page loads. Each event is stored as its own entry and is encapsulated within
+an object. Here's a description of the object fields for each kind of event.
+All events have at minimum two fields: <code>id</code> (a unique id used by
+the database) and <code>e</code> (for "event", see table below).
+</p>
+
+<table>
+    <tr>
+        <th>Event</th> <th>Fields</th> 
+    </tr><tr>
+        <td>search</td> 
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>q</code>: The parsed query.
+                <li><code>se</code>: The search engine.
+                <li><code>url</code>: The URL of the results page.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "search", 
+ t: 1359928100, 
+ q: "upcoming movies", 
+ se: "google", 
+ url: "https://www.google.com/search?q=upcoming+movies"}
+</pre>
+        </td>
+    </tr><tr>
+        <td>click</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>turl</code>: The clicked URL.
+                <li><code>surl</code>: The URL of the page on which the click occured.
+                <li><code>sr</code>: <code>true</code> if the source url (<code>surl</code>) is a Search Engine Results Page and the target URL is a <i>search result</i> on that page.
+                <li><code>q</code>: If <code>sr==true</code>, then this contains the associated query.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "click", 
+ t: 1359928100, 
+ turl: "http://en.wikipedia.org/wiki/Panda", 
+ surl: "https://www.google.com/search?q=panda",
+ sr: true,
+ q: panda}
+</pre>
+        </td>
+    </tr><tr>
+        <td>tabadd</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>ttid</code>: The target tab id (the one being added).
+                <li><code>turl</code>: The URL loaded in the new tab.
+                <li><code>stid</code>: The source tab id (the one from which the new one was added).
+                <li><code>surl</code>: The URL loaded in the source tab.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "tabadd", 
+ t: 1359928100, 
+ ttid: 2k3,
+ turl: "http://www.cnn.com", 
+ stid: 4wi5a,
+ surl: "http://en.wikipedia.org/wiki/Panda"}
+</pre>
+        </td>
+    </tr><tr>
+        <td>tabremove</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>tid</code>: The id of the removed tab.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "tabremove", 
+ t: 1359928100, 
+ tid: 2k3}
+</pre>
+        </td>
+    </tr><tr>
+        <td>pageload</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>tid</code>: The id of the tab in which the page was loaded.
+                <li><code>url</code>: The loaded URL.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "pageload", 
+ t: 1359928100, 
+ tid: 2k3,
+ url: "http://www.cnn.com"}
+</pre>
+        </td>
+    </tr><tr>
+        <td>pagefocus</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>tid</code>: The id of the tab in which the page was focused.
+                <li><code>url</code>: The URL of the focused page.
+            </ul>
+E.g.:
+<pre class="prettyprint">{id: 1,
+ e: "pagefocus", 
+ t: 1359928100, 
+ tid: 2k3,
+ url: "http://www.cnn.com"}
+</pre>
+        </td>
+    </tr>
+</table>
+
+<p>
+The <code>CROWDLOGGER.io.log</code> interface allows four operations
+</p>
+
+<ul>
+    <li><a href="#user:readlog">read</a>
+    <li><a href="#user:writelog">write</a>
+    <li><a href="#updatelog">update</a>
+    <li><a href="#clearlog">clear</a>
+</ul>
+
+<!-- Read log entries. -->
+<a name="readlog"></a>
+<h3>Reading log entries</h3>
+<p>
+To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.read_activity_log</code> and <code>CROWDLOGGER.io.log.read_error_log</code> functions. The take the same parameter: a map of options. I.e.:
+</p>
+
+<table>
+    <tr>
+        <th>Option key</th> <th>Type</th> <th>Description</th>
+    </tr><tr>
+        <td colspan="3"><i>Required</i></td>
+    </tr><tr>
+        <td><code>on_chunk</code></td>
+        <td>function</td>
+        <td>Invoked per chunk (see <code>chunk_size</code> below). Chunks are 
+            processed asynchronously. It should expect two parameters: an
+            array of entries (objects) and a 'next' function, which, when 
+            invoked, will read in the next chunk asynchronously.
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="3"><i>Optional</i></td>
+    </tr><tr>
+        <td><code>on_success</code></td>
+        <td>function</td>
+        <td>Invoked when everything has been read and processed by 
+            <code>on_chunk</code>.</td>
+    </tr><tr>
+        <td><code>on_error</code></td>
+        <td>funciton</td>
+        <td>Invoked if there's an error.</td>
+    </tr><tr>
+        <td><code>chunk_size</code></td>
+        <td>integer</td>
+        <td>The size of the chunks to process. E.g.,
+            <coode>chunk_size = 50</code> will cause 50 entries to
+            be read, stored in an array, and then
+            passed to the on_chunk function. If &lt;=0,
+            all entries will be read in before
+            calling <code>on_chunk</code>. This is approximate
+            because ranges are used and therefore
+            deleted items within that range will not
+            be read (their id's are not reused).
+            Default: 0.
+        </td>
+    </tr><tr>
+        <td><code>reverse</code></td>
+        <td>boolean</td>
+        <td>If true, the data will be read in reverse
+            order of id. Default is 'false'.
+        </td>
+    </tr><tr>
+        <td><code>lower_bound</code></td>
+        <td>integer</td>
+        <td>The smallest id to retrieve; default: 0</td>
+    </tr><tr>
+        <td><code>upper_bound</code></td>
+        <td>integer</td>
+        <td>The largest id to retrieve; default: -1
+            (all ids >= lower_bound are retrieved).
+        </td>
+    </tr>
+</table>
+
+<p>
+Lets go over a few common patterns. If you want to <b>read the entire activity log 
+at once</b>, you can do something like this:
+</p>
+
+<pre class="prettyprint">
+// Prints each of the given entries.
+function print_entries( entries, next /* ignored */ ){
+    var i;
+    for( i = 0; i &lt; entries.length; i++ ){
+        CROWDLOGGER.debug.log( JSON.stringify(entries[i]) );
+    }
+}
+
+// Read the log and print the entries.
+CROWDLOGGER.io.log.read_activity_log({
+    on_chunk: print_entries
+});
+</pre>
+
+<p>
+If you are sure you're going to have to do something with all of logged
+data AND you think that the log is small enough that it shouldn't be an issue,
+then this method is okay. However, most of the time, you probably don't need to
+read all the logged data at once. For instance, suppose you are <b>populating a
+search history web page</b>. If the user hasn't scrolled to the bottom of the page
+yet, there's no reason to load any additional content. So, we want to chunk
+the data and traverse it in reverse order (most recent log entries first):
+</p>
+
+<pre class="prettyprint">
+var body = jQuery('&lt;div&gt;');
+
+// Appends a set of entries to an html page.
+function append_entries_to_page( entries, next ){
+    var i, entry_elm;
+
+    // Append the entries as spans of text.
+    for( i = 0; i &lt; entries.length; i++ ){
+        entry_elm = jQuery('&lt;span&gt;').text(entries[i].e +'@'+ entries[i].t);
+        body.append(entry_elm);
+    }
+
+    // When the last element comes into view, read the next chunk. The 'next' function knows 
+    // to call this function again, so we don't have to pass any additional information.
+    function on_focus(e){
+        next();
+        jQuery(this).unbind('focus', on_focus);
+    }
+    if( entry_elm ){ entry_elm.focus(on_focus); }
+}
+
+// Read the log, reading entries in 50-entry chunks, and add them to the
+// body element. We're reading in reverse, so we set reverse: true.
+CROWDLOGGER.io.log.read_activity_log({
+    on_chunk: append_entries_to_page,
+    chunk_size: 50,
+    reverse: true
+});
+</pre>
+
+<p>
+The other options are useful for various situations. The <code>on_success</code>
+is convenient if you need to do something once all the data has been read
+and processed. Note that this call will never be made if the 'next' function
+isn't invoked. The <code>upper_bound</code> and <code>lower_bound</code> 
+options are handy if you know the minimum or maximum ids of the entries you 
+would like to retrieve&emdash;after all, why read in everything if you don't
+need to?
+</p>
+
+<!-- Write log entries. -->
+<a name="writelog"></a>
+<h3>Write log entries</h3>
+
+<p>
+Use the <code>CROWDLOGGER.io.log.write_to_activity_log</code> and
+<code>CROWDLOGGER.io.log.write_to_error_log</code> to write data or update
+a specific entry for which you have the id and other attributes (i.e., you
+don't have to read it first). Extensions probably won't be performing these
+actions, but this is good to know, anyway. The write functions take a
+single parameter, as before: a map of options. 
+</p>
+
+<table>
+    <tr>
+        <th>Option key</th> <th>Type</th> <th>Description</th>
+    </tr><tr>
+        <td colspan="3"><i>Required</i></td>
+    </tr><tr>
+        <td><code>data</code></td>
+        <td>array of objects</td>
+        <td>An array of entries to be added. If an entry contains an id, and an entry with that id exists, then it will be overwritten by the new entry.
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="3"><i>Optional</i></td>
+    </tr><tr>
+        <td><code>on_success</code></td>
+        <td>function</td>
+        <td>Invoked when everything has been successfully written.
+    </tr><tr>
+        <td><code>on_error</code></td>
+        <td>funciton</td>
+        <td>Invoked if there's an error.</td>
+    </tr>
+</table>
+
+<!-- Update log entries. -->
+<a name="updatelog"></a>
+<h3>Update log entries</h3>
+
+
+<!-- Clear log entries. -->
+<a name="clearlog"></a>
+<h3>Clear log entries</h3>
+
+
 
 <a name="realtime"></a>
 <h2>Accessing Real-time User Activity</h2>

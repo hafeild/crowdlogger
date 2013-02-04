@@ -119,7 +119,7 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
 
     var on_error = function( error ){
         CROWDLOGGER.debug.log( "ERROR contacting " + url + ": \n\t" + error + "\n" );
-        CROWDLOGGER.io.log.write_to_error_log( 
+        CROWDLOGGER.io.log.write_to_error_log(
             "ERROR contacting " + url + ": \n\t" + error + "\n" );
     };
 

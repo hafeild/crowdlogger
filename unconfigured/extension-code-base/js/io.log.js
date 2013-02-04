@@ -27,37 +27,39 @@ CROWDLOGGER.io.log = {};
  *      placed at the end.
  */
 CROWDLOGGER.io.log.init = function(){
+    CrowdLogger.io.log = new CROWDLOGGER.io.IndexedDB()
+
     // Writers.
     // Specialized writers.
-    CROWDLOGGER.io.log.write_to_activity_log = 
-        CROWDLOGGER.io.indexed_db.write_to_activity_log;
-    CROWDLOGGER.io.log.write_to_error_log = 
-        CROWDLOGGER.io.indexed_db.write_to_error_log;
-    CROWDLOGGER.
-    // Generic writer. Note that this may have some restrictions.
-    CROWDLOGGER.io.log.write_to_log =
-        CROWDLOGGER.io.indexed_db.write_to_generic_log
+    // CROWDLOGGER.io.log.write_to_activity_log = 
+    //     CROWDLOGGER.io.indexed_db.write_to_activity_log;
+    // CROWDLOGGER.io.log.write_to_error_log = 
+    //     CROWDLOGGER.io.indexed_db.write_to_error_log;
+    // CROWDLOGGER.
+    // // Generic writer. Note that this may have some restrictions.
+    // CROWDLOGGER.io.log.write_to_log =
+    //     CROWDLOGGER.io.indexed_db.write_to_generic_log
 
-    // Updaters.
-    // Generic updaters.
-    CROWDLOGGER.io.log.update_search = 
-        CROWDLOGGER.io.indexed_db.update_search;
-    CROWDLOGGER.io.log.update_task = 
-        CROWDLOGGER.io.indexed_db.update_task;
+    // // Updaters.
+    // // Generic updaters.
+    // CROWDLOGGER.io.log.update_search = 
+    //     CROWDLOGGER.io.indexed_db.update_search;
+    // CROWDLOGGER.io.log.update_task = 
+    //     CROWDLOGGER.io.indexed_db.update_task;
 
-    // Readers.
-    CROWDLOGGER.io.log.read_activity_log =
-        CROWDLOGGER.io.indexed_db.read_activity_log;
-    CROWDLOGGER.io.log.read_error_log =
-        CROWDLOGGER.io.indexed_db.read_error_log;
-    CROWDLOGGER.io.log.read_search_log =
+    // // Readers.
+    // CROWDLOGGER.io.log.read_activity_log =
+    //     CROWDLOGGER.io.indexed_db.read_activity_log;
+    // CROWDLOGGER.io.log.read_error_log =
+    //     CROWDLOGGER.io.indexed_db.read_error_log;
+    // CROWDLOGGER.io.log.read_search_log =
 
 
-    // Clearers.
-    CROWDLOGGER.io.log.clear_error_log =
-        CROWDLOGGER.io.indexed_db.clear_error_log;
-    CROWDLOGGER.io.log.clear_activity_log =
-        CROWDLOGGER.io.indexed_db.clear_activity_log;
+    // // Clearers.
+    // CROWDLOGGER.io.log.clear_error_log =
+    //     CROWDLOGGER.io.indexed_db.clear_error_log;
+    // CROWDLOGGER.io.log.clear_activity_log =
+    //     CROWDLOGGER.io.indexed_db.clear_activity_log;
 };
 
 } // END CROWDLOGGER.io.log NAMESPACE
