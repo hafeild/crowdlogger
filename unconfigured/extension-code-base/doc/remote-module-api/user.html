@@ -1,12 +1,28 @@
 <html>
 <head>
-    <script src="../../js/external_lib/jquery.min.js"></script>
+    <script src="js/external/jquery.min.js"></script>
     <script src="js/content-page.js"></script>
 </head>
 <body>
+<div class="toc">
+    <h2>Contents</h2>
+    <ul>
+        <!-- <li><a href="#user">User API (top)</a> -->
+        <li><a href="#user:history">Accessing User History</a>
+        <ul>
+                <li><a href="#user:readlog">Reading From Logs</a>
+                <li><a href="#user:writelog">Writing To Logs</a>
+                <li><a href="#updatelog">Updating Logs</a>
+                <li><a href="#clearlog">Clearing Logs</a>
+        </ul>
+        <li><a href="#user:realtime">Accessing Real-Time User Activity</a>
+        <li><a href="#user:save">Saving Data</a>
+    </ul>
+</div>
+
+
+
 <h1>User API</h1>
-
-
 
 <a name="history"></a>
 <h2>Accessing User History</h2>
@@ -21,7 +37,9 @@ browsing and search activity, including clicks, queries, tab events, and
 page loads. Each event is stored as its own entry and is encapsulated within
 an object. Here's a description of the object fields for each kind of event.
 All events have at minimum two fields: <code>id</code> (a unique id used by
-the database) and <code>e</code> (for "event", see table below).
+the database) and <code>e</code> (for "event", see table below). Currently they
+also all have a <code>t</code> (timestamp) field, as well, but we may introduce
+some new events that don't.
 </p>
 
 <table>
@@ -37,12 +55,12 @@ the database) and <code>e</code> (for "event", see table below).
                 <li><code>url</code>: The URL of the results page.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "search", 
+<pre class='prettyprint'>{id: 1,
+ e: 'search', 
  t: 1359928100, 
- q: "upcoming movies", 
- se: "google", 
- url: "https://www.google.com/search?q=upcoming+movies"}
+ q: 'upcoming movies', 
+ se: 'google', 
+ url: 'https://www.google.com/search?q=upcoming+movies'}
 </pre>
         </td>
     </tr><tr>
@@ -56,11 +74,11 @@ E.g.:
                 <li><code>q</code>: If <code>sr==true</code>, then this contains the associated query.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "click", 
+<pre class='prettyprint'>{id: 1,
+ e: 'click', 
  t: 1359928100, 
- turl: "http://en.wikipedia.org/wiki/Panda", 
- surl: "https://www.google.com/search?q=panda",
+ turl: 'http://en.wikipedia.org/wiki/Panda', 
+ surl: 'https://www.google.com/search?q=panda',
  sr: true,
  q: panda}
 </pre>
@@ -76,13 +94,13 @@ E.g.:
                 <li><code>surl</code>: The URL loaded in the source tab.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "tabadd", 
+<pre class='prettyprint'>{id: 1,
+ e: 'tabadd', 
  t: 1359928100, 
  ttid: 2k3,
- turl: "http://www.cnn.com", 
+ turl: 'http://www.cnn.com', 
  stid: 4wi5a,
- surl: "http://en.wikipedia.org/wiki/Panda"}
+ surl: 'http://en.wikipedia.org/wiki/Panda'}
 </pre>
         </td>
     </tr><tr>
@@ -93,8 +111,8 @@ E.g.:
                 <li><code>tid</code>: The id of the removed tab.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "tabremove", 
+<pre class='prettyprint'>{id: 1,
+ e: 'tabremove', 
  t: 1359928100, 
  tid: 2k3}
 </pre>
@@ -108,11 +126,11 @@ E.g.:
                 <li><code>url</code>: The loaded URL.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "pageload", 
+<pre class='prettyprint'>{id: 1,
+ e: 'pageload', 
  t: 1359928100, 
  tid: 2k3,
- url: "http://www.cnn.com"}
+ url: 'http://www.cnn.com'}
 </pre>
         </td>
     </tr><tr>
@@ -124,11 +142,11 @@ E.g.:
                 <li><code>url</code>: The URL of the focused page.
             </ul>
 E.g.:
-<pre class="prettyprint">{id: 1,
- e: "pagefocus", 
+<pre class='prettyprint'>{id: 1,
+ e: 'pagefocus', 
  t: 1359928100, 
  tid: 2k3,
- url: "http://www.cnn.com"}
+ url: 'http://www.cnn.com'}
 </pre>
         </td>
     </tr>
@@ -140,8 +158,8 @@ The <code>CROWDLOGGER.io.log</code> interface allows four operations
 
 <ul>
     <li><a href="#user:readlog">read</a>
-    <li><a href="#user:writelog">write</a>
-    <li><a href="#updatelog">update</a>
+    <li><a href="#user:writelog">write (add, replace entries)</a>
+    <li><a href="#updatelog">update (modify or delete entries)</a>
     <li><a href="#clearlog">clear</a>
 </ul>
 
@@ -319,6 +337,51 @@ single parameter, as before: a map of options.
         <td>Invoked if there's an error.</td>
     </tr>
 </table>
+
+<p>
+One common pattern is to add a new entry. In this case, make the object to store
+and leave off the <code>id</code> field&mdash;the database will take care of
+setting this.
+</p>
+
+<pre class="prettyprint">
+// A new 'search' event.
+var new_search = {
+    timestamp: new Date().getTime(),
+    e: 'search',
+    q: 'upcoming movies',
+    se: 'google',
+    url: 'https://www.google.com/search?q=upcoming+movies'
+};
+
+// Add the entry to the activity log. Note that the data field consists of
+// a single-element array because we are only adding one entry.
+CROWDLOGGER.io.log.write_to_activity_log({data: [new_search]});
+</pre>
+
+<p>
+Another common use case is that you would like to modify an entry that you read 
+from the log earlier (maybe clean up the URL or something). As long as you know 
+the <code>id</code>, you can do the following:
+</p>
+
+<pre class="prettyprint">
+// Modifying a search event we read earlier. Has id = 558. We are extracting
+// the search engine using a new algorithm.
+my_search.se = extract_se(my_search.url);
+
+// When we write this to the log, it will replace the previous version.
+CROWDLOGGER.io.log.write_to_activity_log({data: [my_search]});
+</pre>
+
+<p>
+Finally, if you have multiple entries you'd like to add, that's easy:
+</p>
+
+<pre class="prettyprint lang-js">
+// Assume we have five entries named e1, e2, e3, e4, and e5.
+CROWDLOGGER.io.log.write_to_activity_log({data: [e1, e2, e3, e4, e5]});
+</pre>
 
 <!-- Update log entries. -->
 <a name="updatelog"></a>

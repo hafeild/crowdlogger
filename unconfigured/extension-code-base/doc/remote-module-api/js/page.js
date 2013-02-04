@@ -64,5 +64,6 @@ function toggle_triggers(e){
 }
 
 function split_hash(){
-    return window.location.hash.replace(/^#/,'').split(':');
+    return window.location.hash ? 
+        window.location.hash.replace(/^#/,'').split(':') : [];
 }

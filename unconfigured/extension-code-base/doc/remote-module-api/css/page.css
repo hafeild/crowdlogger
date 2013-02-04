@@ -49,20 +49,6 @@ body {
     padding-right: 2px;
 }
 
-.sublist {
-    padding-left: 30px;
-}
-
-.trigger, .non-trigger{
-    font-size: 90%;
-    color: #444;
-    cursor: pointer;
-}
-
-.non-trigger {
-    color: #ccc;
-    cursor: text;  
-}
 
 h1, h2 {
 /*    float:none;
@@ -84,7 +70,7 @@ h1, h2 {
     border: none;
 }
 
-.bodyWrapper h2 {
+.bodyWrapper h2, .bodyWrapper h3 {
     margin-top: 25px;
     margin-bottom: 0px;
     padding: 0px;
@@ -97,6 +83,42 @@ h1, h2 {
     color: #444;
     font-weight: normal;
 }
+
+
+.toc {
+    float: right;
+    width: 300px;
+    border: 1px solid #ccc;
+    background-color: #fcfcfc;
+    padding: 10px;
+    margin: 5px;
+}
+
+.toc h2 {
+    margin: 0;
+    padding: 0;
+}
+.toc ul {
+    margin: 3px;
+    margin-left: 0;
+}
+
+.sublist {
+    padding-left: 30px;
+}
+
+.trigger, .non-trigger{
+    font-size: 90%;
+    color: #444;
+    cursor: pointer;
+}
+
+.non-trigger {
+    color: #ccc;
+    cursor: text;  
+}
+
+
 
 .bodyWrapper a {
     color: orange;
