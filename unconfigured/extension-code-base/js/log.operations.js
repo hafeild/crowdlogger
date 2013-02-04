@@ -69,8 +69,8 @@ CROWDLOGGER.log.operations.accumulator = {};
  * @param {function} on_complete The function to call when the accumulation
  *      is finished. Should expect as a parameter whatever is returned by the 
  *      specified accumulator.
- * @param {string} log The log (as a string) or undefined to read the log
- *      in automatically.
+ * @param {array} entries An array of entiry objects, or undefined to read the 
+ *      activity log in automatically.
  *
  * @return Whatever is returned by the accumulator function on an EOS object.
  */
@@ -81,18 +81,22 @@ CROWDLOGGER.log.operations.accumulate_over = function( accumulator,
     // to the accumulator. Finally, once the log has been iterated over,
     // returns the whatever the accumulator returns on a 'last' object
     // (a 'last' object is the following: {last: true}).
-    var iterate = function( log ){
-        var entries = log.split( /\n/ );
+    var iterate = function( entries ){
+        var i;
         for( i in entries ){
-            accumulator( CROWDLOGGER.log.operations.objectify_line(entries[i]));
+            accumulator( entries[i] );
         }
         on_complete( accumulator( {last: true} ) );
     };
 
-    if( log === undefined ){
-        CROWDLOGGER.io.log.read_activity_log( iterate );
+    if( entries === undefined ){
+        //CROWDLOGGER.io.log.read_activity_log( iterate );
+        CROWDLOGGER.io.log.read_activity_log({
+            on_chunk: iterate, 
+            chunk_size:1000
+        });
     } else {
-        iterate( log );
+        iterate( entries );
     }
 };
 

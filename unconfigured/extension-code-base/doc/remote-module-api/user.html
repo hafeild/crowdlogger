@@ -69,9 +69,14 @@ E.g.:
             <ul>
                 <li><code>t</code>: The timestamp.
                 <li><code>turl</code>: The clicked URL.
-                <li><code>surl</code>: The URL of the page on which the click occured.
-                <li><code>sr</code>: <code>true</code> if the source url (<code>surl</code>) is a Search Engine Results Page and the target URL is a <i>search result</i> on that page.
-                <li><code>q</code>: If <code>sr==true</code>, then this contains the associated query.
+                <li><code>surl</code>: The URL of the page on which the click 
+                    occurred.
+                <li><code>sr</code>: 
+                    <code>true</code> if the source url (<code>surl</code>) is a
+                    Search Engine Results Page and the target URL is a
+                    <i>search result</i> on that page.
+                <li><code>q</code>: If <code>sr==true</code>, then this contains
+                    the associated query.
             </ul>
 E.g.:
 <pre class='prettyprint'>{id: 1,
@@ -90,7 +95,8 @@ E.g.:
                 <li><code>t</code>: The timestamp.
                 <li><code>ttid</code>: The target tab id (the one being added).
                 <li><code>turl</code>: The URL loaded in the new tab.
-                <li><code>stid</code>: The source tab id (the one from which the new one was added).
+                <li><code>stid</code>: The source tab id (the one from which the
+                    new one was added).
                 <li><code>surl</code>: The URL loaded in the source tab.
             </ul>
 E.g.:
@@ -122,7 +128,8 @@ E.g.:
         <td>
             <ul>
                 <li><code>t</code>: The timestamp.
-                <li><code>tid</code>: The id of the tab in which the page was loaded.
+                <li><code>tid</code>: The id of the tab in which the page was 
+                    loaded.
                 <li><code>url</code>: The loaded URL.
             </ul>
 E.g.:
@@ -138,7 +145,8 @@ E.g.:
         <td>
             <ul>
                 <li><code>t</code>: The timestamp.
-                <li><code>tid</code>: The id of the tab in which the page was focused.
+                <li><code>tid</code>: The id of the tab in which the page was 
+                    focused.
                 <li><code>url</code>: The URL of the focused page.
             </ul>
 E.g.:
@@ -167,7 +175,9 @@ The <code>CROWDLOGGER.io.log</code> interface allows four operations
 <a name="readlog"></a>
 <h3>Reading log entries</h3>
 <p>
-To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.read_activity_log</code> and <code>CROWDLOGGER.io.log.read_error_log</code> functions. The take the same parameter: a map of options. I.e.:
+To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.
+read_activity_log</code> and <code>CROWDLOGGER.io.log.read_error_log</code> 
+functions. The take the same parameter: a map of options. I.e.:
 </p>
 
 <table>
@@ -230,8 +240,8 @@ To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.re
 </table>
 
 <p>
-Lets go over a few common patterns. If you want to <b>read the entire activity log 
-at once</b>, you can do something like this:
+Lets go over a few common patterns. If you want to <b>read the entire activity 
+log at once</b>, you can do something like this:
 </p>
 
 <pre class="prettyprint">
@@ -250,13 +260,13 @@ CROWDLOGGER.io.log.read_activity_log({
 </pre>
 
 <p>
-If you are sure you're going to have to do something with all of logged
-data AND you think that the log is small enough that it shouldn't be an issue,
-then this method is okay. However, most of the time, you probably don't need to
-read all the logged data at once. For instance, suppose you are <b>populating a
-search history web page</b>. If the user hasn't scrolled to the bottom of the page
-yet, there's no reason to load any additional content. So, we want to chunk
-the data and traverse it in reverse order (most recent log entries first):
+If you are sure you're going to have to do something with all of logged data AND
+you think that the log is small enough that it shouldn't be an issue, then this
+method is okay. However, most of the time, you probably don't need to read all
+the logged data at once. For instance, suppose you are <b>populating a search
+history web page</b>. If the user hasn't scrolled to the bottom of the page yet,
+there's no reason to load any additional content. So, we want to chunk the data
+and traverse it in reverse order (most recent log entries first):
 </p>
 
 <pre class="prettyprint">
@@ -268,7 +278,7 @@ function append_entries_to_page( entries, next ){
 
     // Append the entries as spans of text.
     for( i = 0; i &lt; entries.length; i++ ){
-        entry_elm = jQuery('&lt;span&gt;').text(entries[i].e +'@'+ entries[i].t);
+        entry_elm = jQuery('&lt;span&gt;').text(entries[i].e+'@'+entries[i].t);
         body.append(entry_elm);
     }
 
@@ -324,7 +334,9 @@ single parameter, as before: a map of options.
     </tr><tr>
         <td><code>data</code></td>
         <td>array of objects</td>
-        <td>An array of entries to be added. If an entry contains an id, and an entry with that id exists, then it will be overwritten by the new entry.
+        <td>An array of entries to be added. If an entry contains an id, and 
+            an entry with that id exists, then it will be overwritten by the 
+            new entry.
         </td>
     </tr>
 
@@ -438,7 +450,12 @@ single parameter, which is a map of options, as described below:
 </table>
 
 <p>
-The update operation is helpful when you want to update all (or most) entries in a log. For example, say you wanted to store the top 10 results associated with searches, and lets suppose you have a magical function <code>extract_top_ten_results</code> that can reproduce the results page seen by a user and extract those links. The code to update all of the search entries might look like this:
+The update operation is helpful when you want to update all (or most) entries in
+a log. For example, say you wanted to store the top 10 results associated with
+searches, and lets suppose you have a magical function
+<code>extract_top_ten_results</code> that can reproduce the results page seen by
+a user and extract those links. The code to update all of the search entries
+might look like this:
 </p>
 
 <pre class="prettyprint">
@@ -470,7 +487,8 @@ Clearing logs (or truncating them) can be done by using
 <code>CROWDLOGGER.io.log.clear_activity_log</code> and
 <code>CROWDLOGGER.io.log.clear_error_log</code>. These will remove all entries
 from the log. Note that the numbering of the log entry ids does not reset after
-this operation. The functions take one parameter, a map of options (none required):
+this operation. The functions take one parameter, a map of options (none
+required):
 </p>
 
 <table>
