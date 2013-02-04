@@ -12,8 +12,8 @@
         <ul>
                 <li><a href="#user:readlog">Reading From Logs</a>
                 <li><a href="#user:writelog">Writing To Logs</a>
-                <li><a href="#updatelog">Updating Logs</a>
-                <li><a href="#clearlog">Clearing Logs</a>
+                <li><a href="#user:updatelog">Updating Logs</a>
+                <li><a href="#user:clearlog">Clearing Logs</a>
         </ul>
         <li><a href="#user:realtime">Accessing Real-Time User Activity</a>
         <li><a href="#user:save">Saving Data</a>
@@ -159,8 +159,8 @@ The <code>CROWDLOGGER.io.log</code> interface allows four operations
 <ul>
     <li><a href="#user:readlog">read</a>
     <li><a href="#user:writelog">write (add, replace entries)</a>
-    <li><a href="#updatelog">update (modify or delete entries)</a>
-    <li><a href="#clearlog">clear</a>
+    <li><a href="#user:updatelog">update (modify or delete entries)</a>
+    <li><a href="#user:clearlog">clear</a>
 </ul>
 
 <!-- Read log entries. -->
@@ -194,7 +194,7 @@ To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.re
             <code>on_chunk</code>.</td>
     </tr><tr>
         <td><code>on_error</code></td>
-        <td>funciton</td>
+        <td>function</td>
         <td>Invoked if there's an error.</td>
     </tr><tr>
         <td><code>chunk_size</code></td>
@@ -300,6 +300,9 @@ would like to retrieve&emdash;after all, why read in everything if you don't
 need to?
 </p>
 
+
+
+
 <!-- Write log entries. -->
 <a name="writelog"></a>
 <h3>Write log entries</h3>
@@ -333,7 +336,7 @@ single parameter, as before: a map of options.
         <td>Invoked when everything has been successfully written.
     </tr><tr>
         <td><code>on_error</code></td>
-        <td>funciton</td>
+        <td>function</td>
         <td>Invoked if there's an error.</td>
     </tr>
 </table>
@@ -383,22 +386,261 @@ Finally, if you have multiple entries you'd like to add, that's easy:
 CROWDLOGGER.io.log.write_to_activity_log({data: [e1, e2, e3, e4, e5]});
 </pre>
 
+
+
 <!-- Update log entries. -->
 <a name="updatelog"></a>
 <h3>Update log entries</h3>
 
+<p>
+The <code>CROWDLOGGER.io.log.update_activity_log</code> and
+<code>CROWDLOGGER.io.log.update_error_log</code> functions iterate over every
+entry in a log, passing each to a function you provide (see <code>foreach</code>
+in the table below), where you can choose to update the entry, delete it, stop
+iterating, or ignore the entry and move on. As before, the functions take a
+single parameter, which is a map of options, as described below:
+</p>
+
+<table>
+    <tr>
+        <th>Option key</th> <th>Type</th> <th>Description</th>
+    </tr><tr>
+        <td colspan="3"><i>Required</i></td>
+    </tr><tr>
+        <td><code>foreach</code></td>
+        <td>function</td>
+        <td>
+            A function to run on each entry. It
+            should take a log entry as its
+            only parameter and optionally return
+            an object with three optional fields:
+            <ul>
+                <li><code>entry</code> (new data, ids must match),
+                <li><code>stop</code> (<code>true</code> or <code>false</code>)
+                <li><code>delete</code> (<code>true</code> or <code>false</code>)
+            </ul>
+            This function <i>must</i> be synchronous.
+            As soon as it returns, there's no more updating.
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="3"><i>Optional</i></td>
+    </tr><tr>
+        <td><code>on_success</code></td>
+        <td>function</td>
+        <td>Invoked when everything has been successfully written.
+    </tr><tr>
+        <td><code>on_error</code></td>
+        <td>function</td>
+        <td>Invoked if there's an error.</td>
+    </tr>
+</table>
+
+<p>
+The update operation is helpful when you want to update all (or most) entries in a log. For example, say you wanted to store the top 10 results associated with searches, and lets suppose you have a magical function <code>extract_top_ten_results</code> that can reproduce the results page seen by a user and extract those links. The code to update all of the search entries might look like this:
+</p>
+
+<pre class="prettyprint">
+// This is the update function; it only effects search entries.
+function update_search_entry(entry) {
+    if( entry.e === 'search' ){
+        entry.top_ten_results = extract_top_ten_results(entry.url);
+        return {entry: entry};
+    }
+    return {};
+}
+
+// Update the log.
+CROWDLOGGER.io.log.update_activity_log({foreach: update_search_entry});
+</pre>
+
+<p>
+If an entry is deleted, the numbering of the database will remain unchanged (the
+id of the deleted entry will never be used by another entry, unless you specify
+it when writing a new entry).
+</p>
 
 <!-- Clear log entries. -->
 <a name="clearlog"></a>
 <h3>Clear log entries</h3>
 
+<p>
+Clearing logs (or truncating them) can be done by using
+<code>CROWDLOGGER.io.log.clear_activity_log</code> and
+<code>CROWDLOGGER.io.log.clear_error_log</code>. These will remove all entries
+from the log. Note that the numbering of the log entry ids does not reset after
+this operation. The functions take one parameter, a map of options (none required):
+</p>
+
+<table>
+    <tr>
+        <th>Option key</th> <th>Type</th> <th>Description</th>
+    </tr><tr>
+        <td colspan="3"><i>Optional</i></td>
+    </tr><tr>
+        <td><code>on_success</code></td>
+        <td>function</td>
+        <td>Invoked when everything has been successfully written.
+    </tr><tr>
+        <td><code>on_error</code></td>
+        <td>function</td>
+        <td>Invoked if there's an error.</td>
+    </tr>
+</table>
 
 
 <a name="realtime"></a>
 <h2>Accessing Real-time User Activity</h2>
 
+TODO
+
+
 <a name="save"></a>
 <h2>Saving Data</h2>
+
+<p>
+For each of the operations listed in the <a href="user:history">Accessing User
+History</a> section, there is a parallel for custom CrowdLogger extension logs.
+The differences are that you will always need to supply a database name
+(whatever you want, but should be unique) and version (an integer), and there
+are a few additional options available. Internally, each extension log is put in
+its own database. You can specify how to initialize it or update it between
+database versions, or you can rely on the default extension store creator, which
+gives you a single store that uses the <code>id</code> as the storage key (auto-
+incrementing). 
+</p>
+
+<p>
+For the read, write, update, and clear operations, use:
+</p>
+
+<ul>
+    <li><code>CROWDLOGGER.io.log.read_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.write_to_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.update_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.clear_extension_log</code>
+</ul>
+
+<p>
+These take all the same options as their activity and error log equivalents, but
+with the following set of additional required and optional fields:
+</p>
+
+<table>
+    <tr>
+        <th>Option key</th> <th>Type</th> <th>Description</th>
+    </tr><tr>
+        <td colspan="3"><i>Required</i></td>
+    </tr><tr>
+        <td><code>db_name</code></td>
+        <td>string</td>
+        <td>
+            The name of the database. Should be unique, which means you should
+            probably start it with the name of your extension and then something
+            descriptive, e.g., <code>sta_data</code> for the Search Task 
+            Assistant extension.
+        </td>
+    </tr><tr>
+        <td><code>db_version</code></td>
+        <td>integer</td>
+        <td>
+            The version of the database. If the current database version is less
+            than this value, the <code>on_upgrade</code> function will be
+            invoked (if you don't specify that function, then a default will
+            be used).
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="3"><i>Optional</i></td>
+    </tr><tr>
+        <td><code>on_upgrade</code></td>
+        <td>function</td>
+        <td>
+            Invoked if the database does not exist or if the version number is
+            old. This function should take an <code>IndexedDB</code> database
+            instance and  should not rely on any asynchronous calls. It should
+            return true if things went as planned. It should
+            be used to create stores and indexes for the database. This is
+            invoked before any read, write, update, or clear operations are
+            executed.
+    </tr><tr>
+        <td><code>store_name</code></td>
+        <td>string</td>
+        <td>The store in the database on which to perform the given operation.
+            If you've specified an <code>on_upgrade</code> function, you should
+            probably set this option.
+        </td>
+    </tr>
+</table>
+
+<p>
+An example of when you'd want to specify your own <code>on_upgrade</code>
+function is if you need multiple stores. E.g., the Search Task Assistant stores
+searches and tasks, and each should be stored in a separate store (and no sense
+wasting a separate database). Another example is if you want an index to access
+certain types of entries faster. Let's look at how I would use the various
+operations for the Search Task Assistant (currently, this is a hypothetical and
+this code hasn't been tested).
+</p>
+
+<pre class="prettyprint">
+var DB_VERSION = 1,
+    DB_NAME = 'sta_data',
+    TASK_STORE = 'tasks',
+    SEARCH_STORE = 'searches';
+
+// Initializes the database.
+function upgrade_db(db) {
+    // Create the log to store searches.
+    db.createObjectStore( 
+        SEARCH_STORE, {keyPath: 'id', autoIncrement: true});
+
+    // Create the log to store tasks.
+    db.createObjectStore(
+        TASK_STORE, {keyPath: 'id', autoIncrement: true});
+
+    return true;
+}
+
+// Prints the given entry.
+function print_entries( entries, next ){
+    var i;
+    for( i = 0; i &lt; entries.length; i++ ){
+        CROWDLOGGER.debug.log( JSON.stringify(entries[i]) );
+    }
+
+    // Read the next batch in a little bit.
+    setTimeout( next, 10 );
+}
+
+// Write some entries to the tasks log.
+CROWDLOGGER.io.log.write_to_extension_log({
+    db_name: DB_NAME,
+    db_version: DB_VERSION,
+    on_upgrade: upgrade_db,
+    store_name: TASK_STORE,
+    data: [
+        {name: "task 1", time: 1359928100},
+        {name: "task 2", time: 1359928101},
+        {name: "task 3", time: 1359928102},
+        {name: "task 4", time: 1359928103},
+        {name: "task 5", time: 1359928104}
+    ]
+});
+
+// Print them all out.
+CROWDLOGGER.io.log.read_extension_log({
+    db_name: DB_NAME,
+    db_version: DB_VERSION,
+    on_upgrade: upgrade_db,
+    store_name: TASK_STORE,
+    on_chunk: print_entries,
+    chunk_size: 50,
+    reverse: true
+});
+</pre>
 
 </body>
 </html>
