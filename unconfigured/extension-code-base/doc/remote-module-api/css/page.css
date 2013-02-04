@@ -1,4 +1,11 @@
 
+@font-face {
+    font-family: 'OpenSans';
+    src: url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 html, .bodyWrapper {
     margin: 0;
     /*min-height: 600px;*/
@@ -12,14 +19,6 @@ body {
     height: 100%;
 }
 .bodyWrapper {
-/*    min-width: 1050px;
-*/
-/*
-    margin-left: 230px;
-    margin-right: auto;
-    margin-top: 30px;
-    border-color: #888;
-    */
     position: relative;
     top: 30px;
     bottom: 60px;
@@ -32,9 +31,6 @@ body {
 }
 
 .menu {
-/*    position: relative;
-    left: -185px;
-    width: 150px;*/
     position: absolute;
     left: 31px;
     top: 100px;
@@ -64,12 +60,7 @@ body {
 }
 
 .non-trigger {
-    color: white;
-    text-shadow:
-        -1px -1px 0 #444,
-        1px -1px 0 #444,
-        -1px 1px 0 #444,
-        1px 1px 0 #444;
+    color: #ccc;
     cursor: text;  
 }
 

@@ -21,7 +21,7 @@ function add_src(e) {
         console.log('scrolling to anchor: '+ hash_parts[1]);
         jQuery('a[name="'+ hash_parts[1] +'"]')[0].scrollIntoView();
     } else {
-        window.scrollTo(0);
+        window.scrollTo(0,0);
     }
 
     expand_menu(hash_parts[0]);
