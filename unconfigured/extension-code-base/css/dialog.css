@@ -402,7 +402,7 @@ td.click, td.serpClick {
 #log-area {
     font-family:    fixed-width, courier, "courier new";
     overflow:       auto;
-    white-space:    nowrap;
+    white-space:    pre-wrap;
     font-size:      10pt;
     border:         1px lightgray solid;
 }

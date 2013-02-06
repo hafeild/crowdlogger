@@ -57,7 +57,7 @@ some new events that don't.
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'search', 
- t: 1359928100, 
+ t: 1360168716158, 
  q: 'upcoming movies', 
  se: 'google', 
  url: 'https://www.google.com/search?q=upcoming+movies'}
@@ -81,7 +81,7 @@ E.g.:
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'click', 
- t: 1359928100, 
+ t: 1360168716158, 
  turl: 'http://en.wikipedia.org/wiki/Panda', 
  surl: 'https://www.google.com/search?q=panda',
  sr: true,
@@ -102,7 +102,7 @@ E.g.:
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'tabadd', 
- t: 1359928100, 
+ t: 1360168716158, 
  ttid: 2k3,
  turl: 'http://www.cnn.com', 
  stid: 4wi5a,
@@ -119,7 +119,7 @@ E.g.:
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'tabremove', 
- t: 1359928100, 
+ t: 1360168716158, 
  tid: 2k3}
 </pre>
         </td>
@@ -135,7 +135,7 @@ E.g.:
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'pageload', 
- t: 1359928100, 
+ t: 1360168716158, 
  tid: 2k3,
  url: 'http://www.cnn.com'}
 </pre>
@@ -152,13 +152,39 @@ E.g.:
 E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'pagefocus', 
- t: 1359928100, 
+ t: 1360168716158, 
  tid: 2k3,
  url: 'http://www.cnn.com'}
 </pre>
         </td>
+    </tr><tr>
+        <td>loggingstatuschange</td>
+        <td>
+            <ul>
+                <li><code>t</code>: The timestamp.
+                <li><code>le</code>: Logging enabled: <code>true</code> or 
+                    <code>false</code>
+            </ul>
+E.g.:
+<pre class='prettyprint'>{id: 1,
+ e: 'loggingstatuschange', 
+ t: 1360168716158, 
+ le: false}
+</pre>
+        </td>
     </tr>
 </table>
+
+<p>
+Thought unlikely, if you need to access the error log, all entries conform to
+a three-field format:
+</p>
+<ul>
+    <li><code>f</code>: (string) The name of the function in which the error
+        occurred.
+    <li><code>err</code>: (string) The error itself.
+    <li><code>t</code>: (int) The time at which the error occurred.
+</ul>
 
 <p>
 The <code>CROWDLOGGER.io.log</code> interface allows four operations
@@ -170,6 +196,18 @@ The <code>CROWDLOGGER.io.log</code> interface allows four operations
     <li><a href="#user:updatelog">update (modify or delete entries)</a>
     <li><a href="#user:clearlog">clear</a>
 </ul>
+
+<p>
+E.g.:
+</p>
+
+<pre class="prettyprint">
+{
+    f: 'CROWDLOGGER.experiments.check_for_new_experiments',
+    err: 'ERROR contacting http://server: 404 Server not found.',
+    t: 1360168716158
+}
+</pre>
 
 <!-- Read log entries. -->
 <a name="readlog"></a>
@@ -640,11 +678,11 @@ CROWDLOGGER.io.log.write_to_extension_log({
     on_upgrade: upgrade_db,
     store_name: TASK_STORE,
     data: [
-        {name: "task 1", time: 1359928100},
-        {name: "task 2", time: 1359928101},
-        {name: "task 3", time: 1359928102},
-        {name: "task 4", time: 1359928103},
-        {name: "task 5", time: 1359928104}
+        {name: "task 1", time: 1360168716158},
+        {name: "task 2", time: 1360168717100},
+        {name: "task 3", time: 1360168718100},
+        {name: "task 4", time: 1360168719100},
+        {name: "task 5", time: 1360168720100}
     ]
 });
 

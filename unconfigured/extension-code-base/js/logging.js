@@ -20,7 +20,31 @@ CROWDLOGGER.logging = {
     activity_log_file: "",
     serp_log_file: "",
     query_filter_file: "",
-    MAX_QUERY_LENGTH: 200
+    MAX_QUERY_LENGTH: 200,
+
+    CLICK: "click",
+    SEARCH: "search",
+    PAGE_FOCUS: "pagefocus",
+    PAGE_LOAD: "pageload",
+    LOGGING_STATUS_CHANGE: "loggingstatuschange",
+    TAB_ADD: "tabadd",
+    TAB_REMOVE: "tabremove",
+
+
+    is_click: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.CLICK; },
+    is_search: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.SEARCH; },
+    is_page_focus: function(entry){ 
+        return entry.e ===CROWDLOGGER.logging. PAGE_FOCUS; },
+    is_page_load: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.PAGE_LOAD; },
+    is_logging_status_change: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.LOGGING_STATUS_CHANGE;},
+    is_tab_add: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.TAB_ADD; },
+    is_tab_remove: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.TAB_REMOVE; }
 };
  
  
@@ -65,11 +89,15 @@ CROWDLOGGER.logging.set_logging = function( enable_logging ){
             enable_logging );
     }
 
-    if( enable_logging ) {
-        CROWDLOGGER.io.log.write_to_activity_log( "Logging enabled\t"+time );
-    } else {
-        CROWDLOGGER.io.log.write_to_activity_log( "Logging disabled\t"+time ); 
-    }
+    // Log the change in status.
+    CROWDLOGGER.io.log.write_to_activity_log( {
+        data: [{
+            e: CROWDLOGGER.logging.LOGGING_STATUS_CHANGE,
+            le: enable_logging,
+            t: time
+        }]
+    });
+
 
     CROWDLOGGER.preferences.set_bool_pref( "logging_enabled",
         enable_logging );
@@ -117,66 +145,27 @@ CROWDLOGGER.logging.log_click = function( time, clicked_url,
         return false;
     }
 
-
     // If the query is undefined, we need to set it to an empty string.
     query = (query === undefined) ? "" : query;
 
     // Is this a search result?
     is_search_result = (query === "") ? false : true;
     
-    
-    // We're currently going to create a generic event "click", rather than
-    // looking at types of clicks.
-    click_event = "Click";
 
     // Create the log entry:
-    log_entry = [
-        click_event,
-        time,
-        CROWDLOGGER.util.cleanse_string(clicked_url),
-        CROWDLOGGER.util.cleanse_string(originating_page_url),
-        is_search_result,
-        CROWDLOGGER.util.cleanse_string(query)    
-    ].join("\t")
+    log_entry = {
+        e: CROWDLOGGER.logging.CLICK,
+        t: time,
+        turl: CROWDLOGGER.util.cleanse_string(clicked_url),
+        surl: CROWDLOGGER.util.cleanse_string(originating_page_url),
+        sr: is_search_result,
+        q: CROWDLOGGER.util.cleanse_string(query)  
+    };
 
     // Write the entry to the log.
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
 
-/**
- * Creates an object from the given click line:
- *  {
- *      is_click: true,
- *      time:     col 1, 
- *      target_url: col 2,
- *      source_url: col 3,
- *      is_serp:    col 4,
- *      query:      col 5
- *  }
- *
- * @param {string} line A click log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_click = function( line, is_array ){
-    if( (is_array && line[0] === "Click" ) ||
-            (!is_array && line.match( /^Click/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_click: true,
-            time:     parseInt( cols[1] ),
-            target_url: cols[2],
-            source_url: cols[3],
-            is_serp:    cols[4]==="true",
-            query:      cols[5] };
-    } else {
-        return null;
-    }
-};
 
 
 /**
@@ -196,57 +185,18 @@ CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id,
         return false;
     }
 
-
     // Create the log entry.
-    var log_entry = [
-        "TabAdded",
-        time,
-        tab_id,
-        CROWDLOGGER.util.cleanse_string(url),
-        src_tab_id,
-        CROWDLOGGER.util.cleanse_string(src_url)
-    ].join("\t");
-
+    var log_entry = {
+        e: CROWDLOGGER.logging.TAB_ADD,
+        t: time,
+        ttid: tab_id,
+        turl: CROWDLOGGER.util.cleanse_string(url),
+        stid: src_tab_id,
+        surl: CROWDLOGGER.util.cleanse_string(src_url) 
+    };
     // Log it.
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
-
-/**
- * Creates an object from the given tab added line:
- *  {
- *      is_tab_added: true,
- *      time:   col 1,
- *      target_tab_id: col 2,
- *      target_url: col 3,
- *      source_tab_id: col 4,
- *      source_url: col 5
- *  }
- *
- * @param {string} line A tab added log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_tab_added = function( line, is_array ){
-    if( (is_array && line[0] === "TabAdded" ) ||
-            (!is_array && line.match( /^TabAdded/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_tab_added: true,
-            time:     parseInt( cols[1] ),
-            target_tab_id: cols[2],
-            target_url: cols[3],
-            source_tab_id: cols[4],
-            source_url: cols[5]
-        };
-    } else {
-        return null;
-    }
-};
-
 
 /**
  * Logs that a tab has been removed.
@@ -261,47 +211,15 @@ CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
     }
 
     // Create the log entry.
-    var log_entry = [
-        "RmTab",
-        time,
-        tab_id
-    ].join("\t");
+    var log_entry = {
+        e: CROWDLOGGER.logging.TAB_REMOVE,
+        t: time,
+        tid: tab_id
+    };
 
     // Log it.
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
-
-/**
- * Creates an object from the given tab removed line:
- *  {
- *      is_tab_added: true,
- *      time:   col 1,
- *      tab_id: col 2
- *  }
- *
- * @param {string} line A tab removed log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_tab_removed = function( line, is_array ){
-    if( (is_array && line[0] === "RmTab" ) ||
-            (!is_array && line.match( /^RmTab/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_tab_removed: true,
-            time:     parseInt( cols[1] ),
-            tab_id: cols[2]
-        };
-    } else {
-        return null;
-    }
-};
-
-
 
 /**
  * Logs that a page has loaded.
@@ -317,48 +235,15 @@ CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
     }
 
     // Create the log entry.
-    var log_entry = [
-        "Load",
-        time,
-        tab_id,
-        CROWDLOGGER.util.cleanse_string(url)
-    ].join("\t");
+    var log_entry = {
+        e: CROWDLOGGER.logging.PAGE_LOAD,
+        t: time,
+        tid: tab_id,
+        url: CROWDLOGGER.util.cleanse_string(url)
+    };
 
     // Log it.
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
-};
-
-
-/**
- * Creates an object from the given page loaded line:
- *  {
- *      is_page_loaded: true,
- *      time:   col 1,
- *      tab_id: col 2,
- *      url: col 3
- *  }
- *
- * @param {string} line A page loaded log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_page_loaded = function( line, is_array ){
-    if( (is_array && line[0] === "Load" ) ||
-            (!is_array && line.match( /^Load/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_tab_added: true,
-            time:       parseInt( cols[1] ),
-            tab_id:     cols[2],
-            url:        cols[3]
-        };
-    } else {
-        return null;
-    }
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
 
 
@@ -376,50 +261,16 @@ CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
     }
 
     // Create the log entry.
-    var log_entry = [
-        "Focus",
-        time,
-        tab_id,
-        CROWDLOGGER.util.cleanse_string(url)
-    ].join("\t");
+    var log_entry = {
+        e: CROWDLOGGER.logging.PAGE_FOCUS,
+        t: time,
+        tid: tab_id,
+        url: CROWDLOGGER.util.cleanse_string(url)
+    };
 
     // Log it.
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
-
-/**
- * Creates an object from the given page focused line:
- *  {
- *      is_page_focused: true,
- *      time:            col 1,
- *      tab_id:          col 2,
- *      url:             col 3
- *  }
- *
- * @param {string} line A page focused log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_page_focused = function( line, is_array ){
-    if( (is_array && line[0] === "Focus" ) ||
-            (!is_array && line.match( /^Focus/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_tab_added: true,
-            time:       parseInt( cols[1] ),
-            tab_id:     cols[2],
-            url:        cols[3]
-        };
-    } else {
-        return null;
-    }
-};
-
-
 
 /**
  * Logs a search event.
@@ -438,52 +289,17 @@ CROWDLOGGER.logging.log_search = function( time, query, search_engine, url ){
         return false;
     }
 
-    query = CROWDLOGGER.util.cleanse_string( query );
+    // Create the log entry.
+    var log_entry = {
+        e: CROWDLOGGER.logging.SEARCH,
+        t: time,
+        q: CROWDLOGGER.util.cleanse_string( query ),
+        se: search_engine,
+        url: CROWDLOGGER.util.cleanse_string(url)
+    };
 
-    var log_entry = [
-        "Search",
-        time,
-        query,
-        query, // Included twice for legacy reasons.
-        search_engine,
-        CROWDLOGGER.util.cleanse_string(url)
-    ].join("\t");
-
-    CROWDLOGGER.io.log.write_to_activity_log( log_entry );
-};
-
-/**
- * Creates an object from the given search line:
- *  {
- *      is_search: true,
- *      time:  col 1,
- *      query: col 2,
- *      search_engine: col 4, // This is not a typo; we skipped col 3.
- *      url: col 5
- *  }
- *
- * @param {string} line A search log entry.
- * @param {boolean} is_array If true, then is an array and doesn't have to be
- *      split.
- * @return The object described above.
- */
-CROWDLOGGER.logging.parse_search = function( line, is_array ){
-    if( (is_array && line[0] === "Search") ||
-            (!is_array && line.match( /^Search/ ) !== null ) ){
-        var cols = line;
-        if( !is_array ) {
-            cols = line.split( /\t/ );
-        }
-        return {
-            is_search: true,
-            time:           parseInt( cols[1] ),
-            query:          cols[2],
-            search_engine:  cols[3],
-            url:            cols[4] 
-        };
-    } else {
-        return null;
-    }
+    // Log it.
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
 
 
@@ -575,11 +391,14 @@ CROWDLOGGER.logging.init = function(){
         // First, determine if these are even in the right order.
         if( previous_search !== undefined &&
                 current_search.time < previous_search.time ){
-            CROWDLOGGER.io.log.write_to_error_log( 
-                "Searches out of order! prev: [" + 
-                previous_search.query + ", " + previous_search.time + 
-                "] cur:[ " + current_search.query + ", " + 
-                current_search.time + "]" );
+            CROWDLOGGER.io.log.write_to_error_log( {data: [{
+                f: "CROWDLOGGER.logging.init",
+                err: "Searches out of order! prev: [" + 
+                        previous_search.query + ", " + previous_search.time + 
+                        "] cur:[ " + current_search.query + ", " + 
+                        current_search.time + "]",
+                t: new Date().getTime()
+            }]} );
         }
 
         // Logs the previous query.
@@ -683,12 +502,15 @@ CROWDLOGGER.logging.init = function(){
                 add_search_candidate( time, query, search_engine, 
                 search_results_url, is_dummy );
             } catch (e) {
-                CROWDLOGGER.io.log.write_to_error_log( 
-                    "add_seach_candidate failed on: query=" + query + 
-                    "; search_engine=" + search_engine + 
-                    "; search_results_url=" + search_results_url + 
-                    "; is_dummy: " + is_dummy + "; for ticket number: " + 
-                    ticket_number + "; ERROR: " + e );
+                CROWDLOGGER.io.log.write_to_error_log( {data: [{
+                    f: "CROWDLOGGER.logging.add_seach_candidate",
+                    err: "Failed on: query="+ query + 
+                        "; search_engine="+ search_engine + 
+                        "; search_results_url="+ search_results_url + 
+                        "; is_dummy: "+ is_dummy +"; for ticket number: "+ 
+                        ticket_number +"; ERROR: "+ e,
+                    t: new Date().getTime()
+                }]});
             }
             // Important: this gets set _after_ we've processed the current
             // search.

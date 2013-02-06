@@ -20,247 +20,6 @@ if( CROWDLOGGER.experiments.artifact_extractors === undefined ){
 CROWDLOGGER.experiments.artifact_extractors = {};
 
 /**
- * Extracts queries from the search log.
- *
- * @param {string} log_data The log data.
- * @param {function} on_complete The function to call on completion. It should
- *      take as a parameter an array of object, where each has three fields:
- *      primary_data,  secondary_data, and count.
- */
-/*
-CROWDLOGGER.experiments.artifact_extractors.extract_query_histogram = function( 
-            log_data, on_complete ){
-    //B_DEBUG
-    CROWDLOGGER.debug.log( "In CROWDLOGGER.experiments.artifact_extractors.extract_query_histogram\n" );
-    //E_DEBUG
-
-    var histogram = {};
-
-    // Add a dummy query; this helps us determine how many distinct users
-    // participated in the experiment.
-    histogram['DUMMY'] = {
-        primary_data:   'DUMMY',
-        secondary_data: 'DUMMY',
-        count:          1
-    };
-
-    // Go through the log, looking for Search events.
-    var lines = log_data.split( /\n/ );
-    for( var i = 0; i < lines.length; i++ ){
-        // The log entries should be tab-delimited.
-        var line_parts = lines[i].split( /\t/ );
-
-        // Is this a search?
-        if( line_parts[0] === "Search" ){
-            var query_raw = line_parts[2];
-            // Normalize the query. I.e.:
-            //   1) case conflate
-            //   2) space conflate
-            var query_normalized = 
-                line_parts[2].toLowerCase().replace( /\s+/, " " );
-
-            var key = query_raw + "\t" + query_normalized;
-
-            // Add to the histogram -- create a new entry if needed.
-            if( histogram[key] === undefined ){
-                
-                histogram[key] = {
-                    primary_data:   query_normalized,
-                    secondary_data: query_raw,
-                    count:          0
-                };
-                //B_DEBUG
-                //CROWDLOGGER.debug.log( "Creating a new histogram entry: " +
-                //    JSON.stringify( histogram[key] ) + "\n");
-                //E_DEBUG
-            }
-            histogram[key].count++;
-        }
-    }
-
-    // Convert the histogram to an array.
-    var artifacts = [], i = 0;
-    for( var artifact_key in histogram ){
-        artifacts[i] = histogram[artifact_key];
-        i++;
-    }
-
-    // Invoke the on_complete callback.
-    on_complete( artifacts );
-};
-*/
-
-/**
- * Extracts query pairs from the search log.
- *
- * @param {string} log_data The log data.
- * @param {function} on_complete The function to call on completion. It should
- *      take as a parameter an array of object, where each has three fields:
- *      primary_data,  secondary_data, and count.
- */
-/*
-CROWDLOGGER.experiments.artifact_extractors.extract_query_pairs = function( 
-            log_data, on_complete ){
-    //B_DEBUG
-    CROWDLOGGER.debug.log( "In CROWDLOGGER.experiments.artifact_extractors." +
-        "extract_query_pairs\n" );
-    //E_DEBUG
-
-    var histogram = {};
-
-    var previous_query_raw = "";
-    var previous_query_normalized = "";
-
-    var lines = log_data.split( /\n/ );
-
-    // Add a dummy query; this helps us determine how many distinct users
-    // participated in the experiment.
-    histogram['DUMMY'] = {
-        primary_data:   'DUMMY',
-        secondary_data: 'DUMMY',
-        count:          1
-    };
-
-    // Go through the log, looking for Search events.
-    for( var i = 0; i < lines.length; i++ ){
-        // The log entries should be tab-delimited.
-        var line_parts = lines[i].split( /\t/ );
-
-        // Is this a search?
-        if( line_parts[0] === "Search" ){
-            var query_raw = line_parts[2];
-            // Normalize the query. I.e.:
-            //   1) case conflate
-            //   2) space conflate
-            var query_normalized = 
-                line_parts[2].toLowerCase().replace( /\s+/, " " );
-
-            // If the previous query is empty, then don't emit a pair.
-            if( previous_query_raw !== "" ){
-
-                var key = [previous_query_raw, query_raw, 
-                    previous_query_normalized, query_normalized].join( "\t" );
-    
-                // Add to the histogram -- create a new entry if needed.
-                if( histogram[key] === undefined ){
-                    
-                    histogram[key] = {
-                        primary_data:   [previous_query_normalized, 
-                                        query_normalized].join( "\t" ),
-                        secondary_data: [previous_query_raw, query_raw].
-                                            join("\t"),
-                        count:          0
-                    };
-                    //B_DEBUG
-                    //CROWDLOGGER.debug.log( "Creating a new histogram entry: " +
-                    //    JSON.stringify( histogram[key] ) + "\n");
-                    //E_DEBUG
-                }
-                histogram[key].count++;
-            }
-
-            // The current query now becomes the previous query.
-            previous_query_raw = query_raw;
-            previous_query_normalized = query_normalized;
-        }
-    }
-
-    // Convert the histogram to an array.
-    var artifacts = [], i = 0;
-    for( var artifact_key in histogram ){
-        artifacts[i] = histogram[artifact_key];
-        i++;
-    }
-
-    // Invoke the on_complete callback.
-    on_complete( artifacts );
-};
-*/
-
-/**
- * Extracts query-URL pairs from the search log.
- *
- * @param {string} log_data The log data.
- * @param {function} on_complete The function to call on completion. It should
- *      take as a parameter an array of object, where each has three fields:
- *      primary_data,  secondary_data, and count.
- */
-/*
-CROWDLOGGER.experiments.artifact_extractors.extract_query_url_pairs = function( 
-            log_data, on_complete ){
-    var CLICKED_URL = 2;
-    var IS_SEARCH_RESULT = 4;
-    var QUERY = 5;
-
-    //B_DEBUG
-    CROWDLOGGER.debug.log( "In CROWDLOGGER.experiments.artifact_extractors." +
-        "extract_query_url_pairs\n" );
-    //E_DEBUG
-
-    var histogram = {};
-
-    var lines = log_data.split( /\n/ );
-
-
-    // Add a dummy query; this helps us determine how many distinct users
-    // participated in the experiment.
-    histogram['DUMMY'] = {
-        primary_data:   'DUMMY',
-        secondary_data: 'DUMMY',
-        count:          1
-    };
-
-    // Go through the log, looking for Click events.
-    for( var i = 0; i < lines.length; i++ ){
-        // The log entries should be tab-delimited.
-        var line_parts = lines[i].split( /\t/ );
-
-        // Is this a search?
-        if( line_parts[0] === "Click" && line_parts[IS_SEARCH_RESULT]==="true"){
-
-            var url = line_parts[CLICKED_URL];
-
-            var query_raw = line_parts[QUERY];
-            // Normalize the query. I.e.:
-            //   1) case conflate
-            //   2) space conflate
-            var query_normalized = 
-                line_parts[QUERY].toLowerCase().replace( /\s+/, " " );
-
-            var key = [query_raw, url].join( "\t" );
-
-            // Add to the histogram -- create a new entry if needed.
-            if( histogram[key] === undefined ){
-                
-                histogram[key] = {
-                    primary_data:   [query_normalized, url].join( "\t" ),
-                    secondary_data: [query_raw].join("\t"),
-                    count:          0
-                };
-                //B_DEBUG
-                //CROWDLOGGER.debug.log( "Creating a new histogram entry: " +
-                //    JSON.stringify( histogram[key] ) + "\n");
-                //E_DEBUG
-            }
-
-            histogram[key].count++;
-        }
-    }
-
-    // Convert the histogram to an array.
-    var artifacts = [], i = 0;
-    for( var artifact_key in histogram ){
-        artifacts[i] = histogram[artifact_key];
-        i++;
-    }
-
-    // Invoke the on_complete callback.
-    on_complete( artifacts );
-};
-*/
-
-
-/**
  * Handles a histogram of artifacts:
  *    - adds in a dummy entry
  *    - converts the histogram to an array
@@ -428,22 +187,21 @@ CROWDLOGGER.experiments.artifact_extractors.extract_queries =
         function( on_complete ){
 
     CROWDLOGGER.log.operations.accumulate_over( 
-       CROWDLOGGER.log.operations.filter.session_boundaries(
-              {apply: CROWDLOGGER.log.operations.filter.query_items( 
-                  {apply: CROWDLOGGER.log.operations.filter.to_artifact(
-                      {
-                          apply: CROWDLOGGER.log.operations.accumulator.
+        CROWDLOGGER.log.operations.filter.session_boundaries(
+            {apply: CROWDLOGGER.log.operations.filter.query_items( 
+                {apply: CROWDLOGGER.log.operations.filter.to_artifact({
+                    apply: CROWDLOGGER.log.operations.accumulator.
                             histogram( CROWDLOGGER.log.operations.
                                 artifact_histogram_options
                             ),
-                          gen_primary: function(item){ 
-                            return CROWDLOGGER.log.operations.
-                               term_order_normalize( item.value[0] ) },
-                          gen_secondary: function(item){
-                            return item.value[0] }
-                      })
-                  })
-          }), 
+                    gen_primary: function(item){ 
+                        return CROWDLOGGER.log.operations.
+                           term_order_normalize( item.value[0] ) },
+                    gen_secondary: function(item){
+                        return item.value[0] }
+                })
+            })
+        }), 
        function(histogram){
             CROWDLOGGER.experiments.artifact_extractors.
                 process_artifact_histogram( histogram, on_complete );

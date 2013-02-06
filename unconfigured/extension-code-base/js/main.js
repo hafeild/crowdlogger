@@ -175,8 +175,8 @@ CROWDLOGGER.initialize = function(){
         CROWDLOGGER.preferences.init();
         CROWDLOGGER.preferences.defaults.set_defaults();
         CROWDLOGGER.debug.reinit();
-        CROWDLOGGER.io.file.init();
-        CROWDLOGGER.io.web_sql.init();
+        //CROWDLOGGER.io.file.init();
+        //CROWDLOGGER.io.web_sql.init();
         CROWDLOGGER.io.log.init();
         CROWDLOGGER.gui.notifications.init();
         CROWDLOGGER.notifications.launch_notification_init();

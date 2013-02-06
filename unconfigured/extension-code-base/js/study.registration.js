@@ -314,8 +314,11 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
     on_error = function( error ) {
         alert( "We apologize; the system encountered an error while "+
             "registering your information. Please try again later." );
-        CROWDLOGGER.io.log.write_to_error_log(
-            "Error during registration. Error : " + error );
+        CROWDLOGGER.io.log.write_to_error_log({data: [{
+            f: "CROWDLOGGER.study.registration.submit",
+            err:  "Error submitting registration. Error : " + error,
+            t: new Date().getTime()
+        }]});
     };
 
     // Handles the response from the registration server.

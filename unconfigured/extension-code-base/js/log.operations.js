@@ -75,112 +75,32 @@ CROWDLOGGER.log.operations.accumulator = {};
  * @return Whatever is returned by the accumulator function on an EOS object.
  */
 CROWDLOGGER.log.operations.accumulate_over = function( accumulator, 
-            on_complete, log ){
+            on_complete, entries ){
 
     // Iterates over the log, converts each entry to an object, and passes it
     // to the accumulator. Finally, once the log has been iterated over,
     // returns the whatever the accumulator returns on a 'last' object
     // (a 'last' object is the following: {last: true}).
-    var iterate = function( entries ){
+    var iterate = function( entries, next ){
         var i;
         for( i in entries ){
             accumulator( entries[i] );
         }
-        on_complete( accumulator( {last: true} ) );
-    };
+
+        setTimeout(next, 2);
+    };    
 
     if( entries === undefined ){
         //CROWDLOGGER.io.log.read_activity_log( iterate );
         CROWDLOGGER.io.log.read_activity_log({
             on_chunk: iterate, 
-            chunk_size:1000
+            chunk_size:1000,
+            on_success: function(){ on_complete( accumulator( {last: true} ) );}
         });
     } else {
         iterate( entries );
     }
 };
-
-/**
- * Converts a log entry into an object (columns given base 0):
- * @deprecated
- *
- * Search entries:
- *  {
- *      is_search: true,
- *      time:  col 1,
- *      query: col 2,
- *      search_engine: col 4, // This is not a typo; we skipped col 3.
- *      url: col 5
- *  }
- *
- * Click entries:
- *  {
- *      is_click: true,
- *      time:     col 1, 
- *      target_url: col 2,
- *      source_url: col 3,
- *      is_serp:    col 4,
- *      query:      col 5
- *  }
- *
- * Tab added entries:
- *  {
- *      is_tab_added: true,
- *      time:   col 1,
- *      target_tab_id: col 2,
- *      target_url: col 3,
- *      source_tab_id: col 4,
- *      source_url: col 5
- *  }
- *
- * Tab removed entries: 
- *  {
- *      is_tab_removed: true,
- *      time:   col 1,
- *      tab_id: col 2
- *  }
- *
- * Page loaded entires:
- *  {
- *      is_page_loaded: true,
- *      time:   col 1,
- *      tab_id: col 2,
- *      url:    col 3
- *  }
- *
- * Page focused entries:
- *  {
- *      is_page_focused: true,
- *      time:   col 1,
- *      tab_id: col 2,
- *      url:    col 3
- *  }
- */
-CROWDLOGGER.log.operations.objectify_line = function(){
-
-    // These are the parsers, named by their first column names in the logs.
-    var parsers = {
-        Search: CROWDLOGGER.logging.parse_search,
-        Click: CROWDLOGGER.logging.parse_click,
-        AddTab: CROWDLOGGER.logging.parse_tab_added,
-        RmTab: CROWDLOGGER.logging.parse_tab_removed,
-        Load: CROWDLOGGER.logging.parse_page_loaded,
-        Focus: CROWDLOGGER.logging.parse_page_focused
-    };
-    
-    return function( line ){
-        var cols = line.split( /\t/ );
-
-        if( parsers[cols[0]] === undefined ){
-            return {};
-        } else {
-            // Parse the entry, but tell the parser not to resplit the line.
-            return parsers[cols[0]]( cols, true );
-        }
-    };
-
-}();
-
 
 /**
  * A helper function that adds to the options object any values not 
@@ -225,12 +145,12 @@ CROWDLOGGER.log.operations.filter.instant_queries = function( options ) {
 
     return function( entry ){
         if( last_query !== undefined && ( entry.last || entry.skip ||
-                (entry.is_search && Math.abs(entry.time-last_query.time) 
-                    >= options.time_diff ) ) ) {
+                (CROWDLOGGER.logging.is_search(entry) && 
+                Math.abs(entry.t-last_query.t) >= options.time_diff ))){
             options.apply( last_query );    
         }
 
-        if( entry.is_search ){
+        if( CROWDLOGGER.logging.is_search(entry) ){
             last_query = entry;
         }
 
@@ -308,10 +228,10 @@ CROWDLOGGER.log.operations.filter.session_boundaries = function( options ) {
 
     return function( entry ){
         if ( prev_time !== -1 && !entry.last &&
-                Math.abs(entry.time-prev_time) > options.session_cutoff ) {
+                Math.abs(entry.t-prev_time) > options.session_cutoff ) {
             options.apply( {skip: true} );
         } 
-        prev_time = entry.time;
+        prev_time = entry.t;
         options.apply( entry );
 
         // The last entry.
@@ -344,7 +264,7 @@ CROWDLOGGER.log.operations.filter.searches = function( options ) {
     options = CROWDLOGGER.log.operations.set_options(options, defaults);
 
     return function( entry ){
-        if( entry.is_search ){
+        if( CROWDLOGGER.logging.is_search(entry) ){
             options.apply( entry );
         }
 
@@ -379,8 +299,9 @@ CROWDLOGGER.log.operations.filter.clean_queries = function( options ) {
     options = CROWDLOGGER.log.operations.set_options(options, defaults);
 
     return function( entry ){
-        if( entry.is_search || (entry.is_click && entry.is_serp) ) { 
-            entry.query = options.cleaner( entry.query );
+        if( CROWDLOGGER.logging.is_search(entry) || 
+            (CROWDLOGGER.logging.is_click(entry) && entry.sr) ) { 
+            entry.q = options.cleaner( entry.q );
         }
 
         if( !entry.last ) {
@@ -424,8 +345,8 @@ CROWDLOGGER.log.operations.filter.query_items = function( options ){
     options = CROWDLOGGER.log.operations.set_options(options, defaults);
 
     return function( entry ){
-        if( entry.is_search ){
-            options.apply( {value: [entry.query]} );
+        if( CROWDLOGGER.logging.is_search(entry) ){
+            options.apply( {value: [entry.q]} );
         }
 
         if( entry.last ){
@@ -457,11 +378,11 @@ CROWDLOGGER.log.operations.filter.query_pair_items = function( options ){
     options = CROWDLOGGER.log.operations.set_options(options, defaults);
 
     return function( entry ){
-        if( entry.is_search ){
+        if( CROWDLOGGER.logging.is_search(entry) ){
             if( last_query !== undefined ) {
-                options.apply( {value: [last_query, entry.query]} );
+                options.apply( {value: [last_query, entry.q]} );
             }
-            last_query = entry.query;
+            last_query = entry.q;
         }
 
         if( entry.last ){
@@ -492,8 +413,8 @@ CROWDLOGGER.log.operations.filter.query_click_pair_items = function( options ){
     options = CROWDLOGGER.log.operations.set_options(options, defaults);
 
     return function( entry ){
-        if( entry.is_click && entry.is_serp ){
-            options.apply( {value: [entry.query, entry.target_url]} );
+        if( CROWDLOGGER.logging.is_click(entry) && entry.sr ){
+            options.apply( {value: [entry.q, entry.turl]} );
         }
 
         if( entry.last ){
@@ -526,13 +447,13 @@ CROWDLOGGER.log.operations.filter.query_visit_pair_items = function( options ){
 
 
     return function( entry ){
-        if( entry.is_click ){
-            if( entry.is_serp ){
-                query = entry.query;
+        if( CROWDLOGGER.logging.is_click(entry) ){
+            if( entry.sr ){
+                query = entry.q;
             }
 
             if( query !== undefined ){
-                options.apply( {value: [query, entry.target_url]} );
+                options.apply( {value: [query, entry.turl]} );
             }
         }
  
@@ -577,9 +498,9 @@ CROWDLOGGER.log.operations.filter.query_visit_pair_items = function( options ){
 CROWDLOGGER.log.operations.accumulator.histogram = function( options ){
 
     var defaults = {
-        gen_key: function(value){ return value.join( "\t" ); },
-        gen_entry: function(value){ return [value, 0]; },
-        increment_entry_count: function(entry){ entry[1]++; }
+        gen_key: function(item){ return JSON.stringify(item); },
+        gen_entry: function(item){ return 0; },
+        increment_entry_count: function(value){ return value + 1; }
     };
 
     var items = {};
@@ -589,12 +510,12 @@ CROWDLOGGER.log.operations.accumulator.histogram = function( options ){
         if( item.last ){
             return items;
         } else if( !item.skip ){
-            var key = options.gen_key( item.value );
+            var key = options.gen_key( item );
 
             if( items[key] === undefined ){
-                items[key] = options.gen_entry(item.value);//[ item.value, 0 ];
+                items[key] = options.gen_entry(item);
             }
-            options.increment_entry_count(items[key]); //items[key][1]++;
+            items[key] = options.increment_entry_count(items[key]); 
         }
     };
 };
@@ -606,15 +527,17 @@ CROWDLOGGER.log.operations.accumulator.histogram = function( options ){
  */
 CROWDLOGGER.log.operations.artifact_histogram_options = {
     // Identifies this uniquely by the primary and secondary data joined.
-    gen_key:    function(artifact){ return [
-        artifact.primary_data, artifact.secondary_data].join("\t"); },
+    gen_key:    function(item){ return [
+        item.value.primary_data, item.value.secondary_data].join("\t"); },
     // Copies the artifact to a new object and adds a 'count' field.
-    gen_entry:  function(artifact){ return {
-        primary_data: artifact.primary_data, 
-        secondary_data: artifact.secondary_data,
+    gen_entry:  function(item){ return {
+        primary_data: item.value.primary_data, 
+        secondary_data: item.value.secondary_data,
         count:  0 }; },
     // Increments the count by 1.
-    increment_entry_count: function( artifact ){ artifact.count++; }
+    increment_entry_count: function( value ){ 
+        value.count++; return value; 
+    }
 };
 
 /**
@@ -677,11 +600,17 @@ CROWDLOGGER.log.operations.filter.to_artifact = function( options ){
 CROWDLOGGER.log.operations.accumulator.list = function( options ){
     var items = [];
 
+    var defaults = {
+        unwrap_item: function(item){ return item; }
+    };
+
+    options = CROWDLOGGER.log.operations.set_options(options, defaults);
+
     return function( item ){
         if( item.last ){
             return items;
         } else if( !item.skip ) {
-            items.push( item.value );
+            items.push( options.unwrap_item(item) );
         }
     };
 };

@@ -27,9 +27,9 @@ function add_listeners(){
  * has been initialized yet.
  */
 function check_if_initialized(){
-    var init_elm = document.getElementById( "init" );
-    if( init_elm ) {
-        if( init_elm.innerHTML === "" ){
+    var init_elm = jQuery('#init');
+    if( init_elm[0] ) {
+        if( init_elm.html() === '' ){
             CROWDLOGGER.gui.tools.diplay_search_histogram( document );
         }
     }

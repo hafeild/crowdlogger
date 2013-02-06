@@ -118,10 +118,10 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
         "registration_id", "" );
 
     var on_error = function( error ){
-        CROWDLOGGER.debug.log( "ERROR contacting " + url + ": \n\t" + error + "\n" );
-        CROWDLOGGER.io.log.write_to_error_log({data: [{
+        CROWDLOGGER.debug.log("ERROR contacting "+ url +": \n\t"+ error +"\n");
+        CROWDLOGGER.io.log.write_to_error_log( {data: [{
             f: "CROWDLOGGER.experiments.check_for_new_experiments",
-            err: "ERROR contacting " + url + ": \n\t" + error + "\n",
+            err: "ERROR contacting " + url + ": " + error,
             t: new Date().getTime()
         }]} );
     };

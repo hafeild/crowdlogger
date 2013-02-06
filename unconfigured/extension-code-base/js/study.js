@@ -153,8 +153,12 @@ CROWDLOGGER.study.check_raffle_status = function( timeout, do_continue ){
 
     // The method to call on failure.
     var on_error = function( response ) {
-        CROWDLOGGER.io.log.write_to_error_log( "Error: " + response );
-    }
+        CROWDLOGGER.io.log.write_to_error_log( {data: [{
+            f: "CROWDLOGGER.study.check_raffle_status",
+            err: response,
+            t: new Date().getTime()
+        }]} );
+    };
 
 
     // This is the brains of the operation -- it contacts the server
@@ -193,10 +197,13 @@ CROWDLOGGER.study.check_raffle_status = function( timeout, do_continue ){
 CROWDLOGGER.study.get_raffle_wins = function( callback ){
     // The method to call on failure.
     var on_error = function( response ) {
-        CROWDLOGGER.io.log.write_to_error_log( 
-            "There was an error while we were contacting the server about " +
-            "raffle wins: " + response );
-    }
+        CROWDLOGGER.io.log.write_to_error_log( {data: [{
+            f: "CROWDLOGGER.study.get_raffle_wins",
+            err: "There was an error while we were contacting the server "+
+                 "about raffle wins: "+ response,
+            t: new Date().getTime()
+        }]} );
+    };
 
     // Attempt to contact the server, using the functions above in the
     // event of a success or failure.
@@ -281,8 +288,12 @@ CROWDLOGGER.study.check_for_new_messages = function( timeout, do_continue,
     
     // The method to call on failure.
     var on_error = function( response ) {
-        CROWDLOGGER.io.log.write_to_error_log( "Error: " + response );
-    }
+        CROWDLOGGER.io.log.write_to_error_log( {data: [{
+            f: "CROWDLOGGER.study.check_for_new_messages",
+            err: response,
+            t: new Date().getTime()
+        }]});
+    };
 
     // This is the brains of the operation -- it contacts the server
     // and then recurses if the caller requested that.

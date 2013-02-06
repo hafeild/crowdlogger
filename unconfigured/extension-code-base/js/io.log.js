@@ -27,7 +27,7 @@ CROWDLOGGER.io.log = {};
  *      placed at the end.
  */
 CROWDLOGGER.io.log.init = function(){
-    CrowdLogger.io.log = new CROWDLOGGER.io.IndexedDB()
+    CROWDLOGGER.io.log = new CROWDLOGGER.io.IndexedDB()
 
     // Writers.
     // Specialized writers.
