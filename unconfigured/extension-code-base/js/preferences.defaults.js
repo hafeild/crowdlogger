@@ -38,8 +38,8 @@ CROWDLOGGER.preferences.defaults = {
 CROWDLOGGER.preferences.defaults.default_prefs = {
     // char preferences.
     server_base_url: [CROWDLOGGER.preferences.defaults.server_base_url,
-         "1.4.2"],
-    ping_server_url: ["%%PING_SERVER_BASE_URL%%", "1.7.3"],
+         "%%VERSION%%"],
+    ping_server_url: ["%%PING_SERVER_BASE_URL%%", "%%VERSION%%"],
     pass_phrase: ["", "1.4.2"],
     experiment_list: ["{}" , "1.4.2"],
     ran_experiments: ["{}" , "1.4.2"],
@@ -50,45 +50,45 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     registration_id: ["" , "1.4.2"],
     most_recent_message_id: ["0", "1.4.2"],
     whatsnew_url : [CROWDLOGGER.preferences.defaults.server_base_url +
-        "/updates/whatsnew.php", "1.4.2"],
+        "/updates/whatsnew.php", "%%VERSION%%"],
     email_url : [CROWDLOGGER.preferences.defaults.server_base_url +
-        "/messages/email.php", "1.7.0"],
+        "/messages/email.php", "%%VERSION%%"],
     experiment_update_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/experiments/experiments.php", "1.4.2"],
+		"/experiments/experiments.php", "%%VERSION%%"],
     registration_id_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/register/getId.php", "1.4.2"],
+		"/register/getId.php", "%%VERSION%%"],
     registration_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/register/register.php", "1.4.2"],
+		"/register/register.php", "%%VERSION%%"],
     job_completion_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/register/jobRan.php", "1.4.2"],
+		"/register/jobRan.php", "%%VERSION%%"],
     id_code_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/register/getReferralId.php", "1.7.0"],
+		"/register/getReferralId.php", "%%VERSION%%"],
     extension_version_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/updates/checkForUpdate.php", "1.4.2"],
+		"/updates/checkForUpdate.php", "%%VERSION%%"],
     how_to_update_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/updates/howToUpdate.html", "1.4.2"],
+		"/updates/howToUpdate.html", "%%VERSION%%"],
     help_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/help.html", "1.4.2"],
+		"/help.html", "%%VERSION%%"],
     update_welcome_url: ["welcome.html", "1.4.2"],
     server_status_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/experiments/serverStatus", "1.4.2"],
+		"/experiments/serverStatus", "%%VERSION%%"],
     error_server_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/errors/logError.php", "1.4.2"],
+		"/errors/logError.php", "%%VERSION%%"],
     show_messages_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/messages/messages.php", "1.4.2"],
+		"/messages/messages.php", "%%VERSION%%"],
     check_messages_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/messages/newMessages.php", "1.4.2"],
+		"/messages/newMessages.php", "%%VERSION%%"],
     check_status_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/checkStatus/checkStatus.php" , "1.4.2"],
+		"/checkStatus/checkStatus.php" , "%%VERSION%%"],
     redeem_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/checkStatus/redeem.php" , "1.4.2"],
+		"/checkStatus/redeem.php" , "%%VERSION%%"],
     consent_body_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/consent/consentBody.php" , "1.4.2"],
+		"/consent/consentBody.php" , "%%VERSION%%"],
     consent_accepted_url: [CROWDLOGGER.preferences.defaults.server_base_url+
-		"/consent/consentAccepted.php" , "1.4.2"],
+		"/consent/consentAccepted.php" , "%%VERSION%%"],
     registration_id_verification_url: [
         CROWDLOGGER.preferences.defaults.server_base_url + 
-        "/register/verifyId.php", "1.4.2"],
+        "/register/verifyId.php", "%%VERSION%%"],
     consent_dialog_url: ["consent_form.html", "1.4.2"],
     registration_dialog_url: ["registration.html", "1.4.2"],
     refer_a_friend_dialog_url: ["refer_a_friend.html", "1.4.2"],

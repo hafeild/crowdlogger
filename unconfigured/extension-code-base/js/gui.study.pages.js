@@ -777,9 +777,9 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_jq, jq ){
 
             // If the current message is new, we should highlight it.
             if( parseInt( parts[0] ) > most_recent_message_id ){
-                entry = jq("<span> class=\"newMessage\">").append(entry);
+                entry = jq('<span class="newMessage">').append(entry);
             } else {
-                entry = jq("<span>").append(entry);
+                entry = jq('<span>').append(entry);
             }
 
             html_to_add = entry;
