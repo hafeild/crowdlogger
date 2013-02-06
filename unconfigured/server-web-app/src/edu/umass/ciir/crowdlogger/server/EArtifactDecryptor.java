@@ -121,7 +121,7 @@ public class EArtifactDecryptor
 	                eartifactBags.get( primaryCipherText ).
 	                    addEArtifact( eartifact );
 	                } catch ( JSONException e ) {
-	                    logger.severe( "Excpetion reading line [" + line +"]:"+
+	                    logger.severe( "Exception reading line [" + line +"]:"+
 	                            e.toString() ); 
 	                }
 	            }
@@ -161,6 +161,8 @@ public class EArtifactDecryptor
 	                    support + "; instances: " + instances );
 	            
 	            unsupportedArtifactStats.put( support, stats );
+
+                outputFile.write( "## "+ eab.toString2() +"\n");
 	            
 	        }
 	        // Otherwise, write it to file and update the necessary counts.
@@ -169,6 +171,9 @@ public class EArtifactDecryptor
 	            numberOfDistinctArtifactsSupported++;
 	            numberOfArtifactInstancesSupported += ab.getNumberOfInstances();
 	            outputFile.write( ab.toString() + "\n" );
+
+                if( ab.getPrimaryField().equals("") )
+                    outputFile.write( "# "+ eab.toString2() +"\n" );
 	        }
 	        
 	        totalDistinctArtifacts++;

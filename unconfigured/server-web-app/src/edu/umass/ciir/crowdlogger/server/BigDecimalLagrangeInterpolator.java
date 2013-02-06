@@ -146,14 +146,33 @@ public class BigDecimalLagrangeInterpolator extends BigDecimalInterpolator
         
         String toRound = resultParts[0].charAt(resultParts[0].length()-1) + 
             "." + resultParts[1].substring(0,Math.min(resultParts[1].length(), 3));
+
+        String originalLastDigit = resultParts[0].charAt(resultParts[0].length()-1)+"";
+        
+        String roundedLastDigit = Integer.toString( 
+                (int) Math.round( new Double(toRound).doubleValue() ) );
+
+        if( originalLastDigit.equals(roundedLastDigit) )
+        {
+            return resultParts[0];
+        }
+        else
+        {
+            BigDecimal tmp = new BigDecimal(resultParts[0]);
+            tmp = tmp.add( new BigDecimal("1") );
+            return tmp.toPlainString();
+        }    
+        
+
+/*        
         String lastDigit = Integer.toString( 
                 (int) Math.round( new Double(toRound).doubleValue() ) );
-        
         String roundedResult = 
             resultParts[0].substring(0, resultParts[0].length()-1) +
             lastDigit;
             
         return roundedResult;
+*/
     }
     
     /**
@@ -168,11 +187,15 @@ public class BigDecimalLagrangeInterpolator extends BigDecimalInterpolator
      
         d = new BigDecimal( 
             "608375017745352119000495708316353808485004039356.42384923");
-        System.out.println( "Rounded decimal 1: "+ d + "\n\t--> "+ round( d ) );
+        System.out.println( "Rounded decimal 2: "+ d + "\n\t--> "+ round( d ) );
         
         d = new BigDecimal( 
             "608375017745352119000495708316353808485004039356.52384923");
-        System.out.println( "Rounded decimal 1: "+ d + "\n\t--> "+ round( d ) );
+        System.out.println( "Rounded decimal 3: "+ d + "\n\t--> "+ round( d ) );
+
+        d = new BigDecimal( 
+            "608375017745352119000495708316353808485004039359.52384923");
+        System.out.println( "Rounded decimal 4: "+ d + "\n\t--> "+ round( d ) );
     }
 
 }

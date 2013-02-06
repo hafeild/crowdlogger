@@ -604,53 +604,70 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
 
         var current_running_job_id = "";
 
-
         // Display the current running experiment
-        if( running_doc_element && 
-                CROWDLOGGER.session_data.keep_running_experiments === true ){
+        var html = "<span class=\"note\">None</span>";
+        if( CROWDLOGGER.session_data.keep_running_experiments === true ){
             //B_DEBUG
             CROWDLOGGER.debug.log( "running_doc_element: " + 
                 running_doc_element + 
-                "\nCROWDLOGGER.session_data.keep_running_experiments" + 
+                "\nCROWDLOGGER.session_data.keep_running_experiments: " + 
                 CROWDLOGGER.session_data.keep_running_experiments + "\n" );
             //E_DEBUG
 
             current_running_job_id = JSON.parse(
                 CROWDLOGGER.preferences.get_char_pref(
                     "current_running_experiment", "{}" ) ).job_id;
-            running_doc_element.innerHTML = current_running_job_id + 
-                " <span class='note'>(" + 
+            html = current_running_job_id + 
+                " <span class=\"note\">(" + 
                 CROWDLOGGER.session_data.current_running_experiment_status.
                     message + ")</span>"; 
-        } else if( running_doc_element ) {
-            running_doc_element.innerHTML ="<span class='note'>None</span>";
+        } 
+             
+        if( running_doc_element && running_doc_element.innerHTML !== html ) {
+            running_doc_element.innerHTML = html;
         }
         
         // Generate the list of upcoming experiments.
-        if( upcoming_doc_element &&
-                CROWDLOGGER.session_data.job_indicies_to_run !== undefined && 
-                CROWDLOGGER.session_data.cur_job_index + 1 <
-                CROWDLOGGER.session_data.job_indicies_to_run.length ){
-            upcoming_doc_element.innerHTML = "";
+        html = "<span class=\"note\">None</span>"
+        if( CROWDLOGGER.session_data.job_indicies_to_run !== undefined && 
+                ((CROWDLOGGER.session_data.cur_job_index <
+                CROWDLOGGER.session_data.job_indicies_to_run.length &&
+                !CROWDLOGGER.session_data.keep_running_experiments) || 
+                (CROWDLOGGER.session_data.cur_job_index +1 <
+                CROWDLOGGER.session_data.job_indicies_to_run.length &&
+                CROWDLOGGER.session_data.keep_running_experiments))){
+            //upcoming_doc_element.innerHTML = "";
+            html = "";
 
             // If the current experiment is running, don't show it in the
             // 'upcoming' list; but if its not running, it should be displayed.
             var start_index = CROWDLOGGER.session_data.cur_job_index;
+            if( start_index === undefined ){
+                start_index = 0;
+            }
             if( CROWDLOGGER.session_data.keep_running_experiments === true ) {
                 start_index++;
             }
 
+
+
             for( var i = start_index;
                      i < CROWDLOGGER.session_data.job_indicies_to_run.length;
                      i++ ){
-                upcoming_doc_element.innerHTML += 
+                html += 
                     CROWDLOGGER.session_data.job_indicies_to_run[i] + "<br>";
             }
-        } else if( upcoming_doc_element ) {
-            upcoming_doc_element.innerHTML ="<span class='note'>None</span>";
+        }
+
+        CROWDLOGGER.debug.log("start_index: "+ start_index +
+          "; upcoming_doc_element.innerHTML: "+ upcoming_doc_element.innerHTML);
+
+        if( upcoming_doc_element && upcoming_doc_element.innerHTML !== html ) {
+            upcoming_doc_element.innerHTML = html;
         }
 
         // Display info about the most recently completed experiment.
+        html = "N/A";
         if( last_completed_experiment_elm ){
             var job_id = 
                 CROWDLOGGER.preferences.get_char_pref( "last_ran_experiment_id",
@@ -664,7 +681,7 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
             //E_DEBUG
 
             if( job_id === "N/A" || job_id === "" ){
-                last_completed_experiment_elm.innerHTML = "N/A";
+                html = "N/A";
             } else {
                 var completion_time = new Date(
                     JSON.parse( CROWDLOGGER.preferences.get_char_pref(
@@ -673,14 +690,20 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
                     completion_time.getMonth()] +
                     " " + completion_time.getDate();
 
-                last_completed_experiment_elm.innerHTML = job_id + " on " +
+                html = job_id + " on " +
                     date_string;
+            }
+
+            if( html !== last_completed_experiment_elm.innerHTML ){
+                last_completed_experiment_elm.innerHTML = html;
             }
 
         }
 
         // Display the number of experiments completed.
+        html = "0";
         if( number_completed_doc_element ){
+
             var ran_experiments_length = Object.keys( JSON.parse(
                 CROWDLOGGER.preferences.get_char_pref(
                     "ran_experiments", "{}"))).length;
@@ -691,13 +714,13 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
             var number_to_report = Math.max( ran_experiments_length, 
                 total_experiments_run );
 
-            number_completed_doc_element.innerHTML = number_to_report; 
+            html = number_to_report+""; 
+
+            if( number_completed_doc_element.innerHTML !== html ) {
+                number_completed_doc_element.innerHTML = html;
+            }
         }
-        
     }
-
-
-
 }
 
 
