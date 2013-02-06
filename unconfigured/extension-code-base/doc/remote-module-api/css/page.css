@@ -189,4 +189,25 @@ hr {
 td {
     vertical-align: top;
     border: 1px solid #e2e2e2;
+    background-color: white;
+    color: #666;
+}
+
+th {
+    background-color: lightsteelblue;
+    border: 1px solid lightsteelblue;
+}
+
+table {
+    border: 1px solid #e2e2e2;
+}
+
+tr.subHeader {
+    background-color: white;
+    /*color: steelblue;*/
+    counter-reset: row 0;
+}
+.subHeader td {
+    border: none;
+    background-color: #e2e2e2;
 }

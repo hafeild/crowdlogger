@@ -102,6 +102,7 @@ CROWDLOGGER.log.operations.accumulate_over = function( accumulator,
 
 /**
  * Converts a log entry into an object (columns given base 0):
+ * @deprecated
  *
  * Search entries:
  *  {
@@ -409,7 +410,6 @@ CROWDLOGGER.log.operations.term_order_normalize = function( query ){
 
 /**
  * Filters queries; emits items: { value: [query] }
- * Only clicks on SERP results are emitted.
  *
  * @param {object} options Options that can contain the following field:
  *      apply:  the function to apply to each item. 

@@ -29,6 +29,8 @@ CROWDLOGGER.gui.tools = {};
  */
 CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
 
+    // TODO This function needs to be re-written to use log.operations.
+
     // The page to load.
     var registration_page = CROWDLOGGER.preferences.get_char_pref( 
         "search_histogram_dialog_url", "not_found.html" );
@@ -40,67 +42,67 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
     var url = extension_prefix + registration_page;
 
 
-    // Takes a dump of the log and converts it to an object that contains
-    // pairs of (normalized) searches and frequencies.
-    var log_to_query_counts = function( log_entries, make_array ){
-        var histogram = {};
-        var threshold = 2000; // 2 seconds.
+    // // Takes a dump of the log and converts it to an object that contains
+    // // pairs of (normalized) searches and frequencies.
+    // var log_to_query_counts = function( log_entries, make_array ){
+    //     var histogram = {};
+    //     var threshold = 2000; // 2 seconds.
 
-        // So we can track the time between queries. We're only going to
-        // emit a query if it is the last in a line of rapidly submitted
-        // queries (this line is allowed to consist of only one element
-        var previous_time = 0;
-        var previous_query = "";
+    //     // So we can track the time between queries. We're only going to
+    //     // emit a query if it is the last in a line of rapidly submitted
+    //     // queries (this line is allowed to consist of only one element
+    //     var previous_time = 0;
+    //     var previous_query = "";
 
-        // Adds the query to the histogram, provided it's not an empty 
-        // query, i.e., "".
-        var addQuery = function( query ){
-            if( query === "" ){ return; }
+    //     // Adds the query to the histogram, provided it's not an empty 
+    //     // query, i.e., "".
+    //     var addQuery = function( query ){
+    //         if( query === "" ){ return; }
             
-            // Add to the histogram.
-            if( histogram[query] === undefined ){
-                histogram[query] = 0;
-            }
-            histogram[query]++;
-        };
+    //         // Add to the histogram.
+    //         if( histogram[query] === undefined ){
+    //             histogram[query] = 0;
+    //         }
+    //         histogram[query]++;
+    //     };
 
-        // Go through the log, looking for Search events.
-        for( var i = 0; i < log_entries.length; i++ ){
-            // The log entries should be tab-delimited.
-            //var line_parts = lines[i].split( /\t/ );
+    //     // Go through the log, looking for Search events.
+    //     for( var i = 0; i < log_entries.length; i++ ){
+    //         // The log entries should be tab-delimited.
+    //         //var line_parts = lines[i].split( /\t/ );
 
-            // Is this a search?
-            if( line_parts[0] === "Search" ){
-                // Normalize the query. I.e.:
-                //   1) case conflate
-                //   2) space conflate
-                var query = line_parts[2].toLowerCase().replace( /\s+/, " " );
-                var time  = parseInt( line_parts[1] );
+    //         // Is this a search?
+    //         if( line_parts[0] === "Search" ){
+    //             // Normalize the query. I.e.:
+    //             //   1) case conflate
+    //             //   2) space conflate
+    //             var query = line_parts[2].toLowerCase().replace( /\s+/, " " );
+    //             var time  = parseInt( line_parts[1] );
 
-                if( (time - previous_time) > threshold ) {
-                    // Add to the histogram.
-                    addQuery( previous_query );
-                }
+    //             if( (time - previous_time) > threshold ) {
+    //                 // Add to the histogram.
+    //                 addQuery( previous_query );
+    //             }
 
-                previous_time  = time;
-                previous_query = query;
-            }
-        }
-        // Don't forget about the last query! (Don't worry, this checks if
-        // no queries were processed at all...or at least if this query is
-        // blank).
-        addQuery( previous_query );
+    //             previous_time  = time;
+    //             previous_query = query;
+    //         }
+    //     }
+    //     // Don't forget about the last query! (Don't worry, this checks if
+    //     // no queries were processed at all...or at least if this query is
+    //     // blank).
+    //     addQuery( previous_query );
 
-        if( make_array ){
-            var hist_array = [];
-            for( var query in histogram ){
-                hist_array.push( [query, histogram[query]] );
-            }
-            return hist_array;
-        } else {
-            return histogram;
-        }
-    };
+    //     if( make_array ){
+    //         var hist_array = [];
+    //         for( var query in histogram ){
+    //             hist_array.push( [query, histogram[query]] );
+    //         }
+    //         return hist_array;
+    //     } else {
+    //         return histogram;
+    //     }
+    // };
 
     // The function to call when the page loads.
     /** @ignore */
@@ -114,7 +116,7 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
             
 
             // This will be called when the file is finished being read.
-            var on_file_read = function( entries ){
+            var process_entries = function( entries ){
 
                 // Get the search histogram for the log.
                 var query_counts = log_to_query_counts( file_contents, true );
@@ -138,7 +140,13 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
             };
             
             // Read the activity file in and then call the function above.
-            CROWDLOGGER.io.log.read_activity_log( {on_chunk: on_file_read} );
+            CROWDLOGGER.io.log.read_activity_log( {on_chunk: process_entries} );
+//             CROWDLOGGER.log.operations.accumulate_over(
+
+// CROWDLOGGER.log.operations.filter.query_items
+// CROWDLOGGER.log.operations.filter.clean_queries
+// CROWDLOGGER.log.operations.accumulator.histogram
+//              process_entries);
             
     };
 

@@ -119,8 +119,11 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
 
     var on_error = function( error ){
         CROWDLOGGER.debug.log( "ERROR contacting " + url + ": \n\t" + error + "\n" );
-        CROWDLOGGER.io.log.write_to_error_log(
-            "ERROR contacting " + url + ": \n\t" + error + "\n" );
+        CROWDLOGGER.io.log.write_to_error_log({data: [{
+            f: "CROWDLOGGER.experiments.check_for_new_experiments",
+            err: "ERROR contacting " + url + ": \n\t" + error + "\n",
+            t: new Date().getTime()
+        }]} );
     };
 
     var cur_version = CROWDLOGGER.version.info.get_extension_version();
