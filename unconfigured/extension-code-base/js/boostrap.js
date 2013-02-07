@@ -16,6 +16,8 @@ Cu.import('resource://gre/modules/AddonManager.jsm')
 var that = this;
 //var window = undefined;
 
+var CROWDLOGGER;
+
 var CSS_PATH = 'chrome/content/css/';
 var CSS_FILES = [
  'crowdlogger.css',
@@ -73,6 +75,10 @@ var JS_FILES = [
     'log.operations.js'
 ];
 
+// A map of ids to an array of 2-d elements.
+// The first is a type and the second is a function. 
+var listeners_placed = {};
+
 (function(scope){ 
     scope.include =  function(path){
         Services.scriptloader.loadSubScript(path, this);
@@ -109,8 +115,19 @@ function load_js(addon){
 function create_xul_element(win, elm_name, attributes) {
     const XUL_NS = 
         'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
-    var i, elm = win.document.createElementNS(XUL_NS, elm_name);
-    for(attr in attributes){ elm.setAttribute(attr, attributes[attr]); }
+    var i, elm = win.document.createElementNS(XUL_NS, elm_name), attr, listener;
+    for(attr in attributes){ 
+        if( attr !== 'listeners' ){
+            elm.setAttribute(attr, attributes[attr]);
+        } 
+    }
+
+    var listeners = attributes.listeners ? attributes.listeners : [];
+    for(i = 0; i < listeners.length; i++) {
+        elm.addEventListener(listeners[i][0], listeners[i][1]);
+    }
+    listeners_placed[attributes.id] = listeners;
+
     return elm;
 }
 
@@ -124,44 +141,44 @@ function load_xul(){
         var win = enumerator.getNext();
         load_xul_for_window(win);
     }
-
     wm.addListener(WindowListener);
 }
 
 function load_xul_for_window(win){
-    // Services.prompt.alert(null, 'Demo', 'win: '+ win);
-     
+    // If this is the first window, initialize CrowdLogger.
     if( !that.window ) {
         that.window = win;
-        // for(var x in win){
-        //     eval('that.'+ x +' = win.'+ x);
-        //     //that[x] = win[x];
-        // }
-
-        // that.navigator = win.navigator;
-        // that.setTimeout = win.setTimeout;
-        // that.set
         init_crowdlogger();
     }
 
-    // Add the toolbar menu.
+    // Find the toolbar menu.
     var toolbar_palette = 
         win.document.getElementById('nav-bar');
-        //win.document.getElementById('BrowserToolbarPalette');
 
-    if(toolbar_palette === null) {
+    // If the toolbar palette doesn't exist, it probably hasn't been
+    // initialized yet. If CrowdLogger hasn't been completely initialized yet,
+    // then some of the button onload listeners won't work, so  keep trying 
+    // until both of these are ready.
+    if(toolbar_palette === null || !CROWDLOGGER.initialized ) {
+        win.setTimeout(function(){load_xul_for_window(win)}, 10);
         return;
     }
 
+    // var style = win.document.createProcessingInstruction('xml-stylesheet',
+    //     'id="crowdlogger-css", type="text/css", '+
+    //     'href="chrome://crowdlogger/content/css/crowdlogger.css"');
+    // win.document.insertBefore(style, win.document.documentElement);
+
+    // Add the buttons to the palette.
     // Toolbar button, which goes on the palette.
     var crowdlogger_button = create_xul_element(win, 'toolbarbutton', {
         id:             'crowdlogger-start-button',
         tooltiptext:    'Toggle search activity logging.',
         label:          'Toggle Logging',
-        onload:         'CROWDLOGGER.gui.buttons.update_logging_buttons()',
         'class':        'menu-iconic  crowdlogger-logging-off-button '+
                         'chromeclass-toolbar-additional',
-        type:           'menu'
+        type:           'menu',
+        listeners:    [['load', CROWDLOGGER.gui.buttons.update_logging_buttons]]
     });
 
     // The toolbar menu -- holds all of the items (added next).
@@ -176,19 +193,18 @@ function load_xul_for_window(win){
     // Add menu items.
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
         'class':        'menuitem-iconic crowdlogger-logging-off-button',
-        id:             'crowdlogger-logging-toggle-menu-button',
+        id:             'crowdlogger-logging-button',
         tooltiptext:    'Start logging for CrowdLogger',
         label:          'Start logging',
-        onload:         'CROWDLOGGER.gui.buttons.update_logging_buttons()',
-        oncommand:      'CROWDLOGGER.logging.toggle_logging(event)'
+        listeners: [['command', CROWDLOGGER.logging.toggle_logging]]
     }));
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
         'class':        'menuitem-iconic crowdlogger-settings-button',
-        id:             'crowdlogger-settings-button',
+        id:             'crowdlogger-register-button',
         tooltiptext:    'Register for CrowdLogger',
         label:          'Register',
-        oncommand:      'CROWDLOGGER.study.launch_registration_dialog()' 
+        listeners: [['command', CROWDLOGGER.study.launch_registration_dialog]]
     }));
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
@@ -196,7 +212,7 @@ function load_xul_for_window(win){
         id:             'crowdlogger-refer-a-friend-launch-button',
         tooltiptext:    'Refer a friend to download CrowdLogger',
         label:          'Refer a friend',
-        oncommand:      'CROWDLOGGER.study.launch_refer_a_friend_dialog()'
+        listeners: [['command', CROWDLOGGER.study.launch_refer_a_friend_dialog]]
     }));
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
@@ -204,7 +220,8 @@ function load_xul_for_window(win){
         id:             'crowdlogger-settings-button',
         tooltiptext:    'Settings options for CrowdLogger',
         label:          'Settings',
-        oncommand:      'CROWDLOGGER.gui.preferences.launch_preference_dialog()'
+        listeners: [['command', 
+            CROWDLOGGER.gui.preferences.launch_preference_dialog]]
     }));
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
@@ -212,7 +229,7 @@ function load_xul_for_window(win){
         id:             'crowdlogger-show-status-page-button',
         tooltiptext:    'Show the study\'s status page',
         label:          'Go to status page',
-        oncommand:      'CROWDLOGGER.gui.study.pages.launch_status_page()'
+        listeners: [['command', CROWDLOGGER.gui.study.pages.launch_status_page]]
     }));
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
@@ -220,7 +237,7 @@ function load_xul_for_window(win){
         id:             'crowdlogger-help-button',
         tooltiptext:    'Information for CrowdLogger',
         label:          'Help',
-        oncommand:      'CROWDLOGGER.gui.study.pages.launch_help_page()'
+        listeners: [['command', CROWDLOGGER.gui.study.pages.launch_help_page]]
     }));
 }
 
@@ -231,8 +248,11 @@ function startup(data, reason) {
     AddonManager.getAddonByID(data.id, function(addon) {
 
         that.init_crowdlogger = function(){
+            dump('initializing...\n');
             load_js(addon);
             that.window.CROWDLOGGER.initialize();
+            dump('done initializing\n');
+            CROWDLOGGER = that.window.CROWDLOGGER;
         };
 
         load_css(addon);
@@ -245,7 +265,7 @@ function shutdown(data, reason) {
 }
 
 function install(data, reason) {
-
+    //startup(data, reason);
 }
 
 function uninstall(data, reason) {
@@ -264,7 +284,8 @@ var WindowListener = {
       domWindow.removeEventListener('load', listener, false);
 
       // If this is a browser window then setup its UI
-      if (domWindow.document.documentElement.getAttribute('windowtype') === 'navigator:browser')
+      if (domWindow.document.documentElement.getAttribute('windowtype') === 
+                'navigator:browser')
         load_xul_for_window(domWindow);
     }, false);
   },

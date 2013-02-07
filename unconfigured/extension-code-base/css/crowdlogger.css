@@ -25,86 +25,94 @@ body.chrome-menu {
     margin-bottom:   25px;
 }
 
-.menu-iconic-left {
-     visibility: visible!important;
+/*.menuitem-iconic, .menu-iconic-left, .menuitem-iconic-left {
+     visibility: visible !important;
  }
-
+*/
+#crowdlogger-start-button .menuitem-iconic,
+#crowdlogger-start-button .menuitem-iconic-left,
+#crowdlogger-start-button .menu-iconic-left {
+    /*width: 700px;*/
+    background-repeat:no-repeat !important;
+    background-position:0px 0px !important;
+    visibility: visible !important;
+}
 
 .crowdlogger-logging-off-button {
-    list-style-image: url("img/startLogging.png");
+    list-style-image: url("img/startLogging.png") !important;
 }
 
 .crowdlogger-logging-on-button {
-    list-style-image: url("img/pauseLogging.png");
+    list-style-image: url("img/pauseLogging.png") !important;
 }
 
 .crowdlogger-logging-off_low_alert-button {
-    list-style-image: url("img/startLoggingAlertLow.png");
+    list-style-image: url("img/startLoggingAlertLow.png") !important;
 }
 
 .crowdlogger-logging-on_low_alert-button {
-    list-style-image: url("img/pauseLoggingAlertLow.png");
+    list-style-image: url("img/pauseLoggingAlertLow.png") !important;
 }
 
 .crowdlogger-logging-off_high_alert-button {
-    list-style-image: url("img/startLoggingAlertHigh.png");
+    list-style-image: url("img/startLoggingAlertHigh.png") !important;
 }
 
 .crowdlogger-logging-on_high_alert-button {
-    list-style-image: url("img/pauseLoggingAlertHigh.png");
+    list-style-image: url("img/pauseLoggingAlertHigh.png") !important;
 }
 .crowdlogger-mine-log-button {
-    list-style-image: url("img/mineLog.png");
+    list-style-image: url("img/mineLog.png") !important;
 }
 
 .crowdlogger-new-mine-log {
-  list-style-image: url("img/mineLogAlert.png");
+  list-style-image: url("img/mineLogAlert.png") !important;
 }
 
 .crowdlogger-register-button {
-  list-style-image: url("img/register.png");
+  list-style-image: url("img/register.png") !important;
 }
 
 .crowdlogger-run-now-button {
-  list-style-image: url("img/ok.png");
+  list-style-image: url("img/ok.png") !important;
 }
 
 .crowdlogger-run-later-button {
-  list-style-image: url("img/no.png");
+  list-style-image: url("img/no.png") !important;
 }
 
 
 .crowdlogger-refer-a-friend-button {
-  list-style-image: url("img/refer.png");
+  list-style-image: url("img/refer.png") !important;
 }
 
 .crowdlogger-settings-button {
-    list-style-image: url("img/config.png");
+    list-style-image: url("img/config.png") !important;
 }
 
 .crowdlogger-help-button {
-    list-style-image: url("img/help.png");
+    list-style-image: url("img/help.png") !important;
 }
 
 .crowdlogger-show-messages-button {
-    list-style-image: url("img/messages.png");
+    list-style-image: url("img/messages.png") !important;
 }
 
 .crowdlogger-view-log-button {
-    list-style-image: url("img/view.png");
+    list-style-image: url("img/view.png") !important;
 }
 
 .ppserachlogtoolbar-notification-button {
-	list-style-image: url("img/messages.png");
+	list-style-image: url("img/messages.png") !important;
 }
 
 .ppserachlogtoolbar-consent-button {
-	list-style-image: url("img/notification.png");
+	list-style-image: url("img/notification.png") !important;
 }
 
 
 .crowdlogger-check-wins-button {
-    list-style-image: url("img/win.png");
+    list-style-image: url("img/win.png") !important;
 }
 
 

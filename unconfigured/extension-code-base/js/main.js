@@ -44,9 +44,7 @@ var CROWDLOGGER = {
 
 
 CROWDLOGGER.check_if_new_instance = function() {
-    CROWDLOGGER.jq(document).ready(function(){
-        CROWDLOGGER.messages = jQuery("#messages");
-    });
+
     
     //B_DEBUG
     //dump( "Checking if CROWDLOGGER exists...\n" );    
@@ -144,6 +142,10 @@ CROWDLOGGER.check_if_new_instance = function() {
 CROWDLOGGER.initialize = function(){
     CROWDLOGGER.window = window;
 
+    CROWDLOGGER.jq(document).ready(function(){
+        CROWDLOGGER.messages = jQuery("#messages");
+    });
+
     // A reference to the CROWDLOGGER object.
     var that = this;
     var browser_name, extension_version;
@@ -171,7 +173,9 @@ CROWDLOGGER.initialize = function(){
         //CROWDLOGGER.debug.log( "Initializing all of the components...\n" );
         //E_DEBUG
 
+        dump("Initializing CROWDLOGGER.debug.log....");
         CROWDLOGGER.debug.init();
+        dump("done!\n");
         CROWDLOGGER.preferences.init();
         CROWDLOGGER.preferences.defaults.set_defaults();
         CROWDLOGGER.debug.reinit();

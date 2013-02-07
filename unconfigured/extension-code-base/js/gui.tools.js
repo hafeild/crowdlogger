@@ -493,12 +493,13 @@ CROWDLOGGER.gui.tools.export_log = function( doc ){
                 // to do it in Chrome right now (I think, at least).
                 // This isn't supported in FF3.*, so in that case, we just
                 // have to display the file itself.
-                if( !CROWDLOGGER.util.save_dynamic_text( doc, 
-                        JSON.stringify(entries) ) &&
-                     CROWDLOGGER.version.info.get_browser_name().
-                        match(/^ff/) != null ) {
-                    CROWDLOGGER.io.file.display_activity_log( doc );
-                }
+                // if( !CROWDLOGGER.util.save_dynamic_text( doc, 
+                //         JSON.stringify(entries) ) &&
+                //      CROWDLOGGER.version.info.get_browser_name().
+                //         match(/^ff/) != null ) {
+                //     CROWDLOGGER.io.file.display_activity_log( doc );
+                // }
+                CROWDLOGGER.util.save_dynamic_text(doc,JSON.stringify(entries));
             };
 
             doc.getElementById( "log-area" ).innerHTML = 

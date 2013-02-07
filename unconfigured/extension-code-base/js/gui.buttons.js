@@ -31,15 +31,15 @@ CROWDLOGGER.gui.buttons = {};
  
 
 CROWDLOGGER.gui.buttons.defaults = {
-    logging_on_class: "crowdlogger-logging-on-button",
+    logging_on_class: 'crowdlogger-logging-on-button',
     logging_on_hover_text: 
-        "Logging is currently turned on for %%FULL_PROJECT_NAME%%. " +
-        "Click to pause logging.",
-    logging_off_class: "crowdlogger-logging-off-button",
+        'Logging is currently turned on for %%FULL_PROJECT_NAME%%. '+
+        'Click to pause logging.',
+    logging_off_class: 'crowdlogger-logging-off-button',
     logging_off_hover_text: 
-        "Logging is currently turned off for %%FULL_PROJECT_NAME%%. " +
-        "Click to start logging.",
-    status_page_class: ""
+        'Logging is currently turned off for %%FULL_PROJECT_NAME%%. '+
+        'Click to start logging.',
+    status_page_class: ''
         
 };
 
@@ -71,17 +71,17 @@ CROWDLOGGER.gui.buttons.display_experiments_ready_button = function(){
  */
 CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff = function( id ){
     try {
-       var firefoxnav = document.getElementById("nav-bar");
+       var firefoxnav = document.getElementById('nav-bar');
        var curSet = firefoxnav.currentSet;
 
         if(  !document.getElementById(id) && curSet.indexOf(id) == -1)  {
          var set;
 
          // Place the button before the urlbar
-         set = curSet + ","+id;
-         firefoxnav.setAttribute("currentset", set);
+         set = curSet + ','+id;
+         firefoxnav.setAttribute('currentset', set);
          firefoxnav.currentSet = set;
-         document.persist("nav-bar", "currentset");
+         document.persist('nav-bar', 'currentset');
          // If you don't do the following call, funny things happen
          try {
            BrowserToolboxCustomizeDone(true);
@@ -104,10 +104,10 @@ CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff = function( id ){
 CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff = function(){
     // The preference that keeps track of whether the button has been added
     // or not.
-    var button_added_pref = "added_logging_button_to_nav_bar";
+    var button_added_pref = 'added_logging_button_to_nav_bar';
 
     // The id of the button.
-    var button_id = "crowdlogger-start-button";
+    var button_id = 'crowdlogger-start-button';
 
     /**
      * @name check_if_toggle_button_added
@@ -119,7 +119,7 @@ CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff = function(){
      */
     var check_if_toggle_button_added = function(){
 //B_DEBUG
-        CROWDLOGGER.debug.log( "We're in check_if_toggle_button_added()\n" );
+        CROWDLOGGER.debug.log( 'We\'re in check_if_toggle_button_added()\n' );
 //E_DEBUG
         var toolbar = document.getElementById( 'nav' );
 
@@ -136,41 +136,37 @@ CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff = function(){
 
     // If it's not added, try adding it.
     if( !already_added_to_toolbar ) {
-        setTimeout(
-            "CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff(" +
-                "\"" + button_id + "\")",
-            800 );
+        setTimeout( function(){
+            CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff(button_id );
+        }, 800 );
 
         // In a few seconds, try adding the logging button again (in case the
         // first call was too soon).
-        setTimeout(
-            "CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff(" +
-                "\"" + button_id + "\")",
-            3000 );
+        setTimeout( function(){
+            CROWDLOGGER.gui.buttons.add_button_to_nav_bar_ff( button_id );
+        }, 3000 );
 
         // Check if we were successful.
-        setTimeout(
-            check_if_toggle_button_added, 
-            3500 );
+        setTimeout( check_if_toggle_button_added, 3500 );
     }
 };
 
 
 /**
- * Checks if the "experiments ready" button needs to be displayed in the 
+ * Checks if the 'experiments ready' button needs to be displayed in the 
  * current window. This should be called when a new (Firefox) window is opened.
  * In that case, this function checks if the button is displayed in existing
  * windows; if so, it gets added to this window, too.
  */
 CROWDLOGGER.gui.buttons.check_if_experiments_button_should_be_shown_ff = function(){
-    if( CROWDLOGGER.session_data.get( "showing_run_experiments_button",
-            "false" ) === "true" ){
+    if( CROWDLOGGER.session_data.get( 'showing_run_experiments_button',
+            'false' ) === 'true' ){
         // Get the toolbar button element by id.
         var toolbar_button = document.getElementById( 
-            "crowdlogger-mine-job-toolbar-button");
+            'crowdlogger-mine-job-toolbar-button');
 
         // Make it visible.
-        toolbar_button.setAttribute( "hidden", false );
+        toolbar_button.setAttribute( 'hidden', false );
     }
 };
 
@@ -189,13 +185,13 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
 
     // Check if the turn_logging_on parameter was set; if not, find out
     // what the current state of logging is.
-    if( turn_logging_on === undefined ) {
+    if( turn_logging_on === undefined || typeof turn_logging_on !== 'boolean') {
         turn_logging_on = CROWDLOGGER.preferences.get_bool_pref( 
-            "logging_enabled" );
+            'logging_enabled' );
     }
 
-    CROWDLOGGER.debug.log( "Updating the buttons [loggingEnabled = " +
-        turn_logging_on + "]\n" );
+    CROWDLOGGER.debug.log( 'Updating the buttons [loggingEnabled = ' +
+        turn_logging_on + ']\n' );
 
     // The logging on/off css class names; we're going to need these
     // in a few places, so this will help us from mistyping them.
@@ -205,7 +201,7 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         menu_class_name: CROWDLOGGER.gui.buttons.defaults.logging_on_class,
         menu_hover_text: 
             CROWDLOGGER.gui.buttons.defaults.logging_on_hover_text, 
-        menu_label: "[Logging: on] Click to pause logging",
+        menu_label: '[Logging: on] Click to pause logging',
         status_page_class:
             CROWDLOGGER.gui.buttons.current.status_page_class
     };
@@ -216,7 +212,7 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         menu_class_name: CROWDLOGGER.gui.buttons.defaults.logging_off_class,
         menu_hover_text: 
             CROWDLOGGER.gui.buttons.defaults.logging_off_hover_text,
-        menu_label: "[Logging: paused] Click to start logging",
+        menu_label: '[Logging: paused] Click to start logging',
         status_page_class: 
             CROWDLOGGER.gui.buttons.current.status_page_class
     };
@@ -226,9 +222,9 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         display_data = logging_on_data;
     }
 
-    // Removes "crowdlogger-logging-[^-]*-button" from the given string.
+    // Removes 'crowdlogger-logging-[^-]*-button' from the given string.
     var clean_class = function( class_str ) {
-        return class_str.replace( / {0,1}crowdlogger-logging-[^-]*-button/, "" );
+        return class_str.replace( / {0,1}crowdlogger-logging-[^-]*-button/, '');
     }
 
     // Removes any style class name that matches crowdlogger-dynamic-[^ ]*-end.
@@ -237,85 +233,94 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
     // A good example is highlighting the Status Page menu button when
     // a notification is available.
     var clean_dynamic_class = function( class_str ) {
-        return class_str.replace( / {0,1}crowdlogger-dynamic-[^ ]*-end/, "" );
+        return class_str.replace( / {0,1}crowdlogger-dynamic-[^ ]*-end/, '' );
     };
 
     var set_buttons_ff = function( 
             toolbar_button, menu_button, status_page_button ) {
         try {
             // Update the class of the toolbar button.
-            toolbar_button.setAttribute( "class", 
-                clean_class( toolbar_button.getAttribute( "class" ) ) +
-                " " + display_data.class_name );
+            toolbar_button.setAttribute( 'class', 
+                clean_class( toolbar_button.getAttribute( 'class' ) ) +
+                ' ' + display_data.class_name );
         
             // Update the tooltip text for the toolbar button.
-            toolbar_button.setAttribute( "tooltiptext", 
+            toolbar_button.setAttribute( 'tooltiptext', 
                 display_data.hover_text );
         
             // Update the class of the menu button.
-            menu_button.setAttribute( "class",
-                clean_class( menu_button.getAttribute( "class" ) ) +
-                " " + display_data.menu_class_name );
+            menu_button.setAttribute( 'class',
+                clean_class( menu_button.getAttribute( 'class' ) ) +
+                ' ' + display_data.menu_class_name );
 
-            // Update the lable and tooltip text for the menu button.
+            // Update the label and tooltip text for the menu button.
             menu_button.label = display_data.menu_label;
-            menu_button.setAttribute( "tooltiptext",  
+            menu_button.setAttribute( 'tooltiptext',  
                     display_data.menu_hover_text );
 
             // Update the status page button style.
-            status_page_button.setAttribute( "class",
-                clean_dynamic_class(status_page_button.getAttribute("class")) +
-                " " + display_data.status_page_class );
+            status_page_button.setAttribute( 'class',
+                clean_dynamic_class(status_page_button.getAttribute('class')) +
+                ' ' + display_data.status_page_class );
         
             //B_DEBUG
-            CROWDLOGGER.debug.log( "\t\ttoolbar button class: " + 
-                toolbar_button.getAttribute( "class" ) + "\n" );
+            CROWDLOGGER.debug.log( '\t\ttoolbar button class: ' + 
+                toolbar_button.getAttribute( 'class' ) + '\n' );
             //E_DEBUG
         } catch (ex) {
-            CROWDLOGGER.io.file.write_to_error_log( "Error updating buttons: " +
-                ex );
+            CROWDLOGGER.io.log.write_to_error_log( {data: [{
+                f: 
+                'CROWDLOGGER.gui.buttons.update_logging_buttons.set_buttons_ff',
+                err: 'Error updating buttons: '+ ex,
+                t: new Date().getTime()
+            }]});
         }
     }  
     
     // If this is firefox.
     if( browser_name.match( /^ff/ ) !== null ) {
+        dump('Updating ff buttons...\n');
 
-        var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+        var wm = Components.classes['@mozilla.org/appshell/window-mediator;1']
                        .getService(Components.interfaces.nsIWindowMediator);
-        var enumerator = wm.getEnumerator("navigator:browser");
+        var enumerator = wm.getEnumerator('navigator:browser');
     
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Iterating through windows to update toggle button.\n" );
+        CROWDLOGGER.debug.log( 
+            'Iterating through windows to update toggle button.\n' );
         //E_DEBUG
         // Loop through each of the open windows and update the buttons.
         while(enumerator.hasMoreElements()) {
             var win = enumerator.getNext();
             
+            dump('Updating buttons for a window...\n');
 
             //B_DEBUG
-            CROWDLOGGER.debug.log( "\tWindow " + win + ": " + win.parent + "\n" );
+            CROWDLOGGER.debug.log( '\tWindow '+ win +': '+ win.parent +'\n' );
             //E_DEBUG
     
     
             // This is the button that is located on the toolbar (or in the 
             // palette)
             var toolbar_button = win.document.getElementById(
-                "crowdlogger-start-button" );
+                'crowdlogger-start-button' );
     
             // This is the button that is located in the menu.
             var menu_button = win.document.getElementById(
-                "crowdlogger-logging-toggle-menu-button" );
+                'crowdlogger-logging-button' );
 
             // This is the status page button in the menu.
             var status_page_button = win.document.getElementById(
-                "crowdlogger-show-status-page-button" );
+                'crowdlogger-show-status-page-button' );
+
+
             set_buttons_ff( toolbar_button, menu_button, status_page_button );
         }
     // If this is Chrome.
-    } else if( browser_name === "chrome" ) {
+    } else if( browser_name === 'chrome' ) {
 
         //B_DEBUG       
-        CROWDLOGGER.debug.log( "Updating images for Chrome.\n" );
+        CROWDLOGGER.debug.log( 'Updating images for Chrome.\n' );
         //E_DEBUG
 
 
@@ -336,33 +341,33 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         // for the pop ups (i.e., the %%PROJECT_NAME%% menu).
         var change_icons_on_page = function( doc ){
             var logging_button = 
-                doc.getElementById( "crowdlogger-logging-button" );
+                doc.getElementById( 'crowdlogger-logging-button' );
             var status_page_button = 
-                doc.getElementById( "crowdlogger-show-status-page-button" );
+                doc.getElementById( 'crowdlogger-show-status-page-button' );
 
             // Change the title (i.e., tooltiptext).
             logging_button.title = display_data.menu_hover_text;
 
             // Change the class.
-            logging_button.setAttribute( "class", 
-                clean_class(logging_button.getAttribute("class")) 
-                + " " + display_data.menu_class_name );
+            logging_button.setAttribute( 'class', 
+                clean_class(logging_button.getAttribute('class')) 
+                + ' ' + display_data.menu_class_name );
 
             // Change the label text.
             logging_button.innerHTML = display_data.menu_label;
 
             // Update the status page button style.
-            status_page_button.setAttribute( "class",
-                clean_dynamic_class(status_page_button.getAttribute("class")) +
-                " " + display_data.status_page_class );
+            status_page_button.setAttribute( 'class',
+                clean_dynamic_class(status_page_button.getAttribute('class')) +
+                ' '+ display_data.status_page_class );
   
         };
 
         // Iterate through each of the popup windows.
-        var tabs = chrome.extension.getViews( {type: "popup"} );
+        var tabs = chrome.extension.getViews( {type: 'popup'} );
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Iterating through " + tabs.length + 
-            " popup windows.\n" );
+        CROWDLOGGER.debug.log( 'Iterating through ' + tabs.length + 
+            ' popup windows.\n' );
         //E_DEBUG
         for( var i = 0; i < tabs.length; i++ ){
             change_icons_on_page( tabs[i].document );
