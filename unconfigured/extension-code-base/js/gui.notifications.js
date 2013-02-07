@@ -50,7 +50,7 @@ CROWDLOGGER.gui.notifications.high_alert = {
 CROWDLOGGER.gui.notifications.init = function(){
     var notify_function;
     var notification_image_name = CROWDLOGGER.preferences.get_char_pref(
-        "notification_image_name", "notification.png" );
+        'notification_image_name', 'notification.png' );
     var extension_prefix = CROWDLOGGER.version.info.get_extension_img_prefix();
     var notification_image_url = extension_prefix + notification_image_name; 
 
@@ -60,9 +60,9 @@ CROWDLOGGER.gui.notifications.init = function(){
     
     CROWDLOGGER.gui.notifications.notify = function( alert_level, hover_text ){
         var alert_data;
-        if( alert_level === "high" ){
+        if( alert_level === 'high' ){
             alert_data = CROWDLOGGER.gui.notifications.high_alert;
-        } else if( alert_level === "low" ){
+        } else if( alert_level === 'low' ){
             alert_data = CROWDLOGGER.gui.notifications.low_alert;
         } else {
             CROWDLOGGER.gui.notifications.un_notify();

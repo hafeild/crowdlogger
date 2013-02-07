@@ -18,7 +18,7 @@ CROWDLOGGER.experiments = {
     experiment_update_interval :   1000*60*30, // 30 minutes.
     // We cannot just set this to the preference value because the preferences
     // likely are not loaded at the time this gets executed.
-    anonymizers : [%%ANONYMIZERS%%],
+    anonymizers : %%ANONYMIZERS%%,
     MAX_BUNDLE_SIZE : 50 // The number of e-artifacts per bundle.
 };
 
@@ -111,17 +111,17 @@ CROWDLOGGER.experiments.run_available_experiments = function(){
 CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
         start_process, on_new_experiments, on_no_experiments ) {
 
-    var url = CROWDLOGGER.preferences.get_char_pref( "experiment_update_url",
-        "" );
+    var url = CROWDLOGGER.io.network.get_server_url( 'experiment_update_url',
+        '' );
 
-    var data = "userID=" + CROWDLOGGER.preferences.get_char_pref( 
-        "registration_id", "" );
+    var data = 'userID='+ CROWDLOGGER.preferences.get_char_pref( 
+        'registration_id', '' );
 
     var on_error = function( error ){
-        CROWDLOGGER.debug.log("ERROR contacting "+ url +": \n\t"+ error +"\n");
+        CROWDLOGGER.debug.log('ERROR contacting '+ url +': \n\t'+ error +'\n');
         CROWDLOGGER.io.log.write_to_error_log( {data: [{
-            f: "CROWDLOGGER.experiments.check_for_new_experiments",
-            err: "ERROR contacting " + url + ": " + error,
+            f: 'CROWDLOGGER.experiments.check_for_new_experiments',
+            err: 'ERROR contacting ' +url +': '+ error,
             t: new Date().getTime()
         }]} );
     };
@@ -129,70 +129,48 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
     var cur_version = CROWDLOGGER.version.info.get_extension_version();
 
 
-        // First, see if there are any new jobs on the server.
+    // First, see if there are any new jobs on the server.
     // Next, expunge old one from the list.
     // Lastly, add all jobs that should be run to the running queue.
 
-    // This is a lambda function that will get called as soon as we hear back
-    // from the server.
+    // This is invoked as soon as we hear back from the server.
     var process_experiments = function( response ) {
 
         // First, check if the response is "CONSENT" -- this means that
         // the user needs to accept a new consent form. If this is the case,
         // we don't need to process the response any further.
-        if( response == "CONSENT" ) {
+        if( response == 'CONSENT' ) {
             // Set the "consentRequired" flag.
             CROWDLOGGER.study.notify_of_new_consent_form();
             return false;
         }
 
         var job_indicies_to_run_now = [];
-
         var ran_jobs  = JSON.parse( 
-            CROWDLOGGER.preferences.get_char_pref( "ran_experiments" ) );
+            CROWDLOGGER.preferences.get_char_pref( 'ran_experiments' ) );
         var new_jobs = {};
-
-        //var max_order_number =  
-        //    CROWDLOGGER.preferences.get_char_pref(
-        //        "last_experiment_order_number" );
-
         var cur_time = new Date().getTime();
-
-        //B_DEBUG
-        //CROWDLOGGER.debug.log( "Response: " + response + "\n" );
-        //E_DEBUG
 
         // Add the new jobs to the list of known jobs. Keep track of the
         // maximum order number seen and record it to the 
         // lastExperimentOrderNumber preference.
-        var lines = response.split( "\n" );
+        var lines = response.split( '\n' );
 
         for( var i = 0; i < lines.length; i++ ) {
-            if( lines[i] == "" || lines[i].match(/^#/) ) {
+            if( lines[i] == '' || lines[i].match(/^#/) ) {
                 continue;
             }
 
-            //B_DEBUG
-            //CROWDLOGGER.debug.log( "Processing experiment line: " + lines[i] + "\n" );
-            //E_DEBUG
-
-            var job = lines[i].split( "\t" );
+            var job = lines[i].split( '\t' );
 
             // If no arguments were supplied to the extractor, we need to
             // add in a blank entry to the job definition.
             if( job.length < 9 ) {
-                job.push( "" );
+                job.push( '' );
             }
-
 
             // Set the last_run time to 0.
             job.push( 0 );
-
-            //B_DEBUG
-            //CROWDLOGGER.debug.log( "Jobs length: " + job.length + "\n" );
-            //CROWDLOGGER.debug.log( "Job array: " + JSON.stringify( job ) + "\n" );
-            //E_DEBUG
-
 
             // Parse the start and end time stamps.
             job[CROWDLOGGER.experiments.manifest_columns.start_date] =
@@ -203,25 +181,13 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
               Date.parse(
               job[CROWDLOGGER.experiments.manifest_columns.end_date] );
 
-                
 
             // Extract the ID.
             var job_id = job[CROWDLOGGER.experiments.manifest_columns.job_id];
 
             // Add the new job to the hash.
             new_jobs[job_id] = job;
-            
-            //B_DEBUG
-            //CROWDLOGGER.debug.log( "job:\n" );
-            //for( var j = 0; j < job.length; j++ ) {
-            //    CROWDLOGGER.debug.log( "\tjob[" + j + "]: " + job[j] + "\n" );
-            //}
-            //E_DEBUG
         }
-
-        //B_DEBUG
-        //CROWDLOGGER.debug.log( "new_jobs: " + JSON.stringify(new_jobs) + "\n" );
-        //E_DEBUG
 
         // Walk through the ran_jobs hash and get rid of any old jobs (ones
         // that do not appear in the new jobs -- we don't want old job ids
@@ -248,15 +214,6 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
                 last_run = ran_jobs[job_id];
             }
  
-            //B_DEBUG
-            //CROWDLOGGER.debug.log( "OrderNum: " + new_jobs[job_id][0] + "\n" );
-            //CROWDLOGGER.debug.log( "start_date: " + start_date + "\n" );       
-            //CROWDLOGGER.debug.log( "end_date: " + end_date + "\n" );           
-            //CROWDLOGGER.debug.log( "cur_time: " + cur_time + "\n" );           
-            //CROWDLOGGER.debug.log( "frequency: " + frequency + "\n" );       
-            //CROWDLOGGER.debug.log( "last_run: " + last_run + "\n" );           
-            //E_DEBUG
- 
             // Check if the job is old; if so, remove it from the job array.
             if( end_date < cur_time || (
                     frequency == 0 && last_run > 0 ) ||
@@ -276,32 +233,32 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
                     ( frequency*1000 > (cur_time - last_run)  ) ) ) {
 
                 //B_DEBUG
-                //CROWDLOGGER.debug.log( "Adding job_id " + job_id + 
-                //    " to job_indicies_to_run_now\n" );
+                CROWDLOGGER.debug.log( "Adding job_id " + job_id + 
+                   " to job_indicies_to_run_now\n" );
                 //E_DEBUG
 
                 job_indicies_to_run_now.push( job_id );
 
             } else {
                 //B_DEBUG
-                //CROWDLOGGER.debug.log( "Job being ignored\n" );
+                CROWDLOGGER.debug.log( "Job being ignored\n" );
                 //E_DEBUG
             }
         }
        
         // Save the experiment_list.
         CROWDLOGGER.preferences.set_char_pref(
-                "experiment_list", JSON.stringify( new_jobs ) );
+                'experiment_list', JSON.stringify( new_jobs ) );
 
         // Save the ran_experiments list.
-        CROWDLOGGER.preferences.set_char_pref( "ran_experiments",
+        CROWDLOGGER.preferences.set_char_pref( 'ran_experiments',
                 JSON.stringify( ran_jobs ) );
 
         //B_DEBUG 
-        CROWDLOGGER.debug.log( "job_indicies_to_run_now:\n" );
+        CROWDLOGGER.debug.log( 'job_indicies_to_run_now:\n' );
         for( var i = 0; i < job_indicies_to_run_now.length; i++ ) {
-            CROWDLOGGER.debug.log( "\tjob_indicies_to_run_now[" + i + "]: " + 
-                job_indicies_to_run_now[i] + "\n\n" );
+            CROWDLOGGER.debug.log( '\tjob_indicies_to_run_now['+ i +']: ' + 
+                job_indicies_to_run_now[i] +'\n\n' );
         }
         //E_DEBUG
 
@@ -335,26 +292,26 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
             data, 
             process_experiments, 
             on_error, 
-            "GET");
+            'GET');
     }
 
     // This function will be invoked when we hear back about the server status.
     var check_server_status = function( response ) {
-        if( response == "up" ){
+        if( response == 'up' ){
             check_for_new_experiments();
         } else {
-            CROWDLOGGER.debug.log( "Experiment server is down: " + response +"\n");
+            CROWDLOGGER.debug.log('Experiment server is down: '+response +'\n');
         }
     }
 
 
     // Check the server status.
     CROWDLOGGER.io.network.send_data( 
-            CROWDLOGGER.preferences.get_char_pref("server_status_url", ""),
-            "x=" + new Date().getTime(),
+            CROWDLOGGER.io.network.get_server_url('server_status_url', ''),
+            'x=' + new Date().getTime(),
             check_server_status,
             on_error,
-            "GET"
+            'GET'
     );
 
     // After some period, check again.
@@ -398,25 +355,25 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
     var on_experiment_completed = function( ) {
         // Get the list of jobs.
         var job_array = JSON.parse(
-            CROWDLOGGER.preferences.get_char_pref("experiment_list"));
+            CROWDLOGGER.preferences.get_char_pref('experiment_list'));
         var ran_jobs  = JSON.parse(
-            CROWDLOGGER.preferences.get_char_pref( "ran_experiments" ) );
+            CROWDLOGGER.preferences.get_char_pref( 'ran_experiments' ) );
 
         // Increment the number of jobs run.
-        CROWDLOGGER.preferences.set_int_pref( "total_experiments_run",
-            CROWDLOGGER.preferences.get_int_pref( "total_experiments_run", 0 ) + 1 );
+        CROWDLOGGER.preferences.set_int_pref( 'total_experiments_run',
+            CROWDLOGGER.preferences.get_int_pref( 'total_experiments_run', 0 ) + 1 );
 
         // Log the last ran experiment.
-        CROWDLOGGER.preferences.set_char_pref( "last_ran_experiment_id",
+        CROWDLOGGER.preferences.set_char_pref( 'last_ran_experiment_id',
             JSON.parse( CROWDLOGGER.preferences.get_char_pref( 
-                "current_running_experiment", "{}" ) ).job_id );
+                'current_running_experiment', '{}' ) ).job_id );
  
         // Unset running experiments.
-        CROWDLOGGER.preferences.set_char_pref( "current_running_experiment", "" );
+        CROWDLOGGER.preferences.set_char_pref( 'current_running_experiment', '' );
 
 
         //B_DEBUG
-        CROWDLOGGER.debug.log( "job_array: " + JSON.stringify(job_array) + "\n");
+        CROWDLOGGER.debug.log( 'job_array: ' + JSON.stringify(job_array) + '\n');
         //E_DEBUG
 
         // Update the last run time field for this job.
@@ -426,37 +383,37 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
         ran_jobs[job_id] = new Date().getTime();
 
         // Save the modified ran_experiments list.
-        CROWDLOGGER.preferences.set_char_pref( "ran_experiments",
+        CROWDLOGGER.preferences.set_char_pref( 'ran_experiments',
                 JSON.stringify( ran_jobs ) );
 
         // Save the updated experiment list.
-        CROWDLOGGER.preferences.set_char_pref("experiment_list",
+        CROWDLOGGER.preferences.set_char_pref('experiment_list',
             JSON.stringify( job_array ) );
 
         // Should contact the server about users participation in
         // this job.
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Attempting to contact the server about completing job " +
-            job_id + "\nurl: " +CROWDLOGGER.preferences.get_char_pref(
-                   "job_completion_url", "" ) +  "?userID=" +
-                  CROWDLOGGER.preferences.get_char_pref("registration_id")+
-                  "&job_id=" + job_id  + "\n" );
+        CROWDLOGGER.debug.log( 'Attempting to contact the server about completing job ' +
+            job_id + '\nurl: ' +CROWDLOGGER.io.network.get_server_url(
+                   'job_completion_url', '' ) +  '?userID=' +
+                  CROWDLOGGER.preferences.get_char_pref('registration_id')+
+                  '&job_id=' + job_id  + '\n' );
         //E_DEBUG
-        if( CROWDLOGGER.preferences.get_bool_pref("registered") ) {
+        if( CROWDLOGGER.preferences.get_bool_pref('registered') ) {
             CROWDLOGGER.io.network.send_data(
-                CROWDLOGGER.preferences.get_char_pref(
-                   "job_completion_url", "" ),
-                "userID=" +
-                  CROWDLOGGER.preferences.get_char_pref("registration_id")+
-                  "&job_id=" + job_id,
+                CROWDLOGGER.io.network.get_server_url(
+                   'job_completion_url', '' ),
+                'userID=' +
+                  CROWDLOGGER.preferences.get_char_pref('registration_id')+
+                  '&job_id=' + job_id,
                 function(msg){
-                    CROWDLOGGER.debug.log( "Successfully contacted server about " + 
-                        job_id + "!\n" );
+                    CROWDLOGGER.debug.log( 'Successfully contacted server about ' + 
+                        job_id + '!\n' );
                 }, function(msg){
-                    CROWDLOGGER.debug.log( "Did not successfully contacted server about " + 
-                        job_id + "! Error: " + msg + "\n" );
+                    CROWDLOGGER.debug.log( 'Did not successfully contacted server about ' + 
+                        job_id + '! Error: ' + msg + '\n' );
                 },
-                "GET" );
+                'GET' );
         }
 
         // Increment the cur_job_index.
@@ -472,9 +429,9 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
     }
 
     //B_DEBUG
-    CROWDLOGGER.debug.log( "job_indicies_to_run: " + 
+    CROWDLOGGER.debug.log( 'job_indicies_to_run: ' + 
         CROWDLOGGER.session_data.job_indicies_to_run + 
-        "\ncur_job_index: " + CROWDLOGGER.session_data.cur_job_index + "\n" );
+        '\ncur_job_index: ' + CROWDLOGGER.session_data.cur_job_index + '\n' );
     //E_DEBUG
 
     // We're going to call this in the event of an error.
@@ -484,7 +441,7 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
 
         // Generate the error log.
         var job_array = JSON.parse(
-            CROWDLOGGER.preferences.get_char_pref("experiment_list"));
+            CROWDLOGGER.preferences.get_char_pref('experiment_list'));
         var job_id = job_array[
             CROWDLOGGER.session_data.job_indicies_to_run[
                 CROWDLOGGER.session_data.cur_job_index]][
@@ -492,17 +449,17 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
 
         // Make sure the experiments error log exists.
         if( CROWDLOGGER.session_data.experiments_error_log === undefined ){
-            CROWDLOGGER.session_data.experiments_error_log = "";
+            CROWDLOGGER.session_data.experiments_error_log = '';
         }
 
         // Updated the error log.
         var error_log =
             CROWDLOGGER.session_data.experiments_error_log +
-            "\nFor experiment "  + job_id + ":\n\t" + error;
+            '\nFor experiment '  + job_id + ':\n\t' + error;
 
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Index: " + CROWDLOGGER.session_data.cur_job_index +
-                ": " + error );
+        CROWDLOGGER.debug.log( 'Index: ' + CROWDLOGGER.session_data.cur_job_index +
+                ': ' + error );
         //E_DEBUG
 
         // Figure out if we should add this error to the running log
@@ -526,20 +483,20 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
         // Need to do something with the rest of the jobs...
         CROWDLOGGER.experiments.run_next_experiment();
 
-   }
+    }
 
     var prepare_next_experiment = function() {
         //showStatus( cur_job_index, job_indicies_to_run.length );
 
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Running next job." );
+        CROWDLOGGER.debug.log( 'Running next job.' );
         //E_DEBUG
 
         // Get the list of experiments.
         var job_array = JSON.parse(
-            CROWDLOGGER.preferences.get_char_pref("experiment_list"));
+            CROWDLOGGER.preferences.get_char_pref('experiment_list'));
 
-        // Check if the current experiment is a dummy "NULL_EXPERIMENT"; if
+        // Check if the current experiment is a dummy 'NULL_EXPERIMENT'; if
         // so, there is nothing to actually run for this experiment. Just
         // call the success function.
         if( job_array[CROWDLOGGER.session_data.job_indicies_to_run[
@@ -564,9 +521,9 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
             prepare_next_experiment();
         } else {
             CROWDLOGGER.session_data.keep_running_experiments = false;
-            CROWDLOGGER.debug.log( "Experiment server is down: " + response +"\n");
-            alert( "The experiment server has gone done. We will prompt you " +
-                   "to run the rest of the experiments later." );
+            CROWDLOGGER.debug.log('Experiment server is down: '+response+'\n');
+            alert( 'The experiment server has gone done. We will prompt you '+
+                   'to run the rest of the experiments later.' );
         }
     }
 
@@ -574,10 +531,10 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
     var no_connection_to_server_status = function( error ) {
         CROWDLOGGER.session_data.keep_running_experiments = false;
         CROWDLOGGER.debug.log( 
-            "Error establishing connection to serverStatus file: " +
-            error + "\n" );
-        alert( "The experiment server has gone done. We will prompt you to " +
-               "run the rest of the experiments later." );
+            'Error establishing connection to serverStatus file: '+
+            error +'\n' );
+        alert( 'The experiment server has gone done. We will prompt you to '+
+               'run the rest of the experiments later.' );
         //removeStatus();
     }
 
@@ -590,11 +547,11 @@ CROWDLOGGER.experiments.run_next_experiment = function(){
         // Check if the experiment server is up or down. If it's up, check
         // for new experiments.
         CROWDLOGGER.io.network.send_data(
-                CROWDLOGGER.preferences.get_char_pref( "server_status_url", "" ),
-                "x=" + new Date().getTime(),
+                CROWDLOGGER.io.network.get_server_url( 'server_status_url', '' ),
+                'x=' + new Date().getTime(),
                 check_server_status,
                 no_connection_to_server_status,
-                "GET" );
+                'GET' );
 
     // If not and the status bar is present, remove the status bar stuff.
     } else {
@@ -680,14 +637,17 @@ CROWDLOGGER.experiments.run_experiment = function( experiment_data,
 
     CROWDLOGGER.preferences.set_char_pref( "current_running_experiment", 
         JSON.stringify( {
-            job_id: experiment_data[CROWDLOGGER.experiments.manifest_columns.job_id],
+            job_id: experiment_data[
+                CROWDLOGGER.experiments.manifest_columns.job_id],
             start_time: new Date().getTime()
         } ) );
 
-    CROWDLOGGER.debug.log( "Current running experiment: " + CROWDLOGGER.preferences.get_char_pref( "current_running_experiment" ) + "\n" );
+    CROWDLOGGER.debug.log( 'Current running experiment: '+ 
+        CROWDLOGGER.preferences.get_char_pref( 'current_running_experiment' ) +
+        '\n' );
 
     CROWDLOGGER.session_data.current_running_experiment_status = {
-        message: "Preparing log...",
+        message: 'Preparing log...',
         artifacts_to_process: 0,
         artifacts_processed: -1
     };
@@ -701,9 +661,9 @@ CROWDLOGGER.experiments.run_experiment = function( experiment_data,
                     experiment_data, on_completion, on_error );
             } ) ){
 
-        on_error( "Extractor class " + 
+        on_error( 'Extractor class '+ 
             experiment_data[CROWDLOGGER.experiments.
-                manifest_columns.class_name] + " not found." );
+                manifest_columns.class_name] +' not found.' );
     }
     
 
@@ -733,30 +693,31 @@ CROWDLOGGER.experiments.pack_and_send_artifacts = function(
         artifacts_to_process = artifacts.length;
 
     //B_DEBUG
-    //CROWDLOGGER.debug.log( "In on_artifact_extracted. artifacts.length: " +
-    //    artifacts.length + "\n" );
+    //CROWDLOGGER.debug.log( 'In on_artifact_extracted. artifacts.length: ' +
+    //    artifacts.length + '\n' );
     //E_DEBUG
     
     // Shuffle the artifacts so that they are not in any particular order.
     CROWDLOGGER.util.shuffle( artifacts );
 
-    passphrase = CROWDLOGGER.preferences.get_char_pref( "pass_phrase", "" );
+    passphrase = CROWDLOGGER.preferences.get_char_pref( 'pass_phrase', '' );
     n = parseInt( experiment_data[CROWDLOGGER.experiments.manifest_columns.n] ); 
     k = parseInt( experiment_data[CROWDLOGGER.experiments.manifest_columns.k] ); 
     job_id = experiment_data[CROWDLOGGER.experiments.manifest_columns.job_id]; 
-    job_salt = job_id + experiment_data[CROWDLOGGER.experiments.manifest_columns.start_date]; 
-    //url = "https://monto.cs.umass.edu/crowdlogger/experiments/test_.php";
+    job_salt = job_id + experiment_data[
+        CROWDLOGGER.experiments.manifest_columns.start_date]; 
+    //url = 'https://monto.cs.umass.edu/crowdlogger/experiments/test_.php';
     job_failed = false;
 
     // Stores the current bundle of encrypted artifacts (e-artifacts).
-    current_bundle = "";
+    current_bundle = '';
     bundle_size = 0;
 
     // Make sure the pass phrase is not empty. If it is, alert the user.
-    if( passphrase === "" ){
-        alert( "Please set your passphrase for %%FULL_PROJECT_NAME%%." +
-            "Otherwise, we cannot run experiments!");
-        on_error( "No passphrase set." );
+    if( passphrase === '' ){
+        alert( 'Please set your passphrase for %%FULL_PROJECT_NAME%%.'+
+            'Otherwise, we cannot run experiments!');
+        on_error( 'No passphrase set.' );
         //B_DEBUG
         //CROWDLOGGER.debug.log( "Returning false...\n" );
         //E_DEBUG
@@ -772,7 +733,7 @@ CROWDLOGGER.experiments.pack_and_send_artifacts = function(
         if( eartifact !== null ) {
             // Add the current e-artifact to the bundle.
             for( var j = 0; j < count; j++ ) {
-                current_bundle += eartifact + "\n";
+                current_bundle += eartifact + '\n';
                 bundle_size++;
             }
         }
@@ -787,22 +748,22 @@ CROWDLOGGER.experiments.pack_and_send_artifacts = function(
                     CROWDLOGGER.experiments.anonymizers.length ) )]; 
 
             //B_DEBUG
-            CROWDLOGGER.debug.log( "Anonymizer: " + url + "\n" );
-            //CROWDLOGGER.debug.log( "Data: " + 
-            //        encodeURIComponent(current_bundle)+ "\n" );
+            CROWDLOGGER.debug.log( 'Anonymizer: '+ url +'\n' );
+            //CROWDLOGGER.debug.log( 'Data: '+ 
+            //        encodeURIComponent(current_bundle)+ '\n' );
             //E_DEBUG
             
             CROWDLOGGER.io.network.send_data(
                 url,
-                "eartifacts=" + encodeURIComponent(current_bundle),
+                'eartifacts=' + encodeURIComponent(current_bundle),
                 function( response ){
                     //B_DEBUG
-                    //CROWDLOGGER.debug.log("From experiment server: " +
-                    //    response + "\n");
+                    //CROWDLOGGER.debug.log('From experiment server: ' +
+                    //    response + '\n');
                     //E_DEBUG
                     
                     // It's safe to reset the current bundle.
-                    current_bundle = "";
+                    current_bundle = '';
                     bundle_size = 0;
    
                     // If the eartifact is null, then we we're done processing. 
@@ -814,10 +775,10 @@ CROWDLOGGER.experiments.pack_and_send_artifacts = function(
                     }
                 },
                 function( error ) {
-                    on_error( "Error communicating with the experiment "+
-                              "server. " + error );
+                    on_error( 'Error communicating with the experiment '+
+                              'server. '+ error );
                 },
-                "POST"
+                'POST'
             );
         } else {
             setTimeout( function(){

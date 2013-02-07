@@ -11,6 +11,9 @@ var CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
 
 
 jQuery(document).ready(function(){
+    // Update the logging button.
+    CROWDLOGGER.gui.buttons.update_logging_buttons();
+
     // Place listeners.
     add_listeners();
 

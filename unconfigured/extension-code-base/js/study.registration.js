@@ -51,7 +51,7 @@ CROWDLOGGER.study.registration = {
  */
 CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
     //B_DEBUG
-    CROWDLOGGER.debug.log( "In check_form\n" );
+    CROWDLOGGER.debug.log( 'In check_form\n' );
     //E_DEBUG
 
     var form, something_missing, text_boxes, radio_groups, skip_full_check;
@@ -69,53 +69,53 @@ CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
     }
     
     //B_DEBUG
-    CROWDLOGGER.debug.log( "\tFound form...\n" );
+    CROWDLOGGER.debug.log( '\tFound form...\n' );
     //E_DEBUG
 
     // Check if the user has selected that this is not their primary 
     // installation. If so, they don't have to complete the rest of the 
     // registration and a note should be displayed saying as much.
     var primary_questions_elm = 
-        doc.getElementById( "primary_location_questions" );
+        doc.getElementById( 'primary_location_questions' );
     var not_primary_note_elm = 
-        doc.getElementById( "not_primary_message" );
+        doc.getElementById( 'not_primary_message' );
     var is_primary_note_elm =
-        doc.getElementById( "is_primary_message" );
+        doc.getElementById( 'is_primary_message' );
 
-    if( CROWDLOGGER.util.get_selected_radio_button( form["primary_location"] ) ===
-            "no" ) {
+    if( CROWDLOGGER.util.get_selected_radio_button( form['primary_location'] ) ===
+            'no' ) {
         if( primary_questions_elm ){
             // Hide the rest of the registration.
-            primary_questions_elm.style.display = "none";
+            primary_questions_elm.style.display = 'none';
             // Show the note about why the rest of the registration is being
             // hidden.
-            not_primary_note_elm.style.display = "inline";
+            not_primary_note_elm.style.display = 'inline';
         } 
 
         // Check if the 'multiple installs' question has been answered; if so,
         // we can skip the full check.
         if( CROWDLOGGER.util.get_selected_radio_button( 
-                form["multiple_installs"] ) !== "default" ){
+                form['multiple_installs'] ) !== 'default' ){
             skip_full_check = true;
         }
 
     } else {
         if( primary_questions_elm ){
             // Show the rest of the registration.
-            primary_questions_elm.style.display = "";
+            primary_questions_elm.style.display = '';
             // Hide the message.
-            not_primary_note_elm.style.display = "none";
+            not_primary_note_elm.style.display = 'none';
         }
 
     }
 
-    // Check if the "this is my primary install" option is selected; if so,
+    // Check if the 'this is my primary install' option is selected; if so,
     // show the message next to it.
     if( CROWDLOGGER.util.get_selected_radio_button( 
-           form["primary_location"] ) === "yes" ) {
-        is_primary_note_elm.style.display = "inline";
+           form['primary_location'] ) === 'yes' ) {
+        is_primary_note_elm.style.display = 'inline';
     } else {
-        is_primary_note_elm.style.display = "none";
+        is_primary_note_elm.style.display = 'none';
     }
 
 
@@ -125,10 +125,11 @@ CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
 
     // If the user has already registered, we don't need to worry about checking
     // any of the fields.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "registered", false ) &&
+    if( !CROWDLOGGER.preferences.get_bool_pref( 'registered', false ) &&
                 !skip_full_check ){
         //B_DEBUG
-        CROWDLOGGER.debug.log( "\tUser hasn't registered, looking at fields...\n" );
+        CROWDLOGGER.debug.log( 
+            '\tUser hasn\'t registered, looking at fields...\n' );
         //E_DEBUG
         
         // Loop through each of the set of mandatory things and check that
@@ -137,10 +138,10 @@ CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
         for( var name in text_boxes ){
             var textbox = form[name];
             //B_DEBUG
-            CROWDLOGGER.debug.log( "\texamining " + textbox.name + "\n" );   
+            CROWDLOGGER.debug.log( '\texamining ' + textbox.name + '\n' );   
             //E_DEBUG
 
-            if( text_boxes[name] && textbox !== null && textbox.value === "" ){
+            if( text_boxes[name] && textbox !== null && textbox.value === '' ){
                 something_missing = true;
                 break;
             }
@@ -153,17 +154,17 @@ CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
                 var group = form[name];
 
                 //B_DEBUG
-                CROWDLOGGER.debug.log( "\texamining " + group[0].name + ": " +
-                            get_selected_value( group ) +";\n" ); 
+                CROWDLOGGER.debug.log( '\texamining ' + group[0].name + ': ' +
+                            get_selected_value( group ) +';\n' ); 
                 CROWDLOGGER.debug.log( 
-                    "  radio_groups[name]:  " + radio_groups[name] + "\n" +
-                    "  group !== null:       " + (group !== null ) + "\n" +
-                    "  selectedval==default: " + 
-                        (get_selected_value(group) === "default") + "\n" ); 
+                    '  radio_groups[name]:  ' + radio_groups[name] + '\n' +
+                    '  group !== null:       ' + (group !== null ) + '\n' +
+                    '  selectedval==default: ' + 
+                        (get_selected_value(group) === 'default') + '\n' ); 
                 //E_DEBUG
 
                 if( radio_groups[name] && group !== null && 
-                        get_selected_value(group) === "default" ){
+                        get_selected_value(group) === 'default' ){
                     something_missing = true;
                     break;
                 }
@@ -176,18 +177,18 @@ CROWDLOGGER.study.registration.check_form = function( doc, register_buttons ){
     
 
     //B_DEBUG
-    CROWDLOGGER.debug.log( "  something missing: " + something_missing + "\n" );
+    CROWDLOGGER.debug.log( '  something missing: ' + something_missing + '\n' );
     //E_DEBUG
     
     // Check if we should re-enable the button.
     if( register_buttons === undefined ){
 
-        register_buttons = [doc.getElementById("register_button_enabled"), 
-                            doc.getElementById("register_button_disabled")];
+        register_buttons = [doc.getElementById('register_button_enabled'), 
+                            doc.getElementById('register_button_disabled')];
     }
 
     //B_DEBUG
-    CROWDLOGGER.debug.log( "Got register buttons.\n" );
+    CROWDLOGGER.debug.log( 'Got register buttons.\n' );
     //E_DEBUG
 
     if( something_missing ) {
@@ -214,32 +215,32 @@ CROWDLOGGER.study.registration.initialize_registration_page = function( doc,
     var already_registered_elm, required_mark_up;
 
     // Set the init element so that we don't load this twice.
-    var init_elm = doc.getElementById( "init" );
+    var init_elm = doc.getElementById( 'init' );
     if( init_elm ){
-        init_elm.innerHTML = "no listeners";
+        init_elm.innerHTML = 'no listeners';
     }
 
     // Check if we should re-enable the button.
     if( register_buttons === undefined ){
-        register_buttons = [doc.getElementById("register_button_enabled"), 
-                            doc.getElementById("register_button_disabled")];
+        register_buttons = [doc.getElementById('register_button_enabled'), 
+                            doc.getElementById('register_button_disabled')];
     }
 
     // If the user has already registered...
-    if( CROWDLOGGER.preferences.get_bool_pref( "registered", false ) ){
+    if( CROWDLOGGER.preferences.get_bool_pref( 'registered', false ) ){
         
         // Display the note at the top about updating their registration.
-        already_registered_elm = doc.getElementById( "alreadyRegistered" );
+        already_registered_elm = doc.getElementById( 'alreadyRegistered' );
         if( already_registered_elm ){
-            already_registered_elm.style.display = "inline";
+            already_registered_elm.style.display = 'inline';
         }
 
-        // Get rid of the "required" mark up (i.e., the *'s).
-        required_mark_up = doc.getElementsByName( "required" );
+        // Get rid of the 'required' mark up (i.e., the *'s).
+        required_mark_up = doc.getElementsByName( 'required' );
         for( var i = 0; i < required_mark_up.length; i++ ){
             var elm = required_mark_up[i];
             if( elm.style !== undefined ){
-                elm.style.display = "none";
+                elm.style.display = 'none';
             }
         }
         
@@ -272,7 +273,7 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
         on_id_server_response, register;
 
     // This will hold all of the field names and values.
-    data = "";
+    data = '';
 
     // Get the form. If it isn't present, just return false.
     form = doc.forms.registration;
@@ -286,37 +287,37 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
 
     // Extract text box info.
     for( var name in text_boxes ){
-        data += "&" + name + "=" + form[name].value;
+        data += '&' + name + '=' + form[name].value;
     }
 
     // Extract radio group info.
     for( var name in radio_groups ){
         if( form[name] ){
             try{
-            data += "&" + name + "=" + 
+            data += '&' + name + '=' + 
                 CROWDLOGGER.util.get_selected_radio_button(
                     form[name]);
             } catch (e){
-                CROWDLOGGER.debug.log( "Problem with" + name + ": " + e + "\n" );
+                CROWDLOGGER.debug.log( 'Problem with' + name + ': ' + e + '\n' );
                 return false;
             }
         } else {
-            CROWDLOGGER.debug.log( "Hmm, " + name + " not found...strange.\n" );
+            CROWDLOGGER.debug.log( 'Hmm, ' + name + ' not found...strange.\n' );
         }
     }
 
     // Add the check box at the end.
     if( form.optOut ){
-        data += "&optOutPayment=" + form.optOut.checked;
+        data += '&optOutPayment=' + form.optOut.checked;
     }
 
     // Handles any errors in connections.
     on_error = function( error ) {
-        alert( "We apologize; the system encountered an error while "+
-            "registering your information. Please try again later." );
+        alert( 'We apologize; the system encountered an error while '+
+            'registering your information. Please try again later.' );
         CROWDLOGGER.io.log.write_to_error_log({data: [{
-            f: "CROWDLOGGER.study.registration.submit",
-            err:  "Error submitting registration. Error : " + error,
+            f: 'CROWDLOGGER.study.registration.submit',
+            err:  'Error submitting registration. Error : ' + error,
             t: new Date().getTime()
         }]});
     };
@@ -324,20 +325,20 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
     // Handles the response from the registration server.
     var on_registration_server_response = function( response ) {
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Response from registration server: " + 
-            response + "\n" );
+        CROWDLOGGER.debug.log( 'Response from registration server: ' + 
+            response + '\n' );
         //E_DEBUG
 
         // Successful registrations should begin with 'c:'.
         if( response.match( /^c:/ ) ) {
-            response = response.replace( /^c:/, "" );
+            response = response.replace( /^c:/, '' );
             // The response was good -- the user is now registered.
             // Updated the preferences to reflect this and the user's
             // id code.
             CROWDLOGGER.preferences.set_bool_pref(
-                    "registered", true );
+                    'registered', true );
             CROWDLOGGER.preferences.set_char_pref(
-                    "id_code", response );
+                    'id_code', response );
 
             CROWDLOGGER.notifications.unset_notification('update_registration');
             CROWDLOGGER.notifications.unset_notification('register');
@@ -352,26 +353,26 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
             }
 
         } else {
-            on_error( "Bad response from server: " + response );
+            on_error( 'Bad response from server: ' + response );
         }
     };
 
     // Registers the user.
     register = function() {
-        data = "userID=" +
-            CROWDLOGGER.preferences.get_char_pref( "registration_id" ) + data;
+        data = 'userID=' +
+            CROWDLOGGER.preferences.get_char_pref( 'registration_id' ) + data;
 
         CROWDLOGGER.io.network.send_data(
-            CROWDLOGGER.preferences.get_char_pref( "registration_url" ),
+            CROWDLOGGER.io.network.get_server_url( 'registration_url' ),
             data,
             on_registration_server_response, 
             on_error,
-            "POST" );
+            'POST' );
     }
 
     // Check if the user already has a registration id. If not, get one.
     if( CROWDLOGGER.preferences.get_char_pref(
-            "registration_id" ) == "" ) {
+            'registration_id' ) == '' ) {
         CROWDLOGGER.study.registration.get_new_registration_id( register,
             on_error );
     } else {
@@ -399,29 +400,28 @@ CROWDLOGGER.study.registration.get_new_registration_id = function( callback,
     // Handles the response from the id server.
     on_id_server_response = function( response ) {
         //B_DEBUG
-        CROWDLOGGER.debug.log( "id server response: " + response + "\n" );
+        CROWDLOGGER.debug.log( 'id server response: ' + response + '\n' );
         //E_DEBUG
 
         if( response.match( /^id:/ ) ) {
-            var id = response.replace( /^id:/, "" );
-            CROWDLOGGER.preferences.set_char_pref( "registration_id", id );
+            var id = response.replace( /^id:/, '' );
+            CROWDLOGGER.preferences.set_char_pref( 'registration_id', id );
 
             // Invoke the callback function.
             callback();
 
         } else {
-            on_error( "Invalid response from getID.php: " + response );
+            on_error( 'Invalid response from getID.php: ' + response );
         }
     };
 
     // Request a new id from the id server.
     CROWDLOGGER.io.network.send_data(
-        CROWDLOGGER.preferences.get_char_pref(
-            "registration_id_url" ),
+        CROWDLOGGER.io.network.get_server_url( 'registration_id_url' ),
         null,
         on_id_server_response,
         on_error,
-        "GET" );
+        'GET' );
 };
 
 

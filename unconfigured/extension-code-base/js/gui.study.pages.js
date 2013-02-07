@@ -24,11 +24,11 @@ if( CROWDLOGGER.gui.study.pages === undefined ){
 CROWDLOGGER.gui.study.pages = {
     // This should really go in some utility, but for now it's only used 
     // here.
-    months : ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", 
-        "Sep", "Oct", "Nov", "Dec" ],
+    months : ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 
+        'Sep', 'Oct', 'Nov', 'Dec' ],
     months_long : [
-        "January", "February", "March", "April", "May", "June", "July", 
-        "August", "September", "October", "November", "December" ],
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 
+        'August', 'September', 'October', 'November', 'December' ],
     MESSAGE_SUMMARY_SIZE : 25
 };
 
@@ -43,11 +43,11 @@ CROWDLOGGER.gui.study.pages = {
 CROWDLOGGER.gui.study.pages.add_listeners = function(the_window){
 
     // A listener for the status page refresh request. The event passed in
-    // should include a "doc" attribute pointing to the page.
-    the_window.addEventListener( "crowdlogger_status_page_refresh",
+    // should include a 'doc' attribute pointing to the page.
+    the_window.addEventListener( 'crowdlogger_status_page_refresh',
         function( e ){ 
             //B_DEBUG
-            CROWDLOGGER.debug.log( "Caught crowdlogger_status_page_refresh\n" );
+            CROWDLOGGER.debug.log( 'Caught crowdlogger_status_page_refresh\n' );
             //E_DEBUG
 
             CROWDLOGGER.gui.study.pages.refresh_status_page(e.originalTarget);
@@ -62,13 +62,13 @@ CROWDLOGGER.gui.study.pages.add_listeners = function(the_window){
  */
 CROWDLOGGER.gui.study.pages.launch_consent_form_page = function(){
     //B_DEBUG
-    CROWDLOGGER.debug.log( "In launch_consent_form_page\n" );
+    CROWDLOGGER.debug.log( 'In launch_consent_form_page\n' );
     //E_DEBUG
 
 
     // Get the url of the status page.
     var consent_form_page = CROWDLOGGER.preferences.get_char_pref(
-        "consent_dialog_url", "not_found.html" );
+        'consent_dialog_url', 'not_found.html' );
 
     // The prefix for the extension's html files.
     var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
@@ -84,8 +84,8 @@ CROWDLOGGER.gui.study.pages.launch_consent_form_page = function(){
 
 
     // Once the new tab has opened, this will give us a handle on it.
-    CROWDLOGGER.gui.windows.open_dialog( url, "%%FULL_PROJECT_NAME%% Consent Page",
-       on_load );
+    CROWDLOGGER.gui.windows.open_dialog( url, 
+        '%%FULL_PROJECT_NAME%% Consent Page', on_load );
 };
 
 /**
@@ -95,29 +95,29 @@ CROWDLOGGER.gui.study.pages.launch_consent_form_page = function(){
  */
 CROWDLOGGER.gui.study.pages.refresh_consent_page = function( doc ){
     var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
-    var consent_body_url = CROWDLOGGER.preferences.get_char_pref(
-        "consent_body_url", extension_prefix + "not_found.html" );
+    var consent_body_url = CROWDLOGGER.io.network.get_server_url(
+        'consent_body_url', extension_prefix + 'not_found.html' );
 
     // Once we get the consent body HTML from the server, this function
     // will place it in the page.
     var on_server_response = function( consent_body ){
-        var init_elm         = doc.getElementById( "init" );
+        var init_elm         = doc.getElementById( 'init' );
        
-        var consent_frame = doc.getElementById( "consent_frame" );
+        var consent_frame = doc.getElementById( 'consent_frame' );
         if( consent_frame ){
-            //consent_frame.setAttribute( "src",  consent_body_url );
+            //consent_frame.setAttribute( 'src',  consent_body_url );
             consent_frame.innerHTML = consent_body + consent_frame.innerHTML;
         }
     
         if( init_elm ){
-            init_elm.innerHTML = "true";
+            init_elm.innerHTML = 'true';
         }
     
     }
 
     // Ask the server for the consent form body.
     CROWDLOGGER.io.network.send_data( consent_body_url, null, 
-        on_server_response, function(){}, "GET" );
+        on_server_response, function(){}, 'GET' );
 };
 
 
@@ -129,17 +129,17 @@ CROWDLOGGER.gui.study.pages.launch_update_help = function(){
     var update_help_url;
     var browser = CROWDLOGGER.version.info.get_browser_name();
     // Firefox 3.
-    if( browser === "ff3" ) {
+    if( browser === 'ff3' ) {
         update_help_url = CROWDLOGGER.preferences.get_char_pref( 
-            "firefox_3_update_help_url", "not_found.html" );
+            'firefox_3_update_help_url', 'not_found.html' );
     // Firefox 4.
-    } else if ( browser === "ff4" ) {
+    } else if ( browser === 'ff4' ) {
         update_help_url = CROWDLOGGER.preferences.get_char_pref( 
-            "firefox_4_update_help_url", "not_found.html" );
+            'firefox_4_update_help_url', 'not_found.html' );
     // Chrome.
     } else {
         update_help_url = CROWDLOGGER.preferences.get_char_pref( 
-            "chrome_update_help_url", "not_found.html" );
+            'chrome_update_help_url', 'not_found.html' );
     }
 
     // The prefix for the extension's html files.
@@ -159,7 +159,7 @@ CROWDLOGGER.gui.study.pages.launch_status_page = function(){
 
     // Get the url of the status page.
     var status_page = CROWDLOGGER.preferences.get_char_pref(
-        "status_page_url", "not_found.html" );
+        'status_page_url', 'not_found.html' );
 
     // The prefix for the extension's html files.
     var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
@@ -168,7 +168,7 @@ CROWDLOGGER.gui.study.pages.launch_status_page = function(){
     var url = extension_prefix + status_page;
 
     // Once the new tab has opened, this will give us a handle on it.
-    CROWDLOGGER.gui.windows.open_dialog( url, "%%FULL_PROJECT_NAME%% Status Page",
+    CROWDLOGGER.gui.windows.open_dialog( url, '%%FULL_PROJECT_NAME%% Status Page',
             CROWDLOGGER.gui.study.pages.refresh_status_page );
 
 };
@@ -179,18 +179,19 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     var jq = doc.defaultView.jQuery; 
 
     // Get the elements we need to populate.
-    var notification_elm = jq('#notifications');
-    var messages_elm     = doc.getElementById( "messages" );
-    var experiments_elm  = doc.getElementById( "experiments" );
-    var raffle_wins_elm  = doc.getElementById( "raffleWins" );
-    var init_elm         = doc.getElementById( "init" );
+    var notification_elm = jq('#notifications').html('');
+    var messages_elm     = doc.getElementById( 'messages' );
+    var experiments_elm  = doc.getElementById( 'experiments' );
+    var raffle_wins_elm  = doc.getElementById( 'raffleWins' );
+    var init_elm         = doc.getElementById( 'init' );
     
     // This tells the page that it's been initialized.
-    init_elm.innerHTML = "starting";
+    init_elm.innerHTML = 'starting';
 
     // For the special update notifications (shown after an update is installed).
     var clear_update_notification_delay = 30*1000; // 30-seconds
     var clear_update_message_delay = 30*60*1000; // 30-minutes
+
 
     /*
     CROWDLOGGER.study.notify_of_new_consent_form();
@@ -207,20 +208,20 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     // Place the version number.
     var version = CROWDLOGGER.version.info.get_extension_version();
-    var version_elms = doc.getElementsByName( "version_no" );
+    var version_elms = doc.getElementsByName( 'version_no' );
     for( var i = 0; i < version_elms.length; i++ ) {
         if( version_elms[i] ) {
-            version_elms[i].innerHTML = "version " + version; 
+            version_elms[i].innerHTML = 'version ' + version; 
         }
     }
     
-    var whatsnew_elms = doc.getElementsByName( "whatsnew" );
+    var whatsnew_elms = doc.getElementsByName( 'whatsnew' );
     for( var i = 0; i < whatsnew_elms.length; i++ ) {
         if( whatsnew_elms[i] ) {
             whatsnew_elms[i].onclick = function(){
                 CROWDLOGGER.gui.windows.open_tab(
-                    CROWDLOGGER.preferences.get_char_pref( "whatsnew_url" ) + 
-                        "?version=" + version,
+                    CROWDLOGGER.io.network.get_server_url( 'whatsnew_url' ) + 
+                        '?version=' + version,
                    function(){} );
             };
         }
@@ -228,9 +229,9 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     // Reveal the update message if need be.
     if( CROWDLOGGER.notifications.show_update_message ){
-        var update_message = doc.getElementById( "update_message" );
+        var update_message = doc.getElementById( 'update_message' );
         if( update_message ){
-            update_message.style.display = "block";
+            update_message.style.display = 'block';
         }
 
         setTimeout( 
@@ -463,7 +464,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             }
 
             // Check for notifications about new experiments.
-            if( note_board.new_experiments > 0 ) {
+            if( note_board.new_experiments > 0 ){
+
                 CROWDLOGGER.debug.log( 'Posting experiment' );
                 notifications_posted++;
                 notifications.append('<tr id="new_experiments_notification">' +
@@ -509,27 +511,27 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             // Check for notifications about unread messages.
             if( note_board.new_messages > 0 ){
                 notifications_posted++;
-                notifications.append("<tr><td class=\"alert\"></td>" +
-                    "<td>There are <a href=\"#messages\">new messages</a> " +
-                    " from the project researchers.</td><td></td></tr>");
+                notifications.append('<tr><td class="alert"></td>' +
+                    '<td>There are <a href="#messages">new messages</a> ' +
+                    ' from the project researchers.</td><td></td></tr>');
             }
 
             // Check for notifications about raffle wins.
             if( note_board.unredeemed_raffle_win > 0 ){
                 notifications_posted++;
-                notifications.append("<tr><td class=\"alert\"></td>" +
-                    "<td>You have <a href=\"#raffleWins\">un-redeemed</a> " + 
-                    " raffle wins.</td><td></td></tr>");
+                notifications.append('<tr><td class="alert"></td>' +
+                    '<td>You have <a href="#raffleWins">un-redeemed</a> ' + 
+                    ' raffle wins.</td><td></td></tr>');
             }
 
             if( notifications_posted === 0 ){
-                notification_elm.html("No new notifications");
+                notification_elm.html('No new notifications');
                 note_board.new_notifications = 0;
             } else {
-                //notifications += "</table>";
+                //notifications += '</table>';
                 //B_DEBUG   
-                CROWDLOGGER.debug.log( "Added " + notifications + 
-                    " to the status page.\n" );
+                CROWDLOGGER.debug.log( 'Added ' + notifications + 
+                    ' to the status page.\n' );
                 //E_DEBUG
                 //notification_elm.innerHTML = notifications;
                 notification_elm.append(notifications);
@@ -543,9 +545,9 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     // Now take care of the messages section.
     if( messages_elm ){
-        messages_elm.innerHTML = "<span class=\"loading\">Loading ...</span>";
+        messages_elm.innerHTML = '<span class="loading">Loading ...</span>';
         setTimeout( function(){
-            CROWDLOGGER.gui.study.pages.populate_messages( jq(messages_elm), jq);
+            CROWDLOGGER.gui.study.pages.populate_messages(jq(messages_elm), jq);
         }, 5 );
     }
 
@@ -555,9 +557,10 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // And now the raffle wins.
     if( raffle_wins_elm ){
         raffle_wins_elm.innerHTML = 
-            "<span class=\"loading\">Loading ...</span>";
+            '<span class="loading">Loading ...</span>';
         setTimeout( function(){
-            CROWDLOGGER.gui.study.pages.populate_raffle_wins( raffle_wins_elm );
+            CROWDLOGGER.gui.study.pages.populate_raffle_wins( 
+                jq(raffle_wins_elm), jq );
         }, 5 );
     }
 
@@ -594,33 +597,33 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
     // Populate the experiment history section.
     if( doc_element ){
         var running_doc_element = 
-            doc.getElementById( "running_experiments" );
+            doc.getElementById( 'running_experiments' );
         var upcoming_doc_element = 
-            doc.getElementById( "upcoming_experiments" );
+            doc.getElementById( 'upcoming_experiments' );
         var last_completed_experiment_elm =
-            doc.getElementById( "last_completed_experiment" );
+            doc.getElementById( 'last_completed_experiment' );
         var number_completed_doc_element =
-            doc.getElementById( "number_completed_experiments" );
+            doc.getElementById( 'number_completed_experiments' );
 
-        var current_running_job_id = "";
+        var current_running_job_id = '';
 
         // Display the current running experiment
-        var html = "<span class=\"note\">None</span>";
+        var html = '<span class=\"note\">None</span>';
         if( CROWDLOGGER.session_data.keep_running_experiments === true ){
             //B_DEBUG
-            CROWDLOGGER.debug.log( "running_doc_element: " + 
+            CROWDLOGGER.debug.log( 'running_doc_element: ' + 
                 running_doc_element + 
-                "\nCROWDLOGGER.session_data.keep_running_experiments: " + 
-                CROWDLOGGER.session_data.keep_running_experiments + "\n" );
+                '\nCROWDLOGGER.session_data.keep_running_experiments: ' + 
+                CROWDLOGGER.session_data.keep_running_experiments + '\n' );
             //E_DEBUG
 
             current_running_job_id = JSON.parse(
                 CROWDLOGGER.preferences.get_char_pref(
-                    "current_running_experiment", "{}" ) ).job_id;
+                    'current_running_experiment', '{}' ) ).job_id;
             html = current_running_job_id + 
-                " <span class=\"note\">(" + 
+                ' <span class="note">(' + 
                 CROWDLOGGER.session_data.current_running_experiment_status.
-                    message + ")</span>"; 
+                    message + ')</span>'; 
         } 
              
         if( running_doc_element && running_doc_element.innerHTML !== html ) {
@@ -628,7 +631,7 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
         }
         
         // Generate the list of upcoming experiments.
-        html = "<span class=\"note\">None</span>"
+        html = '<span class="note">None</span>'
         if( CROWDLOGGER.session_data.job_indicies_to_run !== undefined && 
                 ((CROWDLOGGER.session_data.cur_job_index <
                 CROWDLOGGER.session_data.job_indicies_to_run.length &&
@@ -655,42 +658,42 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
                      i < CROWDLOGGER.session_data.job_indicies_to_run.length;
                      i++ ){
                 html += 
-                    CROWDLOGGER.session_data.job_indicies_to_run[i] + "<br>";
+                    CROWDLOGGER.session_data.job_indicies_to_run[i] + '<br>';
             }
         }
 
-        CROWDLOGGER.debug.log("start_index: "+ start_index +
-          "; upcoming_doc_element.innerHTML: "+ upcoming_doc_element.innerHTML);
+        CROWDLOGGER.debug.log('start_index: '+ start_index +
+          '; upcoming_doc_element.innerHTML: '+ upcoming_doc_element.innerHTML);
 
         if( upcoming_doc_element && upcoming_doc_element.innerHTML !== html ) {
             upcoming_doc_element.innerHTML = html;
         }
 
         // Display info about the most recently completed experiment.
-        html = "N/A";
+        html = 'N/A';
         if( last_completed_experiment_elm ){
             var job_id = 
-                CROWDLOGGER.preferences.get_char_pref( "last_ran_experiment_id",
-                    "N/A" );
+                CROWDLOGGER.preferences.get_char_pref( 'last_ran_experiment_id',
+                    'N/A' );
 
             //B_DEBUG
-            CROWDLOGGER.debug.log( "Last run job_id: " + job_id + "\n" +
-                "Ran experiments: " + CROWDLOGGER.preferences.get_char_pref(
-                        "ran_experiments" ) 
+            CROWDLOGGER.debug.log( 'Last run job_id: ' + job_id + '\n' +
+                'Ran experiments: ' + CROWDLOGGER.preferences.get_char_pref(
+                        'ran_experiments' ) 
                 );
             //E_DEBUG
 
-            if( job_id === "N/A" || job_id === "" ){
-                html = "N/A";
+            if( job_id === 'N/A' || job_id === '' ){
+                html = 'N/A';
             } else {
                 var completion_time = new Date(
                     JSON.parse( CROWDLOGGER.preferences.get_char_pref(
-                        "ran_experiments" ) )[job_id] );
+                        'ran_experiments' ) )[job_id] );
                 var date_string = CROWDLOGGER.gui.study.pages.months_long[
                     completion_time.getMonth()] +
-                    " " + completion_time.getDate();
+                    ' ' + completion_time.getDate();
 
-                html = job_id + " on " +
+                html = job_id +' on '+
                     date_string;
             }
 
@@ -701,20 +704,20 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
         }
 
         // Display the number of experiments completed.
-        html = "0";
+        html = '0';
         if( number_completed_doc_element ){
 
             var ran_experiments_length = Object.keys( JSON.parse(
                 CROWDLOGGER.preferences.get_char_pref(
-                    "ran_experiments", "{}"))).length;
+                    'ran_experiments', '{}'))).length;
 
             var total_experiments_run = CROWDLOGGER.preferences.get_int_pref(
-                    "total_experiments_run", 0 );
+                    'total_experiments_run', 0 );
 
             var number_to_report = Math.max( ran_experiments_length, 
                 total_experiments_run );
 
-            html = number_to_report+""; 
+            html = number_to_report+''; 
 
             if( number_completed_doc_element.innerHTML !== html ) {
                 number_completed_doc_element.innerHTML = html;
@@ -784,7 +787,7 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_jq, jq ){
 
             html_to_add = entry;
 
-            var message_url = CROWDLOGGER.preferences.get_char_pref(
+            var message_url = CROWDLOGGER.io.network.get_server_url(
                 'show_messages_url', '' );
             var total_message_count = parseInt( parts[0] );
             var new_message_count = total_message_count- most_recent_message_id;
@@ -825,7 +828,7 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_jq, jq ){
  * @param {object} doc_element  The document element to which the raffle wins
  *      should be added. 
  */
-CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_element ){
+CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_jq, jq ){
 
     // Called when we hear back from the server.
     var on_server_response = function( response ){
@@ -838,59 +841,66 @@ CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_element ){
         if( response !== "" && response.match(/^GO\t/) !== null ){
             CROWDLOGGER.debug.log('Raffle response: '+ response);
 
-            var html_to_add = "The drawings you have won are listed below " +
-             "along with the date on which the drawing took place. " +
-             "Click on the 'View' button to redeem and view your Amazon.com " +
-             "gift card.<p><table class=\"raffleWins\">" +
-             "<tr><th>Date</th><th>Link</th></tr>";
+            var html_to_add = jq('<div><p>The drawings you have won are listed '+
+             ' below along with the date on which the drawing took place. '+
+             'Click on the "View" button to redeem and view your Amazon.com '+
+             'gift card.</p><div>');
+
+            var table = jq('<table class="raffleWins">');
+            html_to_add.append(table);
+            table.append('<tr><th>Date</th><th>Link</th></tr>');
             
-            var lines = response.split( "\n" ) ;
+            var lines = response.split( '\n' ) ;
             for( var i = 0; i < lines.length; i++ ) {
                 var line = lines[i];
 
                 //B_DEBUG
-                CROWDLOGGER.debug.log( "line: " + line + "\n" );
+                CROWDLOGGER.debug.log( 'line: ' + line + '\n' );
                 //E_DEBUG
 
-                var columns = line.split( "\t" );
+                var columns = line.split( '\t' );
 
                 // Work out the date.
                 var date = new Date( columns[DATE] );
 
                 var display_date = 
-                    CROWDLOGGER.gui.study.pages.months[date.getMonth()] + " " +
-                    date.getDate() + ", " + date.getFullYear();
+                    CROWDLOGGER.gui.study.pages.months[date.getMonth()] + ' ' +
+                    date.getDate() + ', ' + date.getFullYear();
 
                 // Form the redemption url.
-                var url = CROWDLOGGER.preferences.get_char_pref(
-                    "redeem_url", "" ) + "?url=" + columns[URL] +
-                    "&date=" + escape( columns[DATE] );
+                var url = CROWDLOGGER.io.network.get_server_url(
+                    'redeem_url', '' ) + '?url=' + columns[URL] +
+                    '&date=' + escape( columns[DATE] );
 
 
                 //B_DEBUG
-                //CROWDLOGGER.debug.log( "Display date: " + displayDate + "\n" );
+                //CROWDLOGGER.debug.log( 'Display date: ' + displayDate + '\n' );
                 //E_DEBUG
             
-                var button_text = "View";
-                if( columns[REDEEMED] === "no" ){
-                    button_text = "View (un-redeemed)";
+                var button_text = 'View';
+                if( columns[REDEEMED] === 'no' ){
+                    button_text = 'View (un-redeemed)';
                 }
 
-                html_to_add += "<tr><td class=\"date\">" + 
-                    display_date + "</td><td>" +
-                    "<span class=\"buttonPanel\"><span class=\"button\" " +
-                        "onclick=\"CROWDLOGGER.gui.windows.open_tab('" + 
-                        url + "')\">" + button_text +
-                    "</span></td></tr>";
+
+                table.append('<tr><td class="date">' + 
+                    display_date + '</td><td>' +
+                    '<span class="buttonPanel"><span class="button" '+
+                        'id="raffle_win_url">'+ button_text +
+                    '</span></td></tr>');
+
+                table('#raffle_win_url').click(function(){
+                    CROWDLOGGER.gui.windows.open_tab(url);
+                });
             } // end for
            
             // Add all of the html to the element.
-            doc_element.innerHTML = html_to_add+ "</table>";
+            //doc_element.innerHTML = html_to_add+ '</table>';
+            doc_jq.append(html_to_add);
  
         // There haven't, so let the user know.        
         } else {
-            doc_element.innerHTML = 
-                "You have not won any drawings at this time.";
+            doc_jq.html('You have not won any drawings at this time.');
         }
     };
 
@@ -903,8 +913,8 @@ CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_element ){
  */
 CROWDLOGGER.gui.study.pages.launch_help_page = function(){
     // Get the url of the help page.
-    var help_page = CROWDLOGGER.preferences.get_char_pref(
-        "help_url", "" );
+    var help_page = CROWDLOGGER.io.network.get_server_url(
+        'help_url', '' );
 
     CROWDLOGGER.gui.windows.open_tab( help_page, function(){} );
 };
@@ -922,24 +932,24 @@ CROWDLOGGER.gui.study.pages.launch_help_page = function(){
 CROWDLOGGER.gui.study.pages.send_auto_email = function( doc, form ){
     var reg_id, data_missing = false, data, on_error, on_server_response;
     var elms = {
-        missing_name: doc.getElementById( "missingName" ),
-        missing_emails: doc.getElementById( "missingEmails" ),
-        success: doc.getElementById( "success" ),
-        failure: doc.getElementById( "failure" ),
-        custom_failure: doc.getElementById( "custom_failure" ),
-        not_registered_alert: doc.getElementById( "not_registered_alert" ),
-        sending: doc.getElementById( "sending" )
+        missing_name: doc.getElementById( 'missingName' ),
+        missing_emails: doc.getElementById( 'missingEmails' ),
+        success: doc.getElementById( 'success' ),
+        failure: doc.getElementById( 'failure' ),
+        custom_failure: doc.getElementById( 'custom_failure' ),
+        not_registered_alert: doc.getElementById( 'not_registered_alert' ),
+        sending: doc.getElementById( 'sending' )
     };
-    var cleaned_emails_elm = doc.getElementById( "cleaned_emails" );
-    var successful_emails_elm = doc.getElementById( "successful_emails" );
+    var cleaned_emails_elm = doc.getElementById( 'cleaned_emails' );
+    var successful_emails_elm = doc.getElementById( 'successful_emails' );
 
     var emails = CROWDLOGGER.util.clean_mixed_emails( form.emails.value );
 
     var unset_elm = function( elm ) {
-        elm.style.display = "none";
+        elm.style.display = 'none';
     };
     var set_elm = function( elm ) {
-        elm.style.display = "inline";
+        elm.style.display = 'inline';
     };
 
     var apply_to_all_elms = function(elms, f){
@@ -964,8 +974,8 @@ CROWDLOGGER.gui.study.pages.send_auto_email = function( doc, form ){
     }
 
     // Get the registration id.
-    reg_id = CROWDLOGGER.preferences.get_char_pref( "registration_id", "" );
-    if( reg_id === "" ){
+    reg_id = CROWDLOGGER.preferences.get_char_pref( 'registration_id', '' );
+    if( reg_id === '' ){
         set_elm(elms.not_registered_alert);
         return;
     }
@@ -982,10 +992,10 @@ CROWDLOGGER.gui.study.pages.send_auto_email = function( doc, form ){
 
     on_server_response = function( response ) {
         if( response.match(/^(true)|(false)/) !== null ){
-            var parts = response.split("\t");
+            var parts = response.split('\t');
             var successful = 1, failed = 2;
 
-            dump( JSON.stringify( parts ) + "\n\n" );
+            dump( JSON.stringify( parts ) + '\n\n' );
 
             if( parts[successful].length > 0 ){
                 set_elm( elms.success );
@@ -994,29 +1004,29 @@ CROWDLOGGER.gui.study.pages.send_auto_email = function( doc, form ){
 
             if( parts.length > failed &&  parts[failed].length > 0 ){
                 elms.custom_failure.innerHTML = 
-                    "There were errors sending the following emails: " + 
+                    'There were errors sending the following emails: ' + 
                     parts[failed];
                 set_elm( elms.custom_failure );
             }
             unset_elm( elms.sending );
             
         } else {
-            on_error( "Processing issue: " + response );
+            on_error( 'Processing issue: ' + response );
         }
     }    
 
     // Send the data off to the server.
-    data = "userID=" + reg_id + 
-           "&sender=" + encodeURIComponent( form.sender.value ) +
-           "&emails=" + encodeURIComponent( 
+    data = 'userID=' + reg_id + 
+           '&sender=' + encodeURIComponent( form.sender.value ) +
+           '&emails=' + encodeURIComponent( 
                 CROWDLOGGER.util.clean_mixed_emails(form.emails.value ) );
 
     CROWDLOGGER.io.network.send_data(
-        CROWDLOGGER.preferences.get_char_pref( "email_url" ),
+        CROWDLOGGER.io.network.get_server_url( 'email_url' ),
         data,
         on_server_response,
         on_error,
-        "POST" );
+        'POST' );
 
     
 };

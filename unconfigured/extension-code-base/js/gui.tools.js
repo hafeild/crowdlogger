@@ -163,8 +163,8 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search history", 
-            CROWDLOGGER.gui.tools.diplay_search_histogram );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search history" ); //, 
+            // CROWDLOGGER.gui.tools.diplay_search_histogram );
     } else {
         if( doc.defaultView && doc.defaultView.jQuery ){
             doc.defaultView.jQuery('#init').html('initialized');
@@ -436,8 +436,8 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search trails", 
-            CROWDLOGGER.gui.tools.diplay_search_trails );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search trails" ); //, 
+            // CROWDLOGGER.gui.tools.diplay_search_trails );
     } else {
         if( doc.defaultView && doc.defaultView.jQuery ){
             doc.defaultView.jQuery('#init').html('initialized');
@@ -528,8 +528,8 @@ CROWDLOGGER.gui.tools.export_log = function( doc ){
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search log",
-            CROWDLOGGER.gui.tools.export_log );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search log" );
+            //CROWDLOGGER.gui.tools.export_log );
     } else {
         if( doc.defaultView && doc.defaultView.jQuery ){
             doc.defaultView.jQuery('#init').html('initialized');

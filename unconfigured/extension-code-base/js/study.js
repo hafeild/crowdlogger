@@ -167,7 +167,7 @@ CROWDLOGGER.study.check_raffle_status = function( timeout, do_continue ){
         // Attempt to contact the server, using the functions above in the
         // event of a success or failure.
         CROWDLOGGER.io.network.send_data(
-           CROWDLOGGER.preferences.get_char_pref( "check_status_url" ),
+           CROWDLOGGER.io.network.get_server_url( "check_status_url" ),
            "regID=" +
                 CROWDLOGGER.preferences.get_char_pref( "registration_id" ),
            on_server_response,
@@ -208,7 +208,7 @@ CROWDLOGGER.study.get_raffle_wins = function( callback ){
     // Attempt to contact the server, using the functions above in the
     // event of a success or failure.
     CROWDLOGGER.io.network.send_data(
-        CROWDLOGGER.preferences.get_char_pref( "check_status_url" ),
+        CROWDLOGGER.io.network.get_server_url( "check_status_url" ),
         "regID=" + CROWDLOGGER.preferences.get_char_pref( "registration_id" ),
         callback,
         on_error,
@@ -301,9 +301,9 @@ CROWDLOGGER.study.check_for_new_messages = function( timeout, do_continue,
         // Attempt to contact the server, using the functions above in the
         // event of a success or failure.
         CROWDLOGGER.io.network.send_data(
-           CROWDLOGGER.preferences.get_char_pref( "check_messages_url" ),
+           CROWDLOGGER.io.network.get_server_url( "check_messages_url" ),
            "msgID=" +
-                CROWDLOGGER.preferences.get_char_pref( "most_recent_message_id" ),
+                CROWDLOGGER.preferences.get_char_pref("most_recent_message_id"),
            on_server_response,
            on_error,
            "GET"
@@ -339,16 +339,16 @@ CROWDLOGGER.study.check_if_registration_is_valid = function(){
  */
 CROWDLOGGER.study.launch_registration_dialog = function(){
     // Make sure that logging is turned on. If not, just return.
-    if( CROWDLOGGER.preferences.get_bool_pref( "consent_required", true ) ){
-        alert( "Please agree to the Informed Consent (see the status page) " +
-               "before attempting to register. Thanks!" ); 
+    if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){
+        alert( 'Please agree to the Informed Consent (see the status page) ' +
+               'before attempting to register. Thanks!' ); 
         return false;
     }
 
 
     // The page to load.
     var registration_page = CROWDLOGGER.preferences.get_char_pref( 
-        "registration_dialog_url", "not_found.html" );
+        'registration_dialog_url', 'not_found.html' );
 
     // The prefix for the extension's html files.
     var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
@@ -371,15 +371,15 @@ CROWDLOGGER.study.launch_registration_dialog = function(){
 CROWDLOGGER.study.launch_refer_a_friend_dialog = function( is_post_registration ){
 
     // Make sure that logging is turned on. If not, just return.
-    if( CROWDLOGGER.preferences.get_bool_pref( "consent_required", true ) ){
-        alert( "Please agree to the Informed Consent (see the status page) " +
-               "before attempting to refer friends. Thanks!" ); 
+    if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){
+        alert( 'Please agree to the Informed Consent (see the status page) ' +
+               'before attempting to refer friends. Thanks!' ); 
         return false;
     }
 
     // The page to load.
     var refer_a_friend_page = CROWDLOGGER.preferences.get_char_pref(
-        "refer_a_friend_dialog_url", "not_found.html" );
+        'refer_a_friend_dialog_url', 'not_found.html' );
 
     // The prefix for the extension's html files.
     var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
@@ -393,7 +393,7 @@ CROWDLOGGER.study.launch_refer_a_friend_dialog = function( is_post_registration 
     };
 
     // Open the window and call the handler when the page loads.
-    CROWDLOGGER.gui.windows.open_dialog( url, "refer a friend", on_page_load ); 
+    CROWDLOGGER.gui.windows.open_dialog( url, 'refer a friend', on_page_load ); 
 };
 
 /**
@@ -406,22 +406,22 @@ CROWDLOGGER.study.refresh_refer_a_friend_page = function(
     var email_box, message_elm, message, registered, referral_id;
 
     // Set the init element so that we don't load this twice.
-    var init_elm         = doc.getElementById( "init" );
+    var init_elm         = doc.getElementById( 'init' );
     if( init_elm ){
-        init_elm.innerHTML = "true";
+        init_elm.innerHTML = 'true';
     }    
 
     // If this dialog is being called because the user just finished
     // registering, display the post-registration note.
     if( is_post_registration !== undefined &&
            is_post_registration ){
-        var post_registration_elm = doc.getElementById("post_registration");
+        var post_registration_elm = doc.getElementById('post_registration');
         if( post_registration_elm ){
             //B_DEBUG
-            CROWDLOGGER.debug.log( "Un-revealing header on refer-a-freind\n");
+            CROWDLOGGER.debug.log( 'Un-revealing header on refer-a-freind\n');
             //E_DEBUG
 
-            post_registration_elm.style.display = "block";
+            post_registration_elm.style.display = 'block';
         }
     }
 
@@ -433,7 +433,7 @@ CROWDLOGGER.study.refresh_refer_a_friend_page = function(
     }
 
     // Get the message parts.
-    message_elm = doc.getElementById( "message" );
+    message_elm = doc.getElementById( 'message' );
 
 
     var populate_message = function( referral_id ){
@@ -449,31 +449,31 @@ CROWDLOGGER.study.refresh_refer_a_friend_page = function(
     };
 
     var on_error = function( error ){
-        populate_message( "70c616519c33fce85134b65dac1ace463c34aa0f" );
+        populate_message( '70c616519c33fce85134b65dac1ace463c34aa0f' );
     };
 
     var on_server_response = function( response ){
         if( response.match( /^id:/ ) !== null ){
-            var id =response.replace( /^id:/, "" );
-            CROWDLOGGER.preferences.set_char_pref( "id_code", id ); 
+            var id =response.replace( /^id:/, '' );
+            CROWDLOGGER.preferences.set_char_pref( 'id_code', id ); 
             populate_message( id );
         } else {
-            on_error( "Empty reponse." );
+            on_error( 'Empty reponse.' );
         }   
     };
 
     // Get the users registration info.
-    referral_id = CROWDLOGGER.preferences.get_char_pref( "id_code", "" );
+    referral_id = CROWDLOGGER.preferences.get_char_pref( 'id_code', '' );
 
     // If there's no referral id, put in a dummy one.
-    if( referral_id === "" ){
+    if( referral_id === '' ){
         CROWDLOGGER.io.network.send_data(
-            CROWDLOGGER.preferences.get_char_pref( "id_code_url" ),
-            "userID=" + CROWDLOGGER.preferences.get_char_pref( 
-                "registration_id", "" ),
+            CROWDLOGGER.io.network.get_server_url( 'id_code_url' ),
+            'userID=' + CROWDLOGGER.preferences.get_char_pref( 
+                'registration_id', '' ),
             on_server_response,
             on_error,
-            "POST" );
+            'POST' );
     } else {
         populate_message( referral_id );
     }
@@ -488,7 +488,9 @@ CROWDLOGGER.study.refresh_refer_a_friend_page = function(
  *
  * @param {int} timeout The timeout until the initial check.
  */
-CROWDLOGGER.study.initialize_notification_check_process = function( initial_timeout, frequency ){
+CROWDLOGGER.study.initialize_notification_check_process = function( 
+        initial_timeout, frequency ){
+    
     if( frequency === undefined ){
         frequency = 1000*60*20;
     }   
@@ -496,14 +498,14 @@ CROWDLOGGER.study.initialize_notification_check_process = function( initial_time
     // Checks if there are notifications and launches the notification.
     var check_notifications = function(){
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Checking for notifications...\n" );
+        CROWDLOGGER.debug.log( 'Checking for notifications...\n' );
         //E_DEBUG
 
         if( CROWDLOGGER.notifications.new_notifications > 0 ) {
             //B_DEBUG
-            CROWDLOGGER.debug.log( "\tFound " + 
+            CROWDLOGGER.debug.log( '\tFound ' + 
                 CROWDLOGGER.notifications.new_notifications + 
-                ", notifying user...\n" );
+                ', notifying user...\n' );
             //E_DEBUG
 
             // Launch the notification box.
@@ -513,7 +515,7 @@ CROWDLOGGER.study.initialize_notification_check_process = function( initial_time
         // Check again a little later.
         setTimeout( check_notifications, 
             CROWDLOGGER.preferences.get_int_pref( 
-                "notification_check_interval", frequency ) 
+                'notification_check_interval', frequency ) 
         );
     };
     
@@ -529,7 +531,7 @@ CROWDLOGGER.study.initialize_notification_check_process = function( initial_time
  */
 CROWDLOGGER.study.notify_of_new_consent_form = function(){
         // Set a notification for the new consent form.
-        CROWDLOGGER.notifications.set_notification( "consent" );
+        CROWDLOGGER.notifications.set_notification( 'consent' );
 };
 
 
@@ -550,19 +552,19 @@ CROWDLOGGER.study.notify_user_of_experiment_failures = function( error_log ){
 CROWDLOGGER.study.user_accepted_consent_form = function( the_window ){
     // Called when we've heard back from the server.
     var on_server_response = function( response ) {
-        if( response == "success" ){
+        if( response == 'success' ){
             CROWDLOGGER.preferences.set_bool_pref(
-                "consent_required", false );
+                'consent_required', false );
             // Turn logging back to it's former status.
             CROWDLOGGER.logging.set_logging( 
                 CROWDLOGGER.preferences.get_bool_pref( 
-                    "logging_enabled_pre_consent", true ) );
+                    'logging_enabled_pre_consent', true ) );
 
             // Unset the consent notification.
-            CROWDLOGGER.notifications.unset_notification( "consent" );
+            CROWDLOGGER.notifications.unset_notification( 'consent' );
 
         } else {
-            on_error( "The server encountered an error while processing." );
+            on_error( 'The server encountered an error while processing.' );
         }
         if( the_window ){
             the_window.close();
@@ -571,7 +573,7 @@ CROWDLOGGER.study.user_accepted_consent_form = function( the_window ){
 
     // If an error has occurred.
     var on_error = function( error ){
-        alert( "An error occurred saving your consent status: " + error );
+        alert( 'An error occurred saving your consent status: ' + error );
         if( the_window ){
             the_window.close();
         }
@@ -579,22 +581,22 @@ CROWDLOGGER.study.user_accepted_consent_form = function( the_window ){
 
     // Called once we know we have a registration id.
     var on_have_id = function() {
-        var url = CROWDLOGGER.preferences.get_char_pref(
-                "consent_accepted_url" );
-        var data = "userID=" + 
-            CROWDLOGGER.preferences.get_char_pref("registration_id");
+        var url = CROWDLOGGER.io.network.get_server_url(
+                'consent_accepted_url' );
+        var data = 'userID=' + 
+            CROWDLOGGER.preferences.get_char_pref('registration_id');
         CROWDLOGGER.io.network.send_data( 
             url, 
             data, 
             on_server_response, 
             on_error, 
-            "GET" );
+            'GET' );
     };
 
 
     // Check if the user already has a registration id. If not, get one.
     if( CROWDLOGGER.preferences.get_char_pref(
-            "registration_id" ) == "" ) {
+            'registration_id' ) == '' ) {
         CROWDLOGGER.study.registration.get_new_registration_id( on_have_id,
             on_error );
     } else {

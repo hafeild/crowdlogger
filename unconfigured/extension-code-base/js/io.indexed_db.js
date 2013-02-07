@@ -1147,7 +1147,6 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     open_db = function( opts ) {
-        console.log("In open_db.");
         // Make sure we have the basic parameters. If there's opts.on_error is
         // not defined, this will throw an exception.
         if( !opts|| !opts.db_name || !opts.db_version || !opts.on_success ||
@@ -1179,14 +1178,11 @@ CROWDLOGGER.io.IndexedDB = function(){
             if( parseInt(db.version) !== opts.db_version && db.setVersion ){
                 var version_request = db.setVersion(opts.db_version);
                 version_request.onsuccess = function(e){
-                    console.log("DB needs an upgrade!");
                     opts.on_upgrade(db);
                     db.close();
                     open_db(opts);
                 }
             } else {
-                console.log("Passing db on.");
-                console.log(db);
                 // Pass the db onto the caller.
                 opts.on_success(db); 
             }

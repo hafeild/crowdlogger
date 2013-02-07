@@ -72,7 +72,9 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
         
         dlg.addEventListener( "load", function(){
             var doc = dlg.document;
-            callback( doc, dlg );
+            if( callback ){
+                callback( doc, dlg );
+            }
         }, true);
 
 

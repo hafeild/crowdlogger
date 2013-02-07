@@ -31,6 +31,22 @@ CROWDLOGGER.io.network = {};
 
 
 /**
+ * Forms a url from the server_base_url and the given page name. The page name
+ * should be a valid preference variable.
+ * @param {string} page_name  The name of the preference corresponding to the 
+ *                            desired page.
+ * @param {string} the_default    The default web page to use in the event that 
+ *                            page_name is not a valid preference. This is
+ *                            appended to the server_base_url.
+ * @return The value of the page_name preference appended to the 
+ *         server_base_url.
+ */
+CROWDLOGGER.io.network.get_server_url = function( page_name, the_default ){
+    return CROWDLOGGER.preferences.get_char_pref( 'server_base_url', '' ) +
+        CROWDLOGGER.preferences.get_char_pref( page_name, the_default );
+};
+
+/**
  * Sends data to the given URL using GET or POST. On error, the error callback 
  * function is called. On success, the success callback function is invoked.
  * @function
