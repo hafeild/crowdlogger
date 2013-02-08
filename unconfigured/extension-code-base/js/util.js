@@ -628,4 +628,32 @@ CROWDLOGGER.util.copy = function(array){
     return copy;
 };
 
+/**
+ * Checks if a refresh was requested or the given document contains an element 
+ * named 'init' and it's not already set to 'initialized'.
+ *
+ * @param {Object} doc  The doc of the page to check.
+ * @param {boolean} refresh Whether a refresh was requested.
+ * @return refresh || doc has 'init' and 'init' is not set to 'initialized'.
+ */
+CROWDLOGGER.util.okay_to_refresh_page = function(doc, refresh) {
+    refresh === undefined ? false : refresh;
+    var elm = doc.getElementById('init');
+    if( elm ){
+        return refresh || elm.innerHTML !== 'initialized';
+    } 
+    return true;
+};
+
+/**
+ * Sets the 'init' element to 'initialized'.
+ *
+ * @param {Object} doc  The doc of the page to update.
+ */
+CROWDLOGGER.util.mark_page_as_initialized = function(doc) {
+    if( doc.defaultView && doc.defaultView.jQuery ){
+        doc.defaultView.jQuery('#init').html('initialized');
+    }
+};
+
 } // END CROWDLOGGER.util NAMESPACE

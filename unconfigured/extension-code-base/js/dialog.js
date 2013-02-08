@@ -46,7 +46,7 @@ function init(){
     }
   
     if( CROWDLOGGER && check_if_initialized !== undefined ){
-        setTimeout( check_if_initialized, 5 );    
+        setTimeout( check_if_initialized, 5 );
     }
 
     return true;

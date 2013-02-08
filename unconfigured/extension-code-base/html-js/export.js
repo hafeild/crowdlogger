@@ -29,19 +29,14 @@ function add_listeners(){
  * has been initialized yet.
  */
 function check_if_initialized(){
-    var init_elm = jQuery('#init');
-    if( init_elm[0] ) {
-        if( init_elm.html() === '' ){
-            CROWDLOGGER.gui.tools.export_log( document );
-        }
-    }
+    CROWDLOGGER.gui.tools.export_log( document );
 }
 
 /**
  * Refreshes the contents of the page.
  */
 function refresh_page(){
-    CROWDLOGGER.gui.tools.export_log( document );
+    CROWDLOGGER.gui.tools.export_log( document, true );
 }
 
 // Initialize the search for the CROWDLOGGER variable.

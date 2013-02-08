@@ -19,18 +19,15 @@ if( CROWDLOGGER.gui.tools === undefined ){
  */
 CROWDLOGGER.gui.tools = {};
 
-
 /**
  * Launches a new tab with the search_histogram.html file. This file is
  * then populated with the user's searches along with their counts.
  *
  * @param {object} doc [Optional.] If included, the given doc will be
  *      updated, rather than launching a whole new page.
+ * @param {boolean} refresh Whether to refresh the page.
  */
-CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
-
-    // TODO This function needs to be re-written to use log.operations.
-
+CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc, refresh ){
     // The page to load.
     var registration_page = CROWDLOGGER.preferences.get_char_pref( 
         "search_histogram_dialog_url", "not_found.html" );
@@ -41,72 +38,12 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
     // The full url.
     var url = extension_prefix + registration_page;
 
-
-    // Takes a dump of the log and converts it to an object that contains
-    // pairs of (normalized) searches and frequencies.
-    // var log_to_query_counts = function( log_entries, make_array ){
-    //     var histogram = {};
-    //     var threshold = 2000; // 2 seconds.
-
-    //     // So we can track the time between queries. We're only going to
-    //     // emit a query if it is the last in a line of rapidly submitted
-    //     // queries (this line is allowed to consist of only one element
-    //     var previous_time = 0;
-    //     var previous_query = "";
-
-    //     // Adds the query to the histogram, provided it's not an empty 
-    //     // query, i.e., "".
-    //     var addQuery = function( query ){
-    //         if( query === "" ){ return; }
-            
-    //         // Add to the histogram.
-    //         if( histogram[query] === undefined ){
-    //             histogram[query] = 0;
-    //         }
-    //         histogram[query]++;
-    //     };
-
-    //     // Go through the log, looking for Search events.
-    //     for( var i = 0; i < log_entries.length; i++ ){
-    //         // The log entries should be tab-delimited.
-    //         //var line_parts = lines[i].split( /\t/ );
-
-    //         // Is this a search?
-    //         if( line_parts[0] === "Search" ){
-    //             // Normalize the query. I.e.:
-    //             //   1) case conflate
-    //             //   2) space conflate
-    //             var query = line_parts[2].toLowerCase().replace( /\s+/, " " );
-    //             var time  = parseInt( line_parts[1] );
-
-    //             if( (time - previous_time) > threshold ) {
-    //                 // Add to the histogram.
-    //                 addQuery( previous_query );
-    //             }
-
-    //             previous_time  = time;
-    //             previous_query = query;
-    //         }
-    //     }
-    //     // Don't forget about the last query! (Don't worry, this checks if
-    //     // no queries were processed at all...or at least if this query is
-    //     // blank).
-    //     addQuery( previous_query );
-
-    //     if( make_array ){
-    //         var hist_array = [];
-    //         for( var query in histogram ){
-    //             hist_array.push( [query, histogram[query]] );
-    //         }
-    //         return hist_array;
-    //     } else {
-    //         return histogram;
-    //     }
-    // };
-
     // The function to call when the page loads.
     /** @ignore */
-    var search_history_handler = function( doc ){
+    var search_history_handler = function( doc, refresh ){
+            if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){return;}
+            CROWDLOGGER.util.mark_page_as_initialized(doc);
+
             // This points to the container on the web page where we will
             // place the histogram.
             var contents_element = doc.getElementById("contents");
@@ -122,12 +59,8 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
                     query_counts.push( [query, histogram[query]] );
                 }
 
-                // // Get the search histogram for the log.
-                // var query_counts = log_to_query_counts( file_contents, true );
-
                 // Sort by query frequency, non-ascending. 
                 query_counts.sort( function(a,b){ return b[1]-a[1]; } );
-
 
                 // The header.
                 var html = "";
@@ -142,10 +75,8 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
                 // Place the html.
                 contents_element.innerHTML = html;
             };
-            
-            // Read the activity file in and then call the function above.
-            // CROWDLOGGER.io.log.read_activity_log( {on_chunk: process_entries} );
 
+            // Create a search histogram.            
             CROWDLOGGER.log.operations.accumulate_over(
                 CROWDLOGGER.log.operations.filter.searches({
                     apply: CROWDLOGGER.log.operations.filter.clean_queries({
@@ -158,23 +89,16 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
                 }),
                 process_histogram
             );
-            
     };
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search history" ); //, 
-            // CROWDLOGGER.gui.tools.diplay_search_histogram );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search history",
+            search_history_handler );
     } else {
-        if( doc.defaultView && doc.defaultView.jQuery ){
-            doc.defaultView.jQuery('#init').html('initialized');
-            search_history_handler( doc );
-        }
+        search_history_handler( doc, refresh );
     }
 };
-
-
-
 
 /**
  * Launches a new tab with the search_trails.html file. This file is
@@ -182,8 +106,9 @@ CROWDLOGGER.gui.tools.diplay_search_histogram = function( doc ){
  *
  * @param {object} doc [Optional.] If included, the given doc will be
  *      updated, rather than launching a whole new page.
+ * @param {boolean} refresh Whether to refresh the page.
  */
-CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
+CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
 
     // The page to load.
     var registration_page = CROWDLOGGER.preferences.get_char_pref( 
@@ -243,15 +168,10 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
                 CROWDLOGGER.gui.study.pages.months_long[the_date.getMonth()],  
                 the_date.getFullYear() );
 
-            //B_DEBUG
-            // CROWDLOGGER.debug.log( "Adding a trail event: [" + trail_event.to_s() + "]\n" );
-            //E_DEBUG 
-
             if( !are_same_day( cur_search_trail, st ) ){
                 cur_search_trail = st;
                 search_trail_array.push( cur_search_trail );
             }
-
             cur_search_trail.add_event( trail_event );
         }
 
@@ -263,9 +183,7 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
             } else if( search_engine.match( /bing/ ) !== null ) {
                 return "http://www.bing.com/search?q=" + encodeURI( query );
             }
-
         };
-
 
         // So we can track the time between queries. We're only going to
         // emit a query if it is the last in a line of rapidly submitted
@@ -286,9 +204,6 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
                     entry.t, "search",
                     to_search_url( entry.q, entry.se), entry.url, entry.se
                 );
-                //B_DEBUG
-                // CROWDLOGGER.debug.log( "Just created a search trail event: " + search_trail_event.to_s() + "\n" );
-                //E_DEBUG
 
                 if( (search_trail_event.time - previous_search_event.time) > 
                         threshold && previous_search_event.time > 0 ) {
@@ -315,27 +230,23 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
                     previous_search_event = new Search_Trail_Event( 
                         0, "", "", "", "" );
                 }
-    
                 add_trail_event( click_event );
-                
             }
-           
         }
         // Don't forget about the last query! 
         if(  previous_search_event.time > 0 ){
             add_trail_event( previous_search_event );
         }
 
-        //B_DEBUG
-        //CROWDLOGGER.debug.log( "Returning " + search_trail_array.length + 
-        //    " day's worth of search trails!\n" );
-        //E_DEBUG
         return search_trail_array;
     };
 
     // The function to call when the page loads.
     /** @ignore */
-    var search_trail_handler = function( doc ){
+    var search_trail_handler = function( doc, refresh ){
+        if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){ return; }
+        CROWDLOGGER.util.mark_page_as_initialized(doc);
+
         var jq = doc.defaultView.jQuery;
 
         // This points to the container on the web page where we will
@@ -357,12 +268,8 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
 
         // This will be called when the file is finished being read.
         var process_entries = function( entries, next ){
-
-            console.log( "Entries: "+ entries );
-
             // Get the search histogram for the log.
             var search_trails = log_to_search_trails_by_day( entries );
-
 
             // The header.
             var html = jq('<table>');
@@ -370,10 +277,6 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
             // Now iterate through the array of search trails in reverse order,
             // separating days with a ruler.
             for( var i = search_trails.length-1; i >= 0; i-- ){
-                //B_DEBUG
-                //CROWDLOGGER.debug.log( "Analyzing search trail " + i + "\n" );
-                //E_DEBUG
-
                 html.append('<tr><td colspan="2" class="date">'+
                     search_trails[i].to_key() +'</td></tr>'); // The date.
 
@@ -431,21 +334,16 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
         
         // Read the activity file in and then call the function above.
         CROWDLOGGER.io.log.read_activity_log( {on_chunk: process_entries} );
-            
     };
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search trails" ); //, 
-            // CROWDLOGGER.gui.tools.diplay_search_trails );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search trails",
+            search_trail_handler );
     } else {
-        if( doc.defaultView && doc.defaultView.jQuery ){
-            doc.defaultView.jQuery('#init').html('initialized');
-            search_trail_handler( doc );
-        }
+        search_trail_handler( doc, refresh );
     }
 };
-
 
 /**
  * Does two things:
@@ -458,12 +356,13 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc ){
  *          file is given.</li>
  * </ol>
  *
- * @param {object} The document on which to display the log. This should have
+ * @param {object} doc The document on which to display the log. This should have
  *      at least two elements: log-area (where the log will be displayed) and
  *      save-log (a link that will either invoke the log to be saved or
  *      open the log file in a new window).
+ * @param {boolean} refresh Whether the page is being refreshed (optional).
  */
-CROWDLOGGER.gui.tools.export_log = function( doc ){
+CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
     // The page to load.
     var registration_page = CROWDLOGGER.preferences.get_char_pref(
         "export_dialog_url", "not_found.html" );
@@ -475,7 +374,10 @@ CROWDLOGGER.gui.tools.export_log = function( doc ){
     var url = extension_prefix + registration_page;  
 
     // Dumps the contents of the log to the given document.
-    var dump_log = function( doc ) {
+    var dump_log = function( doc, refresh ) {
+        if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){ return; }
+        CROWDLOGGER.util.mark_page_as_initialized(doc);
+
         var win = CROWDLOGGER.window;
 
         // Called when the activity log has been parsed.
@@ -502,25 +404,25 @@ CROWDLOGGER.gui.tools.export_log = function( doc ){
                 CROWDLOGGER.util.save_dynamic_text(doc,JSON.stringify(entries));
             };
 
-            doc.getElementById( "log-area" ).innerHTML = 
+            doc.getElementById( 'log-area' ).innerHTML = 
                 JSON.stringify(entries, null, '\t');
 
-            var save_log_elm = doc.getElementById( "save-log" );
-            var description = "Save log (this will create a file with a " +
-                "random string of numbers to your default downloads " +
-                "directory)";
+            var save_log_elm = doc.getElementById( 'save-log' );
+            var description = 'Save log (this will create a file with a ' +
+                'random string of numbers to your default downloads ' +
+                'directory)';
 
-            //CROWDLOGGER.version.info.get_browser_name() === "ff3" ){
+            //CROWDLOGGER.version.info.get_browser_name() === 'ff3' ){
             if( CROWDLOGGER.util.get_dynamic_save_functions() === null ){ 
-                description = "Show log on file system";
+                description = 'Show log on file system';
             }
 
             save_log_elm.innerHTML = description; 
-            save_log_elm.addEventListener(
-                "click", function(e){ save_data_to_file(); }, false ); 
-
+            if( !refresh ){
+                save_log_elm.addEventListener(
+                    'click', function(e){ save_data_to_file(); }, false ); 
+            }    
             next();
-
         };
 
         // Read the activity file in and then call the function above.
@@ -529,16 +431,12 @@ CROWDLOGGER.gui.tools.export_log = function( doc ){
 
     if( doc === undefined ){
         // Open the window and call the handler when the page loads.
-        CROWDLOGGER.gui.windows.open_dialog( url, "search log" );
-            //CROWDLOGGER.gui.tools.export_log );
+        CROWDLOGGER.gui.windows.open_dialog( url, "search log", dump_log );
     } else {
-        if( doc.defaultView && doc.defaultView.jQuery ){
-            doc.defaultView.jQuery('#init').html('initialized');
-            dump_log( doc );
-        }
+        dump_log( doc, refresh );
     }
-  
-
 }
+
+
 
 } // END CROWDLOGGER.gui.tools NAMESPaCE
