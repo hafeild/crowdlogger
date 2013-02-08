@@ -20,8 +20,8 @@ var CROWDLOGGER;
 
 var CSS_PATH = 'chrome/content/css/';
 var CSS_FILES = [
- 'crowdlogger.css',
- 'dialog.css'
+ 'crowdlogger.css'
+ // 'dialog.css'
 ];
 var JS_PATH = 'chrome/content/js/';
 var JS_FILES = [

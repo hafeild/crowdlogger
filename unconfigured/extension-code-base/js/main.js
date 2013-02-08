@@ -13,19 +13,7 @@
 
 
 if( CROWDLOGGER === undefined ) {
-/* 
-    // Says: true if this is the first window or the opener doesn't have this
-    // namespace.
-    (!window.opener || window.opener.CROWDLOGGER === undefined ) &&
-    (window.parent === undefined || window.parent === window ) ){
-
-dump( "window === window.parent? : " + ( window === window.parent ) + "\n" );
-
-var util = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor).getInterface(Components.interfaces.nsIDOMWindowUtils);  
-var windowID = util.outerWindowID;
-dump( "window.id: " +  windowID + "\n" );
-*/
-
+    
 /**
  * A new object to create the CrowdLogger namespace.
  *
@@ -44,11 +32,6 @@ var CROWDLOGGER = {
 
 
 CROWDLOGGER.check_if_new_instance = function() {
-
-    
-    //B_DEBUG
-    //dump( "Checking if CROWDLOGGER exists...\n" );    
-    //E_DEBUG
     var wm, enumerator;
 
     // A catch for Chrome (the rest of this function is for FF).
@@ -89,26 +72,15 @@ CROWDLOGGER.check_if_new_instance = function() {
         var util = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor).
                 getInterface(Components.interfaces.nsIDOMWindowUtils); 
         var window_id = util.outerWindowID;
-        
-        //B_DEBUG
-        //dump( "Looking at window: " + window_id + "\n" );
-        //E_DEBUG
 
 
         if( win.CROWDLOGGER !== undefined && win.CROWDLOGGER.initialization_in_progress ) {
             window.CROWDLOGGER = win.CROWDLOGGER;
             add_listeners();
-            //B_DEBUG
-            //dump( "Found a window that has CROWDLOGGER (window " + window_id +
-            //    ")\n" );    
-            //E_DEBUG
             return;
         } else if( min_id === -1 || window_id < min_id ) {
             min_id = window_id;
             min_window = win;
-            //B_DEBUG
-            //dump( "Setting min id to: " + window_id + "\n" );    
-            //E_DEBUG
         }
 
         if( win === window ) {
@@ -118,17 +90,10 @@ CROWDLOGGER.check_if_new_instance = function() {
 
     // If this is the smallest window, initalize things.
     if( window === min_window ) {
-        //B_DEBUG
-        //dump( "This window (" + this_window_id + ") is being initialized.\n" );
-        //E_DEBUG
         CROWDLOGGER.initialize();
     } else {
     // Otherwise, set this instance's CROWDLOGGER to the smallest window's 
     // CROWDLOGGER.
-        //B_DEBUG
-        //dump( "This window (" + this_window_id + ") is waiting for window " +
-        //        min_id + ".\n" );
-        //E_DEBUG
         CROWDLOGGER = min_window.CROWDLOGGER;
         add_listeners();
     }
@@ -164,18 +129,7 @@ CROWDLOGGER.initialize = function(){
     
     // Initializes everything that needs initializing.
     var init = function(){
-        //B_DEBUG
-        //dump( "\n\n===> Intializing current window <===\n\n" );
-        //E_DEBUG
-
-
-        //B_DEBUG
-        //CROWDLOGGER.debug.log( "Initializing all of the components...\n" );
-        //E_DEBUG
-
-        dump("Initializing CROWDLOGGER.debug.log....");
         CROWDLOGGER.debug.init();
-        dump("done!\n");
         CROWDLOGGER.preferences.init();
         CROWDLOGGER.preferences.defaults.set_defaults();
         CROWDLOGGER.debug.reinit();

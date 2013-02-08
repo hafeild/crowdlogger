@@ -10,12 +10,7 @@
     font-style: normal;
 }
 
-html {
-    /*font-family: "Open Sans Condensed", arial;*/
-    font-family: OpenSans, arial;
-}
-
-ul.flush{
+body.chrome-menu ul.flush {
     margin: 0px;
     padding: 0px;
     padding-left: 5px;
@@ -23,6 +18,7 @@ ul.flush{
 body.chrome-menu {
     min-width: 300px;
     margin-bottom:   25px;
+    font-family: OpenSans, arial;
 }
 
 /*.menuitem-iconic, .menu-iconic-left, .menuitem-iconic-left {

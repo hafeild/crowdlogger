@@ -47,9 +47,10 @@ CROWDLOGGER.io.IndexedDB = function(){
         ERROR_LOG_STORE_NAME = 'error_log',
         DATABASE_SIZE = 10 * 1024 * 1024, // 10 MB
         VERSION = 1,
-        VERSIONCHANGE = 'versionchange',
-        READONLY = 'readonly',
-        READWRITE = 'readwrite',
+        VERSIONCHANGE = IDBTransaction ? IDBTransaction.VERSION_CHANGE : 
+            'versionchange',
+        READONLY = IDBTransaction ? IDBTransaction.READ_ONLY : 'readonly',
+        READWRITE = IDBTransaction ? IDBTransaction.READ_WRITE : 'readwrite',
         NEXT = 'next',
         NEXTUNIQUE = 'nextunique',
         PREV = 'prev',

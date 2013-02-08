@@ -279,8 +279,6 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
     
     // If this is firefox.
     if( browser_name.match( /^ff/ ) !== null ) {
-        dump('Updating ff buttons...\n');
-
         var wm = Components.classes['@mozilla.org/appshell/window-mediator;1']
                        .getService(Components.interfaces.nsIWindowMediator);
         var enumerator = wm.getEnumerator('navigator:browser');
@@ -293,12 +291,9 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         while(enumerator.hasMoreElements()) {
             var win = enumerator.getNext();
             
-            dump('Updating buttons for a window...\n');
-
             //B_DEBUG
             CROWDLOGGER.debug.log( '\tWindow '+ win +': '+ win.parent +'\n' );
             //E_DEBUG
-    
     
             // This is the button that is located on the toolbar (or in the 
             // palette)

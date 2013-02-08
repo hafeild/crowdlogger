@@ -66,7 +66,6 @@ CROWDLOGGER.logging.toggle_logging = function( event ){
     var enable_logging = !CROWDLOGGER.preferences.get_bool_pref(
             'logging_enabled', false );
 
-    dump('Toggling logging...\n');
     CROWDLOGGER.logging.set_logging( enable_logging );
 };
 
