@@ -164,11 +164,6 @@ function load_xul_for_window(win){
         return;
     }
 
-    // var style = win.document.createProcessingInstruction('xml-stylesheet',
-    //     'id="crowdlogger-css", type="text/css", '+
-    //     'href="chrome://crowdlogger/content/css/crowdlogger.css"');
-    // win.document.insertBefore(style, win.document.documentElement);
-
     // Add the buttons to the palette.
     // Toolbar button, which goes on the palette.
     var crowdlogger_button = create_xul_element(win, 'toolbarbutton', {
@@ -241,6 +236,38 @@ function load_xul_for_window(win){
     }));
 }
 
+function unload_xul(){
+    var wm = Components.classes['@mozilla.org/appshell/window-mediator;1']
+                   .getService(Components.interfaces.nsIWindowMediator);
+    wm.removeListener(WindowListener);
+
+    var enumerator = wm.getEnumerator('navigator:browser');
+
+    // Loop through each of the open windows and update the buttons.
+    while(enumerator.hasMoreElements()) {
+        var win = enumerator.getNext();
+        remove_buttons_from_window(win, listeners_placed);
+    }
+}
+
+function remove_buttons_from_window( win, listeners ) {
+    var id, i;
+    for( id in listeners ){
+        var elm = win.document.getElementById(id);
+        dump('Looking at id='+ id +'; elm: '+ elm +'\n');
+        if( elm ){
+            for(i = 0; i < listeners[id].length; i++){
+                dump('\tremoving listener: '+ listeners[id][i][0] +'\n');
+                elm.removeEventListener(
+                    listeners[id][i][0], listeners[id][i][1]);
+            }
+            var x = elm.parentNode.removeChild(elm);
+            dump('\tremoving element: '+ x +'\n');
+        }
+    }
+    win.CROWDLOGGER = undefined;
+}
+
 
 function startup(data, reason) {
     //setTimeout(load_xul, 1500);
@@ -257,11 +284,22 @@ function startup(data, reason) {
 
         load_css(addon);
         load_xul();
+
+        dump('CROWDLOGGER enabled? : '+ CROWDLOGGER.enabled );
     });
 }
 
 function shutdown(data, reason) {
+    CROWDLOGGER.enabled = false;
 
+    // Uninstall all of the listeners placed by CROWDLOGGER.
+    CROWDLOGGER.logging.event_listeners.uninstall_listener();
+
+    // Remove all of the buttons.
+    unload_xul();
+
+    // Unset CROWDLOGGER.
+    CROWDLOGGER = undefined;
 }
 
 function install(data, reason) {

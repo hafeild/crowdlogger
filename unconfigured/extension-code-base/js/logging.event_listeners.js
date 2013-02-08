@@ -29,7 +29,19 @@ if( CROWDLOGGER.logging.event_listeners === undefined ){
  * @param {Object} current_window For FF -- this should refer to the window to 
  *      which listeners should be attached.
  */
-CROWDLOGGER.logging.event_listeners = {};
+CROWDLOGGER.logging.event_listeners = {
+    placed_listeners: {},
+    id: 0
+};
+
+CROWDLOGGER.logging.event_listeners.mk_listener_observer = function(on_unload){
+    var observer = {
+        id: CROWDLOGGER.logging.event_listeners.id++,
+        on_unload: on_unload
+    };
+    CROWDLOGGER.logging.event_listeners.placed_listeners[observer.id]= observer;
+    return observer; 
+}
 
 CROWDLOGGER.logging.event_listeners.initialize = function(current_window){
     if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null ){
@@ -41,6 +53,22 @@ CROWDLOGGER.logging.event_listeners.initialize = function(current_window){
 
 };
 
+CROWDLOGGER.logging.event_listeners.uninstall_listener = function( id ){
+    if( id === undefined ){
+        var x;
+        for( x in CROWDLOGGER.logging.event_listeners.placed_listerns ){
+            if( CROWDLOGGER.logging.event_listeners.placed_listerns[x] ){
+                CROWDLOGGER.logging.event_listeners.
+                    placed_listerns[x].on_unload();
+            }
+            delete CROWDLOGGER.logging.event_listeners.placed_listerns[x];
+        }
+    } else {
+        var obj = CROWDLOGGER.logging.event_listeners.placed_listerns[id];
+        if( obj ){ obj.on_unload(); }
+        delete CROWDLOGGER.logging.event_listeners.placed_listerns[id];
+    }
+}
 
 /**
  * Initializes the listeners for Google Chrome.
@@ -56,10 +84,6 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
             CROWDLOGGER.logging.log_page_loaded( new Date().getTime(), tab_id,
                 tab.url );
     
-            //B_DEBUG
-            //CROWDLOGGER.debug.log( "Injecting script\n" );
-            //E_DEBUG
-    
             // Inject the code.
             chrome.tabs.executeScript( tab_id, {
                 // Stringify the function above and remove the 'function(..){'
@@ -71,7 +95,6 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
                 // We want to inject this script into all frames.
                 allFrames: true
             });
-
 
             // Update the tab information and log a focus, if necessary.
             if( tab.selected &&
@@ -86,7 +109,6 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
                     tab_id: tab_id,
                     url: tab.url
                 };
-
             }
         }
     };
@@ -155,8 +177,7 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
         //B_DEBUG
         //CROWDLOGGER.debug.log( message );
         //E_DEBUG
-    }
-);
+    });
 
 };
 
@@ -165,14 +186,14 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
  */
 CROWDLOGGER.logging.event_listeners.initialize_for_firefox = function(
         current_window ){
-    // The page listener -- this is what will take care of logging searches
-    // (on search pages) and clicks.
-//    CROWDLOGGER.logging.event_listeners.add_page_load_listeners_firefox(
-//        current_window );
     //B_DEBUG
     CROWDLOGGER.debug.log( "About to initialize tab listeners for firefox.\n" );
     //E_DEBUG
 
+    CROWDLOGGER.logging.event_listeners.mk_listener_observer(function(){
+        current_window.gBrowser.removeTabsProgressListener(
+            CROWDLOGGER.logging.event_listeners.tab_listener_firefox );
+    });
     current_window.gBrowser.addTabsProgressListener(
         CROWDLOGGER.logging.event_listeners.tab_listener_firefox );
 
@@ -202,14 +223,13 @@ CROWDLOGGER.logging.event_listeners.tab_update_listener_chrome = function(
             tab.url );
 
         // Inject the code.
-        //B_DEBUG
-        CROWDLOGGER.debug.log( "Injecting script:\n" +
-            String(
-                CROWDLOGGER.logging.event_listeners.inject_page_listeners).
-                    replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, "" ).
-                    replace( /\s*\}\s*$/, "") );
-        //E_DEBUG
-
+        // //B_DEBUG
+        // CROWDLOGGER.debug.log( "Injecting script:\n" +
+        //     String(
+        //         CROWDLOGGER.logging.event_listeners.inject_page_listeners).
+        //             replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, "" ).
+        //             replace( /\s*\}\s*$/, "") );
+        // //E_DEBUG
 
         chrome.tabs.executeScript( tab_id, {
             // Stringify the function above and remove the 'function(..){' and
@@ -222,7 +242,6 @@ CROWDLOGGER.logging.event_listeners.tab_update_listener_chrome = function(
             allFrames: true
         });
     }
-
 };
 
 /**
@@ -248,7 +267,8 @@ CROWDLOGGER.logging.event_listeners.extract_tab_id_ff = function(browser){
  * Injects the script that attaches search and link listeners on content pages.
  * Also logs that a page has been loaded.
  */
-CROWDLOGGER.logging.event_listeners.add_page_load_listeners_firefox = function(current_window){
+CROWDLOGGER.logging.event_listeners.add_page_load_listeners_firefox = 
+        function(current_window){
 
     // Add a listener for new pages being loaded in tabs in this window.
     current_window.addEventListener( "load", function(){
@@ -305,8 +325,16 @@ CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener =
                 }
             }
 
+            var observer = CROWDLOGGER.logging.event_listeners.
+                mk_listener_observer(function(){
+                    uninit();
+                });
+            
             // When the window closes, remove these listeners.
-            the_window.addEventListener( "unload", uninit, false );
+            the_window.addEventListener( "unload", function(){
+                CROWDLOGGER.logging.event_listeners.uninstall_listener(
+                    observer.id );
+            }, false );
 
             // Log the currently selected tab as the current tab.
             select_current_tab();
@@ -379,7 +407,8 @@ CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener =
             
             // Get the browser and tab id.
             browser = the_window.gBrowser.getBrowserForTab( e.target );
-            tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff( browser );
+            tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff( 
+                browser );
 
             //B_DEBUG
             CROWDLOGGER.debug.log( "Tab removed: " + tab_id + "\n" );
@@ -395,7 +424,8 @@ CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener =
 
             // Get the browser and tab id.
             browser = the_window.gBrowser.getBrowserForTab( e.target );
-            tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff( browser );
+            tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff( 
+                browser );
 
             // Attempt to extract a URL.
             try{
@@ -449,15 +479,9 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
                 nsIWebProgressListener.STATE_STOP ) &&
              ( state_flags & Components.interfaces.
                 nsIWebProgressListener.STATE_IS_WINDOW ) ) {
-            /*//B_DEBUG
-            CROWDLOGGER.debug.log(
-                "Tab " + tab_id + " Injecting event listeners into " + web_progress.DOMWindow.document.URL + "\n" );
-            //E_DEBUG*/
 
             CROWDLOGGER.logging.event_listeners.inject_page_listeners(
                 web_progress.DOMWindow ); //browser.contentWindow );
-
-
         }
 
     },
@@ -580,14 +604,6 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win){
             if( search_page_info.is_search_page ){
                 search_page_info.query = search_page_info.search_box.value;
             }
-
-
-            /*//B_DEBUG
-            log( "In Click\n\ttagName: " + e.target.tagName + 
-                "\n\tclicked_url: " + clicked_url +
-                "\n\thref: " + e.target.href + 
-                "\n\thref_orig: " + e.target.href_orig );
-            //E_DEBUG*/
     
             info = {
                     time: new Date().getTime(),

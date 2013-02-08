@@ -98,13 +98,11 @@ CROWDLOGGER.logging.set_logging = function( enable_logging ){
         }]
     });
 
-
     CROWDLOGGER.preferences.set_bool_pref( 'logging_enabled',
         enable_logging );
 
     // Update the buttons.
     CROWDLOGGER.gui.buttons.update_logging_buttons( enable_logging );
-
 };
 
 /**
@@ -141,7 +139,8 @@ CROWDLOGGER.logging.log_click = function( time, clicked_url,
     var click_event, is_search_result, log_entry;
 
     // Make sure that logging is turned on. If not, just return.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
@@ -181,7 +180,8 @@ CROWDLOGGER.logging.log_click = function( time, clicked_url,
 CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id, 
         src_url ){
     // Make sure that logging is turned on. If not, just return.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
@@ -206,7 +206,8 @@ CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id,
  */
 CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
     // Make sure that logging is turned on. If not, just return.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
@@ -230,7 +231,8 @@ CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
  */
 CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
     // Make sure that logging is turned on. If not, just return.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
@@ -256,7 +258,8 @@ CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
  */
 CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
     // Make sure that logging is turned on. If not, just return.
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
@@ -284,7 +287,8 @@ CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
 CROWDLOGGER.logging.log_search = function( time, query, search_engine, url ){
     // Make sure that logging is turned on. Also check how long the query is --
     // if it's too long, we're not going to log it. 
-    if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ||
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )||
         query.length > CROWDLOGGER.logging.MAX_QUERY_LENGTH ){
         return false;
     }

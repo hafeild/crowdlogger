@@ -254,7 +254,7 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
                 ' ' + display_data.menu_class_name );
 
             // Update the label and tooltip text for the menu button.
-            menu_button.label = display_data.menu_label;
+            menu_button.setAttribute( 'label', display_data.menu_label );
             menu_button.setAttribute( 'tooltiptext',  
                     display_data.menu_hover_text );
 
@@ -268,6 +268,7 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
                 toolbar_button.getAttribute( 'class' ) + '\n' );
             //E_DEBUG
         } catch (ex) {
+            CROWDLOGGER.debug.log('Error updating buttons: '+ ex);
             CROWDLOGGER.io.log.write_to_error_log( {data: [{
                 f: 
                 'CROWDLOGGER.gui.buttons.update_logging_buttons.set_buttons_ff',

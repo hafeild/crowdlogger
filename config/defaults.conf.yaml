@@ -12,8 +12,8 @@ CREATOR: CIIR
 HOMEPAGE: http://code.google.com/p/crowdlogger/
 ID: crowdlogger@myurl.org
 CONTACT_EMAIL: name@email
-FF_MIN_VERSION: 3.5
-FF_MAX_VERSION: 16.0.*
+FF_MIN_VERSION: 16
+FF_MAX_VERSION: 20.*
 
 
 ## Server info. The url does not need to be https.

@@ -315,7 +315,7 @@ CROWDLOGGER.experiments.check_for_new_experiments = function( update_interval,
     );
 
     // After some period, check again.
-    if( start_process ){
+    if( CROWDLOGGER.enabled && start_process ){
         setTimeout( function(){ 
             CROWDLOGGER.experiments.check_for_new_experiments( 
                 update_interval, start_process, on_new_experiments, 

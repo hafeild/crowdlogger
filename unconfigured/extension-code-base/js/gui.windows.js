@@ -23,7 +23,9 @@ if( CROWDLOGGER.gui.windows === undefined ) {
  * @namespace Contains window functionalities, such as opening tabs,
  * windows, and dialogs.
  */
-CROWDLOGGER.gui.windows = {};
+CROWDLOGGER.gui.windows = {
+    open_dialogs: {}
+};
 
 /**
  * Opens the given url in a dialog. In Firefox, the window.openDialog method
@@ -41,23 +43,6 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
     var browser_name = CROWDLOGGER.version.info.get_browser_name();
 
     if( browser_name.match( /^ff/ ) !== null ){
-/*        
-        var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                       .getService(Components.interfaces.nsIWindowMediator);
-        var main_window = wm.getMostRecentWindow("navigator:browser");
-        main_window.gBrowser.selectedTab = main_window.gBrowser.addTab(url);
-        var newTabBrowser = gBrowser.getBrowserForTab(gBrowser.selectedTab);
-        
-
-//        var dlg = window.openDialog( url, name, "all", CROWDLOGGER );
-        
-        newTabBrowser.addEventListener( "load", function(){
-            var doc = newTabBrowser.contentDocument;
-            callback( doc );
-        }, true);
-
-*/
-
         var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
                        .getService(Components.interfaces.nsIWindowMediator);
         var main_window = wm.getMostRecentWindow("navigator:browser");
@@ -67,14 +52,22 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
             options = "width=1000,height=700,resizable";
         }
 
-        var dlg = window.openDialog( url, name, options, "dialog" );
-        //main_window.gBrowser.moveTabTo( dlg.gBrowser.selectedTab, 0 );
-        
-        dlg.addEventListener( "load", function(){
-            var doc = dlg.document;
+        var tab = CROWDLOGGER.gui.windows.open_dialogs[url] || 
+            main_window.gBrowser.addTab(url);
+        var tab_browser = main_window.gBrowser.getBrowserForTab(tab);
+        CROWDLOGGER.gui.windows.open_dialogs[url] = tab;
+
+        main_window.gBrowser.selectedTab = tab;
+
+        tab_browser.addEventListener('load', function(){
+            var doc = tab_browser.contentDocument;
+            tab_browser.contentWindow.CROWDLOGGER = CROWDLOGGER;
             if( callback ){
-                callback( doc, dlg );
+                callback( doc );
             }
+            tab_browser.contentWindow.addEventListener('unload', function(){
+                delete CROWDLOGGER.gui.windows.open_dialogs[url];
+            }, true);
         }, true);
 
 

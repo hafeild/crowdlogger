@@ -28,20 +28,22 @@ function init(){
     }
 
     // Try to get the CROWDLOGGER object.
-    try{
-        // Chrome.
+    if( !CROWDLOGGER ){
         try{
-            CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
-        // Firefox.
-        } catch (e) {
-            CROWDLOGGER = opener.CROWDLOGGER;
-        }
-    } catch(e){
-        if( parent && parent.CROWDLOGGER ){
-            CROWDLOGGER = parent.CROWDLOGGER;
-        } else {
-            setTimeout( init, 20 );
-            return false;
+            // Chrome.
+            try{
+                CROWDLOGGER = chrome.extension.getBackgroundPage().CROWDLOGGER;
+            // Firefox.
+            } catch (e) {
+                CROWDLOGGER = opener.CROWDLOGGER;
+            }
+        } catch(e){
+            if( parent && parent.CROWDLOGGER ){
+                CROWDLOGGER = parent.CROWDLOGGER;
+            } else {
+                setTimeout( init, 20 );
+                return false;
+            }
         }
     }
   

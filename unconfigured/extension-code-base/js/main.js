@@ -27,7 +27,8 @@ var CROWDLOGGER = {
     initialized: false,
     window: window,
     jq: jQuery,
-    messages: null
+    messages: null,
+    enabled: true
 };
 
 
@@ -146,7 +147,7 @@ CROWDLOGGER.initialize = function(){
         report_version_info();
 
         //B_DEBUG
-        CROWDLOGGER.debug.log( "Setting unintall observers...\n" );
+        CROWDLOGGER.debug.log( "Setting uninstall observers...\n" );
         //E_DEBUG
 
         // Initialize the un-install and quit observers.

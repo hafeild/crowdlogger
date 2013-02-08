@@ -250,7 +250,7 @@ CROWDLOGGER.study.initiate_check_for_new_messages = function( timeout ){
 
     // Check the server.
     setTimeout( function(){
-        CROWDLOGGER.study.check_for_new_messages( 0, true, on_server_response );
+        CROWDLOGGER.study.check_for_new_messages(0,true,on_server_response);
     }, timeout );
 }
 
@@ -311,15 +311,12 @@ CROWDLOGGER.study.check_for_new_messages = function( timeout, do_continue,
 
         // Set a timeout for another call to this if the do_continue flag
         // was set to true.
-        if( do_continue ){
+        if( CROWDLOGGER.enabled && do_continue ){
             setTimeout( check_status, check_message_interval );
         }
     }
 
-
     setTimeout( check_status, timeout );
-
-     
 };
 
 
@@ -513,10 +510,12 @@ CROWDLOGGER.study.initialize_notification_check_process = function(
         }
 
         // Check again a little later.
-        setTimeout( check_notifications, 
-            CROWDLOGGER.preferences.get_int_pref( 
-                'notification_check_interval', frequency ) 
-        );
+        if( CROWDLOGGER.enabled ){
+            setTimeout( check_notifications, 
+                CROWDLOGGER.preferences.get_int_pref( 
+                    'notification_check_interval', frequency ) 
+            );
+        }
     };
     
     // Set the timeout for the initial check.
