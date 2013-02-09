@@ -178,6 +178,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // TODO Implement all the dynamic things to stick on the page.
     var jq = doc.defaultView.jQuery; 
 
+    if( !jq ){ return };
+
     // Get the elements we need to populate.
     var notification_elm = jq('#notifications').html('');
     var messages_elm     = doc.getElementById( 'messages' );
@@ -530,8 +532,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             } else {
                 //notifications += '</table>';
                 //B_DEBUG   
-                CROWDLOGGER.debug.log( 'Added ' + notifications + 
-                    ' to the status page.\n' );
+                // CROWDLOGGER.debug.log( 'Added ' + notifications + 
+                //     ' to the status page.\n' );
                 //E_DEBUG
                 //notification_elm.innerHTML = notifications;
                 notification_elm.append(notifications);
@@ -611,10 +613,10 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
         var html = '<span class=\"note\">None</span>';
         if( CROWDLOGGER.session_data.keep_running_experiments === true ){
             //B_DEBUG
-            CROWDLOGGER.debug.log( 'running_doc_element: ' + 
-                running_doc_element + 
-                '\nCROWDLOGGER.session_data.keep_running_experiments: ' + 
-                CROWDLOGGER.session_data.keep_running_experiments + '\n' );
+            // CROWDLOGGER.debug.log( 'running_doc_element: ' + 
+            //     running_doc_element + 
+            //     '\nCROWDLOGGER.session_data.keep_running_experiments: ' + 
+            //     CROWDLOGGER.session_data.keep_running_experiments + '\n' );
             //E_DEBUG
 
             current_running_job_id = JSON.parse(
@@ -662,8 +664,8 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
             }
         }
 
-        CROWDLOGGER.debug.log('start_index: '+ start_index +
-          '; upcoming_doc_element.innerHTML: '+ upcoming_doc_element.innerHTML);
+        // CROWDLOGGER.debug.log('start_index: '+ start_index +
+        //   '; upcoming_doc_element.innerHTML: '+ upcoming_doc_element.innerHTML);
 
         if( upcoming_doc_element && upcoming_doc_element.innerHTML !== html ) {
             upcoming_doc_element.innerHTML = html;
@@ -677,10 +679,10 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
                     'N/A' );
 
             //B_DEBUG
-            CROWDLOGGER.debug.log( 'Last run job_id: ' + job_id + '\n' +
-                'Ran experiments: ' + CROWDLOGGER.preferences.get_char_pref(
-                        'ran_experiments' ) 
-                );
+            // CROWDLOGGER.debug.log( 'Last run job_id: ' + job_id + '\n' +
+            //     'Ran experiments: ' + CROWDLOGGER.preferences.get_char_pref(
+            //             'ran_experiments' ) 
+            //     );
             //E_DEBUG
 
             if( job_id === 'N/A' || job_id === '' ){
@@ -855,7 +857,7 @@ CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_jq, jq ){
                 var line = lines[i];
 
                 //B_DEBUG
-                CROWDLOGGER.debug.log( 'line: ' + line + '\n' );
+                // CROWDLOGGER.debug.log( 'line: ' + line + '\n' );
                 //E_DEBUG
 
                 var columns = line.split( '\t' );

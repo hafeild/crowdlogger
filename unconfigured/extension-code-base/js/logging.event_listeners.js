@@ -895,9 +895,9 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win){
 
             // If there are links being added, place listeners on them.
             if( sublinks !== undefined && sublinks.length > 0 ){
-                if( search_page_info.search_engine.match(/google/) !== null) {
+                if( search_page_info.search_engine &&
+                    search_page_info.search_engine.match(/google/) !== null) {
                     check_query_status();
-
                 }
                 //B_DEBUG
                 //log( "\t" + sublinks.length + " links removed" );
@@ -932,9 +932,8 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win){
             
             // If there are links being added, place listeners on them.
             if( sublinks !== undefined && sublinks.length > 0 ){
-                if( search_page_info.search_engine.match(/google/) !== null) {
-
-
+                if( search_page_info.search_engine && 
+                    search_page_info.search_engine.match(/google/) !== null) {
                     check_query_status();
 
                 }

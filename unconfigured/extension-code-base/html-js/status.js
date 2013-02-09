@@ -77,14 +77,12 @@ function refresh_page(){
  * page has been initialized yet.
  */
 function check_if_initialized(){
-    var init_elm = jQuery("#init");
-    if( init_elm.length > 0 ){
-        if( init_elm.innerHTML === "" ){
-            CROWDLOGGER.gui.study.pages.refresh_status_page( document );
-        }
+    if( jQuery('#init').html() !== 'initialized' ){
+        CROWDLOGGER.debug.log('Initializing from status.js\n');
+        CROWDLOGGER.gui.study.pages.refresh_status_page( document );
     }
 
-    if( experimentRefreshActivated === false ) {
+    if( !experimentRefreshActivated ) {
         experimentRefreshActivated = true;
         refreshExperimentStats();
     }

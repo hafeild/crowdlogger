@@ -43,34 +43,57 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
     var browser_name = CROWDLOGGER.version.info.get_browser_name();
 
     if( browser_name.match( /^ff/ ) !== null ){
-        var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                       .getService(Components.interfaces.nsIWindowMediator);
-        var main_window = wm.getMostRecentWindow("navigator:browser");
+        var tab, main_window, tab_browser, on_unload, doc;
 
-        // Check if the invoker provided any options. If not, use the defaults.
-        if( options === undefined ) {
-            options = "width=1000,height=700,resizable";
+        // See if there's already a tab for this dialog -- we'll only open one.
+        if( CROWDLOGGER.gui.windows.open_dialogs[url] &&
+                CROWDLOGGER.gui.windows.open_dialogs[url][2].contentWindow &&
+                CROWDLOGGER.gui.windows.open_dialogs[url][2].
+                    contentWindow.location.href === url ){
+            tab = CROWDLOGGER.gui.windows.open_dialogs[url][0];
+            main_window = CROWDLOGGER.gui.windows.open_dialogs[url][1];
+            tab_browser = CROWDLOGGER.gui.windows.open_dialogs[url][2];
+        } else {
+            var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                       .getService(Components.interfaces.nsIWindowMediator);
+            main_window = wm.getMostRecentWindow("navigator:browser");
+            tab = main_window.gBrowser.addTab(url);
+            tab_browser = main_window.gBrowser.getBrowserForTab(tab);
         }
 
-        var tab = CROWDLOGGER.gui.windows.open_dialogs[url] || 
-            main_window.gBrowser.addTab(url);
-        var tab_browser = main_window.gBrowser.getBrowserForTab(tab);
-        CROWDLOGGER.gui.windows.open_dialogs[url] = tab;
-
+        // Focus the window.
+        main_window.focus();
         main_window.gBrowser.selectedTab = tab;
 
+        // Save the windows so we can access them later.
+        CROWDLOGGER.gui.windows.open_dialogs[url]=[tab,main_window,tab_browser];
+
+        
+
+        // var on_unload = function(){
+        //     // As soon as the dialog content is unloaded (either the tab is
+        //     // closed or the user navigates away), remove the entry in the
+        //     // open_dialogs map.
+        //     CROWDLOGGER.debug.log('Url: '+ doc.location.href);
+        //     if( doc.location.href === url ){
+        //         tab_browser.contentWindow.addEventListener('unload',
+        //             on_unload, true);
+        //     } else {
+        //         delete CROWDLOGGER.gui.windows.open_dialogs[url];
+        //     }
+        // };
+
+        // Invoke the callback and establish a connection to the CROWDLOGGER
+        // variable so the dialog has access.
         tab_browser.addEventListener('load', function(){
             var doc = tab_browser.contentDocument;
             tab_browser.contentWindow.CROWDLOGGER = CROWDLOGGER;
-            if( callback ){
-                callback( doc );
+            if( callback ){ 
+                CROWDLOGGER.debug.log('Initializing from gui.windows.js\n');
+                callback( doc ); 
             }
-            tab_browser.contentWindow.addEventListener('unload', function(){
-                delete CROWDLOGGER.gui.windows.open_dialogs[url];
-            }, true);
+            // tab_browser.contentWindow.addEventListener('unload',on_unload,true);
         }, true);
-
-
 
     } else if( browser_name === "chrome" ) {
         var created_tab_id;

@@ -19,7 +19,6 @@ function add_listeners(){
         refresh_page();
         return false;
     });
-
 }
 
 /**
@@ -27,7 +26,10 @@ function add_listeners(){
  * has been initialized yet.
  */
 function check_if_initialized(){
-    CROWDLOGGER.gui.tools.diplay_search_histogram( document );
+    if( jQuery('#init').html() !== 'initialized' ){
+        //CROWDLOGGER.gui.tools.diplay_search_histogram( document );
+        refresh_page();
+    }
 }
 
 /**

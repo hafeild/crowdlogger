@@ -119,7 +119,7 @@ CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff = function(){
      */
     var check_if_toggle_button_added = function(){
 //B_DEBUG
-        CROWDLOGGER.debug.log( 'We\'re in check_if_toggle_button_added()\n' );
+        // CROWDLOGGER.debug.log( 'We\'re in check_if_toggle_button_added()\n' );
 //E_DEBUG
         var toolbar = document.getElementById( 'nav' );
 
@@ -190,8 +190,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
             'logging_enabled' );
     }
 
-    CROWDLOGGER.debug.log( 'Updating the buttons [loggingEnabled = ' +
-        turn_logging_on + ']\n' );
+    // CROWDLOGGER.debug.log( 'Updating the buttons [loggingEnabled = ' +
+    //     turn_logging_on + ']\n' );
 
     // The logging on/off css class names; we're going to need these
     // in a few places, so this will help us from mistyping them.
@@ -264,8 +264,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
                 ' ' + display_data.status_page_class );
         
             //B_DEBUG
-            CROWDLOGGER.debug.log( '\t\ttoolbar button class: ' + 
-                toolbar_button.getAttribute( 'class' ) + '\n' );
+            // CROWDLOGGER.debug.log( '\t\ttoolbar button class: ' + 
+            //     toolbar_button.getAttribute( 'class' ) + '\n' );
             //E_DEBUG
         } catch (ex) {
             CROWDLOGGER.debug.log('Error updating buttons: '+ ex);
@@ -285,15 +285,15 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         var enumerator = wm.getEnumerator('navigator:browser');
     
         //B_DEBUG
-        CROWDLOGGER.debug.log( 
-            'Iterating through windows to update toggle button.\n' );
+        // CROWDLOGGER.debug.log( 
+        //     'Iterating through windows to update toggle button.\n' );
         //E_DEBUG
         // Loop through each of the open windows and update the buttons.
         while(enumerator.hasMoreElements()) {
             var win = enumerator.getNext();
             
             //B_DEBUG
-            CROWDLOGGER.debug.log( '\tWindow '+ win +': '+ win.parent +'\n' );
+            // CROWDLOGGER.debug.log( '\tWindow '+ win +': '+ win.parent +'\n' );
             //E_DEBUG
     
             // This is the button that is located on the toolbar (or in the 
@@ -362,8 +362,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         // Iterate through each of the popup windows.
         var tabs = chrome.extension.getViews( {type: 'popup'} );
         //B_DEBUG
-        CROWDLOGGER.debug.log( 'Iterating through ' + tabs.length + 
-            ' popup windows.\n' );
+        // CROWDLOGGER.debug.log( 'Iterating through ' + tabs.length + 
+        //     ' popup windows.\n' );
         //E_DEBUG
         for( var i = 0; i < tabs.length; i++ ){
             change_icons_on_page( tabs[i].document );

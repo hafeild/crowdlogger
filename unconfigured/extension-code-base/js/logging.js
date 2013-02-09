@@ -54,7 +54,7 @@ CROWDLOGGER.logging = {
  */
 CROWDLOGGER.logging.toggle_logging = function( event ){
     //B_DEBUG
-    CROWDLOGGER.debug.log( 'Toggling logging.\n' );
+    // CROWDLOGGER.debug.log( 'Toggling logging.\n' );
     //E_DEBUG
   
     if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){
