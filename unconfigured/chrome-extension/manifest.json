@@ -23,5 +23,8 @@
         "unlimitedStorage",
         "tabs",
         "<all_urls>"
-    ]
+    ],
+    "sandbox": {
+        "pages": ["html/clrm.html"]
+    }
 }

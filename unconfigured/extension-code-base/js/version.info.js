@@ -23,7 +23,10 @@ if( CROWDLOGGER.version.info === undefined ){
  * @namespace Contains functions to get and set version information about
  * the CrowdLogger extension.
  */
-CROWDLOGGER.version.info = {};
+CROWDLOGGER.version.info = {
+    is_firefox: false,
+    is_chrome: false
+};
 
 CROWDLOGGER.version.info.init = function(){
  
@@ -67,9 +70,12 @@ CROWDLOGGER.version.info.get_browser_name = (function(){
         this.compareVersions = function(v1, v2){
             return version_checker.compare(v1, v2);
         }
+
+        CROWDLOGGER.version.info.is_firefox = true;
         
     } catch (e) {
         browser_name = "chrome";
+        CROWDLOGGER.version.info.is_chrome = true;
     }
 
     return function(){

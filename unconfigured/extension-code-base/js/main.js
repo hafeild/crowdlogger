@@ -28,7 +28,8 @@ var CROWDLOGGER = {
     window: window,
     jq: jQuery,
     messages: null,
-    enabled: true
+    enabled: true,
+    clrmi: undefined
 };
 
 
@@ -142,6 +143,7 @@ CROWDLOGGER.initialize = function(){
         CROWDLOGGER.logging.init();
         CROWDLOGGER.uninstall.init();
         CROWDLOGGER.version.util.init();
+        CROWDLOGGER.api = {cli: new CLI(CROWDLOGGER)};
 
         // Print out version info.
         report_version_info();

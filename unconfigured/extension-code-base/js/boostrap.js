@@ -57,6 +57,16 @@ var JS_FILES = [
     'gui.study.pages.welcome.js',
     'experiments.artifact_extractors.js',
 
+    // CrowdLogger Remote Module API:
+    'api.cli.base.js',
+    'api.cli.ui.js',
+    'api.cli.user.js',
+    'api.cli.js',
+    // 'api.clrmi.init.js',
+    // 'api.clrmi.base.js',
+    // 'api.clrmi.ui.js',
+    // 'api.clrmi.user.js',
+
     // Crypto libraries.
     'external_lib/bignumber.js',
     'external_lib/pidcrypt/jsbn.js',

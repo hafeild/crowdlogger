@@ -38,6 +38,12 @@ function add_listeners(){
         CROWDLOGGER.gui.tools.dev.check_for_experiments();
         return false;
     });        
+
+    jQuery('#load-clrm').click(function(){
+        CROWDLOGGER.debug.log('Retrieving JS from '+ jQuery('#clrm-url').val());
+        CROWDLOGGER.api.cli.base.loadCLRMFromURL( jQuery('#clrm-url').val() );
+        return false;
+    });
 }
 
 /**

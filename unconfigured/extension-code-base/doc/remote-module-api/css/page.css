@@ -17,6 +17,7 @@ body {
 /*    width: 100%;
     height: 100%;*/
     height: 100%;
+    color: #444;
 }
 .bodyWrapper {
     position: relative;
@@ -171,13 +172,13 @@ h1, h2 {
 code, pre {
     font-family: monospace;
     color: #080;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .prettyprint {
     border-color: #ececec;
     background-color: #fafafa;
-    font-weight: normal;
+    /*font-weight: normal;*/
 }
 
 hr {
