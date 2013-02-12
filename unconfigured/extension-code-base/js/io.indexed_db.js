@@ -1159,24 +1159,37 @@ CROWDLOGGER.io.IndexedDB = function(){
                 opts.on_error);
         }
 
+        CROWDLOGGER.debug.log('Opening DB...');
+
         // Open the database.
         var request = IndexedDB.open(opts.db_name, opts.db_version);
+
+        // CROWDLOGGER.debug.log('The request:');
+        // CROWDLOGGER.debug.log(request);
+
+        // setTimeout(function(){
+        //     CROWDLOGGER.debug.log('The request after timeout:');
+        //     CROWDLOGGER.debug.log(request);
+        // }, 500);
 
         // Invoked when there's an error.
         request.onerror = function(event){
             CROWDLOGGER.debug.log("Error opening database: "+ 
                 event.target.errorCode);
 
-            opts.on_error && opts.on_error({
-                errorCode: event.target.errorCode, 
-                event: event
-            });
+            if( opts.on_error ) {
+                opts.on_error({
+                    errorCode: event.target.errorCode, 
+                    event: event
+                });
+            }
         };
+
         // Invoked if we were able to open the database.
-        
         request.onsuccess = function(event){
             var db = request.result;
 
+            CROWDLOGGER.debug.log('DB opened; version: '+ db.version);
             // For older versions of chrome.
             if( parseInt(db.version) !== opts.db_version && db.setVersion ){
                 var version_request = db.setVersion(opts.db_version);
@@ -1185,6 +1198,10 @@ CROWDLOGGER.io.IndexedDB = function(){
                     db.close();
                     open_db(opts);
                 }
+                version_request.onerror = function(e){
+                    CROWDLOGGER.debug.log('Error while upgrading db:');
+                    CROWDLOGGER.debug.log(e);
+                }
             } else {
                 // Pass the db onto the caller.
                 opts.on_success(db); 
@@ -1192,8 +1209,14 @@ CROWDLOGGER.io.IndexedDB = function(){
 
         };
 
+        request.onblocked = function(event){
+            CROWDLOGGER.debug.log('DB blocked!');
+        };
+
         // Invoked if the database needs to be upgraded.
         request.onupgradeneeded = function(event){
+            CROWDLOGGER.debug.log('Upgrading DB; current version: '+ 
+                request.result.version);
             opts.on_upgrade(request.result);
         }; 
 
@@ -1224,8 +1247,12 @@ CROWDLOGGER.io.IndexedDB = function(){
                 opts.on_error);
         }
 
-        return opts.db.createObjectStore(opts.store_name, 
-            {keyPath: "id", autoIncrement: true});
+        if( !opts.db.objectStoreNames.contains(opts.store_name) ){
+            return opts.db.createObjectStore(opts.store_name, 
+                {keyPath: "id", autoIncrement: true});
+        } else {
+            return true;
+        }
     };
 
     /**
