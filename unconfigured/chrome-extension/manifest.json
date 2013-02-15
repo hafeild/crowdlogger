@@ -9,7 +9,11 @@
     },
     "description": "%%DESCRIPTION%% %%LICENSE%%",
     "browser_action": {
-        "default_icon": "css/img/pauseLogging.png",
+        "default_icon": {
+            "128": "css/img/crowdlogger-logo.001.not-logging.128x128.png",
+            "48": "css/img/crowdlogger-logo.001.not-logging.48x48.png",
+            "16": "css/img/crowdlogger-logo.001.not-logging.16x16.png"
+        },
         "default_popup": "html/chrome_menu.html",
         "default_title": "%%PROJECT_NAME%%"
     },
@@ -23,8 +27,5 @@
         "unlimitedStorage",
         "tabs",
         "<all_urls>"
-    ],
-    "sandbox": {
-        "pages": ["html/clrm.html"]
-    }
+    ]
 }

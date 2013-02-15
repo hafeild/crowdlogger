@@ -31,11 +31,13 @@ CROWDLOGGER.gui.buttons = {};
  
 
 CROWDLOGGER.gui.buttons.defaults = {
-    logging_on_class: 'crowdlogger-logging-on-button',
+    logging_on_class: 'crowdlogger-logging-on-icon',
+    menu_logging_on_class: 'crowdlogger-logging-on-button',
     logging_on_hover_text: 
         'Logging is currently turned on for %%FULL_PROJECT_NAME%%. '+
         'Click to pause logging.',
-    logging_off_class: 'crowdlogger-logging-off-button',
+    logging_off_class: 'crowdlogger-logging-off-icon',
+    menu_logging_off_class: 'crowdlogger-logging-off-button',
     logging_off_hover_text: 
         'Logging is currently turned off for %%FULL_PROJECT_NAME%%. '+
         'Click to start logging.',
@@ -45,9 +47,13 @@ CROWDLOGGER.gui.buttons.defaults = {
 
 CROWDLOGGER.gui.buttons.current = {
     logging_on_class: CROWDLOGGER.gui.buttons.defaults.logging_on_class,
+    menu_logging_on_class: 
+        CROWDLOGGER.gui.buttons.defaults.menu_logging_on_class,
     logging_on_hover_text: 
         CROWDLOGGER.gui.buttons.defaults.logging_on_hover_text,
     logging_off_class: CROWDLOGGER.gui.buttons.defaults.logging_off_class,
+    menu_logging_off_class: 
+        CROWDLOGGER.gui.buttons.defaults.menu_logging_off_class,
     logging_off_hover_text: 
         CROWDLOGGER.gui.buttons.defaults.logging_off_hover_text,
     status_page_class: 
@@ -198,7 +204,7 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
     var logging_on_data = {
         class_name: CROWDLOGGER.gui.buttons.current.logging_on_class,
         hover_text: CROWDLOGGER.gui.buttons.current.logging_on_hover_text,
-        menu_class_name: CROWDLOGGER.gui.buttons.defaults.logging_on_class,
+        menu_class_name: CROWDLOGGER.gui.buttons.defaults.menu_logging_on_class,
         menu_hover_text: 
             CROWDLOGGER.gui.buttons.defaults.logging_on_hover_text, 
         menu_label: '[Logging: on] Click to pause logging',
@@ -209,7 +215,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
         class_name: CROWDLOGGER.gui.buttons.current.logging_off_class,
         hover_text: 
             CROWDLOGGER.gui.buttons.current.logging_off_hover_text,
-        menu_class_name: CROWDLOGGER.gui.buttons.defaults.logging_off_class,
+        menu_class_name: 
+            CROWDLOGGER.gui.buttons.defaults.menu_logging_off_class,
         menu_hover_text: 
             CROWDLOGGER.gui.buttons.defaults.logging_off_hover_text,
         menu_label: '[Logging: paused] Click to start logging',
@@ -224,7 +231,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
 
     // Removes 'crowdlogger-logging-[^-]*-button' from the given string.
     var clean_class = function( class_str ) {
-        return class_str.replace( / {0,1}crowdlogger-logging-[^-]*-button/, '');
+        return class_str.replace( 
+            / {0,1}crowdlogger-logging-[^-]*-[^ ]*/, '');
     }
 
     // Removes any style class name that matches crowdlogger-dynamic-[^ ]*-end.

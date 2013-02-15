@@ -87,18 +87,18 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     chrome_update_help_url: ['chrome_update_help.html', '1.4.2'],
     dev_tools_url: ['dev_tools.html', '1.7.3'],
     version: ['', '0'],
-    'crowdlogger-logging-off-button': 
-        ['startLogging.png', '1.7.0'],
+    'crowdlogger-logging-off-icon': 
+        ['crowdlogger-logo.001.not-logging.48x48.png', '1.7.4'],
     'crowdlogger-logging-off_low_alert-button': 
-        ['startLoggingAlertLow.png', '1.7.0'],
+        ['crowdlogger-logo.001.not-logging.alert.48x48.png', '1.7.4'],
     'crowdlogger-logging-off_high_alert-button': 
-        ['startLoggingAlertHigh.png', '1.7.0'],
-    'crowdlogger-logging-on-button': 
-        ['pauseLogging.png', '1.7.0'],
+        ['crowdlogger-logo.001.not-logging.alert.48x48.png', '1.7.4'],
+    'crowdlogger-logging-on-icon': 
+        ['crowdlogger-logo.001.logging.48x48.png', '1.7.4'],
     'crowdlogger-logging-on_low_alert-button': 
-        ['pauseLoggingAlertLow.png', '1.7.0'],
+        ['crowdlogger-logo.001.logging.alert.48x48.png', '1.7.4'],
     'crowdlogger-logging-on_high_alert-button': 
-        ['pauseLoggingAlertHigh.png', '1.7.0'],
+        ['crowdlogger-logo.001.logging.alert.48x48.png', '1.7.4'],
     extension_directory_name: ['crowdlogger', '1.4.2'],
     error_log_name: ['errors_log', '1.4.2'],
     activity_log_name: ['activity_log', '1.4.2'],

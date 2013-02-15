@@ -180,7 +180,8 @@ function load_xul_for_window(win){
         id:             'crowdlogger-start-button',
         tooltiptext:    'Toggle search activity logging.',
         label:          'Toggle Logging',
-        'class':        'menu-iconic  crowdlogger-logging-off-button '+
+        // 'class':        'menu-iconic  crowdlogger-logging-off-button '+
+        'class':        'menu-iconic  crowdlogger-logging-off-icon '+
                         'chromeclass-toolbar-additional',
         type:           'menu',
         listeners:    [['load', CROWDLOGGER.gui.buttons.update_logging_buttons]]
