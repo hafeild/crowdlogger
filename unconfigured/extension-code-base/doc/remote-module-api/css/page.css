@@ -166,13 +166,16 @@ h1, h2 {
 }
 
 .highlight {
-    color: #ffa500;
+    /*color: #ffa500;*/
+    color: #ff684d;
+    /*font-weight: bold;*/
 }
 
 code, pre {
     font-family: monospace;
     color: #080;
     /*font-weight: bold;*/
+    font-size: 110%;
 }
 
 .prettyprint {
@@ -195,7 +198,7 @@ td {
 }
 
 th {
-    background-color: lightsteelblue;
+    background-color: #eee;
     border: 1px solid lightsteelblue;
 }
 

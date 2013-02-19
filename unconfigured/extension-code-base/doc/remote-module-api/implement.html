@@ -27,11 +27,11 @@ of the API.
 </p>
 
 <p>
-<i><b>Note:</b> While many of the sections below
+<span class="highlight"><b>Note:</b> While many of the sections below
 go into the details of the underlying CLRM format, there is an automatic
 method for generating the CLRM JSON description, which is discussed in the
 <a href="#implement:auto-packaging">Automatic Packaging</a> section.
-</i>
+</span>
 </p>
 
 <a name="what-clrm-consists-of"></a>
@@ -77,6 +77,14 @@ A CLRM Package is a JSON object with the following fields:
             content will be inserted within <code>&lt;style&gt;</code> tags
             in the header of HTML documents that reference it.
         </td>
+    </tr><tr>
+        <td><code>misc</code></td>
+        <td>map to strings</td>
+        <td>A map of miscellaneous resources names to content. When used in
+            conjunction with a resource reference, the
+            content will replace <code>::CLRMMISC:name</code> occurrences in,
+            e.g., HTML documents.
+        </td>
     </tr>
 </table>
 
@@ -90,6 +98,36 @@ A CLRM Package is a JSON object with the following fields:
 
 <a name="core-module-structure"></a>
 <h2>The Structure of the Core Module Code</h2>
+
+<p>
+The core module is the JavaScript stored under the <code>module</code> key in 
+the CRLM Package. At a minimum, core modules must:
+</p>
+
+<ul>
+    <li>contain a global function named <code>RemoteModule</code> that takes
+        two parameters: the containing CLRM Package and a copy of the CLRM API.
+        <span class="highlight">Note: this should be the only thing you add to
+            the global space!</span>
+    <li>make available an <code>id</code> field within the 
+        <code>RemoteModule</code> instance
+    <li>make available an <code>unload</code> function within the
+        <code>RemoteModule</code> instance
+</ul>
+
+<p>
+The <code>RemoteModule</code> function will be invoked with the <code>new</code>
+keyword and passed a copy of the containing CLRM Package and a copy of the 
+CLRM API. E.g.,
+</p>
+
+<pre class="prettyprint">
+function RemoteModule( clrmPackage, api ){
+    api.ui.alert('Hi!');
+    this.id = 'My Module';
+    this.unload = function(){};
+}    
+</pre>
 
 
 
@@ -114,7 +152,13 @@ references are made in HTML content in the following way:
         <td>Gets replaced with 
             <code>&lt;style&gt;package.css[name]&lt;style&gt;</code>
         </td>
+    </tr><tr>
+        <td><code>::CLRMMISC:name</code></td>
+        <td>Gets replaced with 
+            <code>package.misc[name]</code>
+        </td>
     </tr>
+
 </table>
 
 
