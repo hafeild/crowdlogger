@@ -90,15 +90,15 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     'crowdlogger-logging-off-icon': 
         ['crowdlogger-logo.001.not-logging.48x48.png', '1.7.4'],
     'crowdlogger-logging-off_low_alert-button': 
-        ['crowdlogger-logo.001.not-logging.alert.48x48.png', '1.7.4'],
+        ['crowdlogger-logo.001.not-logging.alert-low.48x48.png', '1.7.4'],
     'crowdlogger-logging-off_high_alert-button': 
-        ['crowdlogger-logo.001.not-logging.alert.48x48.png', '1.7.4'],
+        ['crowdlogger-logo.001.not-logging.alert-high.48x48.png', '1.7.4'],
     'crowdlogger-logging-on-icon': 
         ['crowdlogger-logo.001.logging.48x48.png', '1.7.4'],
     'crowdlogger-logging-on_low_alert-button': 
-        ['crowdlogger-logo.001.logging.alert.48x48.png', '1.7.4'],
+        ['crowdlogger-logo.001.logging.alert-low.48x48.png', '1.7.4'],
     'crowdlogger-logging-on_high_alert-button': 
-        ['crowdlogger-logo.001.logging.alert.48x48.png', '1.7.4'],
+        ['crowdlogger-logo.001.logging.alert-high.48x48.png', '1.7.4'],
     extension_directory_name: ['crowdlogger', '1.4.2'],
     error_log_name: ['errors_log', '1.4.2'],
     activity_log_name: ['activity_log', '1.4.2'],

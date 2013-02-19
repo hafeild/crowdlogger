@@ -62,24 +62,41 @@ body.chrome-menu {
 }
 
 .crowdlogger-logging-off_low_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert.16x16.png") !important;
-
+    padding-left:18px !important;
+    background-image: url("img/crowdlogger-logo.001.not-logging.alert-low.48x48.png") !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 20px;
 }
 
 .crowdlogger-logging-on_low_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.logging.alert.16x16.png") !important;
-
+    padding-left:18px !important;
+    background-image: url("img/crowdlogger-logo.001.logging.alert-low.48x48.png") !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 20px;
 }
 
 .crowdlogger-logging-off_high_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert.16x16.png") !important;
-
+    padding-left:18px !important;
+    background-image: url("img/crowdlogger-logo.001.not-logging.alert-high.48x48.png") !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 20px;
 }
 
 .crowdlogger-logging-on_high_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.logging.alert.16x16.png") !important;
-
+    padding-left:18px !important;
+    background-image: url("img/crowdlogger-logo.001.logging.alert-high.48x48.png") !important;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 20px;
 }
+
 .crowdlogger-mine-log-button {
     list-style-image: url("img/mineLog.png") !important;
 }

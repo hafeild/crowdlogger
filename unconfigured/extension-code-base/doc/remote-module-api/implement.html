@@ -8,6 +8,13 @@
     <h2>Contents</h2>
     <ul>
         <!-- <li><a href="#implement">Implementing a CrowdLogger Remote Module</a> -->
+        <li><a href="#implement:what-clrm-consists-of"
+            >What a CLRM Package Consists of</a>
+        <li><a href="#implement:core-module-structure"
+            >The Structure of the Core Module Code</a>
+        <li><a href="#implement:referencing-resources"
+            >Referencing Module Resources</a>
+        <li><a href="#implement:auto-packaging">Automatic Packaging</a> 
     </ul>
 </div>
 
@@ -16,13 +23,21 @@
 <p>
 This page will contain information about implementing a module, including the
 directory structure and some simple examples. It will also contain an overview
-of the API.
+of the API. 
+</p>
+
+<p>
+<i><b>Note:</b> While many of the sections below
+go into the details of the underlying CLRM format, there is an automatic
+method for generating the CLRM JSON description, which is discussed in the
+<a href="#implement:auto-packaging">Automatic Packaging</a> section.
+</i>
 </p>
 
 <a name="what-clrm-consists-of"></a>
-<h2>What a CLRM consists of</h2>
+<h2>What a CLRM Package Consists of</h2>
 <p>
-A CLRM is a JSON object with the following fields:
+A CLRM Package is a JSON object with the following fields:
 </p>
 
 <table>
@@ -33,32 +48,34 @@ A CLRM is a JSON object with the following fields:
         <td>string</td>
         <td>The core module code. 
             <a href="#implement:core-module-structure">This must adhere to the 
-            structure described below</a>.
+            structure described below</a>. This code will be evaluated using
+            <code>eval()</code> and will have access to the package object
+            (so resources can be accessed) as well as the CLRM API.
         </td>
     </tr><tr>
         <td><code>html</code></td>
         <td>map to strings</td>
-        <td>An map of HTML document names to the document content. Each of these
+        <td>A map of HTML document names to the document content. Each of these
             virtual files can be loaded into a window when needed. They can
             reference other sources from this object, including JavaScript 
             (see <code>js</code>), CSS (see <code>css</code>), and other HTML
-            content. See <a href="#implement:referencing-resources">the
-            Referencing module resources section</a> for more information about
+            content. See the <a href="#implement:referencing-resources">
+            Referencing Module Resources</a> section for more information about
             how to link to these resources.
         </td>
     </tr><tr>
         <td><code>js</code></td>
         <td>map to strings</td>
-        <td>The core module code. 
-            <a href="#implement:core-module-structure">This must adhere to the 
-            structure described below</a>.
+        <td>A map of JavaScript document names to the script content. The
+            content will be inserted within <code>&lt;script&gt;</code> tags
+            in the header of HTML documents that reference it.
         </td>
     </tr><tr>
         <td><code>css</code></td>
         <td>map to strings</td>
-        <td>The core module code. 
-            <a href="#implement:core-module-structure">This must adhere to the 
-            structure described below</a>.
+        <td>A map of CSS document names to the style sheet content. The
+            content will be inserted within <code>&lt;style&gt;</code> tags
+            in the header of HTML documents that reference it.
         </td>
     </tr>
 </table>
@@ -72,11 +89,83 @@ A CLRM is a JSON object with the following fields:
 </pre> -->
 
 <a name="core-module-structure"></a>
-<h2>The structure of the core module code</h2>
+<h2>The Structure of the Core Module Code</h2>
+
 
 
 <a name="referencing-resources"></a>
-<h2>Referencing module resources</h2>
+<h2>Referencing Module Resources</h2>
+
+<p>
+Assuming the CLRM Package is stored in the variable <code>package</code>,
+references are made in HTML content in the following way:
+</p>
+
+<table>
+    <tr>
+        <th>Pattern</th> <th>Description</th> 
+    </tr><tr> 
+        <td><code>::CLRMJS:name</code></td>
+        <td>Gets replaced with 
+            <code>&lt;script&gt;package.js[name]&lt;script&gt;</code>
+        </td>
+    </tr><tr>
+        <td><code>::CLRMCSS:name</code></td>
+        <td>Gets replaced with 
+            <code>&lt;style&gt;package.css[name]&lt;style&gt;</code>
+        </td>
+    </tr>
+</table>
+
+
+<a name="auto-packaging"></a>
+<h2>Automatic Packaging</h2> 
+
+<p>
+It's tedious and error prone to have to package a CLRM manually. Rather than
+do that, you can feed the core CLRM script and a set of resources&mdash;HTML,
+JavaScript, and CSS files&mdash;to the <code>clrm-auto-package.rb</code> script.
+This naive script does the following: 
+</p>
+
+<ol>
+    <li>an empty package is made
+    <li>the core module scripts are concatenated and added to the package under
+        the <code>module</code> key
+    <li>for each HTML resource, all linked CSS and JavaScript files in 
+        <code>&lt;link&gt;</code> and <code>&lt;script&gt;</code> tags are
+        added to the list of resources and are replaced with their references
+        (see the <a href="#implement:referencing-resources">Referencing Module 
+        Resources</a>section). E.g., this:
+<pre class="prettyprint">
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script src="myscript.js"&gt;&lt;/script&gt;
+    &lt;link href="mystyle.css" rel="stylesheet" type="text/css"/&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  ...
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre> 
+becomes:
+<pre class="prettyprint">
+&lt;html&gt;
+  &lt;head&gt;
+::CLRMJS:myscript.js
+::CLRMCSS:mystyle.css
+  &lt;/head&gt;
+  &lt;body&gt;
+  ...
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>    
+    <li>for each resource, it makes an entry in the corresponding map in the 
+        package; each resources base filename is used as the key
+
+</ol>
+
+
 
 </body>
 </html>

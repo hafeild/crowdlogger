@@ -23,7 +23,7 @@ var CLIBase = function(crowdlogger, cli){
             // ui: crowdlogger.api.cli.ui.handleMessage,
             // user: crowdlogger.api.cli.user.handleMessage
             alert: function(data){ alert(data.message); },
-            log: function(data){ crowdlogger.debug.log(data.message);}
+            log: function(data){ crowdlogger.debug.log(data.message);},
             getExtensionPath: function(data){that.sendMessage({
                 command: 'setExtensionPath', 
                 extensionPath: crowdlogger.version.info.
