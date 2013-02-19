@@ -18,13 +18,19 @@
 var CLIBase = function(crowdlogger, cli){
     // Private variables.
     var that = this,
+        clrmi,
         messageHandlers = {
             // ui: crowdlogger.api.cli.ui.handleMessage,
             // user: crowdlogger.api.cli.user.handleMessage
-            alert: function(data){ alert(data.message); }
-        },
-        clrmi;
+            alert: function(data){ alert(data.message); },
+            log: function(data){ crowdlogger.debug.log(data.message);}
+            getExtensionPath: function(data){that.sendMessage({
+                command: 'setExtensionPath', 
+                extensionPath: crowdlogger.version.info.
+                    get_extension_html_prefix()
+            })}
 
+        };
 
     // Private function declarations.
     var onMessage, init, extractData;
@@ -36,6 +42,25 @@ var CLIBase = function(crowdlogger, cli){
     // Private function definitions.
     init = function(){
         crowdlogger.debug.log('In init\n');
+
+        var path = crowdlogger.version.info.get_extension_prefix();
+        var clrm_url = 'data:text/html,'+encodeURI(
+            '<html>'+
+            '<head>'+
+            '<!-- Load jQuery first. -->'+
+            '<script src="'+path+'js/external_lib/jquery.min.js"></script>'+
+            '<!-- Load the API files. -->'+
+            '<script src="'+path+'js/api.clrmi.base.js"></script>'+
+            '<script src="'+path+'js/api.clrmi.user.js"></script>'+
+            '<script src="'+path+'js/api.clrmi.ui.js"></script>'+
+            '<!-- Gives us the api variable. -->'+
+            '<script src="'+path+'js/api.clrmi.init.js"></script>'+
+            '<script src="'+path+'html-js/clrm.js"></script>'+
+            '</head>'+
+            '<body>'+
+            '</body>'+
+            '</html>');
+
         if( crowdlogger.version.info.is_firefox ){
             var hiddenWindow = Components.classes[
                 '@mozilla.org/appshell/appShellService;1']
@@ -43,21 +68,27 @@ var CLIBase = function(crowdlogger, cli){
                  .hiddenDOMWindow;
             var frame = hiddenWindow.document.getElementById('clrm');
             if( !frame ) {
-                var clrm_url = 
-                    crowdlogger.version.info.get_extension_html_prefix() +
-                    'clrm.html'
+                clrm_url = crowdlogger.version.info.get_extension_html_prefix()+
+                    'clrm.html';
+
                 crowdlogger.debug.log('Opening iframe for '+ clrm_url +'\n');
                 var XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/'+
                            'there.is.only.xul';
+
                 frame = hiddenWindow.document.createElementNS(XUL_NS, 'iframe');
                 frame.setAttribute('id', 'clrm');
                 frame.setAttribute('src', clrm_url);
+                frame.setAttribute('type', 'content');
+
                 hiddenWindow.document.documentElement.appendChild(frame);
             }
 
-            hiddenWindow.addEventListener('message', onMessage, false);
-            clrmi = hiddenWindow.document.getElementById('clrm').contentWindow;
+            hiddenWindow.addEventListener('message', onMessage, true, true);
+            clrmi = frame.contentWindow;
+
         } else {
+            crowdlogger.jq('#clrm').attr('src', clrm_url);
+
             clrmi = crowdlogger.jq('#clrm')[0].contentWindow;
             crowdlogger.jq(window).bind( 'message', onMessage );
         }
@@ -88,8 +119,8 @@ var CLIBase = function(crowdlogger, cli){
         crowdlogger.debug.log('CLI received a message: '+ 
             JSON.stringify(data) +"\n");
 
-        if( messageHandlers[command] ){
-            messageHandlers[command](data);
+        if( data.from === 'CLRMI' && messageHandlers[command] ){
+            setTimeout( function(){messageHandlers[command](data)}, 2 );
         }
     };
 
@@ -135,7 +166,10 @@ var CLIBase = function(crowdlogger, cli){
     this.sendMessage = function(message){
         crowdlogger.debug.log('CLI sending a message: '+
             JSON.stringify(message) +'\n');
-        clrmi.postMessage(message, '*');
+        if( clrmi ){
+            message.from = 'CLI';
+            clrmi.postMessage(message, '*');
+        }
     };
 
     init();

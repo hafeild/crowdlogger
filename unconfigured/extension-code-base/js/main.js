@@ -131,6 +131,7 @@ CROWDLOGGER.initialize = function(){
     
     // Initializes everything that needs initializing.
     var init = function(){
+
         CROWDLOGGER.debug.init();
         CROWDLOGGER.preferences.init();
         CROWDLOGGER.preferences.defaults.set_defaults();

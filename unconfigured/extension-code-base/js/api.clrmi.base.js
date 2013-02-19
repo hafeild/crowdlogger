@@ -15,21 +15,28 @@
 var CLRMIBaseAPI = function(api) { //, cli){
     // Private variables.
     var that = this,
-        messageHandlers = {},
+        messageHandlers = {
+            //alert: function(data){ alert(data.message); }
+        },
         modules = {},
         useSandbox = false;
         
     // Private function declarations.
-    var init, extractData, onMessage;
+    var init, extractData, onMessage, setExtensionPath, loadCLRM;
 
     // Public function declarations.
-    this.loadCLRM, this.postMessage;
+    this.postMessage;
 
     // Private function definitions.
     init = function(){
         console.log('Initializing CLRMIBaseAPI.\n');
-        messageHandlers.loadCLRM = that.loadCLRM;
+        messageHandlers.loadCLRM = loadCLRM;
+        messageHandlers.setExtensionPath = setExtensionPath;
         jQuery(window).bind( 'message', onMessage );
+
+        that.sendMessage({command:'getExtensionPath'})
+        //var x = window.open(); x.document.write("hello");
+        that.sendMessage({command:'log', message:'CLRMI saying "Hi!".'});
     };
 
     extractData = function(event){ 
@@ -50,24 +57,32 @@ var CLRMIBaseAPI = function(api) { //, cli){
     onMessage = function(event){
         var data = extractData(event);
         console.log('CLRMI received a message: '+ JSON.stringify(data) +'\n');
+        //alert('CLRMI received a message: '+ JSON.stringify(data));
         var command = data.command;
-        if( messageHandlers[command] ){
-            messageHandlers[command](data);
+        if( data.from === 'CLI' && messageHandlers[command] ){
+            setTimeout(function(){messageHandlers[command](data);}, 2);
         }
     };
 
-    // Public function definitions.
+    setExtensionPath = function(data){
+        if( data.extensionPath ){
+            api.extensionPath = data.extensionPath;
+        }
+    }
 
     /**
      * Loads a CrowdLogger Remote Module. 
      *
      * @param {string} script   The JavaScript module.
      */
-    this.loadCLRM = function(data){
+    loadCLRM = function(data){
         console.log('Loading CLRM');
         var clrm = new CLRM(data.script, api.API);
         modules[clrm.module.id] = clrm.module;
+        that.sendMessage({command: 'log', message: 'Thanks!'});
     };
+
+    // Public function definitions.
 
     /**
      * Sends a message to the CLI.
@@ -75,15 +90,19 @@ var CLRMIBaseAPI = function(api) { //, cli){
     this.sendMessage = function(message){
         console.log('CLRMI sending a message: '+ JSON.stringify(message) +'\n');
 
+        message.from = 'CLRMI';
         parent.postMessage(message, '*');
+        //jQuery('#messages').trigger('amessage', message);
     };
+
+
 
     init();
 };
 
 var CLRM = function(script, CrowdLoggerAPI){
     eval(script);
-    console.log('Evaluated the CLRM; RemoteModule: '+ RemoteModule);
+    //console.log('Evaluated the CLRM; RemoteModule: '+ RemoteModule);
     // Every module should have a Module function defined.
     this.module = new RemoteModule(new CrowdLoggerAPI());
     // Clear it out in case they made it global.

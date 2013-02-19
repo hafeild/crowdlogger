@@ -548,7 +548,6 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win){
         // between Firefox and Chrome).
         var doc, is_chrome, win;
 
-
         try{
             if( CROWDLOGGER ){}
             is_chrome = false;

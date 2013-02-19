@@ -14,6 +14,7 @@ var CLRMI = function(cli){
     // Private. Holds an instance of each API.
     //var api = {};
     var that = this;
+    this.extensionPath = '';
     this.base = new CLRMIBaseAPI(that, cli);
     this.user = new CLRMIUserAPI(that);
     this.ui = new CLRMIUserInterfaceAPI(that);
