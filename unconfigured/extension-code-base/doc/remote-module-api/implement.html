@@ -19,5 +19,64 @@ directory structure and some simple examples. It will also contain an overview
 of the API.
 </p>
 
+<a name="what-clrm-consists-of"></a>
+<h2>What a CLRM consists of</h2>
+<p>
+A CLRM is a JSON object with the following fields:
+</p>
+
+<table>
+    <tr>
+        <th>Field</th> <th width="125px">Type</th> <th>Description</th> 
+    </tr><tr>
+        <td><code>module</code></td>
+        <td>string</td>
+        <td>The core module code. 
+            <a href="#implement:core-module-structure">This must adhere to the 
+            structure described below</a>.
+        </td>
+    </tr><tr>
+        <td><code>html</code></td>
+        <td>map to strings</td>
+        <td>An map of HTML document names to the document content. Each of these
+            virtual files can be loaded into a window when needed. They can
+            reference other sources from this object, including JavaScript 
+            (see <code>js</code>), CSS (see <code>css</code>), and other HTML
+            content. See <a href="#implement:referencing-resources">the
+            Referencing module resources section</a> for more information about
+            how to link to these resources.
+        </td>
+    </tr><tr>
+        <td><code>js</code></td>
+        <td>map to strings</td>
+        <td>The core module code. 
+            <a href="#implement:core-module-structure">This must adhere to the 
+            structure described below</a>.
+        </td>
+    </tr><tr>
+        <td><code>css</code></td>
+        <td>map to strings</td>
+        <td>The core module code. 
+            <a href="#implement:core-module-structure">This must adhere to the 
+            structure described below</a>.
+        </td>
+    </tr>
+</table>
+
+
+
+<!-- <pre class="prettyprint">
+{
+    string:
+}
+</pre> -->
+
+<a name="core-module-structure"></a>
+<h2>The structure of the core module code</h2>
+
+
+<a name="referencing-resources"></a>
+<h2>Referencing module resources</h2>
+
 </body>
 </html>
