@@ -23,7 +23,7 @@ var CLIBase = function(crowdlogger, cli){
             // ui: crowdlogger.api.cli.ui.handleMessage,
             // user: crowdlogger.api.cli.user.handleMessage
             alert: function(data){ alert(data.message); },
-            log: function(data){ crowdlogger.debug.log(data.message);},
+            log: function(data){ crowdlogger.debug.log(data.message+'\n');},
             getExtensionPath: function(data){that.sendMessage({
                 command: 'setExtensionPath', 
                 extensionPath: crowdlogger.version.info.
@@ -44,22 +44,7 @@ var CLIBase = function(crowdlogger, cli){
         crowdlogger.debug.log('In init\n');
 
         var path = crowdlogger.version.info.get_extension_prefix();
-        var clrm_url = 'data:text/html,'+encodeURI(
-            '<html>'+
-            '<head>'+
-            '<!-- Load jQuery first. -->'+
-            '<script src="'+path+'js/external_lib/jquery.min.js"></script>'+
-            '<!-- Load the API files. -->'+
-            '<script src="'+path+'js/api.clrmi.base.js"></script>'+
-            '<script src="'+path+'js/api.clrmi.user.js"></script>'+
-            '<script src="'+path+'js/api.clrmi.ui.js"></script>'+
-            '<!-- Gives us the api variable. -->'+
-            '<script src="'+path+'js/api.clrmi.init.js"></script>'+
-            '<script src="'+path+'html-js/clrm.js"></script>'+
-            '</head>'+
-            '<body>'+
-            '</body>'+
-            '</html>');
+
 
         if( crowdlogger.version.info.is_firefox ){
             var hiddenWindow = Components.classes[
@@ -68,7 +53,7 @@ var CLIBase = function(crowdlogger, cli){
                  .hiddenDOMWindow;
             var frame = hiddenWindow.document.getElementById('clrm');
             if( !frame ) {
-                clrm_url = crowdlogger.version.info.get_extension_html_prefix()+
+                var clrm_url = crowdlogger.version.info.get_extension_html_prefix()+
                     'clrm.html';
 
                 crowdlogger.debug.log('Opening iframe for '+ clrm_url +'\n');
@@ -87,6 +72,22 @@ var CLIBase = function(crowdlogger, cli){
             clrmi = frame.contentWindow;
 
         } else {
+            var clrm_url = 'data:text/html,'+encodeURIComponent(
+                '<html>'+
+                '<head>'+
+                '<!-- Load jQuery first. -->'+
+                '<script src="'+path+'js/external_lib/jquery.min.js"></script>'+
+                '<!-- Load the API files. -->'+
+                '<script src="'+path+'js/api.clrmi.base.js"></script>'+
+                '<script src="'+path+'js/api.clrmi.user.js"></script>'+
+                '<script src="'+path+'js/api.clrmi.ui.js"></script>'+
+                '<!-- Gives us the api variable. -->'+
+                '<script src="'+path+'js/api.clrmi.init.js"></script>'+
+                '<script src="'+path+'html-js/clrm.js"></script>'+
+                '</head>'+
+                '<body>'+
+                '</body>'+
+                '</html>');
             crowdlogger.jq('#clrm').attr('src', clrm_url);
 
             clrmi = crowdlogger.jq('#clrm')[0].contentWindow;
@@ -131,7 +132,7 @@ var CLIBase = function(crowdlogger, cli){
      *                          include:
      * <ul>
      *     <li>urls {array of strings}      One or more URLs of scripts to load.
-     *     <li>scripts  {array of strings}  One or more script strings to load.
+     *     <li>packages  {array of strings} One or more package strings to load.
      * </ul>
      */
     this.loadCLRMs = function(options){
@@ -141,9 +142,9 @@ var CLIBase = function(crowdlogger, cli){
             that.loadCLRMFromURL(options.urls[i]);
         }
 
-        options.scripts = options.scripts || [];
-        for(i = 0; i < options.scripts.length; i++){
-            that.loadCLRMFromString(options.scripts[i]);
+        options.packages = options.packages || [];
+        for(i = 0; i < options.packages.length; i++){
+            that.loadCLRMFromString(options.packages[i]);
         }
     };
 
@@ -156,8 +157,8 @@ var CLIBase = function(crowdlogger, cli){
         );
     };
 
-    this.loadCLRMFromString = function(script){
-        that.sendMessage({command: 'loadCLRM', script: script});
+    this.loadCLRMFromString = function(package){
+        that.sendMessage({command: 'loadCLRM', package: package});
     };
 
     /**

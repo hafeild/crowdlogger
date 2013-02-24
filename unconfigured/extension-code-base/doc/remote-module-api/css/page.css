@@ -64,6 +64,7 @@ h1, h2 {
     content: '\A';
 }*/
 
+
 .bodyWrapper h1 {
     margin-top: 20px;
     font-size: 180%;
@@ -81,10 +82,16 @@ h1, h2 {
 }
 
 .bodyWrapper h3 {
-    color: #444;
+    color: #97bad7;
     font-weight: normal;
+    margin-top: 20;
+    font-size: 120%;
+    /*font-style: italic;*/
 }
 
+.bodyWrapper h2 {
+    margin-top: 50px;
+}
 
 .toc {
     float: right;
@@ -121,7 +128,7 @@ h1, h2 {
 
 
 
-.bodyWrapper a {
+/*.bodyWrapper a {
     color: orange;
 }
 
@@ -131,7 +138,7 @@ h1, h2 {
 
 .bodyWrapper a:active {
     color: darkorange;
-}
+}*/
 
 .menu h2 {
     /*margin-top: -15px;*/
@@ -140,15 +147,18 @@ h1, h2 {
     margin-bottom: 3px;
 }
 
-.menu a {
+/*.toc a, .menu a {*/
+a {
     color: steelblue;
 }
 
-.menu a:visited {
+/*.toc a:visited, .menu a:visited {*/
+a:visited {
     color: steelblue;
 }
 
-.menu a:active {
+/*.toc a:active, .menu a:active {*/
+a:active {
     color: lightsteelblue;
 }
 
@@ -167,13 +177,15 @@ h1, h2 {
 
 .highlight {
     /*color: #ffa500;*/
-    color: #ff684d;
+    /*color: #ff684d;*/
+    color: #b10000;
     /*font-weight: bold;*/
 }
 
 code, pre {
     font-family: monospace;
-    color: #080;
+    /*color: #080;*/
+    color: #cc8400;
     /*font-weight: bold;*/
     font-size: 110%;
 }

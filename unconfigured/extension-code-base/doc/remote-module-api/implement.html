@@ -111,8 +111,13 @@ the CRLM Package. At a minimum, core modules must:
             the global space!</span>
     <li>make available an <code>id</code> field within the 
         <code>RemoteModule</code> instance
+    <li>make available an <code>init</code> function within the 
+        <code>RemoteModule</code> instance; <span class="highlight">Nothing 
+        should be initialized outside of the <code>init</code> function! (<a
+            href="#implement:note-on-init">see this note</a>)</span>
     <li>make available an <code>unload</code> function within the
-        <code>RemoteModule</code> instance
+        <code>RemoteModule</code> instance that takes a callback 
+        function&mdash;this should be called when unloading is complete
 </ul>
 
 <p>
@@ -123,11 +128,131 @@ CLRM API. E.g.,
 
 <pre class="prettyprint">
 function RemoteModule( clrmPackage, api ){
-    api.ui.alert('Hi!');
     this.id = 'My Module';
-    this.unload = function(){};
+    this.unload = function(oncomplete){ 
+        oncomplete(); 
+    };
+    this.init = function(){
+        api.ui.alert('Hi!');
+    };
 }    
 </pre>
+
+<p>
+For larger modules, you will likely want to split your code up across files  (of
+course, these will have to be concatenated before being added to the CLRM
+Package). For instances, you may want to define a <code>Model</code> class that
+provides functionality to maintain a persistent model over user interactions. To
+avoid adding this to the global name space, but still allow your
+<code>RemoteModule</code> class access to it, you can modify
+<code>RemoteModule.prototype</code>. For example:
+</p>
+
+<pre class="prettyprint">
+// file1.js
+
+var RemoteModule = function( clrmPackge, api ){
+    this.id = "My Module";
+    // <a href="http://stackoverflow.com/questions/4886632/what-does-var-that-this-mean-in-javascript">See this page for more info about var that = this.</a>
+    var that = this;
+    var model;
+    
+    this.unload = function(oncomplete){
+        // This save may happen asyncronously -- that is, when model.save
+        // returns, the process of saving may still be occurring. So, we pass
+        // oncomplete along so that whatever code uses it last can invoke it.
+        model.save(oncomplete);
+    };
+
+    this.init = function(){
+        model = new that.Model(api);
+    };
+}
+</pre>
+
+<pre class="prettyprint">
+// file2.js
+
+RemoteModule.prototype.Model = function(api){
+    ...
+    this.save = function(oncomplete){
+        ...
+        // Somewhere oncomplete() is invoked.
+        ...
+    };<!--
+    // Private variables.
+    var that = this,
+        DB_NAME = "mydb",
+        DB_VERSION = 1;
+
+    // Private function declarations.
+    var init, processSE, processQuery;
+
+    // Public variables.
+    this.data = {
+        seCounts: {
+            TOTAL: 0
+        },
+        queryTermCounts: {
+            TOTAL: 0
+        }
+    };
+
+    // Public function declarations.
+    this.save;
+
+    // Private function definitions.
+    // Initialize the listeners.
+    init = function(){
+        // Add listeners to some user activity...
+        api.user.realtime.onSearch(function(search){
+            processSE(search.se);
+            processQuery(search.query);
+        });
+    }
+
+    // Increments a search engines occurence.
+    processSE = function(se){
+        var curCount = that.data.seCounts[se] ? 
+            that.data.seCounts[se] : 0;
+        that.data.seCounts[se] = curCount + 1;
+        that.data.seCounts.TOTAL += 1;
+    }
+
+    // Updates the counts for each term that occurs in the query.
+    processQuery = function(query){
+        var terms = query.toLower().split(/\s+/), term;
+        for( term in terms ){
+            var curCount = that.data.queryTermCounts[term] ? 
+                that.data.queryTermCounts[term] : 0;
+            that.data.queryTermCounts[term] = curCount + 1;
+            that.data.queryTermCounts.TOTAL += 1;
+        }
+    }
+
+    // Public function definitions.
+    // Save the data.
+    this.save = function(){
+        api.user.db.write(DB_NAME, DB_VERSION, that.data);
+    };
+
+    // Called on initialization.
+    init();
+-->
+}
+</pre>
+
+<a name="note-on-init"></a>
+<h3>A note on <code>init</code></h3>
+<p>
+The reason we require that nothing occur outside of the <code>init</code>
+function in the core <code>RemoteModule</code> object is that, if an older 
+version of your CLRM is loaded, we need to invoke the <code>unload</code>
+function of that older instance. This might involve removing listeners
+and such from elements, saving data, etc. Your new code will likely want to
+reattach those listeners, read in the saved data, etc., so it must wait until
+the clean up is complete.
+</p>
 
 
 
@@ -145,17 +270,17 @@ references are made in HTML content in the following way:
     </tr><tr> 
         <td><code>::CLRMJS:name</code></td>
         <td>Gets replaced with 
-            <code>&lt;script&gt;package.js[name]&lt;script&gt;</code>
+            <code> &lt;script&gt;package.js[name]&lt;script&gt; </code>
         </td>
     </tr><tr>
         <td><code>::CLRMCSS:name</code></td>
         <td>Gets replaced with 
-            <code>&lt;style&gt;package.css[name]&lt;style&gt;</code>
+            <code> &lt;style&gt;package.css[name]&lt;style&gt; </code>
         </td>
     </tr><tr>
         <td><code>::CLRMMISC:name</code></td>
         <td>Gets replaced with 
-            <code>package.misc[name]</code>
+            <code> package.misc[name] </code>
         </td>
     </tr>
 
@@ -168,7 +293,7 @@ references are made in HTML content in the following way:
 <p>
 It's tedious and error prone to have to package a CLRM manually. Rather than
 do that, you can feed the core CLRM script and a set of resources&mdash;HTML,
-JavaScript, and CSS files&mdash;to the <code>clrm-auto-package.rb</code> script.
+JavaScript, and CSS files&mdash;to the <code>clrm-package.rb</code> script.
 This naive script does the following: 
 </p>
 
