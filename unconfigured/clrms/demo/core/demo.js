@@ -27,7 +27,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
     console.log('>> Declaring private functions...');
 
     // Private function declarations.
-    var initializeWindow, init, onWindowUnload;
+    var initializeWindow, init, onWindowUnload, printToWindows, 
+        addActivityListeners;
 
     console.log('>> Declaring public variables...');
     // Public variables.
@@ -71,6 +72,40 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         elm.on('load.window.demo', function(event, win){
             initializeWindow(win);
         });
+        addActivityListeners();
+    };
+
+    /**
+     * Adds listeners for user activities. This will cause those events to be
+     * printed to the body of any open Demo window.
+     */
+    addActivityListeners = function(){
+        console.log('Adding activity listeners');
+        var eventToMessage = function(eventName, eventData){
+            console.log('Heard back!: '+ eventName +', '+ 
+                JSON.stringify(eventData));
+            printToWindows(eventName +': '+ JSON.stringify(eventData));
+        };
+
+        clrmAPI.user.realTime.addActivityListeners({
+            'query-entered': eventToMessage,
+            'page-loaded': eventToMessage,
+            'link-clicked': eventToMessage,
+            'page-focused': eventToMessage
+        });
+    }
+
+    /**
+     * Prints the given message to every open Demo window.
+     *
+     * @param {string} message  The message to display.
+     */
+    printToWindows = function(message){
+        var winName;
+        for(winName in openWindows){
+            openWindows[winName].jQuery('#messages').
+                append('<div>'+ message +'</div>');
+        };
     };
 
     // Public function definitions.
@@ -113,6 +148,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         }
         oncomplete();
     };
+
+
 
     // Initialize things.
     init();

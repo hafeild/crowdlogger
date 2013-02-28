@@ -15,7 +15,7 @@
  *
  * @param {object} crowdloger The CrowdLogger object.
  */
-var CLIBase = function(crowdlogger, cli){
+CLI.prototype.Base = function(crowdlogger, cli){
     // Private variables.
     var that = this,
         clrmi,
@@ -28,18 +28,31 @@ var CLIBase = function(crowdlogger, cli){
                 command: 'setExtensionPath', 
                 extensionPath: crowdlogger.version.info.
                     get_extension_html_prefix()
-            })}
-
+            })},
+            cliRequest: invokeCLIFunction,
+            cliCallback: invokeCLICallback
         };
 
     // Private function declarations.
-    var onMessage, init, extractData;
+    var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
 
     // Public function declarations.
-    this.loadCLRM, this.sendMessage; 
+    this.loadCLRM, this.sendMessage, this.registerCallback, 
+    this.unregisterCallback, this.invokeCLRMICallback; 
 
 
     // Private function definitions.
+    /**
+     * Initializes everything, including creating a space for the CLRMI
+     * that is, more or less, separated from the rest of the CrowdLogger code.
+     * Note that for Chrome, this separation is real---it's not possible for
+     * code in the CLRMI to interact directly with CrowdLogger code or any
+     * Chrome APIs. For Firefox, extension-level APIs are still available,
+     * it has to go through the Components window business to access CrowdLogger
+     * (this is undesirable, but we haven't figured out how to reduce the
+     * privileges of the page -- a bootstrap based alternative might be the
+     * right approach...).
+     */
     init = function(){
         crowdlogger.debug.log('In init\n');
 
@@ -53,7 +66,8 @@ var CLIBase = function(crowdlogger, cli){
                  .hiddenDOMWindow;
             var frame = hiddenWindow.document.getElementById('clrm');
             if( !frame ) {
-                var clrm_url = crowdlogger.version.info.get_extension_html_prefix()+
+                var clrm_url = 
+                    crowdlogger.version.info.get_extension_html_prefix()+
                     'clrm.html';
 
                 crowdlogger.debug.log('Opening iframe for '+ clrm_url +'\n');
@@ -95,6 +109,12 @@ var CLIBase = function(crowdlogger, cli){
         }
     };
 
+    /**
+     * Extracts data from a message event.
+     *
+     * @param {DOMEvent} The postMessage event.
+     * @return The data passed via postMessage.
+     */
     extractData = function(event){ 
         if( event.data ){
             return event.data;
@@ -103,7 +123,6 @@ var CLIBase = function(crowdlogger, cli){
         }
     };
 
-    // Public function definitions.
     /**
      * Called via the CLRMI; At a minimum, the event object must consist of
      * a command field.
@@ -117,13 +136,112 @@ var CLIBase = function(crowdlogger, cli){
         var data = extractData(event);
         var command = data.command;
 
-        crowdlogger.debug.log('CLI received a message: '+ 
-            JSON.stringify(data) +"\n");
+        // crowdlogger.debug.log('CLI received a message: '+ 
+        //     JSON.stringify(data) +"\n");
 
         if( data.from === 'CLRMI' && messageHandlers[command] ){
             setTimeout( function(){messageHandlers[command](data)}, 2 );
         }
     };
+
+    /**
+     * Invokes a CLI function. 
+     *
+     * @param {object} params     A map of parameters:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} apiName         The name of the CLI API to access.
+     *    <li>{string} functionName    The name of the function whtin apiName
+     *                                 to invoke.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{anything} options       The options to send to the function.
+     *    <li>{int} callbackID         The id of the function the CLI API should
+     *                                 callback.
+     * </ul>
+     */
+    invokeCLIFunction = function(params){
+        if( !params || !params.apiName || !params.functionName ){
+            throw new Exception('cli.invokeCLIFunction requires at least the '+
+                'apiName and functionName fields to be specified in the '+
+                'parameter object');
+            return false; 
+        }
+
+        var throwInvalid = function(){
+            throw new Exception('Invalid apiName/functionName parameter to '+
+                'cli.invokeCLIFunction: '+ params.apiName +'.'+ 
+                params.functionName);
+            return false;
+        }
+
+        var apiNameParts = params.apiName.split(/\./), func = api, i;
+
+        // Check that the apiName starts off valid.
+        if( apiNameParts.length === 0 || apiNameParts[0] === 'base' ){
+            throwInvalid();
+        }
+
+        // Assemble the object chain leading up to the function.
+        for(i = 0; i < apiNameParts.length; i++){
+            if( func[apiNameParts[i]] ){
+                func = func[apiNameParts[i]];
+            } else {
+                throwInvalid();
+            }
+        }
+
+        // Invoke the function, if it exists.
+        if( func[params.functionName] ){
+            setTimeout(function(){
+                params.options.callbackID = params.callbackID;
+                func[params.functionName](params.options);
+            }, 25)
+        } else {
+            throwInvalid();
+        }
+
+        return true;
+    };
+
+    /**
+     * Invokes a CLI callback function. Invocations of this should stem from a
+     * call to sendMessage from the CLRMI side. The function will be passed the
+     * given parameters in addition to the id of the callback so that the
+     * callback can unregister it if needbe.
+     *
+     * @param {object} params      A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{int} callbackID     The id of the callback to invoke.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{anything} options       The options to send to the function.
+     * </ul>
+     */
+    invokeCLICallback = function(params){
+        if( !params || params.callbackID === undefined ){
+            throw new Exception('cli.invokeCLICallback requires at least '+
+                'a callback field in the parameters map.');
+            return false;
+        }
+
+        if( !functionMap[params.callbackID] ){
+            throw new Exception('cli.invokeCLICallback cannot find a callback '+
+                'function with the id "'+ params.callbackID +'"!');
+            return false;
+        }
+
+        setTimeout(function(){ 
+            functionMap[params.callbackID](params.options, params.callbackID);
+        }, 20);
+
+        return true;
+    };
+
+    // Public function definitions.
 
     /**
      * Loads a CrowdLogger Remote Module. This can be from a URL or a string.
@@ -148,15 +266,25 @@ var CLIBase = function(crowdlogger, cli){
         }
     };
 
+    /**
+     * Downloads the CLRM Package at the given URL and loads it.
+     * 
+     * @param {string} url     The URL of a CLRM Package to download.
+     */
     this.loadCLRMFromURL = function(url){
         CROWDLOGGER.io.network.send_get_data(url, null,
             function(response){ 
-                CROWDLOGGER.debug.log('Heard back: '+ response); 
+                // CROWDLOGGER.debug.log('Heard back: '+ response); 
                 that.loadCLRMFromString(response);
             }, function(e){}
         );
     };
 
+    /**
+     * Loads a CLRM Package from a string.
+     *
+     * @param {string} package     The CLRM Package as serialized JSON.
+     */
     this.loadCLRMFromString = function(package){
         that.sendMessage({command: 'loadCLRM', package: package});
     };
@@ -165,11 +293,68 @@ var CLIBase = function(crowdlogger, cli){
      * Sends a message to the CLRMI.
      */
     this.sendMessage = function(message){
-        crowdlogger.debug.log('CLI sending a message: '+
-            JSON.stringify(message) +'\n');
+        // crowdlogger.debug.log('CLI sending a message: '+
+        //     JSON.stringify(message) +'\n');
         if( clrmi ){
             message.from = 'CLI';
             clrmi.postMessage(message, '*');
+        }
+    };
+
+    /**
+     * Messages the CLRMI to invokes a callback function.
+     *
+     * @param {object} params      A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{int} callbackID     The id of the callback to invoke.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{anything} options       The options to send to the function.
+     * </ul>
+     */
+    this.invokeCLRMICallback = function(params){
+        if( !params || params.callbackID === undefined ){
+            throw new Exception('cli.invokeCLRMICallback requires at least a '+
+                'callback field in the parameters map.');
+            return false;
+        }
+
+        // Pack up the message.
+        var message = {
+            callbackID: params.callbackID,
+            options: params.options,
+            command: 'clrmiCallback'
+        };
+
+        // Send to the CLRMI.
+        that.sendMessage(message);
+
+        return true;
+    };
+
+    /**
+     * Registers a callback. The resulting id can then be sent to the CLRMI
+     * via the this.sendMessage.
+     *
+     * @param {function} callback     The callback to register.
+     * @return {int} The callback id assigned to the given callback.
+     */
+    this.registerCallback = function(callback){
+        var callbackID = nextFunctionID++;
+        functionMap[callbackID] = callback;
+        return callbackID;
+    };
+
+    /**
+     * If the given callbackID exists in the registry, it is removed.
+     *
+     * @param {int} callbackID     The id of the function to unregister.
+     */
+    this.unregisterCallback = function(callbackID){
+        if( functionMap[callbackID] ){
+            delete functionMap[callbackID];
         }
     };
 

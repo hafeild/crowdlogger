@@ -25,7 +25,7 @@ var CLRMIUserInterfaceAPI = function(api){
     var copyDefaults, onMessage, appendScript;
 
     // Public functions.
-    this.openWindow;
+    this.openWindow, this.dereferenceModuleResources;
 
 
     // Private function definitions.
@@ -84,10 +84,7 @@ var CLRMIUserInterfaceAPI = function(api){
      *
      * @param {object} options    A map of options. The following are supported:
      * <ul>
-     *     <li>{string} content      The HTML to go inside. This gets URI
-     *                               escaped and then loaded via data:text/html.
-     *                               If neither contents nor url are provided,
-     *                               an about:blank page is opened.
+     *     <li>{string} content      The HTML to go inside. 
      *     <li>{object} resources    If 'contents' is set, then all CLRM 
      *                               resource placeholders will be replaced
      *                               using this map.
@@ -107,10 +104,12 @@ var CLRMIUserInterfaceAPI = function(api){
      * @return A reference to the window.
      */
     this.openWindow = function(options){
+        var opts, win;
         if( defaultWindowOptions.url === '' ){
             defaultWindowOptions.url = api.extensionPath +'blank.html';
         }
-        var opts = copyDefaults(options, defaultWindowOptions);
+
+        opts = copyDefaults(options, defaultWindowOptions);
 
         if( opts.specsMap ){
             var key, specs = [];
@@ -120,15 +119,13 @@ var CLRMIUserInterfaceAPI = function(api){
             opts.specs = specs.join(',');
         }
 
-
-        var win = window.open(opts.url, opts.name, opts.specs);
+        win = window.open(opts.url, opts.name, opts.specs);
 
         if( opts.content && opts.url === defaultWindowOptions.url ){
             if( opts.resources ){
                 opts.content = that.dereferenceModuleResources(
                     opts.content, opts.resources);
             }
-
             try{
                 // Chrome allows this, but FF does not.
                 win.document.open();
@@ -141,57 +138,43 @@ var CLRMIUserInterfaceAPI = function(api){
 
                 api.base.log('win.document.write did not work: '+ err);
 
-                try{
-                    
-                    var re = function(){
-                        api.base.log('in re...readyState: '+ 
-                            win.document.readyState);
-                        if( win.document.readyState === "complete" ){
-                            // win.document.getElementById('frame').setAttribute(
-                            //     'srcdoc', opts.content    
-                            // );
-                            // var doc = document.implementation.
-                            //     createHTMLDocument("New Document");
-                            // doc.open();
-                            // doc.write(opts.content);
-                            // doc.close();
-                            var doc = (new DOMParser).parseFromString(
-                                opts.content, "text/html");
-                            api.base.log('Body: '+ doc.body.innerHTML);
+                // Updates the document, if it's loaded, with the new content.
+                // Otherwise, waits a bit and then tries again.
+                var updateDoc = function(){
+                    api.base.log('in re...readyState: '+ 
+                        win.document.readyState);
+                    if( win.document.readyState === "complete" ){
+                        var doc = (new DOMParser).parseFromString(
+                            opts.content, "text/html");
+                        api.base.log('Body: '+ doc.body.innerHTML);
 
-                            // Copy the new HTML document into the frame
-                            var destDocument = win.document;
-                            var srcNode = doc.documentElement;
-                            var newNode = destDocument.importNode(srcNode, true);
+                        // Copy the new HTML document into the frame
+                        var destDocument = win.document;
+                        var srcNode = doc.documentElement;
+                        var newNode = destDocument.importNode(srcNode, true);
 
-                            destDocument.replaceChild(newNode, 
-                                destDocument.documentElement);
+                        destDocument.replaceChild(newNode, 
+                            destDocument.documentElement);
 
-                            var scripts = doc.getElementsByTagName('script');
-                            var i;
-                            var destHead = 
-                                destDocument.getElementsByTagName('head')[0];
-                            for( i = 0; i < scripts.length; i++ ){
-                                appendScript(destDocument, destHead, scripts[i]);
-                            }
-                            api.base.log('doc.write appears to have worked!!');
-                            if( opts.callback ){ opts.callback(win); }
-                        } else {
-                            setTimeout(re, 20);
+                        var scripts = doc.getElementsByTagName('script');
+                        var i;
+                        var destHead = 
+                            destDocument.getElementsByTagName('head')[0];
+                        for( i = 0; i < scripts.length; i++ ){
+                            appendScript(destDocument, destHead, scripts[i]);
                         }
+                        api.base.log('doc.write appears to have worked!!');
+                        if( opts.callback ){ opts.callback(win); }
+                    } else {
+                        setTimeout(updateDoc, 20);
                     }
-
-                    re();
-
-                } catch(e){
-                    api.base.log('doc.write did not work: '+ e);
                 }
-                
+
+                updateDoc();
             }
         } else if(opts.callback) {
             opts.callback(win);
         }
-
     }
 
     /**
@@ -228,4 +211,7 @@ var CLRMIUserInterfaceAPI = function(api){
             return derefed + boundary;
         });
     };
+
+
+
 }

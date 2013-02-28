@@ -1,0 +1,163 @@
+<!--
+ File:      search_task_assistant.html
+ Author:    Henry Feild
+ Date:      27-Jul-2012
+ Purpose:   A search task assistant for CrowdLogger.
+
+ Copyright (c) 2010-2012
+ University of Massachusetts
+ All Rights Reserved
+-->
+
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="jquery.jscrollpane.css"/>
+    <link type="text/css" rel="stylesheet" href="search-task-assistant.css"/>
+
+    <script language="javascript" src="jquery-1.7.1.min.js"></script> 
+    <script language="javascript" src="jquery-ui-1.8.18.custom.min.js"></script> 
+    <script language="javascript" src="date.js"></script> 
+    <script language="javascript" src="jquery.mousewheel.js"></script> 
+    <script language="javascript" src="jquery.jscrollpane.min.js"></script> 
+
+    <script language="javascript" src="controller.js"></script> 
+    <script language="javascript" src="view.js"></script>
+
+    <script src="init.js"></script>
+</head>
+
+<body>
+
+
+<div id="sidebar" class="sidebar">
+
+    <div id="inner-sidebar">
+        <div class="initialization-cover">
+            <img src="../css/img/loading.01.gif"/>
+            <p>Loading...</p>
+        </div>
+        
+        <div id="inner-sidebar-content">
+
+            <!-- The expand/collapse button at the top. -->
+            <span id="hide-detail-panel" style="display:none"
+                class="detail-panel-toggle" 
+                title="Hide detail panel">&lt;&lt;</span>
+            <span id="show-detail-panel"
+                class="detail-panel-toggle"
+                title="Show detail panel">&gt;&gt;</span>
+
+            <!-- The current task and searches page. -->
+            <div id="current-view" class="">
+                <div class="">
+                 
+                <!-- The user's most recent searches, grouped by task. -->
+                <div id="current-tasks-block" class="current-view-block">
+                    <h1>Current Tasks</h1>
+                    <div id="current-tasks" class="scroll-pane">
+                        <div id="task-1" class="task" 
+                            style="text-align: center">
+                            This is where the searches you enter will appear!
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The most related tasks to the current search. -->
+                <div id="related-tasks-block" class="current-view-block">
+                    <h1>Related Tasks</h1>
+                    <div id="related-tasks" class="scroll-pane">
+                        <div id="task-1" class="task" 
+                            style="text-align: center">
+                            This is where <i>tasks</i> most related to your current task 
+                            will appear!
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The most related searches to the current search. -->
+                <div id="related-searches-block" class="current-view-block">
+                    <h1>Related Searches</h1>
+                    <div id="related-searches" class="scroll-pane">
+                        <div id="task-1" class="task" 
+                            style="text-align: center">
+                            This is where the searches most related to your current task
+                            will appear...think of this section as a re-ranking over the
+                            searches in the top related tasks.
+                        </div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <!-- Search history page. -->
+            <div id="search-history-view" class="hide">
+                <h1>Search History</h1>
+                    <div id="search-history" class="scroll-pane full-page">
+                    </div>
+            </div>
+            
+            <!-- Task history page. -->
+            <div id="task-history-view" class="hide">
+                <h1>Task History</h1>
+                    <div id="task-history" class="scroll-pane full-page">
+                    </div>
+            </div>
+
+            <!-- Search page. -->
+            <div id="search" class="hide">
+                <h1>Search your history</h1>
+                <form id="search-box-form">
+                    <input type="input" id="search-box" value=""/>
+                    <input type="submit" id="submit-search" value="Go"/>
+                </form>
+
+                <div id="matched-tasks-block" class="search-block">
+                    <h1>Matched tasks</h1>
+                    <div id="matched-tasks" class="scroll-pane search-results">
+                        <div id="task-1" class="task" 
+                                style="text-align: center">
+                                This is where <i>tasks</i> most related to your search terms will appear.
+                            </div>
+                    </div>
+                </div>
+
+                <div id="matched-searches-block" class="search-block">
+                    <h1>Matched Searches</h1>
+                    <div id="matched-searches" class="scroll-pane search-results">
+                        <div id="task-1" class="task" 
+                                style="text-align: center">
+                                This is where the searches most related to your search terms
+                                will appear.
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id='sidebar-footer'>
+        <!--    &nbsp; -->
+            <div id="inner-sidebar-footer">
+            <span id="page-left" class="page-left page">&larr;</span>
+             <div class="marks-container">
+                <div class="marks">
+                    <span id="page-0-mark" class="mark current">&#149;</span>
+                    <span id="page-1-mark" class="mark">&#149;</span>
+                    <span id="page-2-mark" class="mark">&#149;</span>
+                    <span id="page-3-mark" class="mark">&#149;</span>
+                </div>
+            </div>
+            <span id="page-right" class="page-right page">&rarr;</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="detail-panel" class="detail-panel">
+    <h2>Task details</h2>
+    Click a task to see more information, including all 
+        searches we detected were part of the same task and what
+        websites you visited for each search.
+</div>
+
+
+</body>
+</html>

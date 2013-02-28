@@ -89,8 +89,28 @@ h1, h2 {
     /*font-style: italic;*/
 }
 
+.bodyWrapper h4 {
+    font-weight: normal;
+    font-size: 115%;
+    margin-top: 15;
+    margin-bottom: 15;
+    color: #3b709a;
+}
+
 .bodyWrapper h2 {
     margin-top: 50px;
+}
+
+.function {
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px;
+    /*padding-top: 1px;*/
+}
+
+.function h3 {
+    margin-top: 0px;
 }
 
 .toc {

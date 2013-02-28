@@ -9,7 +9,15 @@
  */
 
 var CLI = function(crowdlogger){
-    this.base = new CLIBase(crowdlogger, this);
-    this.ui = null;
-    this.user = null;
+    var that = this,
+        init;
+
+    init = function(){
+        that.base = new that.Base(crowdlogger, that);
+        that.ui = null;
+        that.user = new that.User(crowdlogger, that);
+        return that;
+    };
+
+    init();
 };

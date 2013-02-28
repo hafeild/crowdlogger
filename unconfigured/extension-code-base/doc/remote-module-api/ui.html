@@ -16,11 +16,63 @@
 </div>
 
 <h1>User Interface API</h1>
+<p>
+In the sections that follow, we assume that the CLRM API instance passed to your CLRM is named <code>api</code>.
+</p>
 
 <a name="standalone"></a>
 <h2>Stand-Alone Application API</h2>
+<p>
+    We've listed some of the important functions below along with details,
+    such as parameter descriptions, an overview of how the function works,
+    and examples.
+</p>
 
+<div class="function">
+<h3><code>api.ui.openWindow</code></h3>
+<h4>Parameters</h4>
+    {object} <code>options</code>
+    <ul>  
+        A map of options. The following are supported:
+        <li>{string} <code>content</code> 
+            <ul>The HTML to go inside.</ul>
+        <li>{object} <code>resources</code>
+            <ul>If 'contents' is set, then all CLRM 
+            resource placeholders will be replaced
+            using this map.</ul>
+        <li>{string} <code>url</code>
+            <ul>The URL to load (overrides contents). If
+            neither contents nor url are provided,
+            an about:blank page is opened.</ul>
+        <li>{string} <code>name</code>
+            <ul>The name of the window to open. This will replace any open
+            windows with this name.</ul>
+        <li>{string} specs
+            <ul>The window.open specs. See <a 
+            href="http://www.w3schools.com/jsref/met_win_open.asp">this
+            page</a> for details.</ul>
+        <li>{object} <code>specsMap</code>
+            <ul>A map of specs. This is serialized into the
+            format "key1=value1,key2=value2,...". The
+            keys should be the same as those specified
+            in the specs string.</ul>
+        <li>{function} <code>callback</code>
+            <ul>Invoked when the window has been created.</ul>
+    </ul>
 
+<h4>Description</h4>
+<p>
+    Opens a window. If <code>url</code> is not specified, then a 
+    CrowdLogger extension page named <code>blank.html</code> is opened
+    (this allows greater control over the window than if 
+    <code>about:blank</code> is opened). If <code>content</code> is
+    provided, it is dereferenced using the provided 
+    <code>resources</code> and loaded into the DOM of 
+    <code>blank.html</code>. Once the window has been opened, 
+    <code>callback</code> (if provided) is invoked with the window 
+    object.
+</p>
+</div>
 
 
 <a name="crowdlogger"></a>
