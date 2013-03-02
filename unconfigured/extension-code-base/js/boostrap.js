@@ -58,10 +58,10 @@ var JS_FILES = [
     'experiments.artifact_extractors.js',
 
     // CrowdLogger Remote Module API:
+    'api.cli.js',
     'api.cli.base.js',
     'api.cli.ui.js',
     'api.cli.user.js',
-    'api.cli.js',
     // 'api.clrmi.init.js',
     // 'api.clrmi.base.js',
     // 'api.clrmi.ui.js',

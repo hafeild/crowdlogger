@@ -202,10 +202,11 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
             if( entry.e === "search" ){
                 var search_trail_event = new Search_Trail_Event( 
                     entry.t, "search",
-                    to_search_url( entry.q, entry.se), entry.url, entry.se
+                    entry.q,
+                    to_search_url( entry.q, entry.se), entry.se
                 );
 
-                if( (search_trail_event.time - previous_search_event.time) > 
+                if( (search_trail_event.time - previous_search_event.time) < 
                         threshold && previous_search_event.time > 0 ) {
                     add_trail_event( previous_search_event );
                 }
@@ -247,6 +248,8 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
         if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){ return; }
         CROWDLOGGER.util.mark_page_as_initialized(doc);
 
+        var curDayElm, curDayKey = "";
+
         var jq = doc.defaultView.jQuery;
 
         // This points to the container on the web page where we will
@@ -266,19 +269,27 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
             }
         } 
 
+        // The header.
+        var html = jq('<table>');
+
+        // Place the html.
+        contents_element.append(html);
+
         // This will be called when the file is finished being read.
         var process_entries = function( entries, next ){
             // Get the search histogram for the log.
             var search_trails = log_to_search_trails_by_day( entries );
 
-            // The header.
-            var html = jq('<table>');
-
             // Now iterate through the array of search trails in reverse order,
             // separating days with a ruler.
-            for( var i = search_trails.length-1; i >= 0; i-- ){
-                html.append('<tr><td colspan="2" class="date">'+
-                    search_trails[i].to_key() +'</td></tr>'); // The date.
+            //for( var i = search_trails.length-1; i >= 0; i-- ){
+            var i;
+            for( i = 0; i < search_trails.length; i++ ){
+                if( search_trails[i].to_key() !== curDayKey ){
+                    html.append('<tr><td colspan="2" class="date">'+
+                        search_trails[i].to_key() +'</td></tr>'); // The date.
+                    curDayKey = search_trails[i].to_key();
+                }
 
                 for( var j = 0; j < search_trails[i].events.length; j++ ) {
                     var cur_event = search_trails[i].events[j];
@@ -324,16 +335,27 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
 
                     //html +=  "</td></tr>\n"; 
                 }
+ 
             }
+            entries = null;
+            search_trails = null;
 
-            // Place the html.
-            contents_element.append(html);
+            jq('<span class="button" style="height: 20px">').
+                text('See more').
+                click(function(){
+                    next();
+                    jq(this).remove();
+                }).appendTo(contents_element);
 
             // next();
         };
         
         // Read the activity file in and then call the function above.
-        CROWDLOGGER.io.log.read_activity_log( {on_chunk: process_entries} );
+        CROWDLOGGER.io.log.read_activity_log( {
+            on_chunk: process_entries,
+            chunk_size: 2000,
+            reverse: true
+        } );
     };
 
     if( doc === undefined ){
@@ -378,55 +400,157 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
         if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){ return; }
         CROWDLOGGER.util.mark_page_as_initialized(doc);
 
-        var win = CROWDLOGGER.window;
+        var win = CROWDLOGGER.window,
+            save_log_elm,
+            done = false,
+            jq = doc.defaultView.jQuery,
+            next_button = jq(
+                '<span class="button" style="height: 20px">Next</span>').
+                insertAfter('#log-area'),
+            save,
+            process_entries;
 
-        // Called when the activity log has been parsed.
-        var process_entries = function( entries, next ){
+        save = function(){
+            const FILE_TYPE = 'application/x-download'; //'text/plain;charset=utf-8'; //text/javascript'; //'application/x-download';
+            var blob,
+                firstEntry = true,
+                oldestDate, 
+                newestDate,
+                limit = jq('#file-limit').val(),
+                data = [],
+                append_entries_to_save,
+                save_file;
 
-            // Called when the user clicks on the "Save" link.
-            var save_data_to_file = function(){
-                //B_DEBUG
-                CROWDLOGGER.debug.log( 
-                    "Attempting to save log data to file.\n" );
-                //E_DEBUG
+            if( limit === 'all' ){
+                limit = 0;
+            } else {
+                limit = parseFloat(limit);
+                if( isNaN(limit) ){
+                    limit = 0;
+                }
+            }
 
-                // First, trying using HTML5 blobs to save the data; this
-                // creates an awful looking filename, but it's the only way
-                // to do it in Chrome right now (I think, at least).
-                // This isn't supported in FF3.*, so in that case, we just
-                // have to display the file itself.
-                // if( !CROWDLOGGER.util.save_dynamic_text( doc, 
-                //         JSON.stringify(entries) ) &&
-                //      CROWDLOGGER.version.info.get_browser_name().
-                //         match(/^ff/) != null ) {
-                //     CROWDLOGGER.io.file.display_activity_log( doc );
-                // }
-                CROWDLOGGER.util.save_dynamic_text(doc,JSON.stringify(entries));
+            save_log_elm.removeClass('button');
+            save_log_elm.off('click', save);
+            save_log_elm.html('');
+
+            append_entries_to_save = function( entries, next ){
+                if(save_log_elm.html().length === 3){
+                    save_log_elm.html('');
+                } else {
+                    save_log_elm.html( save_log_elm.html()+'.');
+                }
+
+                var i, size;
+
+                // Update the dates.
+                if( newestDate === undefined && entries.length > 0 ){
+                    newestDate = entries[0].t;
+                    oldestDate = newestDate;
+                }
+
+                if( entries.length > 0 ){
+                    oldestDate = Math.min(
+                        oldestDate, entries[entries.length-1].t);
+                }
+
+                if( data.length === 0 ){
+                    data = ['[', JSON.stringify(entries.shift(), null, '\t')];
+                }
+
+                // Serialize the entries.
+                while( entries.length > 0 ){
+                    data.push(',');
+                    data.push(JSON.stringify(entries.shift(), null, '\t'));
+                }
+
+                size = data.length / 4500.0; // Rough estimate of 4.5k/MB.
+                console.log(size);
+
+                if(limit === 0 || size < limit){
+                    setTimeout(next, 5);
+                } else {
+                    setTimeout(save_file, 5);
+                }
             };
 
+            save_file = function(){
+                if( data.length > 0 ){ //blob){
+
+                    //blob = new Blob([blob, ']'], {type: FILE_TYPE});
+                    data.push(']');
+                    blob = new Blob(data, {type: FILE_TYPE});
+                    console.log("Writing file!");
+                    // saveAs(
+                    //     new Blob([blob,']'], {type: FILE_TYPE}), 
+                    //     'log.'+oldestDate+'-'+newestDate+'.json');
+                    var url = URL.createObjectURL(blob);
+
+                    //blob = null;
+                    // save_log_elm.html('Save');
+                    // save_log_elm.on('click', save); 
+                    var e = jq('<a href="'+url+'" download="log.'+
+                        oldestDate+'-'+
+                        newestDate+'.json"></a>').
+                        insertAfter(save_log_elm);
+
+                    e.click(function(){
+                        var link = jq(this);
+                        save_log_elm.html('Save');
+                        save_log_elm.addClass('button');
+                        save_log_elm.on('click', save); 
+                        setTimeout(function(){
+                            link.remove();
+                            URL.revokeObjectURL(url);
+                        }, 50);
+                    })[0].click();
+                    //.trigger('click');
+                    delete blob;
+                }
+            };
+
+            CROWDLOGGER.io.log.read_activity_log( {
+                on_chunk: append_entries_to_save,
+                chunk_size: 500,
+                on_success: save_file,
+                reverse: true
+            } );
+
+        };
+
+        // Called when the activity log has been parsed.
+        process_entries = function( entries, next ){
             doc.getElementById( 'log-area' ).innerHTML = 
                 JSON.stringify(entries, null, '\t');
 
-            var save_log_elm = doc.getElementById( 'save-log' );
-            var description = 'Save log (this will create a file with a ' +
-                'random string of numbers to your default downloads ' +
-                'directory)';
 
-            //CROWDLOGGER.version.info.get_browser_name() === 'ff3' ){
-            if( CROWDLOGGER.util.get_dynamic_save_functions() === null ){ 
-                description = 'Show log on file system';
+            var next_wrapper = function(){
+                next_button.off('click', next_wrapper);
+                next_button.hide();
             }
-
-            save_log_elm.innerHTML = description; 
-            if( !refresh ){
-                save_log_elm.addEventListener(
-                    'click', function(e){ save_data_to_file(); }, false ); 
-            }    
-            next();
+            next_button.on('click', next_wrapper);
+            if( !done ){
+                next_button.show();
+            }
         };
 
-        // Read the activity file in and then call the function above.
-        CROWDLOGGER.io.log.read_activity_log( {on_chunk: process_entries} );
+        // Attach the code that forms the blob to download to the 'Save' button.
+        save_log_elm = jq('#save-log');
+        if( !refresh ){
+            save_log_elm.on('click', save); 
+        }    
+
+        // This controls what is displayed directly on the export page (i.e.,
+        // it's not for storing the data to a file).
+        CROWDLOGGER.io.log.read_activity_log( {
+            on_chunk: process_entries,
+            chunk_size: 1000,
+            on_success: function(){
+                next_button.hide();
+                done = true;
+            },
+            reverse: true
+        } );
     };
 
     if( doc === undefined ){

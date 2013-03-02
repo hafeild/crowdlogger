@@ -45,13 +45,18 @@
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-    <a id="save-log" href="#">Save file</a> 
+    Save the most recent <input type="text" 
+        id="file-limit"
+        style="width: 40px; text-align: right" 
+        value="2"/> MB
+    <span id="save-log" class="button" style="height: 20px">Save file</span> 
+    <br/>
+    <span class="note">(use 'all' to save all)</span>
 
-    <br>
+    <br/>
 
     <div id="log-area">
     </div>
-
 
     <!-- Everything below here is for the footer. -->
     <div class="buffer">

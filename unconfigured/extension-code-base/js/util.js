@@ -376,6 +376,57 @@ CROWDLOGGER.util.save_dynamic_text = function( doc, data ) {
     return true;    
 };
 
+
+CROWDLOGGER.util.save_dynamic_text_stream = function( doc ) {
+    var builder = undefined, bit_array, saveas, removeURL, createURL;
+    var save_functions = CROWDLOGGER.util.get_dynamic_save_functions();
+
+    if( save_functions === null ){
+        return null;
+    }
+    
+    builder = save_functions.blob_builder();
+    
+    var append = function(data){
+        // Convert the data into unsigned ints.
+        bytes = new Uint8Array(data.length);
+        for(var i = 0; i< data.length; i++) {
+          bytes[i] = data.charCodeAt(i);
+        }
+        builder.append( bytes.buffer );
+    };
+
+    var save = function(name){
+        saveAs(builder.getBlob("application/octet-stream"), name);
+
+        // blob = builder.getBlob("application/octet-stream");
+        // saveas = doc.createElement("iframe");
+        // saveas.style.display = "none";
+        // // saveas.name = "log.tsv";
+        
+
+        // try{
+        //     saveas.src = save_functions.create_object_url(blob);
+        // } catch(e) {
+        //     CROWDLOGGER.debug.log( "Exception: " + e );
+        // }
+    
+        // doc.body.appendChild(saveas);
+        // //doc.getElementById( "log-area" ).appendChild(saveas);
+
+        // // After some period of time, remove this object (it could get big).
+        // setTimeout( 
+        //     function(){ save_functions.revoke_object_url( saveas.src ); }, 50000 )
+    };
+
+    return {
+        append_data: append,
+        save_as: save
+    };    
+};
+
+
+
 /**
  * Based on: http://www.js-x.com/page/javascripts__example.html?view=745
  * Extracts email addresses from the mixed format of names and email addresses

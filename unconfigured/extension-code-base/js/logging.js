@@ -338,7 +338,7 @@ CROWDLOGGER.logging.init = function(){
     // The maximum ticket number (after which, it will wrap back around).
     max_ticket_number = 100;
     // Milliseconds 
-    sufficient_delta = 50; // A half second.
+    sufficient_delta = 1000; // A full second.
 
     // The ticket defaults.
     current_ticket_out = -1;
