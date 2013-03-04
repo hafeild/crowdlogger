@@ -9,9 +9,8 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">%%FULL_PROJECT_NAME%%</span><br>
-            <span id="subtitle">
-                <span class="titleSub">Help</span>
+            <img class="logo" src="images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Help/FAQ</span><br>
             </span>
         </div>
     </div>
@@ -21,7 +20,7 @@
     <div class="headerBuffer"></div>
 
 
-<div id="iframe">
+<div id="iframe" class="menu-frame">
    <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
         height=70px>
    </iframe>
@@ -40,7 +39,7 @@ here:
         <li><a href="#settings">Settings</a></li>
         <li><a href="#statusPage">Status page</a></li>
         <ul>
-    		<li><a href="#win">Check/redeem winnings</a></li>
+    		<!-- <li><a href="#win">Check/redeem winnings</a></li> -->
 	    	<li><a href="#viewLog">View search log</a></li>
         </ul>
     </ul>
@@ -57,7 +56,7 @@ versions of the extension.
 
 <a name="pausingLogger"></a>
 <h1>Pausing the logger</h1>
-
+<p>
 By default, the logger will start logging as soon as you install the extension.
 To pause the logger, click the "pause" button <span style="white-space:
 nowrap;">(<img src="images/pauseLogging.png"/>)</span> on the navigation
@@ -65,20 +64,19 @@ bar. When pressed, a menu will pop up. The first entry is another pause button. 
 "play" button <span style="white-space: nowrap;">(<img
 src="images/startLogging.png"/>)</span>.  You can press this button to start
 logging again.
-
-<br><br>
+</p>
 
 <a name="toolsMenu"></a>
 <h1>Understanding the %%PROJECT_NAME%% menu</h1>
-
+<p>
 This section describes the tools available in the %%PROJECT_NAME%% menu. This menu can be accessed by clicking the play or pause button on your navigation bar in Chrome or Firefox.
-
+</p>
 
 <div align="center">
     <img src="images/chrome_menu.png" width="75%"/>
 </div>
 
-
+<p>
 In this section, we go through the 
 <ul>
     <li><a href="#register">Register</a>,
@@ -88,46 +86,47 @@ In this section, we go through the
 </ul>
 menu items. The pause/start logging button was 
 discussed above. The Help menu item will bring you to this page.
+</p>
 
 <a name="register"></a>
 <h2>Register</h2>
-
+<p>
 In order for us to understand the demographics of the study participants, and to
 enter you into the periodic Amazon.com gift card raffle, we ask that you
 register. If you would like to opt out of (or back into) the raffle, this is where you would do
 so. This is also where you can enter the code given to you by whoever 
 referred you to %%PROJECT_NAME%%. 
+</p>
 
 <p>
-
 While you must enter something for (almost) all of the fields, you can
 select "I prefer not to answer" for multiple-choice question or enter "PNA"
 (prefer not to answer) in text fields.
+</p>
 
 <p>
-
 When you click "Register" at the bottom (this will only be click-able once 
 you've responded to all of the questions), the extension will attempt to contact
 the registration server. If there is a problem, a pop up box will notify you of
 such. If successful, a prompt will appear, asking if you would like to refer a
 friend.
-
-<br><br>
+</p>
 
 <a name="referAFriend"></a>
 <h2>Refer a friend</h2>
+<p>
 If you click on the "Refer a friend" button in either the menu or the 
 post-registration prompt described above, you will see a dialog that supplies you with the code you need to give to the participants 
 you refer to this study. It will also give you sample text for an email message to send to your friends.  (The %%PROJECT_NAME%% team's experience is that spam filters are less likely to be triggered if you send the message yourself.)
 Your friends should enter this code during their registration. 
 Participants will be given a greater chance of winning the periodic Amazon.com 
 gift card raffles as they refer more participants.
+</p>
 
-<br><br>
 
 <a name="settings"></a>
 <h2>Settings</h2>
-
+<p>
 To access the settings for the extension, select the "Settings" option. 
 One of the settings is your <i>pass phrase</i>.
  A pass phrase is used to 
@@ -137,54 +136,56 @@ way, information extracted from your various computers will not appear as
 though it came from different users, ensuring that we do not falsely decrypt 
 your information. <span style="color: red"><b>It is important that you use the 
 same pass phrase across all computers.</b></span> 
+</p>
 
 <p>
-
 Another setting concerns experiments. Currently the only option
 is whether or not to run experiments automatically when they become available. If you select to have experiments run automatically, experiments will run as soon as they are available without your explicit interaction.
-	
-<br><br>
+</p>
+
 
 <a name="statusPage"></a>
 <h2>Status Page</h2>
-
+<p>
 Clicking the "Status Page" menu item will bring you to the %%PROJECT_NAME%% status page. This page includes several important notifications and tools:
 <ul>
     <li>Current notifications, such as:</li>
     <ul>
-        <li>that there are pending experiments to run</li>
-        <li>new messages from the study researchers</li>
-        <li>a new version of the consent form</li>
+        <!-- <li>that there are pending study action to run</li> -->
+        <li>alerts from study researchers</li>
+       <!--  <li>a new version of the consent form</li> -->
         <li>a reminder to set your pass phrase, register, and refer friends</li>
-        <li>that you have won a raffle</li>
-        <li>that a new version of the extension is available</li>
+        <!-- <li>that you have won a raffle</li> -->
+        <!-- <li>that a new version of the extension is available</li> -->
     </ul>
     <li>New messages</li>
-    <li>A list of raffles you have won</li>
+    <!-- <li>A list of raffles you have won</li> -->
+    <li>A list of studies you have signed up for</li>
     <li>Tools, such as:</li>
     <ul>
-        <li>a list of the searchers you have conducted</li>
+        <li>visualizations over your search history</li>
+        <li>exporting your search history</li>
+        <li>removing individual records from your search history</li>
         <li>removing your local search log from you computer</li>
     </ul>
 </ul>
-
-<p>
+</p>
 	
 
 	
-<a name="winning"></a>
+<!-- <a name="winning"></a>
 <h3>Notification of winning a raffle</h3>
 
 If you win a raffle, a notification will appear in the status page. You will also be notified via a desktop notification. The status page will provide you with the information you need to claim and download your Amazon.com gift card.
+ -->
 
-<br><br>
 
 <a name="viewLog"></a>
 <h3>View search log</h3>
-
+<p>
 You can view your search history&mdash;a list of the searches you have submitted to search 
 engines, as well as their frequency&mdash; by selecting the "Search histogram" link under the "Tools" section of the status page. A dialog will pop up listing your searches. You can sort them alphabetically or by frequency.
-
+</p>
 
 
     <!-- Everything below here is for the footer. -->

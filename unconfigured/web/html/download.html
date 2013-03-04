@@ -11,9 +11,8 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">%%FULL_PROJECT_NAME%%</span><br>
-            <span id="subtitle">
-                <span class="titleSub">Download</span>
+            <img class="logo" src="images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Download</span><br>
             </span>
         </div>
     </div>
@@ -23,29 +22,34 @@
     <div class="headerBuffer"></div>
 
 
-<div id="iframe">
+<div id="iframe" class="menu-frame">
    <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
         height=70px>
    </iframe>
 </div>
 
 <h1>Downloading %%PROJECT_NAME%%</h1>
-
-To use %%PROJECT_NAME%% and participate in the study, you must:
-<ol>
-    <li>download the %%PROJECT_NAME%% extension for <a href="http://www.google.com/chrome/">Google Chrome</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a></li>
-    <li>agree to the informed consent form (the form will be shown to you after the extension installation is complete)</li>
-</ol>
-<i><b>%%PROJECT_NAME%% will not be activated until you agree to the terms of the informed consent form.</b></i>
 <p>
+To use %%PROJECT_NAME%% on your desktop or laptop, you must:
+<ol>
+    <li>download <a href="http://www.google.com/chrome/">Google Chrome (v24+)</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox (v17+)</a></li>
+    <li>download the %%PROJECT_NAME%% extension for <a href="http://www.google.com/chrome/">Google Chrome</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a></li>
+</ol>
+</p>
+
+
+<span class="note">%%PROJECT_NAME%% is currently under construction! Version 2.0 will be out soon!</span>
+<br/>
+<br/>
 <span class="buttonPanel" style="height: 5em">
-    <span id="chrome_download" class="button" onclick=" location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Chrome</b></span>
-    <span id="ff_download" class="button" onclick="if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Firefox</b></span>
+    <span id="chrome_download" class="button disabled" onclick="return false; location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Chrome</b></span>
+    <span id="ff_download" class="button disabled" onclick="return false; if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Firefox</b></span>
 </span>
+<br/>
 
-
-<br><br>
-The extension will notify of you any important messages from the project researches. 
+<p>
+After installing, the extension will open a configuration wizard that will guide you through setting things up.
+</p>
 
     <!-- Everything below here is for the footer. -->
     <div class="buffer">

@@ -9,9 +9,8 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">%%PROJECT_NAME%%</span><br>
-            <span id="subtitle">
-                <span class="titleSub">About</span>
+            <img class="logo" src="images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">About</span><br>
             </span>
         </div>
     </div>
@@ -21,7 +20,7 @@
     <div class="headerBuffer"></div>
 
 
-<div id="iframe">
+<div id="iframe" class="menu-frame">
    <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
         height=70px>
    </iframe>
@@ -29,21 +28,38 @@
 
 <h1>About the %%PROJECT_NAME%% study</h1>
 
-%%FULL_PROJECT_NAME%% is a study of a new system that helps researchers use information about people's search behavior on the Web, but simultaneously protecting the privacy of the users who contribute the data.
-
 <p>
+%%FULL_PROJECT_NAME%% is a platform on which researchers can conduct studies of how  people search the Web. Built as a browser extension for <a href="http://www.google.com/chrome/">Google Chrome</a> and <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a>, %%PROJECT_NAME%% offers several services for research studies, including:
+</p>
+<ul>
+  <li>accessing participants' past search behavior
+  <li>accessing participants' real time search behavior
+  <li>local storage
+  <li>uploading data (either privately or not)
+  <li>aggregating data across participants privately
+  <li>interacting with participants via HTML5
+      <br/>Examples:
+    <ul>
+      <li>questionnaires
+      <li>labeling tasks (e.g., relevance judgments)
+      <li>data visualization
+    </ul>
+  <li>performing server-side computations
+</ul>
 
+<!-- 
+<p>
 A crucial element of the system is that the only information that is revealed to researchers is information that is shared by many <i>different</i> individuals. In the current study, we consider "many" to be five. Any data this is not shared by many different individuals is undecipherable.
+</p>
 
 <p>
-
 The system involves a Web browser extension that you will install. The
 way it works is that your search behavior is logged on your
 computer. Search behavior includes actions such as entering searches
 on Web search engines, clicking on results for those searches, and
 navigating through web sites. For sensitive sites&mdash;e.g., bank websites&mdash;%%PROJECT_NAME%% does not log any information other than the name of the site.
-<!--<b>We do not collect data about sensitive
-sites, such as bank websites.</b>-->  We will periodically ask you to run
+
+We will periodically ask you to run
 experiments on your search logs by clicking on a button that is part
 of the browser extension. These experiments will extract information
 from your logs and encrypt them. The encrypted information is then sent to a server, where
@@ -61,7 +77,7 @@ An example experiment that we may run is to have the extension extract the indiv
 </ol>
 
 Let's also suppose that 70 other people also entered searches 1 and 3. Your
-second search for blueberry pie recipes will be ignored -- never seen by
+second search for blueberry pie recipes will be ignored&mdash;never seen by
 researchers. The other two will be revealed, but we will:
 
 <ol>
@@ -72,10 +88,22 @@ researchers. The other two will be revealed, but we will:
 Because we can only see information that is common among many different people,
 your sensitive searchers are not revealed. Because the two conditions above
 hold true, your identity and privacy are preserved.
+ -->
 
-<br><br>
 <h2>Why do this?</h2>
-As researchers in the field of search technologies, we are interested in data pertaining to Web search. This data helps us develop new search algorithms and tools to improve your search experience. However, user search data is not readily available. We would like to collect this data, but we realize that privacy is of great concern to the users of a search logging system. That is why we have built the system described above -- it is a win-win for both the users (who will benefit from the research) and the researchers (who will be able to continue researching).
+<p>
+As researchers in the field of search technologies, we are interested in data pertaining to Web search. This data helps us develop new search algorithms and tools to improve your search experience. There are many ways to collect data, but many times it involves developing the apparatus from scratch&mdash;something that is costly and, for small or non-technical groups, extremely difficult. In addition, it's often difficult to get a large number of participants for studies.
+</p>
+
+<p>
+%%PROJECT_NAME%% addresses these issues. First, it minimizes the amount of programming necessary. A growing number of example study modules makes it easy to tweak existing studies for a researcher's needs. In addition, the code base is open source, so anyone who would like can modify the underlaying framework so it better suits their needs.
+</p>
+
+<p>
+Another goal of %%PROJECT_NAME%% is to form a community of users who participant in many of the studies offered through the interface. Participants of one %%PROJECT_NAME%% study may notice another %%PROJECT_NAME%% study being offered and participate in that one, as well. We hope this will increase study sizes from 20&ndash;30 users (a common range today for academic research) to hundreds or more. 
+</p>
+
+
 
     <!-- Everything below here is for the footer. -->
     <div class="buffer">

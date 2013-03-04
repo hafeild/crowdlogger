@@ -20,6 +20,8 @@ body {
     height:                 100%;
     padding-bottom:         10px;
     /*width:                  850px;*/
+    color: #464646;
+    size: 12pt;
 }
 
 body.welcome {
@@ -31,6 +33,11 @@ body.welcome {
 body.menu, body.copyright {
     background-color:       white;
     text-align:             center;
+}
+
+.menu-frame {
+    margin-top: 30px;
+    margin-bottom: -20px;
 }
 
 .copyright {
@@ -63,13 +70,26 @@ body.menu, body.copyright {
 
 .title {
     float:                  left;
+    width: 100%;
+    position: relative;
 }
 
 .titleMain{ 
-    font-size:              2.0em;
+    display: block;
+    /*float: right;*/
+    position: absolute;
+    right: 20px;
+    bottom:0px;
+    margin-top: 20px;
+    margin-right: 25px;
+
+    color: #666;
+    font-size: 260%;
+
+/*    font-size:              2.0em;
     font-weight:            normal;
     font-family:            sans-serif;
-    color:                  black;
+    color:                  black;*/
     /*font-style:             italic;*/
     
 }
@@ -181,6 +201,7 @@ span.button:active {
 
 
 span.disabled {
+    background: none;
     background-color:       lightgray;
     color:                  gray;
     border:                 1px gray solid;
@@ -192,6 +213,7 @@ span.disabled {
 }
 
 span.disabled:hover {
+    background: none;
     cursor:                 default;
     background-color:       lightgray;
     color:                  gray;
@@ -200,6 +222,8 @@ span.disabled:hover {
 }
 
 span.disabled:active {
+    background: none;
+    background-color:       lightgray;
     cursor:                 default;
 }
 
@@ -230,12 +254,50 @@ span.disabled:active {
 }
 
 
+
+h1 {
+    /*margin-top: 20px;*/
+    font-size: 180%;
+    color: #666;
+    border: none;
+}
+
+h2, h3 {/*
+    margin-top: 25px;
+    margin-bottom: 0px;*/
+    padding: 0px;
+    font-size: 130%;
+    color: steelblue;
+    border: none;
+}
+
+h3 {
+    color: #97bad7;
+    font-weight: normal;
+    /*margin-top: 20;*/
+    font-size: 120%;
+    /*font-style: italic;*/
+}
+
+h4 {
+    font-weight: normal;
+    font-size: 115%;
+/*    margin-top: 15;
+    margin-bottom: 15;*/
+    color: #3b709a;
+}
+
+h2 {
+    /*margin-top: 50px;*/
+}
+/*
+
 h1, h2 {
     font-size:              1.5em;
     font-family:            sans-serif;
     font-weight:            normal;
-    /*width:                  40%;
-    border-bottom:          1px lightsteelblue solid;*/
+    width:                  40%;
+    border-bottom:          1px lightsteelblue solid;
     
 }
 
@@ -245,7 +307,7 @@ h2 {
 
 h2 a {
     text-decoration:        none;
-}
+}*/
 
 .section {
     margin-bottom:          25px;
@@ -365,4 +427,29 @@ span.messageSummary {
     color:                  steelblue;
     padding:                10px;
     border:                 2px orange solid;
+}
+
+.logo {
+    width: 200px;
+    float: left;
+}
+
+a {
+    color: steelblue;
+}
+
+a:visited {
+    color: steelblue;
+}
+
+a:active {
+    color: lightsteelblue;
+}
+
+.copyright a, .copyright a:visited {
+    color: lightgray;
+}
+
+.copyright a:active {
+    color: gray;
 }
