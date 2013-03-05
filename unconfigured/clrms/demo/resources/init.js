@@ -27,6 +27,10 @@ var addButton = function(){
     jQuery('<button>Open a medium-sized window!</button>').
         click(demoBackend.launchMediumWindow).
         appendTo('body');
+
+    jQuery('<button>Display recent searches!</button>').
+        click(function(){demoBackend.displayLastNSearches(10);}).
+        appendTo('body');
 }
 
 // When the document is ready, we can initialize things.

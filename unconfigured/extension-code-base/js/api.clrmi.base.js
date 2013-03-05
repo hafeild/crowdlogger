@@ -17,12 +17,12 @@ var CLRMIBaseAPI = function(api) {
     var that = this,
         messageHandlers = {
             //alert: function(data){ alert(data.message); }
-            clrmiCallback: invokeCLRMICallback
+            
         },
         modules = {},
         useSandbox = false,
         functionMap = {},
-        nextFunctionID = 0;
+        nextFunctionID = 1;
         
     // Private function declarations.
     var init, extractData, onMessage, setExtensionPath, loadCLRM, 
@@ -44,6 +44,8 @@ var CLRMIBaseAPI = function(api) {
 
         // Ask CLI for the extension path so we can open CrowdLogger pages.
         that.sendMessage({command:'getExtensionPath'})
+
+        messageHandlers.clrmiCallback = invokeCLRMICallback;
     };
 
     /**
@@ -142,14 +144,14 @@ var CLRMIBaseAPI = function(api) {
      */
     invokeCLRMICallback = function(params){
         if( !params || params.callbackID === undefined ){
-            throw new Exception('clrmi.invokeCLRMICallback requires at least '+
-                'a callback field in the parameters map.');
+            throw 'clrmi.invokeCLRMICallback requires at least '+
+                'a callback field in the parameters map.';
             return false;
         }
 
         if( !functionMap[params.callbackID] ){
-            throw new Exception('clrmi.invokeCLRMICallback cannot find a '+
-                'callback function with the id "'+ params.callbackID +'"!');
+            throw 'clrmi.invokeCLRMICallback cannot find a '+
+                'callback function with the id "'+ params.callbackID +'"!';
             return false;
         }
 
@@ -204,9 +206,9 @@ var CLRMIBaseAPI = function(api) {
     this.invokeCLIFunction = function(params){
         //apiName, functionName, options, callback
         if( !params || !params.apiName || !params.functionName ){ 
-            throw new Exception('clrmi.invokeCLIFunction requires at least '+
+            throw 'clrmi.invokeCLIFunction requires at least '+
                 'the apiName and functionName fields to be specified in the '+
-                'parameter object');
+                'parameter object';
             return false; 
         }
         var callbackID = null;
@@ -243,8 +245,8 @@ var CLRMIBaseAPI = function(api) {
      */
     this.invokeCLICallback = function(params){
         if( !params || params.callbackID === undefined ){
-            throw new Exception('clrmi.invokeCLICallback requires at least a '+
-                'callback field in the parameters map.');
+            throw 'clrmi.invokeCLICallback requires at least a '+
+                'callback field in the parameters map.';
             return false;
         }
 
@@ -299,10 +301,10 @@ var CLRMIBaseAPI = function(api) {
  *                                   is how the CLRM will access the CLRMI.
  */
 var CLRM = function(clrmPackage, CrowdLoggerAPI){
-    console.log('clrmPackage.module: '+ clrmPackage.module);
+    //console.log('clrmPackage.module: '+ clrmPackage.module);
     eval(clrmPackage.module);
-    console.log('Evaluated the CLRM; RemoteModule: '+ RemoteModule);
-    console.log(RemoteModule);
+    //console.log('Evaluated the CLRM; RemoteModule: '+ RemoteModule);
+    //console.log(RemoteModule);
     // Every module should have a Module function defined.
     this.module = new RemoteModule(clrmPackage, new CrowdLoggerAPI());
     // Clear it out so no one else has access to it.

@@ -161,6 +161,9 @@ CROWDLOGGER.logging.log_click = function( time, clicked_url,
         q: CROWDLOGGER.util.cleanse_string(query)  
     };
 
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('link-clicked', log_entry);
+
     // Write the entry to the log.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
@@ -194,6 +197,10 @@ CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id,
         stid: src_tab_id,
         surl: CROWDLOGGER.util.cleanse_string(src_url) 
     };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('tab-added', log_entry);
+
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
@@ -217,6 +224,9 @@ CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
         t: time,
         tid: tab_id
     };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('tab-removed', log_entry);
 
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
@@ -243,6 +253,8 @@ CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
         tid: tab_id,
         url: CROWDLOGGER.util.cleanse_string(url)
     };
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('page-loaded', log_entry);
 
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
@@ -270,6 +282,9 @@ CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
         tid: tab_id,
         url: CROWDLOGGER.util.cleanse_string(url)
     };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('page-focused', log_entry);
 
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
@@ -301,6 +316,9 @@ CROWDLOGGER.logging.log_search = function( time, query, search_engine, url ){
         se: search_engine,
         url: CROWDLOGGER.util.cleanse_string(url)
     };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('query-entered', log_entry);
 
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );

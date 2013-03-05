@@ -203,6 +203,14 @@ span.disabled:active {
     text-align:             center;
 }
 
+.copyright a, .copyright a:visited {
+    color: lightgray;
+}
+
+.copyright a:active, .copyright a:hover {
+    color: gray;
+}
+
 
 h1, h2 {
     font-size:              1.3em;

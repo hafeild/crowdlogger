@@ -10,7 +10,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             location: 'no',
             status: 'no',
             toolbar: 'no',
-            resizable: 'yes'
+            resizable: 'yes',
+            scrollbars: 'yes'
         },
         mediumWindowSpecs = {
             width: 300,
@@ -18,7 +19,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             location: 'no',
             status: 'no',
             toolbar: 'no',
-            resizable: 'yes'
+            resizable: 'yes',
+            scrollbars: 'yes'
         },
         elm,
         openWindows = {};
@@ -36,7 +38,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
 
     console.log('>> Declaring public functions...');
     // Public function declarations.
-    this.init, this.launchMediumWindow, this.launchSmallWindow, this.unload;
+    this.init, this.launchMediumWindow, this.launchSmallWindow, this.unload,
+    this.displayLastNSearches;
 
     // Private function definitions.
 
@@ -84,7 +87,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         var eventToMessage = function(eventName, eventData){
             console.log('Heard back!: '+ eventName +', '+ 
                 JSON.stringify(eventData));
-            printToWindows(eventName +': '+ JSON.stringify(eventData));
+            printToWindows('messages', 
+                eventName +': '+ JSON.stringify(eventData));
         };
 
         clrmAPI.user.realTime.addActivityListeners({
@@ -93,18 +97,26 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             'link-clicked': eventToMessage,
             'page-focused': eventToMessage
         });
-    }
+    };
 
     /**
      * Prints the given message to every open Demo window.
      *
+     * @param {string} id       The id of the DOM element in which to insert the
+     *                          message.
      * @param {string} message  The message to display.
+     * @param {bool} overwrite If true, the DOM element will be cleared first.
      */
-    printToWindows = function(message){
+    printToWindows = function(id, message, overwrite){
         var winName;
         for(winName in openWindows){
-            openWindows[winName].jQuery('#messages').
-                append('<div>'+ message +'</div>');
+            if( winName && !winName.closed ){
+                var elm = openWindows[winName].jQuery('#'+id);
+                if( overwrite ){
+                    elm.html('');
+                }
+                elm.append('<div>'+ message +'</div>');
+            }
         };
     };
 
@@ -149,7 +161,35 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         oncomplete();
     };
 
+    /**
+     * Prints the most recent n search queries from the user's interaction
+     * history. These go on a displayed window.
+     * 
+     * @param {int} n  The number of searches to display.
+     */
+    this.displayLastNSearches = function(n){
+        var searchesSeen = 0;
 
+        // Clear any previous search listings.
+        printToWindows('searches', '', true);
+
+        var onChunk = function(data, next, abort){
+            var i = 0;
+            for(i = 0; i < data.length && searchesSeen < n; i++){
+                if( data[i].e === 'search' ){
+                    searchesSeen++;
+                    printToWindows('searches', JSON.stringify(data[i]));
+                }
+            }
+            searchesSeen < n ? next() : abort();
+        };
+
+        clrmAPI.user.history.getInteractionHistory({
+            on_chunk: onChunk,
+            reverse: true,
+            chunk_size: 250
+        });
+    };
 
     // Initialize things.
     init();

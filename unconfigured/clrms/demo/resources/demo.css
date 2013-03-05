@@ -3,3 +3,9 @@ body {
     background: lightblue;
     color: darkgray;
 }
+
+#messages, #searches {
+    width: 100%;
+    height: 20%;
+    overflow: scroll;
+}

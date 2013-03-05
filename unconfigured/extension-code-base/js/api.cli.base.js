@@ -28,10 +28,10 @@ CLI.prototype.Base = function(crowdlogger, cli){
                 command: 'setExtensionPath', 
                 extensionPath: crowdlogger.version.info.
                     get_extension_html_prefix()
-            })},
-            cliRequest: invokeCLIFunction,
-            cliCallback: invokeCLICallback
-        };
+            })}
+        },
+        nextFunctionID = 1,
+        functionMap = {};
 
     // Private function declarations.
     var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
@@ -107,6 +107,9 @@ CLI.prototype.Base = function(crowdlogger, cli){
             clrmi = crowdlogger.jq('#clrm')[0].contentWindow;
             crowdlogger.jq(window).bind( 'message', onMessage );
         }
+
+        messageHandlers.cliRequest = invokeCLIFunction;
+        messageHandlers.cliCallback = invokeCLICallback;
     };
 
     /**
@@ -140,6 +143,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
         //     JSON.stringify(data) +"\n");
 
         if( data.from === 'CLRMI' && messageHandlers[command] ){
+            console.log('Received message from CLRMI: '+ JSON.stringify(data));
             setTimeout( function(){messageHandlers[command](data)}, 2 );
         }
     };
@@ -163,20 +167,23 @@ CLI.prototype.Base = function(crowdlogger, cli){
      */
     invokeCLIFunction = function(params){
         if( !params || !params.apiName || !params.functionName ){
-            throw new Exception('cli.invokeCLIFunction requires at least the '+
+            throw 'cli.invokeCLIFunction requires at least the '+
                 'apiName and functionName fields to be specified in the '+
-                'parameter object');
+                'parameter object';
             return false; 
         }
 
         var throwInvalid = function(){
-            throw new Exception('Invalid apiName/functionName parameter to '+
+            throw 'Invalid apiName/functionName parameter to '+
                 'cli.invokeCLIFunction: '+ params.apiName +'.'+ 
-                params.functionName);
+                params.functionName;
             return false;
         }
 
-        var apiNameParts = params.apiName.split(/\./), func = api, i;
+        var apiNameParts = params.apiName.split(/\./), func = cli, i;
+
+        console.log('Attempting to invoke: '+ params.apiName +'.'+
+            params.functionName +' in CLI.');
 
         // Check that the apiName starts off valid.
         if( apiNameParts.length === 0 || apiNameParts[0] === 'base' ){
@@ -185,6 +192,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
         // Assemble the object chain leading up to the function.
         for(i = 0; i < apiNameParts.length; i++){
+            console.log('Checking for existence of ['+ apiNameParts[i] +']');
             if( func[apiNameParts[i]] ){
                 func = func[apiNameParts[i]];
             } else {
@@ -195,7 +203,9 @@ CLI.prototype.Base = function(crowdlogger, cli){
         // Invoke the function, if it exists.
         if( func[params.functionName] ){
             setTimeout(function(){
-                params.options.callbackID = params.callbackID;
+                if( params.options.callbackID === undefined ){
+                    params.options.callbackID = params.callbackID;
+                }
                 func[params.functionName](params.options);
             }, 25)
         } else {
@@ -223,14 +233,14 @@ CLI.prototype.Base = function(crowdlogger, cli){
      */
     invokeCLICallback = function(params){
         if( !params || params.callbackID === undefined ){
-            throw new Exception('cli.invokeCLICallback requires at least '+
-                'a callback field in the parameters map.');
+            throw 'cli.invokeCLICallback requires at least '+
+                'a callback field in the parameters map.';
             return false;
         }
 
         if( !functionMap[params.callbackID] ){
-            throw new Exception('cli.invokeCLICallback cannot find a callback '+
-                'function with the id "'+ params.callbackID +'"!');
+            throw 'cli.invokeCLICallback cannot find a callback '+
+                'function with the id "'+ params.callbackID +'"!';
             return false;
         }
 
@@ -316,8 +326,8 @@ CLI.prototype.Base = function(crowdlogger, cli){
      */
     this.invokeCLRMICallback = function(params){
         if( !params || params.callbackID === undefined ){
-            throw new Exception('cli.invokeCLRMICallback requires at least a '+
-                'callback field in the parameters map.');
+            throw 'cli.invokeCLRMICallback requires at least a '+
+                'callback field in the parameters map.';
             return false;
         }
 

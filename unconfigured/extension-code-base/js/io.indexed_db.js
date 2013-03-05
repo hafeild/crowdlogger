@@ -869,9 +869,12 @@ CROWDLOGGER.io.IndexedDB = function(){
      *     <li>{string} store_name:    The name of the store to read.
      *     <li>{Function} on_chunk:    Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously. Should 
-     *                                 expect the data and a 'next' function
+     *                                 expect the data, a 'next' function
      *                                 which, when invoked, will retrieve
-     *                                 the next chunk.
+     *                                 the next chunk, and an 'abort' function,
+     *                                 which will close things up and invoke the
+     *                                 on_success function if passed nothing,
+     *                                 on_error if passed 'true, errorMsg'.
      * </ul>
      * OPTIONAL:
      * <ul>
@@ -934,7 +937,16 @@ CROWDLOGGER.io.IndexedDB = function(){
         // invocation. This wrapper freezes it, so to speak, so that the version
         // at invocation is the same as the version at execution.
         function on_chunk(b){
-            return function(){ opts.on_chunk(b, next_chunk); }
+            return function(){ opts.on_chunk(b, next_chunk, abort); }
+        }
+
+        function abort(is_error, error_msg){
+            finished = true;
+            if( is_error && opts.on_error ){
+                setTimeout( function(){opts.on_error( error_msg );}, T );
+            } else if( !is_error && opts.on_success ){
+                setTimeout( opts.on_success, T );
+            }
         }
 
         // Process one chunk.

@@ -40,6 +40,10 @@ var CLRMIUserAPI = function( api ){
 CLRMIUserAPI.prototype.History = function( api ){
     // Private variables.
     var that = this;
+    const MAX_CHUNK_SIZE = 500,
+          MIN_CHUNK_SIZE = 1,
+          DEFAULT_CHUNK_SIZE = 250;
+
 
     // Private function declarations.
 
@@ -58,23 +62,38 @@ CLRMIUserAPI.prototype.History = function( api ){
      * @param {object} opts     A map of options:
      * REQUIRED:
      * <ul>
-     *    <li>{Function} on_chunk:     Invoked per chunk (see below). Chunks
-     *                                 are processed asynchronously.
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
+     *                                 are processed asynchronously. Should
+     *                                 expect three parameters:
+     *                                 <ul>
+     *                                     <li>{array of object} data
+     *                                         The DB entries.
+     *                                     <li>{function} next 
+     *                                         Gets the next chunk.
+     *                                         Parameterless.
+     *                                     <li>{function} abort
+     *                                         Takes two params: 
+     *                                             {boolean} is_error,
+     *                                             {string} error_msg. 
+     *                                         Stops reading and causes either
+     *                                         the on_error (if is_error = true)
+     *                                         or on_success (otherwise)
+     *                                         functions to be invoked. 
+     *                                 </ul>
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
-     *                                 passed to the on_chunk function. If <=0,
-     *                                 all entries will be read in before 
-     *                                 calling on_chunk. This is approximate
-     *                                 because ranges are used and therefore
-     *                                 deleted items within that range will not
-     *                                 be read (their id's are not reused).
-     *                                 Default: 0.
+     *                                 passed to the on_chunk function. This
+     *                                 must fall into the range: 
+     *                                     0 < chunk_size <= 500
+     *                                 If not present or if <= 0, the default
+     *                                 250 will be used; if > 500, the default
+     *                                 500 will be used.
      *    <li>{bool} reverse:          If true, the data will be read in reverse
      *                                 order of id. Default is 'false'.
      *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
@@ -85,24 +104,40 @@ CLRMIUserAPI.prototype.History = function( api ){
     this.getInteractionHistory = function( opts ){
         // Check that the mandatory options are present.
         if( !opts || !opts.on_chunk ){
-            throw new Exception('clrmi.user.history.getInteractionHistory '+
-                'requires an on_chunk option.');
+            throw 'clrmi.user.history.getInteractionHistory '+
+                'requires an on_chunk option.';
             return false;
         }
 
-        var callbackID;
+        var callbackID, chunk_size = DEFAULT_CHUNK_SIZE;
 
         // Handles on_chunk, on_success, and on_error events from the CLI.
         var callback = function(params){
+            api.base.log('(in clrmi.user.history) heard back!')
             if( params.event === 'on_chunk' ){
                 var next = function(){
-                    api.base.invokeCLICallback(params.nextCallbackID);
+                    api.base.log('(in clrmi.user.history) invoking next');
+
+                    api.base.invokeCLICallback({
+                        callbackID: params.nextCallbackID
+                    });
                 };
-                opts.on_chunk(data, next);
+                var abort = function(isError, errorMsg){
+                    api.base.log('(in clrmi.user.history) invoking abort');
+
+                    api.base.invokeCLICallback({
+                        callbackID: params.abortCallbackID, 
+                        options: {
+                            is_error: isError,
+                            error_msg: errorMsg
+                        }
+                    });
+                };
+                opts.on_chunk(params.data, next, abort);
             } else {
                 if( params.event === 'on_error' && opts.on_error ){
                     opts.on_error(params.error);
-                } else {
+                } else if( params.event === 'on_success' && opts.on_success ) {
                     opts.on_success();
                 }
                 api.base.unregisterCallback(callbackID);
@@ -112,8 +147,20 @@ CLRMIUserAPI.prototype.History = function( api ){
         // Register the callback.
         callbackID = api.base.registerCallback(callback);
 
+        api.base.log('In api.clrmi.user.history.getInteractionHistory; '+
+            'callbackID: '+ callbackID);
+
+        // Figure out the chunk_size to use.
+        if( opts.chunk_size !== undefined && 
+                opts.chunk_size > MIN_CHUNK_SIZE && 
+                opts.chunk_size <= MAX_CHUNK_SIZE ){
+            chunk_size = opts.chunk_size;
+        } else if( opts.chunk_size && opts.chunk_size > MAX_CHUNK_SIZE ){
+            chunk_size = MAX_CHUNK_SIZE;
+        }
+
         return api.base.invokeCLIFunction({
-            apiName: 'api.user.history',
+            apiName: 'user.history',
             functionName: 'getInteractionHistory',
             options: {
                 callbackID: callbackID,
@@ -124,7 +171,6 @@ CLRMIUserAPI.prototype.History = function( api ){
             }
         });
     };
-
 };
 
 
@@ -162,7 +208,7 @@ CLRMIUserAPI.prototype.RealTime = function( api ){
         // Make a channel through which the CLI can let us know when 
         // activity events fire.
         api.base.invokeCLIFunction({
-            apiName: 'api.user.realTime',
+            apiName: 'user.realTime',
             functionName: 'addCLRMIActivityListener',
             callback: triggerActivityEvent
         });
@@ -204,6 +250,7 @@ CLRMIUserAPI.prototype.RealTime = function( api ){
         for( i = 0; i < validListeners.length; i++ ){
             if( opts[validListeners[i]] ){
                 activityElm.on(validListeners[i], opts[validListeners[i]]);
+                console.log('Adding listener ['+ validListeners[i] +']');
             }
         }
     };

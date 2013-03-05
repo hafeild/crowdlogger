@@ -69,46 +69,68 @@ CLI.prototype.User.prototype.History = function(crowdlogger, cli){
      */
     this.getInteractionHistory = function(opts){
         // Verify the required options are present.
-        if( !opts || !opts.callbackID ){
-            throw new Exception('cli.user.history.getInteractionHistory '+
-                'requires a callbackID field in the options map.');
+        if( !opts || opts.callbackID === undefined ){
+            throw 'cli.user.history.getInteractionHistory '+
+                'requires a callbackID field in the options map.';
             return false;
         }
 
+        console.log('In api.cli.user.history.getInteractionHistory; '+ 
+            'callbackID: '+ opts.callbackID);
+
         // Called when each chunk is ready to be processed.
-        var on_chunk = function(data, next){
+        var on_chunk = function(data, next, abort){
+            console.log('(in cli.user.history) in on_chunk; data.length: '+
+                data.length );
+
             // Serves as a wrapper for the 'next' function. The wrapper is
             // what gets registered in the function registry, not 'next'.
-            var nextWrapper = function(id){
+            var nextWrapper = function(options, id){
                 // Unregister the nextWrapper callback.
                 cli.base.unregisterCallback(id);
                 next();
             };
 
-            // Register the callback.
+            var abortWrapper = function(options, id){
+                cli.base.unregisterCallback(id);
+                abort( options.is_error, options.err_msg );
+            }
+
+            // Register the callbacks.
             var nextCallbackID = cli.base.registerCallback(nextWrapper);
+            var abortCallbackID = cli.base.registerCallback(abortWrapper);
 
             // Call the callback.
-            cli.base.invokeCLRMICallback(opts.callbackID, {
-                event: 'on_chunk',
-                data: data,
-                nextCallbackID: nextCallbackID
+            cli.base.invokeCLRMICallback({
+                callbackID: opts.callbackID, 
+                options: {
+                    event: 'on_chunk',
+                    data: data,
+                    nextCallbackID: nextCallbackID,
+                    abortCallbackID: abortCallbackID
+                }
             });
         }
 
         // Called when there is an error.
         var on_error = function(error){
             // Call the callback.
-            cli.base.invokeCLRMICallback(opts.callbackID, {
-                event: 'on_error',
-                error: error
+            cli.base.invokeCLRMICallback({
+                callbackID: opts.callbackID, 
+                options: {
+                    event: 'on_error',
+                    error: error
+                }
             });
         }
 
         // Called when reading is finished.
         var on_success = function(error){
             // Call the callback.
-            cli.base.invokeCLRMICallback(opts.callbackID, {event:'on_success'});
+            cli.base.invokeCLRMICallback({
+                callbackID: opts.callbackID, 
+                options: {event:'on_success'}
+            });
         }
 
         // Read the log.
@@ -160,9 +182,9 @@ CLI.prototype.User.prototype.RealTime = function(crowdlogger, cli){
      */
     this.addCLRMIActivityListener = function(opts){
         // Verify the required options are present.
-        if( !opts || !opts.callbackID ){
-            throw new Exception('cli.user.realTime.addCLRMIActivityListener '+
-                'requires a callbackID field in the options map.');
+        if( !opts || opts.callbackID === undefined ){
+            throw 'cli.user.realTime.addCLRMIActivityListener '+
+                'requires a callbackID field in the options map.';
             return false;
         }
 
@@ -170,15 +192,21 @@ CLI.prototype.User.prototype.RealTime = function(crowdlogger, cli){
 
         // Invoked for each event we attach a listener for.
         callbackWrapper = function(event, data){
-            cli.base.invokeCLRMICallback(opts.callbackID, {
-                eventName: event.type,
-                eventData: data
+            console.log('Event! ['+ event.type +']');
+            cli.base.invokeCLRMICallback({
+                callbackID: opts.callbackID, 
+                options: {
+                    eventName: event.type,
+                    eventData: data
+                }
             });
         };
 
         // Attach each of the listeners.
-        for(i =0; i < validListeners.length; i++){
-            crowdlogger.messages.on( validListeners[i], callbackWrapper);
+        for(i = 0; i < validListeners.length; i++){
+            crowdlogger.messages.on(validListeners[i], callbackWrapper);
+            console.log('Attaching listener to messages: ['+ 
+                validListeners[i] +']');
         }
 
         return true;
