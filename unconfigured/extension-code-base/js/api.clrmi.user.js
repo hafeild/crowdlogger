@@ -12,7 +12,7 @@
  * Provides the user API for the CrowdLogger Remote Modules ( CRMs )-side  
  * interface ( CRMI ).
  */
-var CLRMIUserAPI = function( api ){
+CLRMI.prototype.User = function( api ){
     // Private variables.
     var that = this;
 
@@ -37,7 +37,7 @@ var CLRMIUserAPI = function( api ){
 };
 
 
-CLRMIUserAPI.prototype.History = function( api ){
+CLRMI.prototype.User.prototype.History = function( api ){
     // Private variables.
     var that = this;
     const MAX_CHUNK_SIZE = 500,
@@ -174,7 +174,7 @@ CLRMIUserAPI.prototype.History = function( api ){
 };
 
 
-CLRMIUserAPI.prototype.RealTime = function( api ){
+CLRMI.prototype.User.prototype.RealTime = function( api ){
     // Private variables.
     var that = this,
         validListeners = [

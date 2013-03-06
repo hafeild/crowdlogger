@@ -212,6 +212,7 @@ a:active {
     position: absolute;
     right: 15px;
     top: 0px;
+    font-weight: lighter;
 }
 
 .highlight {
@@ -265,4 +266,42 @@ tr.subHeader {
 .subHeader td {
     border: none;
     background-color: #e2e2e2;
+}
+
+code a, code a:visited {
+    text-decoration: none; 
+    /*color: #cc8400;*/
+}
+code a:hover, code a:active {
+    text-decoration: underline;
+    /*color: #cc8400;*/
+}
+
+.parameter-requirement {
+    font-style: italic;
+}
+
+.function {
+    position: relative;
+}
+
+.top-tag {
+    position: absolute;
+    right: 2px;
+}
+
+.top-tag a, .top-tag a:visited {
+    color: lightgray;
+}
+
+.top-tag a:hover, .top-tag a:active {
+    color: steelblue;
+}
+
+.top-top {
+    top: 2px;
+}
+
+.top-bottom {
+    bottom: 2px;
 }

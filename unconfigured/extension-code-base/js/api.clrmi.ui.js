@@ -12,7 +12,7 @@
  * Provides the UI API for the CrowdLogger Remote Modules (CRMs)-side interface 
  * (CRMI).
  */
-var CLRMIUserInterfaceAPI = function(api){
+CLRMI.prototype.UserInterface = function(api){
     // Private variables.
     var defaultWindowOptions = {
             url: '',

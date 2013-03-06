@@ -12,7 +12,7 @@
  * Provides the base CrowdLogger Remote Modules (CRMs)-side interface (CRMI) for
  * CRMs. This includes sending messages to the CrowdLogger-side Interface (CLI).
  */
-var CLRMIBaseAPI = function(api) { 
+CLRMI.prototype.Base = function(api) { 
     // Private variables.
     var that = this,
         messageHandlers = {
@@ -301,12 +301,12 @@ var CLRMIBaseAPI = function(api) {
  *                                   is how the CLRM will access the CLRMI.
  */
 var CLRM = function(clrmPackage, CrowdLoggerAPI){
-    //console.log('clrmPackage.module: '+ clrmPackage.module);
     eval(clrmPackage.module);
-    //console.log('Evaluated the CLRM; RemoteModule: '+ RemoteModule);
-    //console.log(RemoteModule);
+
     // Every module should have a Module function defined.
-    this.module = new RemoteModule(clrmPackage, new CrowdLoggerAPI());
+    this.module = new RemoteModule(
+        clrmPackage, new CrowdLoggerAPI(clrmPackage));
+
     // Clear it out so no one else has access to it.
     RemoteModule = undefined;
 };

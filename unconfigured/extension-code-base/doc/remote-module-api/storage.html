@@ -1,0 +1,600 @@
+<html>
+<head>
+    <script src="js/external/jquery.min.js"></script>
+    <script src="js/content-page.js"></script>
+</head>
+<body>
+<div class="toc">
+    <h2>Contents</h2>
+    <ul>
+        <!-- <li><a href="#home">Home</a> -->
+        <li><a href="#storage:addstore">Add stores</a>
+        <li><a href="#storage:removestore">Remove stores</a>
+        <li><a href="#storage:clearstore">Clear stores</a>
+        <li><a href="#storage:listStores">List current stores</a>
+        <li><a href="#storage:save">Save data</a>
+        <li><a href="#storage:read">Read batches of saved data</a>
+        <li><a href="#storage:update">Delete/update saved data</a>
+    </ul>
+</div>
+
+
+<h1>Storage</h1>
+
+<p>
+
+CLRMs can store and access data via the <code>api.storage</code> interface.
+Storage is set up as a set of key-object stores. Objects must be serializable;
+objects can contain maps, arrays, and primitives, but not functions or  complex
+objects, e.g., <code>window</code>.  Objects should not contain an
+<code>id</code> field, unless it can be used as the key. Any object saved
+without an <code>id</code> field will be provided the next available id for the
+associated store (ids are auto-incremented). Any object saved to a store that
+does have an  <code>id</code> field will overwrite any existing entry that
+shares that id in the store. The following functionalities are provided:
+
+</p>
+
+<ul>
+    <li><code><a href="#storage:addstore">api.storage.addStore</a></code>
+    <li><code><a href="#storage:removestore">api.storage.removeStore</a></code>
+    <li><code><a href="#storage:clearstore">api.storage.clearStore</a></code>
+    <li><code><a href="#storage:listStores">api.storage.listStores</a></code>
+    <li><code><a href="#storage:save">api.storage.save</a></code>
+    <li><code><a href="#storage:read">api.storage.read</a></code>
+    <li><code><a href="#storage:update">api.storage.update</a></code>
+</ul>
+
+
+<!-- Add a store -->
+<a name="addstore"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Add a store<br/>
+        <code>api.storage.addStore</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store to add.
+                    </ul>
+            </ul>                
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the store has been successfully created.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Creates a store with the given name.
+    </p>
+</div>
+
+
+<!-- Remove a store -->
+<a name="removestore"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Remove a store<br/>
+        <code>api.storage.removeStore</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store to remove.
+                    </ul>
+            </ul>                
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the store has been successfully removed.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Removes a store. This means all entries contained within will be 
+        deleted and no other operations can occur with this store name until
+        it is regenerated via <code>api.storage.addStore</code>.
+    </p>
+</div>
+
+
+
+<!-- Clear a store -->
+<a name="clearstore"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Clear a store<br/>
+        <code>api.storage.clearStore</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store to clear.
+                    </ul>
+            </ul>                
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the store has been successfully cleared.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        This clears a store, or truncates it. The store will continue
+        to exists, but all current entries will be removed.
+        Note that the numbering of the log entry ids does not reset after
+        this operation. 
+    </p>
+</div>
+
+
+
+
+<!-- List stores -->
+<a name="liststores"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>List stores<br/>
+        <code>api.storage.listStores</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store to clear.
+                    </ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the list of stores has been retrieved.
+                        This should take an {array of strings} as its only
+                        argument.
+                    </ul>
+            </ul>                
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Retrieves the list of existing stores. This is passed to the 
+        <code>on_success</code> function.
+    </p>
+</div>
+
+
+<!-- Save -->
+<a name="save"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Save data<br/>
+        <code>api.storage.save</code></h3>
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store in which to save data.
+                    </ul>
+                <li>{array of objects} <code>data</code>
+                    <ul>
+                        An array of entries to be added. If an entry contains an id,
+                        and an entry with that id exists, then it will be
+                        overwritten by the new entry.
+                    </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when everything has been successfully written.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Saves each of the objects in <code>data</code> to <code>store</code>. If 
+        <code>data[i].id</code> is defined, then that id is used as the
+        <code>data[i]</code>'s key. It will overwrite an existing entry if one 
+        exists. If <code>data[i].id</code> is undefined, an id will be assigned,
+        i.e., the next available id for <code>store</code>. This id will be
+        stored with the object (i.e., you can access the id the next time you
+        read the object from the database).
+    </p>
+
+    <p>
+        Because the <code>api.storage.save</code> function will overwrite 
+        entries that share the same id, you can use it as a means of performing
+        non-deletion updates (rather than use the 
+        <code><a href="#storage:update">api.storage.update</a></code>).
+    </p>
+
+    <h4>Examples</h4>
+    <p>
+        One common pattern is to add a new entry. In this case, make the object
+        to store and leave off the <code>id</code> field&mdash;the database will
+        take care of setting this.
+    </p>
+
+<pre class="prettyprint">
+// Assume we have access to these variables and functions:
+// search, click
+// function judgeDocument(search, click)
+
+// Stores information about a relevance judgment.
+var judgment = {
+    timestamp: new Date().getTime(),
+    search: search,
+    click: click,
+    judgment: judgeDocument(search, click)
+};
+
+// Add the entry to the activity log. Note that the data field consists of
+// a single-element array because we are only adding one entry.
+api.storage.save({data: [judgment], store: 'relevance-judgments'});
+</pre>
+
+    <p>
+        Another common use case is that you would like to modify an entry that
+        you read  from the log earlier (maybe clean up a URL or something). As
+        long as you know  the <code>id</code>, which is stored along with
+        the entry when saved, you can do the following:
+    </p>
+
+<pre class="prettyprint">
+// Modifying a judgment we read earlier. Has id = 558. We are adding
+// an extra field specifying the session id of the search.
+judgment.session = extractSession(judgment.search);
+
+// When we write this to the log, it will replace the previous version.
+api.storage.save({data: [judgment], store: 'relevance-judgments'});
+</pre>
+
+    <p>
+        Finally, if you have multiple entries you'd like to add, that's easy:
+    </p>
+
+<pre class="prettyprint lang-js">
+// Assume we have five judgments named j1, j2, j3, j4, and j5.
+CROWDLOGGER.io.log.write_to_activity_log({
+    data: [j1, j2, j3, j4, j5], 
+    store: 'relevance-judgments'
+});
+</pre>    
+</div>
+
+
+
+<!-- Read saved data -->
+<a name="read"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Read saved data<br/>
+        <code>api.storage.read</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>{object} A list of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                <ul>
+                    The name of the store from which to read data.
+                </ul>
+                <li>{function} <code>on_chunk</code>
+                <ul>
+                    Invoked per chunk (see <code>chunk_size</code> below). 
+                    Chunks are processed asynchronously. It should expect three 
+                    parameters: 
+                    <ul>
+                        <li>{array of objects} the interaction events 
+                        <li>{function} a <code>next</code> function, which, when 
+                            invoked, will read in the next chunk asynchronously
+                        <li>{function} an <code>abort</code> function, which,
+                            when invoked, will end the reading. This can take up
+                            to two parameters: <code>isError</code> (default
+                            false) and <code>errorMsg</code>. If <code>isError
+                            == true</code>, then the <code>on_error</code>
+                            function will be invoked; otherwise, the
+                            <code>on_success</code> function will be (see
+                            below).
+
+
+                    </ul>
+                </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                <ul>
+                    Invoked when everything has been read and processed by 
+                    <code>on_chunk</code>.
+                </ul>
+
+                <li>{function} <code>on_error</code>
+                <ul>
+                    Invoked if there's an error.
+                </ul>
+
+                <li>{int} <code>chunk_size</code>
+                <ul>
+                    The size of the chunks to process. E.g., <coode>chunk_size =
+                    50</code> will cause 50 entries to be read, stored in an
+                    array, and then passed to the on_chunk function. If
+                    provided, this must be between 1 and 500 (default: 250). If
+                    <code>chunk_size</code> is less than 1, it is set to 250,
+                    and if greater than 500, it is set to 500.
+                </ul>
+
+                <li>{boolean} <code>reverse</code>
+                <ul>
+                    If true, the data will be read in reverse
+                    order of id. Default is 'false'.
+                </ul>
+
+                <li>{int} <code>lower_bound</code>
+                <ul>
+                    The smallest id to retrieve; default: 0
+                </ul>
+
+                <li>{int} <code>upper_bound</code>
+                <ul>
+                    The largest id to retrieve; default: -1
+                    (all ids >= lower_bound are retrieved).
+                </ul>
+            </ul>
+        </ul>
+    </p>
+
+
+    <h4>Description</h4>
+    <p>
+        Reads all the stored data from the specified store. Processing occurs
+        in chunks and works in the same way as <a href="#user:read-all">reading 
+        a user's interaction history</a>.
+    </p>
+</div>
+
+
+
+<!-- Update saved data -->
+<a name="update"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Update saved data<br/>
+        <code>api.storage.update</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                    <ul>
+                        The name of the store to update.
+                    </ul>
+                <li>{function} <code>foreach</code>
+                    <ul>
+                        A function to run on each entry. It
+                        should take a log entry as its
+                        only parameter and optionally return
+                        an object with three optional fields:
+                        <ul>
+                            <li>{object} <code>entry</code> 
+                                <ul>
+                                    If <code>entry.id</code> matches the id of
+                                    the original entry, the existing saved entry
+                                    is overwritten with <code>entry</code>.
+                                </ul>
+                            <li>{boolean} <code>stop</code> 
+                                <ul>
+                                    Stops the traversal if <code>true</code>.
+                                </ul>
+                            <li>{boolean} <code>delete</code>
+                                <ul>
+                                    Deletes the stored entry if 
+                                    <code>true</code>.
+                                </ul>
+                        </ul>
+                    </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the traversal is complete and 
+                        everything has been successfully updated.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        This function iterates over every entry in a log, passing each to a
+        function you provide (see <code>foreach</code> above), where you can
+        choose to update the entry, delete it, stop iterating, or ignore the
+        entry and move on.
+    </p>
+
+    <h4>Examples</h4>
+    <p>
+        The update operation is helpful when you want to update all (or most)
+        entries in a log. Extending our example from 
+        <code><a href="#storage:write">api.storage.write</a></code>, say we
+        want to add a <code>session</code> field to all of our saved 
+        judgments that don't already contain such a field.
+        We could use the following code:
+    </p>
+
+<pre class="prettyprint">
+// Adds a session field to each judgment.
+function addSessionField( judgment ){
+    if( judgment.session === undefined ){
+        judgment.session = extractSession(judgment.search);
+        return {entry: judgment};
+    } 
+    // We don't need to update the entry if it already has a session.    
+    return {};
+}
+
+// Update all the saved entries.
+api.storage.update({
+    foreach: addSessionField, 
+    store: 'relevance-judgments' 
+});
+</pre>
+
+    <p>
+        If an entry is deleted, the numbering of the database will remain
+        unchanged (the id of the deleted entry will never be used by another
+        entry, unless you specify it when writing a new entry).
+    </p>    
+</div>
+
+
+
+
+
+<!-- <p>
+An example of when you'd want to specify your own <code>on_upgrade</code>
+function is if you need multiple stores. E.g., the Search Task Assistant stores
+searches and tasks, and each should be stored in a separate store (and no sense
+wasting a separate database). Another example is if you want an index to access
+certain types of entries faster. Let's look at how I would use the various
+operations for the Search Task Assistant (currently, this is a hypothetical and
+this code hasn't been tested).
+</p>
+
+<pre class="prettyprint">
+var DB_VERSION = 1,
+    DB_NAME = 'sta_data',
+    TASK_STORE = 'tasks',
+    SEARCH_STORE = 'searches';
+
+// Initializes the database.
+function upgrade_db(db) {
+    // Create the log to store searches.
+    db.createObjectStore( 
+        SEARCH_STORE, {keyPath: 'id', autoIncrement: true});
+
+    // Create the log to store tasks.
+    db.createObjectStore(
+        TASK_STORE, {keyPath: 'id', autoIncrement: true});
+
+    return true;
+}
+
+// Prints the given entry.
+function print_entries( entries, next ){
+    var i;
+    for( i = 0; i &lt; entries.length; i++ ){
+        CROWDLOGGER.debug.log( JSON.stringify(entries[i]) );
+    }
+
+    // Read the next batch in a little bit.
+    setTimeout( next, 10 );
+}
+
+// Write some entries to the tasks log.
+CROWDLOGGER.io.log.write_to_extension_log({
+    db_name: DB_NAME,
+    db_version: DB_VERSION,
+    on_upgrade: upgrade_db,
+    store_name: TASK_STORE,
+    data: [
+        {name: "task 1", time: 1360168716158},
+        {name: "task 2", time: 1360168717100},
+        {name: "task 3", time: 1360168718100},
+        {name: "task 4", time: 1360168719100},
+        {name: "task 5", time: 1360168720100}
+    ]
+});
+
+// Print them all out.
+CROWDLOGGER.io.log.read_extension_log({
+    db_name: DB_NAME,
+    db_version: DB_VERSION,
+    on_upgrade: upgrade_db,
+    store_name: TASK_STORE,
+    on_chunk: print_entries,
+    chunk_size: 50,
+    reverse: true
+});
+</pre> -->
+
+</body>
+</html>

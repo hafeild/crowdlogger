@@ -14,11 +14,14 @@ Where:
         They will be concatenated in the order specified. Any argument that
         doesn't start with '--' is considered a core module file.
 
-    --resourceDir=<resource dir>
+    --resource-dir=<resource dir>
         OPTIONAL. A directory containing one or more HTML, CSS, or JavaScript
         files. The HTML files are ones you'd like to open at some point and 
         the CSS and JavaScript files are resources you'd like to load in those
         HTML file.
+
+    --id=<id>
+        The string to assign to the id field in the resulting package.
 
 Output:
 
@@ -204,14 +207,20 @@ moduleFiles = []
 
 ARGV.each do |arg|
     ## Add resources.
-    if arg =~ /^--resourceDir=/
-        gatherResources(arg.gsub(/^--resourceDir=/,""), clrmPackage)
+    if arg =~ /^--resource-dir=/
+        gatherResources(arg.gsub(/^--resource-dir=/,""), clrmPackage)
+    elsif arg =~ /^--id=/
+        clrmPackage[:id] = arg.gsub(/^--id=/,"")
     elsif File.exists?(arg)
         moduleFiles << arg
     else
         STDERR.puts "Unrecognized argument: #{arg}"
         exit
     end
+end
+
+unless clrmPackage.has_key?(:id)
+    STDERR.puts "\nWARNING: no id was specified.\n\n"
 end
 
 ## Add in the core module.

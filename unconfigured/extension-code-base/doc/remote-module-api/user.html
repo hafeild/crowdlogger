@@ -408,66 +408,68 @@ have been logged). There are several functions available to you:
     <h3>Reading all interactions<br/>
         <code>api.user.history.getInteractionHistory</code></h3>
     <h4>Parameters</h4>
-    {object} A list of options:<br/>
-    <b>Required</b>
     <ul>
-        <li>{function} <code>on_chunk</code>
+        <li>{object} A list of options:<br/>
+        <span class="parameter-requirement">Required</span>
         <ul>
-            Invoked per chunk (see <code>chunk_size</code> below). Chunks are 
-            processed asynchronously. It should expect three parameters: 
+            <li>{function} <code>on_chunk</code>
             <ul>
-                <li>{array of objects} the interaction events 
-                <li>{function} a <code>next</code> function, which, when 
-                    invoked, will read in the next chunk asynchronously
-                <li>{function} an <code>abort</code> function, which, when 
-                    invoked, will
-                    end the reading. This can take up to two parameters:
-                    <code>isError</code> (default false) and 
-                    <code>errorMsg</code>. If <code>isError == true</code>, then
-                    the <code>on_error</code> function will be invoked; otherwise,
-                    the <code>on_success</code> function will be (see below).
+                Invoked per chunk (see <code>chunk_size</code> below). Chunks are 
+                processed asynchronously. It should expect three parameters: 
+                <ul>
+                    <li>{array of objects} the interaction events 
+                    <li>{function} a <code>next</code> function, which, when 
+                        invoked, will read in the next chunk asynchronously
+                    <li>{function} an <code>abort</code> function, which, when 
+                        invoked, will
+                        end the reading. This can take up to two parameters:
+                        <code>isError</code> (default false) and 
+                        <code>errorMsg</code>. If <code>isError == true</code>, then
+                        the <code>on_error</code> function will be invoked; otherwise,
+                        the <code>on_success</code> function will be (see below).
+                </ul>
             </ul>
         </ul>
-    </ul>
-    <b>Optional</b>
-    <ul>
-        <li>{function} <code>on_success</code>
+        <span class="parameter-requirement">Optional</span>
         <ul>
-            Invoked when everything has been read and processed by 
-            <code>on_chunk</code>.
-        </ul>
+            <li>{function} <code>on_success</code>
+            <ul>
+                Invoked when everything has been read and processed by 
+                <code>on_chunk</code>.
+            </ul>
 
-        <li>{function} <code>on_error</code>
-        <ul>
-            Invoked if there's an error.
-        </ul>
+            <li>{function} <code>on_error</code>
+            <ul>
+                Invoked if there's an error.
+            </ul>
 
-        <li>{int} <code>chunk_size</code>
-        <ul>
-            The size of the chunks to process. E.g.,
-            <coode>chunk_size = 50</code> will cause 50 entries to
-            be read, stored in an array, and then
-            passed to the on_chunk function. If provided, this must be
-            between 1 and 500 (default: 250). If <code>chunk_size</code> is
-            less than 1, it is set to 250, and if greater than 500, it is set
-            to 500.
-        </ul>
+            <li>{int} <code>chunk_size</code>
+            <ul>
+                The size of the chunks to process. E.g.,
+                <coode>chunk_size = 50</code> will cause 50 entries to
+                be read, stored in an array, and then
+                passed to the on_chunk function. If provided, this must be
+                between 1 and 500 (default: 250). If <code>chunk_size</code> is
+                less than 1, it is set to 250, and if greater than 500, it is set
+                to 500.
+            </ul>
 
-        <li>{boolean} <code>reverse</code>
-        <ul>
-            If true, the data will be read in reverse
-            order of id. Default is 'false'.
-        </ul>
+            <li>{boolean} <code>reverse</code>
+            <ul>
+                If true, the data will be read in reverse
+                order of id. Default is 'false'.
+            </ul>
 
-        <li>{int} <code>lower_bound</code>
-        <ul>
-            The smallest id to retrieve; default: 0
-        </ul>
+            <li>{int} <code>lower_bound</code>
+            <ul>
+                The smallest id to retrieve; default: 0
+            </ul>
 
-        <li>{int} <code>upper_bound</code>
-        <ul>
-            The largest id to retrieve; default: -1
-            (all ids >= lower_bound are retrieved).
+            <li>{int} <code>upper_bound</code>
+            <ul>
+                The largest id to retrieve; default: -1
+                (all ids >= lower_bound are retrieved).
+            </ul>
         </ul>
     </ul>
 
@@ -677,348 +679,8 @@ need to?
     </p>
 </div>
 
-<a name="save"></a>
-<h2>Saving Data</h2>
-
-<p>
-For each of the operations listed in the <a href="user:history">Accessing User
-History</a> section, there is a parallel for custom CrowdLogger extension logs.
-The differences are that you will always need to supply a database name
-(whatever you want, but should be unique) and version (an integer), and there
-are a few additional options available. Internally, each extension log is put in
-its own database. You can specify how to initialize it or update it between
-database versions, or you can rely on the default extension store creator, which
-gives you a single store that uses the <code>id</code> as the storage key (auto-
-incrementing). 
-</p>
-
-<p>
-For the read, write, update, and clear operations, use:
-</p>
-
-<ul>
-    <li><code>CROWDLOGGER.io.log.read_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.write_to_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.update_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.clear_extension_log</code>
-</ul>
 
 
-
-<!-- Write log entries. -->
-<a name="writelog"></a>
-<h3>Write log entries</h3>
-
-<p>
-Use the <code>CROWDLOGGER.io.log.write_to_activity_log</code> and
-<code>CROWDLOGGER.io.log.write_to_error_log</code> to write data or update
-a specific entry for which you have the id and other attributes (i.e., you
-don't have to read it first). Extensions probably won't be performing these
-actions, but this is good to know, anyway. The write functions take a
-single parameter, as before: a map of options. 
-</p>
-
-<table>
-    <tr>
-        <th>Option key</th> <th>Type</th> <th>Description</th>
-    </tr><tr class="subHeader">
-        <td colspan="3"><i>Required</i></td>
-    </tr><tr>
-        <td><code>data</code></td>
-        <td>array of objects</td>
-        <td>An array of entries to be added. If an entry contains an id, and 
-            an entry with that id exists, then it will be overwritten by the 
-            new entry.
-        </td>
-    </tr>
-
-    <tr class="subHeader">
-        <td colspan="3"><i>Optional</i></td>
-    </tr><tr>
-        <td><code>on_success</code></td>
-        <td>function</td>
-        <td>Invoked when everything has been successfully written.
-    </tr><tr>
-        <td><code>on_error</code></td>
-        <td>function</td>
-        <td>Invoked if there's an error.</td>
-    </tr>
-</table>
-
-<p>
-One common pattern is to add a new entry. In this case, make the object to store
-and leave off the <code>id</code> field&mdash;the database will take care of
-setting this.
-</p>
-
-<pre class="prettyprint">
-// A new 'search' event.
-var new_search = {
-    timestamp: new Date().getTime(),
-    e: 'search',
-    q: 'upcoming movies',
-    se: 'google',
-    url: 'https://www.google.com/search?q=upcoming+movies'
-};
-
-// Add the entry to the activity log. Note that the data field consists of
-// a single-element array because we are only adding one entry.
-CROWDLOGGER.io.log.write_to_activity_log({data: [new_search]});
-</pre>
-
-<p>
-Another common use case is that you would like to modify an entry that you read 
-from the log earlier (maybe clean up the URL or something). As long as you know 
-the <code>id</code>, you can do the following:
-</p>
-
-<pre class="prettyprint">
-// Modifying a search event we read earlier. Has id = 558. We are extracting
-// the search engine using a new algorithm.
-my_search.se = extract_se(my_search.url);
-
-// When we write this to the log, it will replace the previous version.
-CROWDLOGGER.io.log.write_to_activity_log({data: [my_search]});
-</pre>
-
-<p>
-Finally, if you have multiple entries you'd like to add, that's easy:
-</p>
-
-<pre class="prettyprint lang-js">
-// Assume we have five entries named e1, e2, e3, e4, and e5.
-CROWDLOGGER.io.log.write_to_activity_log({data: [e1, e2, e3, e4, e5]});
-</pre>
-
-
-
-<!-- Update log entries. -->
-<a name="updatelog"></a>
-<h3>Update log entries</h3>
-
-<p>
-The <code>CROWDLOGGER.io.log.update_activity_log</code> and
-<code>CROWDLOGGER.io.log.update_error_log</code> functions iterate over every
-entry in a log, passing each to a function you provide (see <code>foreach</code>
-in the table below), where you can choose to update the entry, delete it, stop
-iterating, or ignore the entry and move on. As before, the functions take a
-single parameter, which is a map of options, as described below:
-</p>
-
-<table>
-    <tr>
-        <th>Option key</th> <th>Type</th> <th>Description</th>
-    </tr><tr class="subHeader">
-        <td colspan="3"><i>Required</i></td>
-    </tr><tr>
-        <td><code>foreach</code></td>
-        <td>function</td>
-        <td>
-            A function to run on each entry. It
-            should take a log entry as its
-            only parameter and optionally return
-            an object with three optional fields:
-            <ul>
-                <li><code>entry</code> (new data, ids must match),
-                <li><code>stop</code> (<code>true</code> or <code>false</code>)
-                <li><code>delete</code> (<code>true</code> or <code>false</code>)
-            </ul>
-            This function <i>must</i> be synchronous.
-            As soon as it returns, there's no more updating.
-        </td>
-    </tr>
-
-    <tr class="subHeader">
-        <td colspan="3"><i>Optional</i></td>
-    </tr><tr>
-        <td><code>on_success</code></td>
-        <td>function</td>
-        <td>Invoked when everything has been successfully written.
-    </tr><tr>
-        <td><code>on_error</code></td>
-        <td>function</td>
-        <td>Invoked if there's an error.</td>
-    </tr>
-</table>
-
-<p>
-The update operation is helpful when you want to update all (or most) entries in
-a log. For example, say you wanted to store the top 10 results associated with
-searches, and lets suppose you have a magical function
-<code>extract_top_ten_results</code> that can reproduce the results page seen by
-a user and extract those links. The code to update all of the search entries
-might look like this:
-</p>
-
-<pre class="prettyprint">
-// This is the update function; it only effects search entries.
-function update_search_entry(entry) {
-    if( entry.e === 'search' ){
-        entry.top_ten_results = extract_top_ten_results(entry.url);
-        return {entry: entry};
-    }
-    return {};
-}
-
-// Update the log.
-CROWDLOGGER.io.log.update_activity_log({foreach: update_search_entry});
-</pre>
-
-<p>
-If an entry is deleted, the numbering of the database will remain unchanged (the
-id of the deleted entry will never be used by another entry, unless you specify
-it when writing a new entry).
-</p>
-
-<!-- Clear log entries. -->
-<a name="clearlog"></a>
-<h3>Clear log entries</h3>
-
-<p>
-Clearing logs (or truncating them) can be done by using
-<code>CROWDLOGGER.io.log.clear_activity_log</code> and
-<code>CROWDLOGGER.io.log.clear_error_log</code>. These will remove all entries
-from the log. Note that the numbering of the log entry ids does not reset after
-this operation. The functions take one parameter, a map of options (none
-required):
-</p>
-
-<table>
-    <tr>
-        <th>Option key</th> <th>Type</th> <th>Description</th>
-    </tr><tr class="subHeader">
-        <td colspan="3"><i>Optional</i></td>
-    </tr><tr>
-        <td><code>on_success</code></td>
-        <td>function</td>
-        <td>Invoked when everything has been successfully written.
-    </tr><tr>
-        <td><code>on_error</code></td>
-        <td>function</td>
-        <td>Invoked if there's an error.</td>
-    </tr>
-</table>
-
-
-<p>
-These take all the same options as their activity and error log equivalents, but
-with the following set of additional required and optional fields:
-</p>
-
-<table>
-    <tr>
-        <th>Option key</th> <th>Type</th> <th>Description</th>
-    </tr><tr class="subHeader">
-        <td colspan="3"><i>Required</i></td>
-    </tr><tr>
-        <td><code>db_name</code></td>
-        <td>string</td>
-        <td>
-            The name of the database. Should be unique, which means you should
-            probably start it with the name of your extension and then something
-            descriptive, e.g., <code>sta_data</code> for the Search Task 
-            Assistant extension.
-        </td>
-    </tr><tr>
-        <td><code>db_version</code></td>
-        <td>integer</td>
-        <td>
-            The version of the database. If the current database version is less
-            than this value, the <code>on_upgrade</code> function will be
-            invoked (if you don't specify that function, then a default will
-            be used).
-        </td>
-    </tr>
-
-    <tr class="subHeader">
-        <td colspan="3"><i>Optional</i></td>
-    </tr><tr>
-        <td><code>on_upgrade</code></td>
-        <td>function</td>
-        <td>
-            Invoked if the database does not exist or if the version number is
-            old. This function should take an <code>IndexedDB</code> database
-            instance and  should not rely on any asynchronous calls. It should
-            return true if things went as planned. It should
-            be used to create stores and indexes for the database. This is
-            invoked before any read, write, update, or clear operations are
-            executed.
-    </tr><tr>
-        <td><code>store_name</code></td>
-        <td>string</td>
-        <td>The store in the database on which to perform the given operation.
-            If you've specified an <code>on_upgrade</code> function, you should
-            probably set this option.
-        </td>
-    </tr>
-</table>
-
-<p>
-An example of when you'd want to specify your own <code>on_upgrade</code>
-function is if you need multiple stores. E.g., the Search Task Assistant stores
-searches and tasks, and each should be stored in a separate store (and no sense
-wasting a separate database). Another example is if you want an index to access
-certain types of entries faster. Let's look at how I would use the various
-operations for the Search Task Assistant (currently, this is a hypothetical and
-this code hasn't been tested).
-</p>
-
-<pre class="prettyprint">
-var DB_VERSION = 1,
-    DB_NAME = 'sta_data',
-    TASK_STORE = 'tasks',
-    SEARCH_STORE = 'searches';
-
-// Initializes the database.
-function upgrade_db(db) {
-    // Create the log to store searches.
-    db.createObjectStore( 
-        SEARCH_STORE, {keyPath: 'id', autoIncrement: true});
-
-    // Create the log to store tasks.
-    db.createObjectStore(
-        TASK_STORE, {keyPath: 'id', autoIncrement: true});
-
-    return true;
-}
-
-// Prints the given entry.
-function print_entries( entries, next ){
-    var i;
-    for( i = 0; i &lt; entries.length; i++ ){
-        CROWDLOGGER.debug.log( JSON.stringify(entries[i]) );
-    }
-
-    // Read the next batch in a little bit.
-    setTimeout( next, 10 );
-}
-
-// Write some entries to the tasks log.
-CROWDLOGGER.io.log.write_to_extension_log({
-    db_name: DB_NAME,
-    db_version: DB_VERSION,
-    on_upgrade: upgrade_db,
-    store_name: TASK_STORE,
-    data: [
-        {name: "task 1", time: 1360168716158},
-        {name: "task 2", time: 1360168717100},
-        {name: "task 3", time: 1360168718100},
-        {name: "task 4", time: 1360168719100},
-        {name: "task 5", time: 1360168720100}
-    ]
-});
-
-// Print them all out.
-CROWDLOGGER.io.log.read_extension_log({
-    db_name: DB_NAME,
-    db_version: DB_VERSION,
-    on_upgrade: upgrade_db,
-    store_name: TASK_STORE,
-    on_chunk: print_entries,
-    chunk_size: 50,
-    reverse: true
-});
-</pre>
 
 </body>
 </html>

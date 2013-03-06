@@ -24,6 +24,12 @@ function add_src(e) {
         window.scrollTo(0,0);
     }
 
+    jQuery('body').on('click', '.top-tag', function(){
+        console.log('clicked!');
+        window.scrollTo(0,0);
+        return false;
+    });
+
     expand_menu(hash_parts[0]);
 }
 
