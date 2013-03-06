@@ -36,7 +36,7 @@ body {
     left: 31px;
     top: 100px;
     width: 200px;
-    margin-bottom: 130px;
+    /*margin-bottom: 130px;*/
 
     box-sizing:border-box;
     -moz-box-sizing:border-box;
@@ -111,7 +111,14 @@ h1, h2 {
 
 .function h3 {
     margin-top: 0px;
+    margin-bottom: 10px;
 }
+
+.function h4, .function p, .function ul {
+    margin-bottom: 5px;
+    margin-top: 0px;
+}
+
 
 .toc {
     float: right;
@@ -160,11 +167,13 @@ h1, h2 {
     color: darkorange;
 }*/
 
+
 .menu h2 {
     /*margin-top: -15px;*/
     min-width: 0;
     width: 150px;
     margin-bottom: 3px;
+
 }
 
 /*.toc a, .menu a {*/
@@ -187,12 +196,22 @@ a:active {
     float: left;
 }
 
+.title {
+    width: 100%;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
 .titleMain {
-    display: inline-block;
-    margin-top: 20px;
-    margin-left: 35px;
-    color: #444;
-    font-size: 300%;
+    display: block;
+    padding: 0;
+    margin: 0;
+    color: #555;
+    font-size: 265%;
+    position: absolute;
+    right: 15px;
+    top: 0px;
 }
 
 .highlight {

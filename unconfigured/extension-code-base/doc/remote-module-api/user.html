@@ -8,12 +8,13 @@
     <h2>Contents</h2>
     <ul>
         <!-- <li><a href="#user">User API (top)</a> -->
+        <li><a href="#user:events">Interaction events</a>
         <li><a href="#user:history">Accessing User History</a>
         <ul>
-                <li><a href="#user:readlog">Reading From Logs</a>
-                <li><a href="#user:writelog">Writing To Logs</a>
-                <li><a href="#user:updatelog">Updating Logs</a>
-                <li><a href="#user:clearlog">Clearing Logs</a>
+                <li><a href="#user:read-all">Reading all interactions</a>
+                <li><a href="#user:read-searches">Reading searches</a>
+                <li><a href="#user:read-clicks">Reading clicks</a>
+                <li><a href="#user:read-pairs">Reading search-click pairs</a>
         </ul>
         <li><a href="#user:realtime">Accessing Real-Time User Activity</a>
         <li><a href="#user:save">Saving Data</a>
@@ -24,25 +25,40 @@
 
 <h1>User API</h1>
 
-<a name="history"></a>
-<h2>Accessing User History</h2>
+<p>
+The User API is available via the <code>api.user</code> namespace. It has 
+several sub namespaces:
+</p>
+<ul>
+    <li><code>api.user.history</code> for accessing a user's search interactions
+        up until the current moment.
+    <li><code>api.user.realtime</code> to listen for new 
+        interactions as they happen.
+    <li><code>api.user.storage</code> for saving state.
+</ul>
+
+<a name="events"></a>
+<h2>Interaction events</h2>
 
 <p>
-The user's browsing history, as logged by CrowdLogger, can be accessed via the
+<!-- The user's browsing history, as logged by CrowdLogger, can be accessed via the
 <code>CROWDLOGGER.io.log</code> interface. Currently, this uses IndexedDB as a 
 backend, which is important if you want to store your own data 
 (<a href="#user:save">see below</a>). CrowdLogger has two default logs:
 the <i>activity log</i> and the <i>error log</i>. The former contains all 
 browsing and search activity, including clicks, queries, tab events, and
-page loads. Each event is stored as its own entry and is encapsulated within
-an object. Here's a description of the object fields for each kind of event.
+page loads.  -->
+CrowdLogger tracks several user-browser interactions: clicks, queries, tab events, page loads, and page focuses. When any of these events are detected, an object is
+created describing the event. This is then broadcasted and logged.
+Here's a description of the object fields for each kind of event.
 All events have at minimum two fields: <code>id</code> (a unique id used by
 the database) and <code>e</code> (for "event", see table below). Currently they
-also all have a <code>t</code> (timestamp) field, as well, but we may introduce
-some new events that don't.
+all have a <code>t</code> (timestamp) field, as well, but we may introduce
+some new events that don't include a timestamp.
 </p>
 
-<table>
+
+<!-- <table>
     <tr>
         <th>Event</th> <th>Fields</th> 
     </tr><tr>
@@ -174,165 +190,352 @@ E.g.:
         </td>
     </tr>
 </table>
-
-<p>
-Thought unlikely, if you need to access the error log, all entries conform to
-a three-field format:
-</p>
-<ul>
-    <li><code>f</code>: (string) The name of the function in which the error
-        occurred.
-    <li><code>err</code>: (string) The error itself.
-    <li><code>t</code>: (int) The time at which the error occurred.
-</ul>
-
-<p>
-The <code>CROWDLOGGER.io.log</code> interface allows four operations
-</p>
+ -->
 
 <ul>
-    <li><a href="#user:readlog">read</a>
-    <li><a href="#user:writelog">write (add, replace entries)</a>
-    <li><a href="#user:updatelog">update (modify or delete entries)</a>
-    <li><a href="#user:clearlog">clear</a>
+    <li><a href="#user:search">Search</a>
+    <li><a href="#user:click">Click</a>
+    <li><a href="#user:tabadd">Tab Add</a>
+    <li><a href="#user:tabremove">Tab Remove</a>
+    <li><a href="#user:pageload">Page Load</a>
+    <li><a href="#user:pagefocus">Page Focus</a>
+    <li><a href="#user:loggingstatuschange">Logging Status Change</a>
 </ul>
 
-<p>
-E.g.:
-</p>
+<a name="search"></a>
+<div class="function">
+    <h3>Search</h3>
+    A query submitted to a search engine. Currently, only a few search engines
+    are supported (Google, Yahoo!, and Bing).
 
-<pre class="prettyprint">
-{
-    f: 'CROWDLOGGER.experiments.check_for_new_experiments',
-    err: 'ERROR contacting http://server: 404 Server not found.',
-    t: 1360168716158
-}
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'search'</code>.
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>q</code>: The parsed query.
+        <li>{string} <code>se</code>: The search engine.
+        <li>{string} <code>url</code>: The URL of the results page.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>
+{id: 1,
+ e: 'search', 
+ t: 1360168716158, 
+ q: 'upcoming movies', 
+ se: 'google', 
+ url: 'https://www.google.com/search?q=upcoming+movies'}
 </pre>
+</div>
+
+<a name="click"></a>
+<div class="function">
+    <h3>Click</h3>
+    Clicks on URLs, whether search engine result URLs or otherwise.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'click'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>turl</code>: The clicked URL.
+        <li>{string} <code>surl</code>: The URL of the page on which the click 
+            occurred.
+        <li>{boolean} <code>sr</code>: 
+            <code>true</code> if the source url (<code>surl</code>) is a
+            Search Engine Results Page and the target URL is a
+            <i>search result</i> on that page.
+        <li>{string} <code>q</code>: If <code>sr==true</code>, then this contains
+            the associated query.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'click', 
+ t: 1360168716158, 
+ turl: 'http://en.wikipedia.org/wiki/Panda', 
+ surl: 'https://www.google.com/search?q=panda',
+ sr: true,
+ q: panda}
+</pre>
+</div>
+
+<a name="tabadd"></a>
+<div class="function">
+    <h3>Tab Add</h3>
+    Fired any time a tab (or new window) is opened.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'tabadd'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>ttid</code>: The target tab id (the one being 
+            added).
+        <li>{string} <code>turl</code>: The URL loaded in the new tab.
+        <li>{string} <code>stid</code>: The source tab id (the one from 
+            which the new one was added).
+        <li>{string} <code>surl</code>: The URL loaded in the source tab.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'tabadd', 
+ t: 1360168716158, 
+ ttid: 2k3,
+ turl: 'http://www.cnn.com', 
+ stid: 4wi5a,
+ surl: 'http://en.wikipedia.org/wiki/Panda'}
+</pre>
+</div>
+
+<a name="tabremove"></a>
+<div class="function">
+    <h3>Tab Remove</h3>
+    Fired any time a tab (or window) is closed.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'tabremove'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>tid</code>: The id of the removed tab.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'tabremove', 
+ t: 1360168716158, 
+ tid: 2k3}
+</pre>
+</div>
+
+<a name="pageload"></a>
+<div class="function">
+    <h3>Page Load</h3>
+    Fires any time a page is loaded.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'pageload'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>tid</code>: The id of the tab in which the page was 
+            loaded.
+        <li>{string} <code>url</code>: The loaded URL.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'pageload', 
+ t: 1360168716158, 
+ tid: 2k3,
+ url: 'http://www.cnn.com'}
+</pre>
+</div>
+
+<a name="pagefocus"></a>
+<div class="function">
+    <h3>Page Focus</h3>
+    Fires any time a page is brought into focus.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'pagefocus'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>tid</code>: The id of the tab in which the page was 
+            focused.
+        <li>{string} <code>url</code>: The URL of the focused page.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'pagefocus', 
+ t: 1360168716158, 
+ tid: 2k3,
+ url: 'http://www.cnn.com'}
+</pre>
+</div>
+
+<a name="loggingstatuschange"></a>
+<div class="function">
+    <h3>Logging Status Change</h3>
+    Fires any time the user toggles logging or when the browser is started.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'loggingstatuschange'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{boolean} <code>le</code>: Logging enabled: <code>true</code> or 
+            <code>false</code>
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'loggingstatuschange', 
+ t: 1360168716158, 
+ le: false}
+</pre>
+</div>
+
+
+<!-- User History -->
+<a name="history"></a>
+<h2>Accessing User History</h2>
+
+<p>
+The <code>api.user.history</code> should be used to access a user's browser
+interactions up until the current moment. For example, if you want to make a
+language model of all queries the user has submitted in the past (assuming they
+have been logged). There are several functions available to you:
+</p>
+
+<ul>
+    <li><a href="#user:read-all">Read all past interactions</a>
+    <li><a href="#user:read-searches">Read past searches</a>
+    <li><a href="#user:read-clicks">Read past clicks</a>
+    <li><a href="#user:read-visits">Read past page visits</a>
+    <li><a href="#user:read-sessions">Read past sessions</a>
+    <li><a href="#user:read-trails">Read past search and browsing trails</a>
+</ul>
 
 <!-- Read log entries. -->
-<a name="readlog"></a>
-<h3>Reading log entries</h3>
-<p>
-To read the activity or error logs, you will use the <code>CROWDLOGGER.io.log.
-read_activity_log</code> and <code>CROWDLOGGER.io.log.read_error_log</code> 
-functions. The take the same parameter: a map of options. I.e.:
-</p>
+<a name="read-all"></a>
+<div class="function">
+    <h3>Reading all interactions<br/>
+        <code>api.user.history.getInteractionHistory</code></h3>
+    <h4>Parameters</h4>
+    {object} A list of options:<br/>
+    <b>Required</b>
+    <ul>
+        <li>{function} <code>on_chunk</code>
+        <ul>
+            Invoked per chunk (see <code>chunk_size</code> below). Chunks are 
+            processed asynchronously. It should expect three parameters: 
+            <ul>
+                <li>{array of objects} the interaction events 
+                <li>{function} a <code>next</code> function, which, when 
+                    invoked, will read in the next chunk asynchronously
+                <li>{function} an <code>abort</code> function, which, when 
+                    invoked, will
+                    end the reading. This can take up to two parameters:
+                    <code>isError</code> (default false) and 
+                    <code>errorMsg</code>. If <code>isError == true</code>, then
+                    the <code>on_error</code> function will be invoked; otherwise,
+                    the <code>on_success</code> function will be (see below).
+            </ul>
+        </ul>
+    </ul>
+    <b>Optional</b>
+    <ul>
+        <li>{function} <code>on_success</code>
+        <ul>
+            Invoked when everything has been read and processed by 
+            <code>on_chunk</code>.
+        </ul>
 
-<table>
-    <tr>
-        <th>Option key</th> <th>Type</th> <th>Description</th>
-    </tr><tr class="subHeader">
-        <td colspan="3"><i>Required</i></td>
-    </tr><tr>
-        <td><code>on_chunk</code></td>
-        <td>function</td>
-        <td>Invoked per chunk (see <code>chunk_size</code> below). Chunks are 
-            processed asynchronously. It should expect two parameters: an
-            array of entries (objects) and a 'next' function, which, when 
-            invoked, will read in the next chunk asynchronously.
-        </td>
-    </tr>
+        <li>{function} <code>on_error</code>
+        <ul>
+            Invoked if there's an error.
+        </ul>
 
-    <tr class="subHeader">
-        <td colspan="3"><i>Optional</i></td>
-    </tr><tr>
-        <td><code>on_success</code></td>
-        <td>function</td>
-        <td>Invoked when everything has been read and processed by 
-            <code>on_chunk</code>.</td>
-    </tr><tr>
-        <td><code>on_error</code></td>
-        <td>function</td>
-        <td>Invoked if there's an error.</td>
-    </tr><tr>
-        <td><code>chunk_size</code></td>
-        <td>integer</td>
-        <td>The size of the chunks to process. E.g.,
+        <li>{int} <code>chunk_size</code>
+        <ul>
+            The size of the chunks to process. E.g.,
             <coode>chunk_size = 50</code> will cause 50 entries to
             be read, stored in an array, and then
-            passed to the on_chunk function. If &lt;=0,
-            all entries will be read in before
-            calling <code>on_chunk</code>. This is approximate
-            because ranges are used and therefore
-            deleted items within that range will not
-            be read (their id's are not reused).
-            Default: 0.
-        </td>
-    </tr><tr>
-        <td><code>reverse</code></td>
-        <td>boolean</td>
-        <td>If true, the data will be read in reverse
+            passed to the on_chunk function. If provided, this must be
+            between 1 and 500 (default: 250). If <code>chunk_size</code> is
+            less than 1, it is set to 250, and if greater than 500, it is set
+            to 500.
+        </ul>
+
+        <li>{boolean} <code>reverse</code>
+        <ul>
+            If true, the data will be read in reverse
             order of id. Default is 'false'.
-        </td>
-    </tr><tr>
-        <td><code>lower_bound</code></td>
-        <td>integer</td>
-        <td>The smallest id to retrieve; default: 0</td>
-    </tr><tr>
-        <td><code>upper_bound</code></td>
-        <td>integer</td>
-        <td>The largest id to retrieve; default: -1
+        </ul>
+
+        <li>{int} <code>lower_bound</code>
+        <ul>
+            The smallest id to retrieve; default: 0
+        </ul>
+
+        <li>{int} <code>upper_bound</code>
+        <ul>
+            The largest id to retrieve; default: -1
             (all ids >= lower_bound are retrieved).
-        </td>
-    </tr>
-</table>
+        </ul>
+    </ul>
+
+    <h4>Description</h4>
+    <p>You can use <code>api.user.history.getInteractionHistory</code> to access
+a user's full interaction history: clicks, queries, page loads/focuses, and
+tab events.
+    </p>
+
+
 
 <p>
 Lets go over a few common patterns. If you want to <b>read the entire activity 
-log at once</b>, you can do something like this:
+log</b> in default chunk sizes, you can do something like this:
 </p>
 
 <pre class="prettyprint">
 // Prints each of the given entries.
-function print_entries( entries, next /* ignored */ ){
+function print_entries( entries, next, abort ){
     var i;
     for( i = 0; i &lt; entries.length; i++ ){
-        CROWDLOGGER.debug.log( JSON.stringify(entries[i]) );
+        console.log( JSON.stringify(entries[i]) );
     }
+    // Read the next chunk.
+    next();
 }
 
 // Read the log and print the entries.
-CROWDLOGGER.io.log.read_activity_log({
+api.user.history.getInteractionHistory({
     on_chunk: print_entries
 });
 </pre>
 
 <p>
-If you are sure you're going to have to do something with all of logged data AND
-you think that the log is small enough that it shouldn't be an issue, then this
-method is okay. However, most of the time, you probably don't need to read all
-the logged data at once. For instance, suppose you are <b>populating a search
+Now let's suppose you are <b>populating a search
 history web page</b>. If the user hasn't scrolled to the bottom of the page yet,
 there's no reason to load any additional content. So, we want to chunk the data
-and traverse it in reverse order (most recent log entries first):
+and traverse it in reverse order (most recent log entries first), but only call
+<code>next</code> when we need to. 
 </p>
 
 <pre class="prettyprint">
 var body = jQuery('&lt;div&gt;');
 
 // Appends a set of entries to an html page.
-function append_entries_to_page( entries, next ){
-    var i, entry_elm;
+function appendEntriesToPage( entries, next, abort ){
+    var i, entryElm;
 
     // Append the entries as spans of text.
     for( i = 0; i &lt; entries.length; i++ ){
-        entry_elm = jQuery('&lt;span&gt;').text(entries[i].e+'@'+entries[i].t);
-        body.append(entry_elm);
+        entryElm = jQuery('&lt;span&gt;').text(entries[i].e+'@'+entries[i].t);
+        body.append(entryElm);
     }
 
-    // When the last element comes into view, read the next chunk. The 'next' function knows 
-    // to call this function again, so we don't have to pass any additional information.
-    function on_focus(e){
+    // When the last element comes into view, read the next chunk. 
+    // The 'next' function knows to call this function again, so 
+    // we don't have to pass any additional information.
+    function onFocus(e){
+        jQuery(this).unbind('focus', onFocus);
         next();
-        jQuery(this).unbind('focus', on_focus);
     }
-    if( entry_elm ){ entry_elm.focus(on_focus); }
+    if( entryElm ){ entryElm.focus(onFocus); }
 }
 
 // Read the log, reading entries in 50-entry chunks, and add them to the
 // body element. We're reading in reverse, so we set reverse: true.
-CROWDLOGGER.io.log.read_activity_log({
-    on_chunk: append_entries_to_page,
+api.user.history.getInteractionHistory({
+    on_chunk: appendEntriesToPage,
     chunk_size: 50,
     reverse: true
 });
@@ -341,13 +544,164 @@ CROWDLOGGER.io.log.read_activity_log({
 <p>
 The other options are useful for various situations. The <code>on_success</code>
 is convenient if you need to do something once all the data has been read
-and processed. Note that this call will never be made if the 'next' function
-isn't invoked. The <code>upper_bound</code> and <code>lower_bound</code> 
+and processed. Note that this call is only made after the last invocation of
+<code>next</code> (when you call <code>next</code> and there is no more data
+to read) or if you invoke <code>abort()</code> or <code>abort(false)</code>. 
+The <code>on_error</code> function will report any errors that occur internally
+or if you invoke <code>abort(true)</code> or 
+<code>abort(true, 'error message')</code>.
+The <code>upper_bound</code> and <code>lower_bound</code> 
 options are handy if you know the minimum or maximum ids of the entries you 
-would like to retrieve&emdash;after all, why read in everything if you don't
+would like to retrieve&mdash;after all, why read in everything if you don't
 need to?
 </p>
 
+</div>
+
+<!-- Read past searches. -->
+<a name="read-searches"></a>
+<div class="function">
+    <h3>Reading all interactions<br/>
+        <code>api.user.history.getPastSearches</code></h3>
+    <h4>Parameters</h4>
+
+    <h4>Description</h4>
+    <p>
+
+    </p>
+</div>
+
+<!-- Read past clicks. -->
+<a name="read-clicks"></a>
+<div class="function">
+    <h3>Reading all interactions<br/>
+        <code>api.user.history.getPastClicks</code></h3>
+    <h4>Parameters</h4>
+
+    <h4>Description</h4>
+    <p>
+
+    </p>
+</div>
+
+<!-- Read past page visits. -->
+<a name="read-visits"></a>
+<div class="function">
+    <h3>Reading all interactions<br/>
+        <code>api.user.history.getPastPageVisits</code></h3>
+    <h4>Parameters</h4>
+
+    <h4>Description</h4>
+    <p>
+
+    </p>
+</div>
+
+
+<!-- Read past sessions (queries and sets of visited pages). -->
+<a name="read-sessions"></a>
+<div class="function">
+    <h3>Read past search sets (queries and sets of visited pages)<br/>
+        <code>api.user.history.getPastSessions</code></h3>
+    <h4>Parameters</h4>
+
+    <h4>Description</h4>
+    <p>
+        Groups interaction events into sessions, where a session boundary is
+        defined as any duration between consecutive interaction events 
+        equal to or greater than <code>sessionThreshold</code> minutes.
+    </p>
+</div>
+
+
+<!-- Read past search and browsing trails. -->
+<a name="read-trails"></a>
+<div class="function">
+    <h3>Read past search and browsing trails<br/>
+        <code>api.user.history.getPastSearchTrails</code></h3>
+    <h4>Parameters</h4>
+
+    <h4>Description</h4>
+    <p>
+        Groups 'related' events. A group starts with one of: 
+        <ul>
+            <li>a search
+            <li>an independent page visit (i.e., a page load not stemming 
+                from a click).
+            <li>the first event in a new session
+        </ul>
+    </p>
+    <p>
+        All actions following one of the start events is grouped with that
+        start event until a new start event is reached or the session ends
+        (determined by at least <code>sessionThreshold</code> minutes of 
+        inactivity).
+    </p>
+</div>
+
+
+<a name="realtime"></a>
+<h2>Accessing Real-time User Activity</h2>
+
+<div class="function">
+    <h3>Attaching listeners<br/>
+        <code>api.user.realtime.addActivityListeners</code></h3>
+
+    <h4>Parameters</h4>
+    {object} A map of event listeners:
+    <ul>
+        <li>{function} <code>search</code>
+            <ul>The callback for new search events.</ul>
+
+        <li>{function} <code>click</code>
+            <ul>The callback for new click events.</ul>
+
+        <li>{function} <code>pageload</code>
+            <ul>The callback for new page load events.</ul>
+
+        <li>{function} <code>pagefocus</code>
+            <ul>The callback for new page focus events.</ul>
+    </ul>
+    <p>
+    Note that each of the callbacks should expect two arguments:
+    <ul>
+        <li>{object} A DOM event -- ignore this.
+        <li>{object} The interaction event data (see <a href="#user:events">Interaction events</a> above).
+    </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        You can use <code>api.user.realtime.addActivityListeners</code> to 
+        access new interactions as they happen.
+    </p>
+</div>
+
+<a name="save"></a>
+<h2>Saving Data</h2>
+
+<p>
+For each of the operations listed in the <a href="user:history">Accessing User
+History</a> section, there is a parallel for custom CrowdLogger extension logs.
+The differences are that you will always need to supply a database name
+(whatever you want, but should be unique) and version (an integer), and there
+are a few additional options available. Internally, each extension log is put in
+its own database. You can specify how to initialize it or update it between
+database versions, or you can rely on the default extension store creator, which
+gives you a single store that uses the <code>id</code> as the storage key (auto-
+incrementing). 
+</p>
+
+<p>
+For the read, write, update, and clear operations, use:
+</p>
+
+<ul>
+    <li><code>CROWDLOGGER.io.log.read_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.write_to_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.update_extension_log</code>
+    <li><code>CROWDLOGGER.io.log.clear_extension_log</code>
+</ul>
 
 
 
@@ -545,38 +899,6 @@ required):
     </tr>
 </table>
 
-
-<a name="realtime"></a>
-<h2>Accessing Real-time User Activity</h2>
-
-TODO
-
-
-<a name="save"></a>
-<h2>Saving Data</h2>
-
-<p>
-For each of the operations listed in the <a href="user:history">Accessing User
-History</a> section, there is a parallel for custom CrowdLogger extension logs.
-The differences are that you will always need to supply a database name
-(whatever you want, but should be unique) and version (an integer), and there
-are a few additional options available. Internally, each extension log is put in
-its own database. You can specify how to initialize it or update it between
-database versions, or you can rely on the default extension store creator, which
-gives you a single store that uses the <code>id</code> as the storage key (auto-
-incrementing). 
-</p>
-
-<p>
-For the read, write, update, and clear operations, use:
-</p>
-
-<ul>
-    <li><code>CROWDLOGGER.io.log.read_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.write_to_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.update_extension_log</code>
-    <li><code>CROWDLOGGER.io.log.clear_extension_log</code>
-</ul>
 
 <p>
 These take all the same options as their activity and error log equivalents, but
