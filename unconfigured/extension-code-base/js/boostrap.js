@@ -62,10 +62,7 @@ var JS_FILES = [
     'api.cli.base.js',
     'api.cli.ui.js',
     'api.cli.user.js',
-    // 'api.clrmi.init.js',
-    // 'api.clrmi.base.js',
-    // 'api.clrmi.ui.js',
-    // 'api.clrmi.user.js',
+    'api.cli.storage.js',
 
     // Crypto libraries.
     'external_lib/bignumber.js',

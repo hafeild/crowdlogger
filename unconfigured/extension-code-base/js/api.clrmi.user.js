@@ -2,7 +2,7 @@
  * @fileOverview <p>Provides the user API for the CrowdLogger Remote Modules 
  * ( CRMs )-side interface ( CRMI ).</p>
  *
- * %%VERSION%%
+ * %%COPYRIGHT%%
  * 
  * @author hfeild
  * @version %%VERSION%%
@@ -164,7 +164,7 @@ CLRMI.prototype.User.prototype.History = function( api ){
             functionName: 'getInteractionHistory',
             options: {
                 callbackID: callbackID,
-                chunk_size: opts.chunk_size,
+                chunk_size: chunk_size,
                 reverse: opts.reverse,
                 lower_bound: opts.lower_bound,
                 upper_bound: opts.upper_bound

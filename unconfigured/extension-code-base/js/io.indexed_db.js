@@ -27,7 +27,7 @@ CROWDLOGGER.io.indexed_db = {};
  * databases. The functions that actually read and write from the database are 
  * private. 
  * @class An interface for accessing an IndexedDB.
- * @return {Object} An object with several publicly accessible functions for 
+ * @return {object} An object with several publicly accessible functions for 
  *   reading from
  *         and writing to IndexedDB databases.
  */
@@ -36,11 +36,10 @@ CROWDLOGGER.io.IndexedDB = function(){
     var create_table, clear_log, write_to_db, read_from_db, open_db, 
         write_to_log, read_log, run_transaction, foreach_entry,
         raise_error, on_crowlogger_db_upgraded, on_extension_db_upgraded,
-        copy_obj, create_store, truncate_store, update_log;
-
+        copy_obj, create_store, truncate_store, update_log, get_range;
 
     // Some constants
-    var DATABASE_NAME = 'crowdlogger',
+    const DATABASE_NAME = 'crowdlogger',
         EXTENSION_DATABASE_NAME = 'crowdlogger_extensions',
         EXTENSION_STORE_NAME = 'data',
         ACTIVITY_LOG_STORE_NAME = 'activity_log',
@@ -63,8 +62,6 @@ CROWDLOGGER.io.IndexedDB = function(){
         IDBKeyRange = window.IDBKeyRange || window.mozIDBKeyRange || 
             window.webkitIDBKeyRange;
 
-
-
     // Some globals.
     var that = this,
         db_connections = {};
@@ -72,30 +69,47 @@ CROWDLOGGER.io.IndexedDB = function(){
     // Public functions. These will all be defined later, just listing them
     // out for now.
     // Writers. For appending individual entries.
-    this.write_to_error_log = undefined;
-    this.write_to_activity_log = undefined;
-    this.log = undefined;
-    this.write_to_extension_log = undefined;
+    this.write_to_error_log;
+    this.write_to_activity_log;
+    this.log;
+    this.write_to_extension_log;
 
     // Updaters. For modifying or deleting batches of entries.
-    this.update_error_log = undefined;
-    this.update_activity_log = undefined;
-    this.update_extension_log = undefined;
+    this.update_error_log;
+    this.update_activity_log;
+    this.update_extension_log;
 
     // Readers. For reading all or subsets of entries.
-    this.read_error_log = undefined;
-    this.read_activity_log = undefined;
-    this.read_extension_log = undefined;
+    this.read_error_log;
+    this.read_activity_log;
+    this.read_extension_log;
 
     // Clearers. For dropping entire tables.
-    this.clear_error_log = undefined;
-    this.clear_activity_log = undefined;
-    this.clear_extension_log = undefined
+    this.clear_error_log;
+    this.clear_activity_log;
+    this.clear_extension_log
+
+    // Accessors.
+    this.get_version;
+    this.list_stores;
+    this.remove_database;
+    this.upgrade_db;
+
+    this.IOLogException;
 
     // Public variables.
     this.version = VERSION;
 
     // ******* BEGIN PUBLIC FUNCTIONS ********* //
+
+    /**
+     * A wrapper for an error message; to be thrown and invoked with new.
+     *
+     * @param {string} message  The error message.
+     */
+    this.IOLogException = function(message){
+        this.message = message;
+    };
 
     // ** WRITERS ** //
     /**
@@ -109,8 +123,8 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul> 
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      Invoked when writing is complete.
-     *    <li>{Function} on_error:        Invoked if there's an error.
+     *    <li>{function} on_success:      Invoked when writing is complete.
+     *    <li>{function} on_error:        Invoked if there's an error.
      * </ul>  
      * 
      * @throws {Error} If the required opts fields are not present.
@@ -147,8 +161,8 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul> 
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      Invoked when writing is complete.
-     *    <li>{Function} on_error:        Invoked if there's an error.
+     *    <li>{function} on_success:      Invoked when writing is complete.
+     *    <li>{function} on_error:        Invoked if there's an error.
      * </ul>  
      * 
      * @throws {Error} If the required opts fields are not present.
@@ -182,24 +196,24 @@ CROWDLOGGER.io.IndexedDB = function(){
      * REQUIRED:
      * <ul>
      *     <li>{string} db_name:          The name of the database to open.
-     *     <li>{int} db_version:          The version of the db.
      *     <li>{string} data:             An array of data objects to write to 
      *                                    the database.
      * </ul> 
      * OPTIONAL:
      * <ul>
+     *     <li>{int} db_version:          The version of the db.
      *     <li>{string} store_name:       The name of the table to create.
-     *     <li>{Function} on_upgrade:     Invoked if the database needs to be 
+     *     <li>{function} on_upgrade:     Invoked if the database needs to be 
      *                                    updated.
-     *    <li>{Function} on_success:      Invoked when writing is complete.
-     *    <li>{Function} on_error:        Invoked if there's an error.
+     *    <li>{function} on_success:      Invoked when writing is complete.
+     *    <li>{function} on_error:        Invoked if there's an error.
      * </ul>  
      * 
      * @throws {Error} If the required opts fields are not present.
      */
     this.write_to_extension_log = function( opts ){
         opts = copy_obj(opts);
-        if( !opts.db_name || !opts.db_version || !opts.data ){
+        if( !opts.db_name || !opts.data ){
             return raise_error(
                 "Missing parameters in call to write_to_extension_log.", 
                 opts.on_error);
@@ -224,10 +238,10 @@ CROWDLOGGER.io.IndexedDB = function(){
      *   on_success: function(entry)
      * })
      *
-     * @param {Object} opts     A map consisting of several options, including:
+     * @param {object} opts     A map consisting of several options, including:
      * REQUIRED:
      * <ul>
-     *    <li>{Funciton} foreach:         A function to run on each entry. It
+     *    <li>{function} foreach:         A function to run on each entry. It
      *                                    should take an entry object as its
      *                                    only parameter and optionally return
      *                                    an object with three optional fields:
@@ -237,9 +251,9 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      A function to call when all data
+     *    <li>{function} on_success:      A function to call when all data
      *                                    has been processed.
-     *    <li>{Funciton} on_error:        Invoked when an error occurs.
+     *    <li>{function} on_error:        Invoked when an error occurs.
      * </ul>
      */
     this.update_activity_log = function( opts ){
@@ -270,10 +284,10 @@ CROWDLOGGER.io.IndexedDB = function(){
      *   on_success: function(entry)
      * })
      *
-     * @param {Object} opts     A map consisting of several options, including:
+     * @param {object} opts     A map consisting of several options, including:
      * REQUIRED:
      * <ul>
-     *    <li>{Funciton} foreach:         A function to run on each entry. It
+     *    <li>{function} foreach:         A function to run on each entry. It
      *                                    should take an entry object as its
      *                                    only parameter and optionally return
      *                                    an object with three optional fields:
@@ -283,9 +297,9 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      A function to call when all data
+     *    <li>{function} on_success:      A function to call when all data
      *                                    has been processed.
-     *    <li>{Funciton} on_error:        Invoked when an error occurs.
+     *    <li>{function} on_error:        Invoked when an error occurs.
      * </ul>
      */
     this.update_error_log = function( opts ){
@@ -316,12 +330,11 @@ CROWDLOGGER.io.IndexedDB = function(){
      *   on_success: function(entry)
      * })
      *
-     * @param {Object} opts     A map consisting of several options, including:
+     * @param {object} opts     A map consisting of several options, including:
      * REQUIRED:
      * <ul>
      *    <li>{string} db_name:           The database name.
-     *    <li>{int} db_version:           The version of the db.     
-     *    <li>{Funciton} foreach:         A function to run on each entry. It
+     *    <li>{function} foreach:         A function to run on each entry. It
      *                                    should take an entry object as its
      *                                    only parameter and optionally return
      *                                    an object with three optional fields:
@@ -331,12 +344,17 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_upgrade:      Invoked if the database needs to be 
+     *    <li>{int} db_version:           The version of the db.     
+     *    <li>{function} on_upgrade:      Invoked if the database needs to be 
      *                                    updated.
      *    <li>{string} store_name:        The name of the store to read.     
-     *    <li>{Function} on_success:      A function to call when all data
+     *    <li>{function} on_success:      A function to call when all data
      *                                    has been processed.
-     *    <li>{Funciton} on_error:        Invoked when an error occurs.
+     *    <li>{function} on_error:        Invoked when an error occurs.
+     *    <li>{int} lower_bound:          Smallest id to retrieve. Default: 0
+     *    <li>{int} upper_bound:          Largest id to retrieve. 
+     *                                    Default:undefined (all ids > 
+     *                                    lower_bound are retrieved).
      * </ul>
      */
     this.update_extension_log = function( opts ){
@@ -357,11 +375,11 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Truncates the activity log store.
      * 
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      * </ul>     
      */
     this.clear_activity_log = function( opts ) {
@@ -369,7 +387,7 @@ CROWDLOGGER.io.IndexedDB = function(){
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
-        opts.store_name = ACTIVITY_LOG_STORE_NAME;
+        opts.store_names = [ACTIVITY_LOG_STORE_NAME];
 
         // Clear the log.
         return clear_log( opts );
@@ -378,11 +396,11 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Truncates the error log store.
      * 
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      * </ul>     
      */
     this.clear_error_log = function( opts ) {
@@ -390,7 +408,7 @@ CROWDLOGGER.io.IndexedDB = function(){
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
-        opts.store_name = ERROR_LOG_STORE_NAME;
+        opts.store_names = [ERROR_LOG_STORE_NAME];
 
         // Clear the log.
         return clear_log( opts );
@@ -399,33 +417,30 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Truncates an extension store.
      * 
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
      *    <li>{string} db_name:        The database name.
-     *    <li>{int} db_version:        The version of the db.
+     *    <li>{string} store_names:    The names of the stores to clear.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_upgrade:   Invoked if the database needs to be 
+     *    <li>{int} db_version:        The version of the db.
+     *    <li>{function} on_upgrade:   Invoked if the database needs to be 
      *                                 updated.
-     *    <li>{string} store_name:     The name of the store to read.
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been cleared.
+     *    <li>{function} on_error:     Invoked if there's an error.
      * </ul>
      * 
      * @throws {Error} If required opts fields are missing.
      */
     this.clear_extension_log = function( opts ) {
         opts = copy_obj(opts);
-        if( !opts.db_name || !opts.db_version ){
-            return raise_error(
-                "Missing parameters in call to clear_extension_log.",
-                opts.on_error);
-        }
+        CROWDLOGGER.util.check_args(opts, ['db_name', 'store_names'], 
+            'clear_extension_log', that.IOLogException, true);
 
         opts.on_upgrade = opts.on_upgrade || on_extension_db_upgraded;
-        opts.store_name = opts.store_name || EXTENSION_STORE_NAME;
+        //opts.store_name = opts.store_name || EXTENSION_STORE_NAME;
 
         // Read the data and send it to callback.
         return clear_log( opts );
@@ -441,16 +456,16 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @function
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of additional options:
+     * @param {object} opts        A map of additional options:
      * REQUIRED:
      * <ul>
-     *    <li>{Function} on_chunk:     Invoked per chunk (see below). Chunks
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
@@ -487,16 +502,16 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @function
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of additional options:
+     * @param {object} opts        A map of additional options:
      * REQUIRED:
      * <ul>
-     *    <li>{Function} on_chunk:     Invoked per chunk (see below). Chunks
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
@@ -533,21 +548,21 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @function
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of additional options:
+     * @param {object} opts        A map of additional options:
      * REQUIRED:
      * <ul>
      *    <li>{string} db_name:        The database name.
-     *    <li>{int} db_version:        The version of the db.
-     *    <li>{Function} on_chunk:     Invoked per chunk (see below). Chunks
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_upgrade:   Invoked if the database needs to be 
+     *    <li>{int} db_version:        The version of the db.
+     *    <li>{function} on_upgrade:   Invoked if the database needs to be 
      *                                 updated.
      *    <li>{string} store_name:     The name of the store to read.
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
@@ -569,7 +584,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      */
     this.read_extension_log = function( opts ){
         opts = copy_obj(opts);
-        if( !opts.db_name || !opts.db_version || !opts.on_chunk ){
+        if( !opts.db_name || !opts.on_chunk ){
             return raise_error(
                 "Missing parameters in call to read_extension_log.",
                 opts.on_error);
@@ -581,10 +596,190 @@ CROWDLOGGER.io.IndexedDB = function(){
         // Read the data.
         return read_log( opts );
     }; 
+
+    /**
+     * Gets the version of the specified database.
+     * 
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} db_name:        The name of the database whose version
+     *                                 should be retrieved.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *                                 Should expect the version number as a
+     *                                 parameter.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>     
+     */
+    this.get_version = function( opts ){
+        if( !opts || !opts.db_name  || !opts.on_success ){
+            return raise_error(
+                "Missing parameters in call to get_version.",
+                opts.on_error);
+        }
+
+        if( is_database_opened(opts.db_name) ){
+            opts.on_success(db_connections[opts.db_name].version);
+        } else {
+            open_db({ 
+                on_success: function(){
+                    opts.on_success(db_connections[opts.db_name].version);
+                },
+                on_error: opts.on_error,
+                db_name: opts.db_name
+            });
+        }
+    };
+
+    /**
+     * Gets the stores contained in the specified database.
+     * 
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} db_name:        The name of the database whose stores
+     *                                 should be retrieved.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *                                 Should expect the array of store names 
+     *                                 as a parameter.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>     
+     */
+    this.list_stores = function( opts ){
+        if( !opts || !opts.db_name  || !opts.on_success ){
+            return raise_error(
+                "Missing parameters in call to list_stores.",
+                opts.on_error);
+        }
+
+        if( is_database_opened(opts.db_name) ){
+            opts.on_success(CROWDLOGGER.util.copy(
+                    db_connections[opts.db_name].objectStoreNames) || []);
+        } else {
+            open_db({ 
+                on_success: function(){
+                    opts.on_success(CROWDLOGGER.util.copy(
+                            db_connections[opts.db_name].objectStoreNames));
+                },
+                on_error: opts.on_error,
+                db_name: opts.db_name
+            });
+        }
+    };
+
+    /**
+     * Removes the specified database.
+     * 
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} db_name:        The name of the database to delete.
+     *                                 This cannot be the name of the primary
+     *                                 CrowdLogger database.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *                                 Should expect the array of store names 
+     *                                 as a parameter.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>     
+     */
+    this.remove_database = function(opts){
+        if( !opts || !opts.db_name ){
+            return raise_error(
+                "Missing parameters in call to remove_database.",
+                opts.on_error);
+        }
+
+        if( opts.db_name !== DATABASE_NAME ){
+            if(db_connections[opts.db_name]){
+                db_connections[opts.db_name].close();
+                delete db_connections[opts.db_name];
+            }
+
+            var request = IndexedDB.deleteDatabase(opts.db_name);
+            request.onsuccess = function(){
+                if(opts.on_success){ opts.on_success(); }
+            };
+            request.onerror = function(event){
+                if(opts.on_error){ opts.on_error({
+                    errorCode: event.target.errorCode}); }
+            };
+        }
+    }
+
+    /**
+     * Upgrades a database. The version is automatically detected and 
+     * incremented.
+     *
+     * @param {object} opts     A map of options.
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} db_name:        The name of the database to delete.
+     *                                 This cannot be the name of the primary
+     *                                 CrowdLogger database.
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *                                 Should expect the array of store names 
+     *                                 as a parameter.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>    
+     *     
+     */
+    this.upgrade_db = function( opts ){
+        if( !opts || !opts.db_name  || !opts.on_success ){
+            return raise_error(
+                "Missing parameters in call to list_stores.",
+                opts.on_error);
+        }
+
+
+        if( is_database_opened(opts.db_name) ){
+            var version = db_connections[opts.db_name].version;
+            db_connections[opts.db_name].close();
+            delete db_connections[opts.db_name];
+            open_db({ 
+                on_upgrade: opts.on_upgrade,
+                on_success: function(){
+                    opts.on_success();
+                },
+                on_error: opts.on_error,
+                db_name: opts.db_name,
+                db_version: version+1
+            });
+        } else {
+            open_db({ 
+                on_success: function(){
+                    that.upgrade_db(opts);
+                },
+                on_error: opts.on_error,
+                db_name: opts.db_name
+            });
+        }
+    };
     // ******* END PUBLIC FUNCTIONS ********* //
 
 
     // ******* BEGIN PRIVATE FUNCTIONS ********* //
+
+    is_database_opened = function(db_name, version){
+        return  db_connections[db_name] && 
+            (db_connections[db_name].version === version || !version ) 
+    };
+
+    add_database_connection = function(db){
+        if( db_connections[db.name] ){
+            db_connections[db.name].close;
+        }
+
+         db_connections[db.name] = db;
+    };
+
     /**
      * Creates the stores in a CrowdLogger database.
      *
@@ -616,38 +811,38 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Truncates the given log store.
      *
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
      *     <li>{string} db_name:          The name of the database to open.
-     *     <li>{Function} on_upgrade:     Invoked if the database needs to be 
+     *     <li>{function} on_upgrade:     Invoked if the database needs to be 
      *                                    updated.
-     *     <li>{int} db_version:          The version of the db.
-     *     <li>{string} store_name:       The name of the store to clear.
+     *     <li>{string} store_names:      The names of the stores to clear.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *     <li>{Funciton} on_error:       Invoked on an error.
-     *     <li>{Function} on_success:     Invoked on success.
+     *     <li>{int} db_version:          The version of the db.
+     *     <li>{function} on_error:       Invoked on an error.
+     *     <li>{function} on_success:     Invoked on success.
      * </ul>     
      *
      * @throws {Error} If required opts fields are missing.
      */
     clear_log = function( opts ) {
-        if( !opts || !opts.db_name || !opts.db_version ){ 
+        if( !opts || !opts.db_name || !opts.store_names ){ 
             opts = opts || {};
             return raise_error("Missing parameters in call to clear_log.", 
                 opts.on_error);
         }
 
-        if( !db_connections[opts.db_name] ){
+        if( !is_database_opened(opts.db_name) ){
             return open_db({
                 db_name: opts.db_name,
                 db_version: opts.db_version,
                 on_upgrade: opts.on_upgrade,
                 on_error: opts.on_error,
                 on_success: function(db){
-                    db_connections[opts.db_name] = db;
+                    // add_database_connection(db);
                     clear_log(opts);
                 }
             });
@@ -655,7 +850,7 @@ CROWDLOGGER.io.IndexedDB = function(){
 
         return truncate_store({
             db: db_connections[opts.db_name], 
-            store_name: opts.store_name,
+            store_names: opts.store_names,
             on_error: opts.on_error, 
             on_success: opts.on_success
         });
@@ -669,39 +864,39 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
      *     <li>{string} db_name:          The name of the database to open.
-     *     <li>{Function} on_upgrade:     Invoked if the database needs to be 
+     *     <li>{function} on_upgrade:     Invoked if the database needs to be 
      *                                    updated.
-     *     <li>{int} db_version:          The version of the db.
      *     <li>{string} store_name:       The name of the table to create.
      *     <li>{string} data:             The data to write to the database.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      Invoked when writing is complete.
-     *    <li>{Function} on_error:        Invoked if there's an error.
+     *    <li>{int} db_version:          The version of the db.
+     *    <li>{function} on_success:      Invoked when writing is complete.
+     *    <li>{function} on_error:        Invoked if there's an error.
      * </ul>
      * @throws {Error} If the required opts fields are missing.
      */
     write_to_log = function( opts ){
-        if( !opts || !opts.db_name || !opts.db_version || !opts.on_upgrade || 
+        if( !opts || !opts.db_name || !opts.on_upgrade || 
                 !opts.data || !opts.store_name ){ 
             opts = opts || {};
             return raise_error("Missing parameters in call to write_to_log.", 
                 opts.on_error);
         }
 
-        if( !db_connections[opts.db_name] ){
+        if( !is_database_opened(opts.db_name, opts.db_version) ){
             return open_db({
                 db_name: opts.db_name,
                 db_version: opts.db_version,
                 on_upgrade: opts.on_upgrade,
                 on_error: opts.on_error,
                 on_success: function(db){
-                    db_connections[opts.db_name] = db;
+                    // add_database_connection(db);
                     write_to_log(opts);
                 }
             });
@@ -733,15 +928,14 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
      *     <li>{string} db_name:          The name of the database to open.
-     *     <li>{Function} on_upgrade:     Invoked if the database needs to be 
+     *     <li>{function} on_upgrade:     Invoked if the database needs to be 
      *                                    updated.
-     *     <li>{int} db_version:          The version of the db.
      *     <li>{string} store_name:       The name of the table to create.
-     *     <li>{Function} foreach:        A function to run on each entry. It
+     *     <li>{function} foreach:        A function to run on each entry. It
      *                                    should take an entry object as its
      *                                    only parameter and optionally return
      *                                    an object with three optional fields:
@@ -751,27 +945,32 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:      Invoked when updating is complete.
-     *    <li>{Function} on_error:        Invoked if there's an error.
+     *    <li>{int} db_version:          The version of the db.
+     *    <li>{function} on_success:     Invoked when updating is complete.
+     *    <li>{function} on_error:       Invoked if there's an error.
+     *    <li>{int} lower_bound:         Smallest id to retrieve. Default: 0
+     *    <li>{int} upper_bound:         Largest id to retrieve. 
+     *                                   Default:undefined (all ids > 
+     *                                   lower_bound are retrieved).
      * </ul>
      * @throws {Error} If the required opts fields are missing.
      */
     update_log = function( opts ){
-        if( !opts || !opts.db_name || !opts.db_version || !opts.on_upgrade || 
+        if( !opts || !opts.db_name || !opts.on_upgrade || 
                 !opts.foreach || !opts.store_name ){ 
             opts = opts || {};
             return raise_error("Missing parameters in call to update_log.", 
                 opts.on_error);
         }
 
-        if( !db_connections[opts.db_name] ){
+        if( !is_database_opened(opts.db_name, opts.db_version) ){
             return open_db({
                 db_name: opts.db_name,
                 db_version: opts.db_version,
                 on_upgrade: opts.on_upgrade,
                 on_error: opts.on_error,
                 on_success: function(db){
-                    db_connections[opts.db_name] = db;
+                    // add_database_connection(db);
                     update_log(opts);
                 }
             });
@@ -784,7 +983,8 @@ CROWDLOGGER.io.IndexedDB = function(){
             on_entry: opts.foreach,
             mode: READWRITE,
             on_success: opts.on_success,
-            on_error: opts.on_error
+            on_error: opts.on_error,
+            range: get_range(opts.upper_bound, opts.lower_bound)
         });
     }; 
 
@@ -796,21 +996,21 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
      *    <li>{string} db_name:        The database name.
-     *    <li>{Function} on_upgrade:   Invoked if the database needs to be 
+     *    <li>{function} on_upgrade:   Invoked if the database needs to be 
      *                                 updated.
-     *    <li>{int} db_version:        The version of the db.
      *    <li>{string} store_name:     The name of the store to read.
-     *    <li>{Function} on_chunk:     Invoked per chunk (see below). Chunks
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously.
      * </ul>             
      * OPTIONAL:
-     * <ul>                      
-     *    <li>{Function} on_success:   Invoked when everything has been read.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     * <ul>
+     *    <li>{int} db_version:        The version of the db.                      
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
@@ -832,7 +1032,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      */
     read_log = function( opts ){
         opts = copy_obj(opts);
-        if( !opts.db_name || !opts.db_version || !opts.on_upgrade ||
+        if( !opts.db_name|| !opts.on_upgrade ||
                 !opts.store_name || !opts.on_chunk ){ 
             return raise_error("Missing parameters in call to read_log.", 
                 opts.on_error);
@@ -849,11 +1049,36 @@ CROWDLOGGER.io.IndexedDB = function(){
                 on_upgrade: opts.on_upgrade,
                 on_error: opts.on_error,
                 on_success: function(db){
-                    db_connections[opts.db_name] = db;
+                    // add_database_connection(db);
                     read_log(opts);
                 }
             });
         }
+    };
+
+    /**
+     * Generates an IDBKeyRange for the given bounds.
+     *
+     * @param {int} upper The upper bound id. Defaults to 0 if undefined.
+     * @param {int} lower The lower bound id. Defaults to infinity if undefined.
+     *
+     * @return An IDBKeyRank for the given range.
+     */
+    get_range = function(upper, lower) {
+        var range;
+        if( lower === undefined ){
+            if( upper === undefined ){
+                range = IDBKeyRange.lowerBound(0);
+            } else {
+                range = IDBKeyRange.upperBound(upper);
+            }
+        } else if( upper === undefined ){
+            range = IDBKeyRange.lowerBound(lower);
+        } else { 
+            range = IDBKeyRange.bound(lower, upper);
+        }
+
+        return range;
     };
 
     /**
@@ -862,12 +1087,12 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts        A map of options:
+     * @param {object} opts        A map of options:
      * REQUIRED:
      * <ul>
-     *     <li>{Object} db:            The database.
+     *     <li>{object} db:            The database.
      *     <li>{string} store_name:    The name of the store to read.
-     *     <li>{Function} on_chunk:    Invoked per chunk (see below). Chunks
+     *     <li>{function} on_chunk:    Invoked per chunk (see below). Chunks
      *                                 are processed asynchronously. Should 
      *                                 expect the data, a 'next' function
      *                                 which, when invoked, will retrieve
@@ -878,12 +1103,12 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success:   Invoked when everything has been read
+     *    <li>{function} on_success:   Invoked when everything has been read
      *                                 and processed by on_chunk.
      *                                 Note that the 'next' function needs to
      *                                 be invoked from the on_chunk function
      *                                 in order for this to trigger.
-     *    <li>{Function} on_error:     Invoked if there's an error.
+     *    <li>{function} on_error:     Invoked if there's an error.
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
@@ -913,23 +1138,6 @@ CROWDLOGGER.io.IndexedDB = function(){
             lower_bound = opts.lower_bound,
             finished = false;
 
-        // Figure out the range of ids to iterate over.
-        function get_range(upper, lower) {
-            var range;
-            if( lower === undefined ){
-                if( upper === undefined ){
-                    range = IDBKeyRange.lowerBound(0);
-                } else {
-                    range = IDBKeyRange.upperBound(upper);
-                }
-            } else if( upper === undefined ){
-                range = IDBKeyRange.lowerBound(lower);
-            } else { 
-                range = IDBKeyRange.bound(lower, upper);
-            }
-
-            return range;
-        }
 
         // This is a wrapper to assist with the issue of closures. If we just
         // pass batch to opts.on_chunk, then opts.on_chunk will get whatever
@@ -1012,12 +1220,12 @@ CROWDLOGGER.io.IndexedDB = function(){
      * The on_entry function must not be asynchronous or the transaction will
      * cease, disrupting the iteration.
      *
-     * @param {Function} opts      A map of options:
+     * @param {function} opts      A map of options:
      * REQUIRED:
      * <ul>
-     *     <li>{Object} db:         The database.
+     *     <li>{object} db:         The database.
      *     <li>{String} store_name: The store name.
-     *     <li>{Function} on_entry: The function to apply to each entry. Can 
+     *     <li>{function} on_entry: The function to apply to each entry. Can 
      *                              return an object with two keys:
      *                                stop: true | false (default: false) If
      *                                    true, stops iterating.
@@ -1030,8 +1238,8 @@ CROWDLOGGER.io.IndexedDB = function(){
      *                             E.g. IDBKeyRange.lowerBound(1)
      *    <li>{String} direction:  The direction, i.e., 'next', 'nextunique',
      *                             'prev', 'prevunique',
-     *    <li>{Function} on_success: What to call at the end.
-     *    <li>{Function} on_error:  What to call when there's an error. 
+     *    <li>{function} on_success: What to call at the end.
+     *    <li>{function} on_error:  What to call when there's an error. 
      * </ul>
      * 
      * @throws {Error} If there are missing required opts fields.
@@ -1099,19 +1307,19 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts A map of options:
+     * @param {object} opts A map of options:
      * REQUIRED:
      * <ul>
-     *     <li>{Object} db:           The db to write to.
+     *     <li>{object} db:           The db to write to.
      *     <li>{string} store_name:   The store to write to.
      *     <li>{Array} data:          An array of objects to insert into the db.
      * </ul>
      * OPTIONAL
      * <ul>
-     *     <li>{Function} on_error:   Invoked if there is an error. Should 
+     *     <li>{function} on_error:   Invoked if there is an error. Should 
      *                                expect an object with two keys:
      *                                errorCode and event.
-     *     <li>{Function} on_success: Invoked when the data has been written.
+     *     <li>{function} on_success: Invoked when the data has been written.
      * </ul>
      * @throws {Error} If the required opts fields are missing.
      */
@@ -1143,20 +1351,21 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @private
      * @member CROWDLOGGER.io.indexed_db
      *
-     * @param {Object} opts A map of options:
+     * @param {object} opts A map of options:
      * REQUIRED:
      * <ul>
-     *     <li>{Function} on_upgrade: If the database has never been made or if
-     *                                the version has changed, 
      *     <li>{String} db_name:      The name of the db to open.
-     *     <li>{Int} db_version:      The version of the database.
-     *     <li>{Function} on_success: Called when the database is successfully
+     *     <li>{function} on_success: Called when the database is successfully
      *                                opened. Should expect a database object
      *                                as its only parameter.
      * </ul>
      * OPTIONAL
      * <ul>
-     *     <li>{Function} on_error:   Called when the database is unsuccessfully
+     *     <li>{function} on_upgrade: If the database has never been made or if
+     *                                the version has changed, this gets called
+     *                                before on_success.
+     *     <li>{Int} db_version:      The version of the database.
+     *     <li>{function} on_error:   Called when the database is unsuccessfully
      *                                opened. Should expect an object with two
      *                                keys: errorCode and event.
      * </ul>
@@ -1164,8 +1373,7 @@ CROWDLOGGER.io.IndexedDB = function(){
     open_db = function( opts ) {
         // Make sure we have the basic parameters. If there's opts.on_error is
         // not defined, this will throw an exception.
-        if( !opts|| !opts.db_name || !opts.db_version || !opts.on_success ||
-                !opts.on_upgrade){
+        if( !opts|| !opts.db_name || !opts.on_success ){
             opts = opts || {};
             return raise_error("Missing parameters in call to open_db.", 
                 opts.on_error);
@@ -1174,7 +1382,10 @@ CROWDLOGGER.io.IndexedDB = function(){
         CROWDLOGGER.debug.log('Opening DB...');
 
         // Open the database.
-        var request = IndexedDB.open(opts.db_name, opts.db_version);
+        var request = opts.db_version ?
+            IndexedDB.open(opts.db_name, opts.db_version) :
+            IndexedDB.open(opts.db_name);
+
 
         // CROWDLOGGER.debug.log('The request:');
         // CROWDLOGGER.debug.log(request);
@@ -1191,8 +1402,7 @@ CROWDLOGGER.io.IndexedDB = function(){
 
             if( opts.on_error ) {
                 opts.on_error({
-                    errorCode: event.target.errorCode, 
-                    event: event
+                    errorCode: event.target.errorCode
                 });
             }
         };
@@ -1203,10 +1413,11 @@ CROWDLOGGER.io.IndexedDB = function(){
 
             CROWDLOGGER.debug.log('DB opened; version: '+ db.version);
             // For older versions of chrome.
-            if( parseInt(db.version) !== opts.db_version && db.setVersion ){
+            if( opts.db_version && 
+                    parseInt(db.version) !== opts.db_version && db.setVersion ){
                 var version_request = db.setVersion(opts.db_version);
                 version_request.onsuccess = function(e){
-                    opts.on_upgrade(db);
+                    if( opts.on_upgrade ){ opts.on_upgrade(db); }
                     db.close();
                     open_db(opts);
                 }
@@ -1215,6 +1426,7 @@ CROWDLOGGER.io.IndexedDB = function(){
                     CROWDLOGGER.debug.log(e);
                 }
             } else {
+                add_database_connection(db);
                 // Pass the db onto the caller.
                 opts.on_success(db); 
             }
@@ -1229,7 +1441,7 @@ CROWDLOGGER.io.IndexedDB = function(){
         request.onupgradeneeded = function(event){
             CROWDLOGGER.debug.log('Upgrading DB; current version: '+ 
                 request.result.version);
-            opts.on_upgrade(request.result);
+            if( opts.on_upgrade ){ opts.on_upgrade(request.result); }
         }; 
 
         return true;
@@ -1240,10 +1452,10 @@ CROWDLOGGER.io.IndexedDB = function(){
      * a database upgrade (i.e., in a function invoked by onupgradedneeded).
      * This sets the key path to "id" and turns on auto incrementing.
      *
-     * @param {Object} opts  The options.
+     * @param {object} opts  The options.
      * REQUIRED:
      * <ul>
-     *     <li>{Object} db:             The database in which the table should 
+     *     <li>{object} db:             The database in which the table should 
      *                                  be created.
      *     <li>{string} store_name:     The name of the store.
      * </ul>
@@ -1270,10 +1482,10 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Truncates the given store in the database.
      *
-     * @param {Object} opts  The options.
+     * @param {object} opts  The options.
      * REQUIRED:
      * <ul>
-     *     <li>{Object} db:             The database in which the table should 
+     *     <li>{object} db:             The database in which the table should 
      *                                  be created.
      *     <li>{string} store_name:     The name of the store.
      * </ul>
@@ -1288,7 +1500,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If the required opts fields are missing.
      */
     truncate_store = function( opts ){
-        if( !opts || !opts.db || !opts.store_name ){
+        if( !opts || !opts.db || !opts.store_names ){
             opts = opts || {};
             return raise_error("Missing parameters in call to truncate_store.", 
                 opts.on_error);
@@ -1296,10 +1508,13 @@ CROWDLOGGER.io.IndexedDB = function(){
 
         return run_transaction({
             db: opts.db,
-            stores: [opts.store_name],
+            stores: opts.store_names,
             mode: READWRITE,
             f: function(t){
-                t.objectStore(opts.store_name, READWRITE).clear();
+                var i;
+                for(i = 0; i < opts.store_names.length; i++){
+                    t.objectStore(opts.store_names[i], READWRITE).clear();
+                }
             },
             on_error: function(event){
                 CROWDLOGGER.debug.log("Error clearing "+ store_name +": "+ 
@@ -1342,18 +1557,18 @@ CROWDLOGGER.io.IndexedDB = function(){
      *     run_transaction(opts);
      * });
      *
-     * @param {Object} opts   A map of options. Options are:
+     * @param {object} opts   A map of options. Options are:
      * REQUIRED:
      * <ul>
-     *    <li>{Object} db:    The database object.
+     *    <li>{object} db:    The database object.
      *    <li>{Array} stores: The stores that the transaction will operate over.
      *    <li>{String} mode:  One of "readonly", "readwrite", or "versionchange".
-     *    <li>{Function} f:   The function to invoke during the transaction.
+     *    <li>{function} f:   The function to invoke during the transaction.
      * </ul>
      * OPTIONAL:
      * <ul>
-     *    <li>{Function} on_success: Invoked when the transaction has finished.
-     *    <li>{Function} on_error:   Invoked if an error occurs.
+     *    <li>{function} on_success: Invoked when the transaction has finished.
+     *    <li>{function} on_error:   Invoked if an error occurs.
      * </ul>  
      * Note that f should expect a transaction object and should not make any 
      * async calls, otherwise the transaction will close.
@@ -1370,12 +1585,12 @@ CROWDLOGGER.io.IndexedDB = function(){
 
         // Invoked when the transaction has completed.
         transaction.oncomplete = function(event) {
-          if( opts.on_success ){ opts.on_success(event); }
+          if( opts.on_success ){ opts.on_success(); }//event); }
         };
         
         // Invoked when the transaction has errored.
         transaction.onerror = function(event) {
-          if( opts.on_error){ opts.on_error(event); }
+          if( opts.on_error){ opts.on_error(); } //event); }
         };
 
         opts.f(transaction);
@@ -1388,7 +1603,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * exits) or by throwing an exception.
      * 
      * @param  {string} msg              The error message.
-     * @param  {Function} error_handler  The error_handler (optional).
+     * @param  {function} error_handler  The error_handler (optional).
      * @throws {Error} If error_handler is not a function.
      */
     raise_error = function(msg, error_handler){
@@ -1403,8 +1618,8 @@ CROWDLOGGER.io.IndexedDB = function(){
     /**
      * Makes a copy of the given object.
      * 
-     * @param  {Object} obj  The object to copy.
-     * @return {Object} A copy of obj.
+     * @param  {object} obj  The object to copy.
+     * @return {object} A copy of obj.
      */
     copy_obj = function(obj){
         var new_obj = {}, i;

@@ -1,19 +1,34 @@
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="demo.css"/>
+<title>CLRM Demo</title>
+<link type="text/css" rel="stylesheet" href="demo.css"/>
 
-    <script language="javascript" src="jquery-1.7.1.min.js"></script>
-    <script language="javascript" src="init.js"></script> 
+<script language="javascript" src="jquery-1.7.1.min.js"></script>
+<script language="javascript" src="init.js"></script>
+
+<script>
+/**
+ * Adds buttons that, when clicked, open either a small or medium window.
+ */
+var start = function(){
+    jQuery('#userAPIDemo').click(function(){
+            demoBackend.launchWindow('user-api-demo.html');
+    });
+
+    jQuery('#storageAPIDemo').click(function(){
+        demoBackend.launchWindow('storage-api-demo.html');
+    });
+};
+</script> 
 </head>
 <body>
+    <h1>CrowdLogger Remote Module (CLRM) Demo</h1>
 
-    <h2>CrowdLogger Remote Module (CLRM) Demo</h2>
-    <h2>Messages</h2>
-    <div id="messages">
-    </div>
+    <button id="userAPIDemo">Open the User API demo</button
 
-    <h2>Recent Searches</h2>
-    <div id="searches">
-    </div>
+    <br/>
+
+    <button id="storageAPIDemo">Open the Storage API demo</button
+
 </body>
 </html>

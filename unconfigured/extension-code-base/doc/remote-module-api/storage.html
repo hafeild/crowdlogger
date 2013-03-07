@@ -11,10 +11,11 @@
         <li><a href="#storage:addstore">Add stores</a>
         <li><a href="#storage:removestore">Remove stores</a>
         <li><a href="#storage:clearstore">Clear stores</a>
-        <li><a href="#storage:listStores">List current stores</a>
+        <li><a href="#storage:liststores">List current stores</a>
         <li><a href="#storage:save">Save data</a>
         <li><a href="#storage:read">Read batches of saved data</a>
         <li><a href="#storage:update">Delete/update saved data</a>
+        <li><a href="#storage:removedb">Remove the database</a>
     </ul>
 </div>
 
@@ -36,13 +37,14 @@ shares that id in the store. The following functionalities are provided:
 </p>
 
 <ul>
-    <li><code><a href="#storage:addstore">api.storage.addStore</a></code>
-    <li><code><a href="#storage:removestore">api.storage.removeStore</a></code>
-    <li><code><a href="#storage:clearstore">api.storage.clearStore</a></code>
-    <li><code><a href="#storage:listStores">api.storage.listStores</a></code>
+    <li><code><a href="#storage:addstore">api.storage.addStores</a></code>
+    <li><code><a href="#storage:removestore">api.storage.removeStores</a></code>
+    <li><code><a href="#storage:clearstore">api.storage.clearStores</a></code>
+    <li><code><a href="#storage:liststores">api.storage.listStores</a></code>
     <li><code><a href="#storage:save">api.storage.save</a></code>
     <li><code><a href="#storage:read">api.storage.read</a></code>
     <li><code><a href="#storage:update">api.storage.update</a></code>
+    <li><code><a href="#storage:removedb">api.storage.removeDatabase</a></code>
 </ul>
 
 
@@ -51,8 +53,8 @@ shares that id in the store. The following functionalities are provided:
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
     <div class="top-bottom top-tag"><a href="#">top</a></div>
-    <h3>Add a store<br/>
-        <code>api.storage.addStore</code></h3>
+    <h3>Add one or more stores<br/>
+        <code>api.storage.addStores</code></h3>
 
     <h4>Parameters</h4>
     <p>
@@ -60,16 +62,16 @@ shares that id in the store. The following functionalities are provided:
             <li>A map of options:<br/>
             <span class="parameter-requirement">Required</span>
             <ul>
-                <li>{string} <code>store</code>
+                <li>{array of strings} <code>stores</code>
                     <ul>
-                        The name of the store to add.
+                        The names of the stores to add.
                     </ul>
             </ul>                
             <span class="parameter-requirement">Optional</span>
             <ul>
                 <li>{function} <code>on_success</code>
                     <ul>
-                        Invoked when the store has been successfully created.
+                        Invoked when the stores have been successfully created.
                     </ul>
                 <li>{function} <code>on_error</code>
                     <ul>
@@ -91,8 +93,8 @@ shares that id in the store. The following functionalities are provided:
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
     <div class="top-bottom top-tag"><a href="#">top</a></div>
-    <h3>Remove a store<br/>
-        <code>api.storage.removeStore</code></h3>
+    <h3>Remove one or more stores<br/>
+        <code>api.storage.removeStores</code></h3>
 
     <h4>Parameters</h4>
     <p>
@@ -100,16 +102,16 @@ shares that id in the store. The following functionalities are provided:
             <li>A map of options:<br/>
             <span class="parameter-requirement">Required</span>
             <ul>
-                <li>{string} <code>store</code>
+                <li>{array of strings} <code>stores</code>
                     <ul>
-                        The name of the store to remove.
+                        The names of the stores to remove.
                     </ul>
             </ul>                
             <span class="parameter-requirement">Optional</span>
             <ul>
                 <li>{function} <code>on_success</code>
                     <ul>
-                        Invoked when the store has been successfully removed.
+                        Invoked when the stores have been successfully removed.
                     </ul>
                 <li>{function} <code>on_error</code>
                     <ul>
@@ -134,8 +136,8 @@ shares that id in the store. The following functionalities are provided:
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
     <div class="top-bottom top-tag"><a href="#">top</a></div>
-    <h3>Clear a store<br/>
-        <code>api.storage.clearStore</code></h3>
+    <h3>Clear one or more stores<br/>
+        <code>api.storage.clearStores</code></h3>
 
     <h4>Parameters</h4>
     <p>
@@ -143,16 +145,16 @@ shares that id in the store. The following functionalities are provided:
             <li>A map of options:<br/>
             <span class="parameter-requirement">Required</span>
             <ul>
-                <li>{string} <code>store</code>
+                <li>{string} <code>stores</code>
                     <ul>
-                        The name of the store to clear.
+                        The names of the stores to clear.
                     </ul>
             </ul>                
             <span class="parameter-requirement">Optional</span>
             <ul>
                 <li>{function} <code>on_success</code>
                     <ul>
-                        Invoked when the store has been successfully cleared.
+                        Invoked when the stores have been successfully cleared.
                     </ul>
                 <li>{function} <code>on_error</code>
                     <ul>
@@ -188,10 +190,6 @@ shares that id in the store. The following functionalities are provided:
             <li>A map of options:<br/>
             <span class="parameter-requirement">Required</span>
             <ul>
-                <li>{string} <code>store</code>
-                    <ul>
-                        The name of the store to clear.
-                    </ul>
                 <li>{function} <code>on_success</code>
                     <ul>
                         Invoked when the list of stores has been retrieved.
@@ -477,6 +475,22 @@ CROWDLOGGER.io.log.write_to_activity_log({
                     <ul>
                         Invoked if there's an error.
                     </ul>
+                <li>{boolean} <code>reverse</code>
+                <ul>
+                    If true, the data will be read in reverse
+                    order of id. Default is 'false'.
+                </ul>
+
+                <li>{int} <code>lower_bound</code>
+                <ul>
+                    The smallest id to retrieve; default: 0
+                </ul>
+
+                <li>{int} <code>upper_bound</code>
+                <ul>
+                    The largest id to retrieve; default: -1
+                    (all ids >= lower_bound are retrieved).
+                </ul>
             </ul>
         </ul>
 
@@ -484,7 +498,7 @@ CROWDLOGGER.io.log.write_to_activity_log({
 
     <h4>Description</h4>
     <p>
-        This function iterates over every entry in a log, passing each to a
+        This function iterates over entries in a store, passing each to a
         function you provide (see <code>foreach</code> above), where you can
         choose to update the entry, delete it, stop iterating, or ignore the
         entry and move on.
@@ -595,6 +609,30 @@ CROWDLOGGER.io.log.read_extension_log({
     reverse: true
 });
 </pre> -->
+
+
+<!-- Clear a store -->
+<a name="removedb"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Remove the database<br/>
+        <code>api.storage.removeDatabase</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        None.
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        This deletes the database associated with your CLRM. If you decide you
+        want to save something later, that's fine&mdash;a new database will
+        be created automatically. Its a good idea to delete your database if
+        your CLRM is finished (e.g., it is for a study that has ended). This
+        will help keep users' computers tidy.
+    </p>
+</div>
 
 </body>
 </html>

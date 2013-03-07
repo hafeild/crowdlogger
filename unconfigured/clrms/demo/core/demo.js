@@ -4,18 +4,9 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
     console.log('>> Declaring private variables...');
     // Private variables.
     var that = this,
-        smallWindowSpecs = {
-            width: 150,
-            height: 150,
-            location: 'no',
-            status: 'no',
-            toolbar: 'no',
-            resizable: 'yes',
-            scrollbars: 'yes'
-        },
-        mediumWindowSpecs = {
-            width: 300,
-            height: 300,
+        windowSpecs = {
+            width: 600,
+            height: 500,
             location: 'no',
             status: 'no',
             toolbar: 'no',
@@ -23,22 +14,20 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             scrollbars: 'yes'
         },
         elm,
-        openWindows = {};
+        openWindows = {},
+        elmsToUpdateOnActivity = [];
 
-
-    console.log('>> Declaring private functions...');
+    const STORE_NAME = 'userInput';
 
     // Private function declarations.
     var initializeWindow, init, onWindowUnload, printToWindows, 
-        addActivityListeners;
+        addGlobalActivityListeners;
 
-    console.log('>> Declaring public variables...');
     // Public variables.
-    this.smallWindowID = 'smallDemo', this.mediumWindowID = 'mediumDemo';
+    this.clrmAPI = clrmAPI;
 
-    console.log('>> Declaring public functions...');
     // Public function declarations.
-    this.init, this.launchMediumWindow, this.launchSmallWindow, this.unload,
+    this.init, this.launchWindow, this.unload, this.addElmToActivityListeners,
     this.displayLastNSearches;
 
     // Private function definitions.
@@ -61,7 +50,6 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
      * Removes a window's entry from the openWindows list.
      */
     onWindowUnload = function(event){
-        console.log('>> in onWindowUnload');
         delete openWindows[event.currentTarget.name];
     }
 
@@ -75,20 +63,40 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         elm.on('load.window.demo', function(event, win){
             initializeWindow(win);
         });
-        addActivityListeners();
+
+        // Listen for new interaction events.
+        addGlobalActivityListeners();
+
+        // Create a store where we can save data, if it doesn't already exist.
+        clrmAPI.storage.listStores({
+            on_success: function(stores){
+                if( stores.indexOf(STORE_NAME) < 0 ){
+                    clrmAPI.storage.addStores({
+                        stores: [STORE_NAME]
+                    })
+                }
+            }
+        });
     };
 
     /**
      * Adds listeners for user activities. This will cause those events to be
      * printed to the body of any open Demo window.
      */
-    addActivityListeners = function(){
+    addGlobalActivityListeners = function(){
         console.log('Adding activity listeners');
         var eventToMessage = function(eventName, eventData){
-            console.log('Heard back!: '+ eventName +', '+ 
-                JSON.stringify(eventData));
-            printToWindows('messages', 
-                eventName +': '+ JSON.stringify(eventData));
+            var i = 0;
+            for(i = 0; i < elmsToUpdateOnActivity.length; i++){
+                try{
+                    var newElm = jQuery('<div>').
+                        prependTo(elmsToUpdateOnActivity[i]);
+                    newElm.text( JSON.stringify(eventData) );
+                } catch(e) {
+                    delete elmsToUpdateOnActivity[i];
+                    i--;
+                }
+            }
         };
 
         clrmAPI.user.realTime.addActivityListeners({
@@ -99,52 +107,20 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         });
     };
 
-    /**
-     * Prints the given message to every open Demo window.
-     *
-     * @param {string} id       The id of the DOM element in which to insert the
-     *                          message.
-     * @param {string} message  The message to display.
-     * @param {bool} overwrite If true, the DOM element will be cleared first.
-     */
-    printToWindows = function(id, message, overwrite){
-        var winName;
-        for(winName in openWindows){
-            if( winName && !winName.closed ){
-                var elm = openWindows[winName].jQuery('#'+id);
-                if( overwrite ){
-                    elm.html('');
-                }
-                elm.append('<div>'+ message +'</div>');
-            }
-        };
-    };
-
     // Public function definitions.
 
     /**
      * Launches a medium Demo window. If the window already exists, then it is 
      * brought into focus.
+     *
+     * @param {string} url     The URL of the resource to open.
      */
-    this.launchMediumWindow = function(){ 
+    this.launchWindow = function(url){ 
         clrmAPI.ui.openWindow({
-            content: clrmPackage.html['demo.html'],
+            content: clrmPackage.html[url],
             resources: clrmPackage,
-            name: that.mediumWindowID,
-            specsMap: mediumWindowSpecs
-        });
-    };
-
-    /**
-     * Launches a small Demo window. If the window already exists, then it is 
-     * brought into focus.
-     */
-    this.launchSmallWindow = function(){ 
-        clrmAPI.ui.openWindow({
-            content: clrmPackage.html['demo.html'],
-            resources: clrmPackage,
-            name: that.smallWindowID,
-            specsMap: smallWindowSpecs
+            name: url,
+            specsMap: windowSpecs
         });
     };
 
@@ -165,20 +141,22 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
      * Prints the most recent n search queries from the user's interaction
      * history. These go on a displayed window.
      * 
-     * @param {int} n  The number of searches to display.
+     * @param {int} n          The number of searches to display.
+     * @param {jQuery} jqElm   The jQuery element to append searches to.
      */
-    this.displayLastNSearches = function(n){
+    this.displayLastNSearches = function(n, jqElm){
         var searchesSeen = 0;
 
         // Clear any previous search listings.
-        printToWindows('searches', '', true);
+        jqElm.html('');
 
         var onChunk = function(data, next, abort){
             var i = 0;
             for(i = 0; i < data.length && searchesSeen < n; i++){
                 if( data[i].e === 'search' ){
                     searchesSeen++;
-                    printToWindows('searches', JSON.stringify(data[i]));
+                    var newElm = jQuery('<div>').appendTo(jqElm);
+                    newElm.text(JSON.stringify(data[i]));
                 }
             }
             searchesSeen < n ? next() : abort();
@@ -190,6 +168,48 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             chunk_size: 250
         });
     };
+
+    /**
+     * Adds the given jQuery element to the list of elements to be updated 
+     * whenever a new event rolls in.
+     *
+     * @param {jQuery} elm   The jQuery element to update on new events.
+     */
+    this.addElmToActivityListeners = function(jqElm){
+        elmsToUpdateOnActivity.push(jqElm);
+    };
+
+    /**
+     * Saves some data.
+     *
+     * @param {array of objects} data  The data to save.
+     * @param {function} onSuccess     Invoked when everything has been saved.
+     * @param {function} onError       Invoked if there was a problem.
+     */
+    this.saveData = function(data, onSuccess, onError){
+        clrmAPI.storage.save({
+            data: data,
+            store: STORE_NAME,
+            on_success: onSuccess,
+            on_error: onError
+        });
+    };
+
+    /**
+     * Retrieves all the data we've saved.
+     *
+     * @param {object} opts  A map of options:
+     * <ul>
+     *    <li>{function} on_chunk    Invoked on each chunk of data.
+     *    <li>{function} on_success  Invoked when everything has been read.
+     *    <li>{function} on_error    Invoked if there is a problem.
+     *    <li>{boolean} reverse      If true, reads from most recent to oldest.
+     * </ul>
+     */
+    this.readData = function(opts){
+        opts.store = STORE_NAME;
+        clrmAPI.storage.read(opts);
+    }
 
     // Initialize things.
     init();

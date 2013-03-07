@@ -707,4 +707,34 @@ CROWDLOGGER.util.mark_page_as_initialized = function(doc) {
     }
 };
 
+/**
+ * Checks if <code>argsMap</code> contains all of the field names specified
+ * in <code>requiredFields</code>.
+ *
+ * @param {object} argsMap                   A map of arguments.
+ * @param {array of strings} requiredFields  The names of fields that should
+ *                                           appear in <code>argsMap</code>.
+ * @param {string} functionName              The name of the function the
+ *                                           check is for (for error 
+ *                                           reporting).
+ * @param {function} Exception               The exception to raise.
+ * @throws An exception if any of the required fields are not found.
+ */
+CROWDLOGGER.util.check_args = function(argsMap, requiredFields, functionName, 
+        Exception, test){
+    var i, missingArgs = [];
+    argsMap = argsMap || {};
+    for( i = 0; i < requiredFields.length; i++ ){
+        if( argsMap[requiredFields[i]] === undefined ){
+            missingArgs.push(requiredFields[i]);
+        }
+    }
+    if( missingArgs.length > 0 || !test ){
+        throw new Exception('Call to '+ functionName +
+            ' is missing the following required fields: '+ 
+            missingArgs.join(','));
+    }
+};
+
+
 } // END CROWDLOGGER.util NAMESPACE

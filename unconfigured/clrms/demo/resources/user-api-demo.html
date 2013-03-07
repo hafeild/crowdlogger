@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>CLRM User Demo</title>
+<link type="text/css" rel="stylesheet" href="demo.css"/>
+
+<script language="javascript" src="jquery-1.7.1.min.js"></script>
+<script language="javascript" src="init.js"></script>
+
+<script>
+/**
+ * Called after the window has connected with the demo background script.
+ * The demoBackend variable will be available when start is called.
+ */
+var start = function(){
+    // Add new interactions to the interactions display.
+    demoBackend.addElmToActivityListeners(jQuery('#interactions'));
+
+    // Update the display of recent searches when the user clicks on the
+    // corresponding button.
+    jQuery('#display-searches').click(function(){
+        demoBackend.displayLastNSearches(10, jQuery('#searches'));
+    });
+};
+</script> 
+</head>
+<body>
+    <h1>CrowdLogger Remote Module (CLRM)</h1>
+    <h2>User API Demo</h2>
+
+    <div>
+        <h3>Live interaction events</h3>
+        <div id="interactions">
+        </div>
+    </div>
+
+    <div>
+        <h3>Recent Searches</h3>
+        <button id="display-searches">Display recent searches!</button>
+        <div id="searches">
+        </div>
+    </div>
+</body>
+</html>

@@ -18,6 +18,7 @@ var CLRMI = function(cli){
     this.base = new this.Base(that, cli);
     this.user = new this.User(that);
     this.ui = new this.UserInterface(that);
+    this.util = new this.Util();
 
     // Serves as a conduit for the API. Each CRMI will be given an instance
     // of this.

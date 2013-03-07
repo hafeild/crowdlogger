@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>CLRM Storage Demo</title>
+
+<link type="text/css" rel="stylesheet" href="demo.css"/>
+
+<script language="javascript" src="jquery-1.7.1.min.js"></script>
+<script language="javascript" src="init.js"></script>
+
+<script>
+/**
+ * Called after the window has connected with the demo background script.
+ * The demoBackend variable will be available when start is called.
+ */
+var start = function(){
+
+    jQuery('#save-data').click(function(){
+        demoBackend.saveData([{
+                timestamp: new Date().getTime(),
+                userInput: jQuery('#data').val()
+            }], 
+            function(){displayAndFade(jQuery('#save-success'))},
+            function(){displayAndFade(jQuery('#save-error'))} 
+        );
+    });
+
+    jQuery('#read-data').click(function(){
+        var jqElm = jQuery('#user-input');
+        jqElm.html('');
+
+        demoBackend.readData({
+            on_chunk: function(data, next, abort){
+                var i;
+                for(i = 0; i < data.length; i++){
+                    var newElm = jQuery('<div>').prependTo(jqElm);
+                    newElm.text(JSON.stringify(data[i]));
+                }
+                next();
+            },
+            on_success: function(){displayAndFade(jQuery('#read-success'))},
+            on_error: function(){displayAndFade(jQuery('#read-error'))}
+        });
+    });
+
+};
+
+var displayAndFade = function(jqElm){
+    jqElm.show().fadeOut(2000);
+};
+
+</script> 
+</head>
+<body>
+
+    <h1>CrowdLogger Remote Module (CLRM)</h1>
+    <h2>Storage API Demo</h2>
+
+    <div>
+        <h3>Save data</h3>
+        Add any text you want to the field.
+        <input type="text" id="data"/>
+        <button id="save-data">Save data</button>
+        <span id="save-success" class="success notice">Saved</span>
+        <span id="save-error" class="error notice">Error!</span>
+    </div>
+
+    <div>
+        <h3>Display Saved data</h3>
+        <button id="read-data">Display saved data below</button>
+        <span id="read-success" class="success notice">Success</span>
+        <span id="read-error" class="error notice">Error!</span>
+        <div id="user-input">
+        </div>
+    </div>
+</body>
+</html>
