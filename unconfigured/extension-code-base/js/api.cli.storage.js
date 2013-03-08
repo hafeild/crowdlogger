@@ -5,7 +5,7 @@
  * turn communicates with the CLI, which has access to the CROWDLOGGER
  * object.
  *
- * %%COPYRIGHT%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * 

@@ -2,7 +2,7 @@
  * @fileOverview <p>Provides the storage API for the CrowdLogger Remote Modules 
  * (CLRMs)-side interface (CLRMI).</p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

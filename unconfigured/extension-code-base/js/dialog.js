@@ -3,7 +3,7 @@
  * (which are simple html files). These include reading parameters passed in
  * via the URL and finding the CROWDLOGGER variable. 
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

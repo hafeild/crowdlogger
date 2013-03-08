@@ -2,7 +2,7 @@
  * @fileOverview <p>Provides utilities to the CrowdLogger Remote Module (CLRM)
  * Interface (CLRMI).</p>
  *
- * %%COPYRIGHT%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

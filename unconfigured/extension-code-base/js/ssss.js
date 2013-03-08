@@ -6,7 +6,7 @@
  * 
  * See the  CROWDLOGGER.secret_sharing namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

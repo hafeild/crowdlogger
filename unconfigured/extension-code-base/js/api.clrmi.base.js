@@ -2,7 +2,7 @@
  * @fileOverview <p>Provides the base CrowdLogger Remote Modules (CRMs)-side 
  * interface (CRMI) for CRMs.</p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

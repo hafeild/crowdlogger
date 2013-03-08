@@ -2,7 +2,7 @@
  * @fileOverview <p>Provides the UI API for the CrowdLogger Remote Modules 
  * (CRMs)-side interface (CRMI).</p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%
@@ -141,7 +141,7 @@ CLRMI.prototype.UserInterface = function(api){
                 // Updates the document, if it's loaded, with the new content.
                 // Otherwise, waits a bit and then tries again.
                 var updateDoc = function(){
-                    api.base.log('in re...readyState: '+ 
+                    api.base.log('in readyState: '+ 
                         win.document.readyState);
                     if( win.document.readyState === "complete" ){
                         var doc = (new DOMParser).parseFromString(

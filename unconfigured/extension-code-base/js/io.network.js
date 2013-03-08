@@ -5,7 +5,7 @@
  * 
  * See the CROWDLOGGER.send_get_data namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%% 

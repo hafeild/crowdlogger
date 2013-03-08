@@ -4,7 +4,7 @@
  * side interface (CLI) functions (see CROWDLOGGER.api.cli). This is meant to
  * be loaded in a sandbox and thus does not use the CROWDLOGGER namespace.</p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

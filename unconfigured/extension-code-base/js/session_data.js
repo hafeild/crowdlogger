@@ -9,7 +9,7 @@
  * 
  * See the CROWDLOGGER.session_data namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%% 

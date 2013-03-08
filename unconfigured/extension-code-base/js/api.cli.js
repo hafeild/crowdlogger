@@ -2,7 +2,7 @@
  * @fileOverview Provides the wrapper for the CrowdLogger-side interface (CLI) 
  * for CrowdLogger remote modules (CRMs).<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

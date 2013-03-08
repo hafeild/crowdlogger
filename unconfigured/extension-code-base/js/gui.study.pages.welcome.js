@@ -4,7 +4,7 @@
  * 
  * See the CROWDLOGGER.gui.study.pages.welcome namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

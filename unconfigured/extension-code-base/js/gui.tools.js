@@ -4,7 +4,7 @@
  * 
  * See the  CROWDLOGGER.gui.tools namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

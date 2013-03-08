@@ -4,7 +4,7 @@
  * 
  * See CROWDLOGGER.uninstall namespace.<p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

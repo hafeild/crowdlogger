@@ -3,7 +3,7 @@
  * 
  * See the  CROWDLOGGER.study.registration namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

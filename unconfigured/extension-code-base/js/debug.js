@@ -4,7 +4,7 @@
  * 
  * See the CROWDLOGGER.debug namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%% 
@@ -37,7 +37,9 @@ CROWDLOGGER.debug.init = function(){
     // For Firefox.
     if( browser_version.match( /^ff/ ) !== null ){
         /** @ignore */
-        logging_function = function( message ) { dump( message ) };
+        logging_function = function( message ) { 
+            dump( message.replace(/\n$/,'')+ '\n' );
+        };
     // For Chrome.
     } else if( browser_version === "chrome" ) {
         /** @ignore */

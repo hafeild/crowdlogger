@@ -4,7 +4,7 @@
  * 
  * See CROWDLOGGER.logging.event_listeners namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%
@@ -45,8 +45,12 @@ CROWDLOGGER.logging.event_listeners.mk_listener_observer = function(on_unload){
 
 CROWDLOGGER.logging.event_listeners.initialize = function(current_window){
     if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null ){
-        CROWDLOGGER.logging.event_listeners.initialize_for_firefox(
-            current_window);
+        try{
+            CROWDLOGGER.logging.event_listeners.initialize_for_firefox(
+                current_window);
+        } catch(e){
+            CROWDLOGGER.debug.log('Error while initializing listener: '+ e);
+        }
     } else if( CROWDLOGGER.version.info.get_browser_name() === "chrome" ){
         CROWDLOGGER.logging.event_listeners.initialize_for_chrome();
     }
@@ -56,17 +60,17 @@ CROWDLOGGER.logging.event_listeners.initialize = function(current_window){
 CROWDLOGGER.logging.event_listeners.uninstall_listener = function( id ){
     if( id === undefined ){
         var x;
-        for( x in CROWDLOGGER.logging.event_listeners.placed_listerns ){
-            if( CROWDLOGGER.logging.event_listeners.placed_listerns[x] ){
+        for( x in CROWDLOGGER.logging.event_listeners.placed_listeners ){
+            if( CROWDLOGGER.logging.event_listeners.placed_listeners[x] ){
                 CROWDLOGGER.logging.event_listeners.
-                    placed_listerns[x].on_unload();
+                    placed_listeners[x].on_unload();
             }
-            delete CROWDLOGGER.logging.event_listeners.placed_listerns[x];
+            delete CROWDLOGGER.logging.event_listeners.placed_listeners[x];
         }
     } else {
-        var obj = CROWDLOGGER.logging.event_listeners.placed_listerns[id];
+        var obj = CROWDLOGGER.logging.event_listeners.placed_listeners[id];
         if( obj ){ obj.on_unload(); }
-        delete CROWDLOGGER.logging.event_listeners.placed_listerns[id];
+        delete CROWDLOGGER.logging.event_listeners.placed_listeners[id];
     }
 }
 
@@ -253,14 +257,12 @@ CROWDLOGGER.logging.event_listeners.tab_update_listener_chrome = function(
  * @return {string} The tab id associated with the given browser object.
  */
 CROWDLOGGER.logging.event_listeners.extract_tab_id_ff = function(browser){
-    // Firefox 3
-    if( CROWDLOGGER.version.info.get_browser_name() === "ff3" ){
-        return browser.parentNode.id;
-    // Firefox 4
-    } else {
-        return browser.parentNode.parentNode.id;
+    if( !browser.uniqueID ){
+        browser.uniqueID = new Date().getTime();
     }
-}
+
+    return browser.uniqueID;
+};
 
 
 /**
@@ -524,7 +526,9 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
     onSecurityChange : function( a_browser, web_progress, request, state ) {},
 
     onStatusChange : function( a_browser, web_progress, request, status, 
-        message ) {},
+            message ) {
+        CROWDLOGGER.log('tab status change: '+ status);
+    },
 
     onRefreshAttempted : function( a_browser, web_progress, refresh_uri, millis,
         same_uri ) { return true; },

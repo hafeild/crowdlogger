@@ -6,7 +6,7 @@
  * 
  * See the CROWDLOGGER.study namespace.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%% 

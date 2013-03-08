@@ -3,7 +3,7 @@
  * 
  * See the  CROWDLOGGER.experiments.artifact_extractors namespace.<p>
  *
- * %%VERSION%% 
+ * %%LICENSE%% 
  * 
  * @author hfeild
  * @version %%VERSION%%

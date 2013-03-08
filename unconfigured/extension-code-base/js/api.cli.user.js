@@ -4,7 +4,7 @@
  * side interface (SBI). CRMs communicate with the SBI, which in turn 
  * communicates with the CLI, which has access to the CROWDLOGGER object.<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%

@@ -2,7 +2,7 @@
  * @fileOverview Provides the base CrowdLogger-side interface (CLI) for 
  * CrowdLogger remote modules (CRMs).<p>
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%
@@ -18,6 +18,7 @@
 CLI.prototype.Base = function(crowdlogger, cli){
     // Private variables.
     var that = this,
+        initAttempts = 0,
         clrmi,
         messageHandlers = {
             // ui: crowdlogger.api.cli.ui.handleMessage,
@@ -32,6 +33,8 @@ CLI.prototype.Base = function(crowdlogger, cli){
         },
         nextFunctionID = 1,
         functionMap = {};
+
+    const MAX_INIT_ATTEMPTS = 100;
 
     // Private function declarations.
     var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
@@ -60,30 +63,52 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
 
         if( crowdlogger.version.info.is_firefox ){
-            var hiddenWindow = Components.classes[
-                '@mozilla.org/appshell/appShellService;1']
-                 .getService(Components.interfaces.nsIAppShellService)
-                 .hiddenDOMWindow;
-            var frame = hiddenWindow.document.getElementById('clrm');
+            // var hiddenWindow = Components.classes[
+            //     '@mozilla.org/appshell/appShellService;1'].
+            //      getService(Components.interfaces.nsIAppShellService).
+            //      hiddenDOMWindow;
+            // var frame = hiddenWindow.document.getElementById('clrm');
+
+            var frame = crowdlogger.jq('#clrm')[0];
+
             if( !frame ) {
                 var clrm_url = 
                     crowdlogger.version.info.get_extension_html_prefix()+
                     'clrm.html';
 
-                crowdlogger.debug.log('Opening iframe for '+ clrm_url +'\n');
+                crowdlogger.debug.log('Opening iframe for '+ clrm_url +
+                    '(attempt '+ initAttempts +')\n');
+
+
                 var XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/'+
                            'there.is.only.xul';
-
-                frame = hiddenWindow.document.createElementNS(XUL_NS, 'iframe');
+                try{
+                    //frame = hiddenWindow.document.createElementNS(XUL_NS, 
+                    //    'iframe');
+                    frame = hiddenWindow.document.createElement('iframe');
+                } catch(e) {
+                    if( initAttempts < MAX_INIT_ATTEMPTS ){
+                        initAttempts++;
+                        setTimeout(init, 100);
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
                 frame.setAttribute('id', 'clrm');
                 frame.setAttribute('src', clrm_url);
                 frame.setAttribute('type', 'content');
 
                 hiddenWindow.document.documentElement.appendChild(frame);
+            } else if( frame.getAttribute('src') === "" ){
+                frame.setAttribute('src', clrm_url);
             }
 
-            hiddenWindow.addEventListener('message', onMessage, true, true);
+            //hiddenWindow.addEventListener('message', onMessage, true, true);
+            //CROWDLOGGER.window.addEventListener('message', onMessage, true, true);
+            clrmi = crowdlogger.jq(window).bind('message', onMessage);
             clrmi = frame.contentWindow;
+
 
         } else {
             var clrm_url = 'data:text/html,'+encodeURIComponent(

@@ -3,7 +3,7 @@
  * 
  * See CROWDLOGGER.gui.notifications namespace.<p>
  *
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%
