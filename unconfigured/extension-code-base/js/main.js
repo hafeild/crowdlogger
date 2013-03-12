@@ -32,8 +32,6 @@ var CROWDLOGGER = {
     clrmi: undefined
 };
 
-dump( CROWDLOGGER +'\n');
-
 CROWDLOGGER.check_if_new_instance = function() {
     
     CROWDLOGGER.initialize();

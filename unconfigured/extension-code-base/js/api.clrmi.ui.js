@@ -19,16 +19,29 @@ CLRMI.prototype.UserInterface = function(api){
             name: '',
             specs: ''
         },
-        that = this;
+        that = this,
+        ioService,
+        faviconService;
 
     // Private functions.
-    var copyDefaults, onMessage, appendScript;
+    var copyDefaults, onMessage, appendScript, init;
 
     // Public functions.
-    this.openWindow, this.dereferenceModuleResources;
+    this.openWindow, this.dereferenceModuleResources, this.getFaviconURL;
 
 
     // Private function definitions.
+
+    init = function(){
+        try{
+            ioService = Components.classes["@mozilla.org/network/io-service;1"].
+                getService(Components.interfaces.nsIIOService);
+            faviconService = Components.classes[
+                "@mozilla.org/browser/favicon-service;1"].
+                 getService(Components.interfaces.nsIFaviconService);
+        } catch(e) {}
+    }
+
     copyDefaults = function(obj, defaults){
         var x, objWithDefaults = {};
         for(x in defaults){
@@ -212,6 +225,28 @@ CLRMI.prototype.UserInterface = function(api){
         });
     };
 
+    /**
+     * Gets the URL of the favicon associated with the given page URL. The URL
+     * of the default favicon will be returned if no favicon is found. The
+     * generated URL is a browser resource and can only access cached favicons.
+     *
+     * @param {string} url  The URL of the page to get the favicon for.
+     * @param {boolean} shorten  Default: true; uses just the domain of the URL.
+     * @return The URL of the favicon associated with the given URL.
+     */
+    this.getFaviconURL = function(url, shorten){
+        shorten = shorten === undefined || shorten;
 
+        if( shorten ){
+            url = url.match('[^/]*/[^/]*/[^/]*')[0];
+        }
+
+        if( faviconService ){
+            return faviconService.getFaviconImageForPage(
+                ioService.newURI(url, null, null)).spec;
+        } else {
+            return 'chrome://favicon/'+ url;
+        }
+    };
 
 }

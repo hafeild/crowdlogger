@@ -31,12 +31,12 @@ CROWDLOGGER.io.indexed_db = {};
  *   reading from
  *         and writing to IndexedDB databases.
  */
-CROWDLOGGER.io.IndexedDB = function(){
+CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     // Private functions.
     var create_table, clear_log, write_to_db, read_from_db, open_db, 
         write_to_log, read_log, run_transaction, foreach_entry,
         raise_error, on_crowlogger_db_upgraded, on_extension_db_upgraded,
-        copy_obj, create_store, truncate_store, update_log, get_range;
+        create_store, truncate_store, update_log, get_range;
 
     // Some constants
     const DATABASE_NAME = 'crowdlogger',
@@ -134,7 +134,7 @@ CROWDLOGGER.io.IndexedDB = function(){
             opts = {data: opts};
         }
 
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.data ){
             return raise_error(
                 "Missing parameters in call to write_to_error_log.", 
@@ -168,7 +168,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If the required opts fields are not present.
      */
     this.write_to_activity_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.data ){
             return raise_error(
                 "Missing parameters in call to write_to_activity_log.", 
@@ -212,7 +212,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If the required opts fields are not present.
      */
     this.write_to_extension_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.db_name || !opts.data ){
             return raise_error(
                 "Missing parameters in call to write_to_extension_log.", 
@@ -257,7 +257,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     this.update_activity_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.foreach ){
             return raise_error(
                 'Missing parameters in call to update_activity_log.',
@@ -303,7 +303,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     this.update_error_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.foreach ){
             return raise_error(
                 'Missing parameters in call to update_activity_log.',
@@ -358,7 +358,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     this.update_extension_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.foreach || !opts.db_version || !opts.db_name ){
             return raise_error(
                 'Missing parameters in call to update_activity_log.',
@@ -383,7 +383,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>     
      */
     this.clear_activity_log = function( opts ) {
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
@@ -404,7 +404,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>     
      */
     this.clear_error_log = function( opts ) {
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
@@ -435,8 +435,8 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If required opts fields are missing.
      */
     this.clear_extension_log = function( opts ) {
-        opts = copy_obj(opts);
-        CROWDLOGGER.util.check_args(opts, ['db_name', 'store_names'], 
+        opts = crowdlogger.util.copy_obj(opts);
+        crowdlogger.util.check_args(opts, ['db_name', 'store_names'], 
             'clear_extension_log', that.IOLogException, true);
 
         opts.on_upgrade = opts.on_upgrade || on_extension_db_upgraded;
@@ -483,7 +483,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     this.read_error_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
@@ -530,7 +530,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * </ul>
      */
     this.read_activity_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         opts.db_name = DATABASE_NAME;
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
@@ -583,7 +583,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If required opts fields are missing.
      */
     this.read_extension_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.db_name || !opts.on_chunk ){
             return raise_error(
                 "Missing parameters in call to read_extension_log.",
@@ -657,12 +657,12 @@ CROWDLOGGER.io.IndexedDB = function(){
         }
 
         if( is_database_opened(opts.db_name) ){
-            opts.on_success(CROWDLOGGER.util.copy(
+            opts.on_success(crowdlogger.util.copy(
                     db_connections[opts.db_name].objectStoreNames) || []);
         } else {
             open_db({ 
                 on_success: function(){
-                    opts.on_success(CROWDLOGGER.util.copy(
+                    opts.on_success(crowdlogger.util.copy(
                             db_connections[opts.db_name].objectStoreNames));
                 },
                 on_error: opts.on_error,
@@ -1031,7 +1031,7 @@ CROWDLOGGER.io.IndexedDB = function(){
      * @throws {Error} If required opts fields are missing.
      */
     read_log = function( opts ){
-        opts = copy_obj(opts);
+        opts = crowdlogger.util.copy_obj(opts);
         if( !opts.db_name|| !opts.on_upgrade ||
                 !opts.store_name || !opts.on_chunk ){ 
             return raise_error("Missing parameters in call to read_log.", 
@@ -1379,7 +1379,7 @@ CROWDLOGGER.io.IndexedDB = function(){
                 opts.on_error);
         }
 
-        CROWDLOGGER.debug.log('Opening DB...');
+        crowdlogger.debug.log('Opening DB...');
 
         // Open the database.
         var request = opts.db_version ?
@@ -1397,7 +1397,7 @@ CROWDLOGGER.io.IndexedDB = function(){
 
         // Invoked when there's an error.
         request.onerror = function(event){
-            CROWDLOGGER.debug.log("Error opening database: "+ 
+            crowdlogger.debug.log("Error opening database: "+ 
                 event.target.errorCode);
 
             if( opts.on_error ) {
@@ -1411,7 +1411,7 @@ CROWDLOGGER.io.IndexedDB = function(){
         request.onsuccess = function(event){
             var db = request.result;
 
-            CROWDLOGGER.debug.log('DB opened; version: '+ db.version);
+            crowdlogger.debug.log('DB opened; version: '+ db.version);
             // For older versions of chrome.
             if( opts.db_version && 
                     parseInt(db.version) !== opts.db_version && db.setVersion ){
@@ -1422,8 +1422,8 @@ CROWDLOGGER.io.IndexedDB = function(){
                     open_db(opts);
                 }
                 version_request.onerror = function(e){
-                    CROWDLOGGER.debug.log('Error while upgrading db:');
-                    CROWDLOGGER.debug.log(e);
+                    crowdlogger.debug.log('Error while upgrading db:');
+                    crowdlogger.debug.log(e);
                 }
             } else {
                 add_database_connection(db);
@@ -1434,12 +1434,12 @@ CROWDLOGGER.io.IndexedDB = function(){
         };
 
         request.onblocked = function(event){
-            CROWDLOGGER.debug.log('DB blocked!');
+            crowdlogger.debug.log('DB blocked!');
         };
 
         // Invoked if the database needs to be upgraded.
         request.onupgradeneeded = function(event){
-            CROWDLOGGER.debug.log('Upgrading DB; current version: '+ 
+            crowdlogger.debug.log('Upgrading DB; current version: '+ 
                 request.result.version);
             if( opts.on_upgrade ){ opts.on_upgrade(request.result); }
         }; 
@@ -1517,7 +1517,7 @@ CROWDLOGGER.io.IndexedDB = function(){
                 }
             },
             on_error: function(event){
-                CROWDLOGGER.debug.log("Error clearing "+ store_name +": "+ 
+                crowdlogger.debug.log("Error clearing "+ store_name +": "+ 
                     event.target.errorCode);
 
                 if(opts.on_error){
@@ -1615,21 +1615,6 @@ CROWDLOGGER.io.IndexedDB = function(){
         return false;
     }
 
-    /**
-     * Makes a copy of the given object.
-     * 
-     * @param  {object} obj  The object to copy.
-     * @return {object} A copy of obj.
-     */
-    copy_obj = function(obj){
-        var new_obj = {}, i;
-        if( obj ){
-            for(i in obj){
-                new_obj[i] = obj[i];
-            }
-        }
-        return new_obj;
-    };
     // ******* END PRIVATE FUNCTIONS ********* //    
 };
 }

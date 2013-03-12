@@ -69,45 +69,17 @@ CLI.prototype.Base = function(crowdlogger, cli){
             //      hiddenDOMWindow;
             // var frame = hiddenWindow.document.getElementById('clrm');
 
-            var frame = crowdlogger.jq('#clrm')[0];
-
-            if( !frame ) {
-                var clrm_url = 
+            var clrm_url = 
                     crowdlogger.version.info.get_extension_html_prefix()+
                     'clrm.html';
+            crowdlogger.jq('#clrm').remove();
+            var frame = crowdlogger.jq('<iframe>');
+            frame.attr('id', 'clrm').attr('src', clrm_url).attr('type', 
+                'content');
+            frame.appendTo('body');
 
-                crowdlogger.debug.log('Opening iframe for '+ clrm_url +
-                    '(attempt '+ initAttempts +')\n');
-
-
-                var XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/'+
-                           'there.is.only.xul';
-                try{
-                    //frame = hiddenWindow.document.createElementNS(XUL_NS, 
-                    //    'iframe');
-                    frame = hiddenWindow.document.createElement('iframe');
-                } catch(e) {
-                    if( initAttempts < MAX_INIT_ATTEMPTS ){
-                        initAttempts++;
-                        setTimeout(init, 100);
-                        return;
-                    } else {
-                        throw e;
-                    }
-                }
-                frame.setAttribute('id', 'clrm');
-                frame.setAttribute('src', clrm_url);
-                frame.setAttribute('type', 'content');
-
-                hiddenWindow.document.documentElement.appendChild(frame);
-            } else if( frame.getAttribute('src') === "" ){
-                frame.setAttribute('src', clrm_url);
-            }
-
-            //hiddenWindow.addEventListener('message', onMessage, true, true);
-            //CROWDLOGGER.window.addEventListener('message', onMessage, true, true);
-            clrmi = crowdlogger.jq(window).bind('message', onMessage);
-            clrmi = frame.contentWindow;
+            crowdlogger.jq(window).bind('message', onMessage);
+            clrmi = frame[0].contentWindow;
 
 
         } else {

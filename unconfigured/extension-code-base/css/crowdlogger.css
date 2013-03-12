@@ -47,73 +47,32 @@ body.chrome-menu {
     padding-left:18px !important;
     background-size: 20px 20px;
     background-repeat: no-repeat;
-    width: 50px;
+    width: 24px;
     height: 20px;
 }
 
 .crowdlogger-logging-off-icon {
-    background-color: white;
-    padding-left: 100px !important;
-    /*padding-left:18px !important;*/
     background-image: url("img/crowdlogger-logo.001.not-logging.48x48.png") !important;
-    background-attachment: fixed;
-    /*list-style-image: url("img/crowdlogger-logo.001.not-logging.16x16.png") !important;*/
-    background-size: 20px 20px;
-    /*background-repeat: no-repeat;*/
-    height: 20px;
-    /*width: 24px;*/
-    width: 75px;
-    /*width: 700px;*/
-    background-position: 0 0 !important;
-    /*background-image: url("img/crowdlogger-logo.001.not-logging.16x16.png") !important;*/
 }
 
 .crowdlogger-logging-on-icon {
-    /*padding-left:18px !important;*/
     background-image: url("img/crowdlogger-logo.001.logging.48x48.png") !important;
-    /*background-size: 20px 20px;*/
-    /*background-repeat: no-repeat;*/
-    height: 20px;
-    width: 24px;
-    width: 40px;
-    /*width: 700px;*/
-    /*background-image: url("img/crowdlogger-logo.001.logging.16x16.png") !important;*/
 }
 
 .crowdlogger-logging-off_low_alert-button {
-    padding-left:18px !important;
     background-image: url("img/crowdlogger-logo.001.not-logging.alert-low.48x48.png") !important;
-    background-size: 20px 20px;
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 20px;
 }
 
 .crowdlogger-logging-on_low_alert-button {
-    padding-left:18px !important;
     background-image: url("img/crowdlogger-logo.001.logging.alert-low.48x48.png") !important;
-    background-size: 20px 20px;
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 20px;
 }
 
 .crowdlogger-logging-off_high_alert-button {
-    padding-left:18px !important;
     background-image: url("img/crowdlogger-logo.001.not-logging.alert-high.48x48.png") !important;
-    background-size: 20px 20px;
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 20px;
 }
 
 .crowdlogger-logging-on_high_alert-button {
-    padding-left:18px !important;
     background-image: url("img/crowdlogger-logo.001.logging.alert-high.48x48.png") !important;
-    background-size: 20px 20px;
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 20px;
 }
 
 .crowdlogger-mine-log-button {

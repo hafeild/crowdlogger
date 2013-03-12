@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<!--
+ File:      ui.html
+ Author:    Henry Feild
+ Purpose:   Describes the CLRM UI API.
+
+%%COPYRIGHT%%
+
+Version: %%VERSION%%
+-->
 <html>
 <head>
     <script src="js/external/jquery.min.js"></script>
@@ -10,6 +20,10 @@
     <ul>
       <!--   <li><a href="#ui">User Interface API (top)</a> -->
         <li><a href="#ui:standalone">Stand-Alone Application API</a>
+            <ul>
+                <li><a href="#ui:openWindow">api.ui.openWindow</a>
+                <li><a href="#ui:getFaviconURL">api.ui.getFaviconURL</a>
+            </ul>
         <li><a href="#ui:crowdlogger">CrowdLogger Widget API</a>
         <li><a href="#ui:page">Content Pages</a>
     </ul>
@@ -28,50 +42,80 @@ In the sections that follow, we assume that the CLRM API instance passed to your
     and examples.
 </p>
 
+<a name="#openWindow"></a>
 <div class="function">
-<h3><code>api.ui.openWindow</code></h3>
-<h4>Parameters</h4>
-    {object} <code>options</code>
-    <ul>  
-        A map of options. The following are supported:
-        <li>{string} <code>content</code> 
-            <ul>The HTML to go inside.</ul>
-        <li>{object} <code>resources</code>
-            <ul>If 'contents' is set, then all CLRM 
-            resource placeholders will be replaced
-            using this map.</ul>
-        <li>{string} <code>url</code>
-            <ul>The URL to load (overrides contents). If
-            neither contents nor url are provided,
-            an about:blank page is opened.</ul>
-        <li>{string} <code>name</code>
-            <ul>The name of the window to open. This will replace any open
-            windows with this name.</ul>
-        <li>{string} specs
-            <ul>The window.open specs. See <a 
-            href="http://www.w3schools.com/jsref/met_win_open.asp">this
-            page</a> for details.</ul>
-        <li>{object} <code>specsMap</code>
-            <ul>A map of specs. This is serialized into the
-            format "key1=value1,key2=value2,...". The
-            keys should be the same as those specified
-            in the specs string.</ul>
-        <li>{function} <code>callback</code>
-            <ul>Invoked when the window has been created.</ul>
-    </ul>
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3><code>api.ui.openWindow</code></h3>
+    <h4>Parameters</h4>
+        <p>
+        <ul>
+            <li>{object} <code>options</code>
+            <ul>  
+                A map of options. The following are supported:
+                <li>{string} <code>content</code> 
+                    <ul>The HTML to go inside.</ul>
+                <li>{object} <code>resources</code>
+                    <ul>If 'contents' is set, then all CLRM 
+                    resource placeholders will be replaced
+                    using this map.</ul>
+                <li>{string} <code>url</code>
+                    <ul>The URL to load (overrides contents). If
+                    neither contents nor url are provided,
+                    an about:blank page is opened.</ul>
+                <li>{string} <code>name</code>
+                    <ul>The name of the window to open. This will replace any 
+                    open windows with this name.</ul>
+                <li>{string} specs
+                    <ul>The window.open specs. See <a 
+                    href="http://www.w3schools.com/jsref/met_win_open.asp">this
+                    page</a> for details.</ul>
+                <li>{object} <code>specsMap</code>
+                    <ul>A map of specs. This is serialized into the
+                    format "key1=value1,key2=value2,...". The
+                    keys should be the same as those specified
+                    in the specs string.</ul>
+                <li>{function} <code>callback</code>
+                    <ul>Invoked when the window has been created.</ul>
+            </ul>
+        </ul>
+        </p>
 
-<h4>Description</h4>
-<p>
-    Opens a window. If <code>url</code> is not specified, then a 
-    CrowdLogger extension page named <code>blank.html</code> is opened
-    (this allows greater control over the window than if 
-    <code>about:blank</code> is opened). If <code>content</code> is
-    provided, it is dereferenced using the provided 
-    <code>resources</code> and loaded into the DOM of 
-    <code>blank.html</code>. Once the window has been opened, 
-    <code>callback</code> (if provided) is invoked with the window 
-    object.
-</p>
+    <h4>Description</h4>
+    <p>
+        Opens a window. If <code>url</code> is not specified, then a 
+        CrowdLogger extension page named <code>blank.html</code> is opened
+        (this allows greater control over the window than if 
+        <code>about:blank</code> is opened). If <code>content</code> is
+        provided, it is dereferenced using the provided 
+        <code>resources</code> and loaded into the DOM of 
+        <code>blank.html</code>. Once the window has been opened, 
+        <code>callback</code> (if provided) is invoked with the window 
+        object.
+    </p>
+</div>
+
+<a name="getFaviconURL"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3><code>api.ui.getFaviconURL</code></h3>
+    <h4>Parameters</h4>
+        <p>
+            <ul>
+                <li>{string} <code>url</code>
+                    <ul>The URL of the page to get the favicon for.</ul>
+                <li>{boolean} <code>shorten</code>
+                    <ul>Default: true; uses just the domain of the URL.</ul>
+            </ul>
+        </p>
+
+    <h4>Description</h4>
+    <p>
+        Gets the URL of the favicon associated with the given page 
+        (<code>url</code>). The URL of the default favicon will be returned if no favicon is found. The generated URL is a browser resource and can only 
+        access cached favicons.
+    </p>
 </div>
 
 

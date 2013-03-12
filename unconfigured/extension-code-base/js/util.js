@@ -134,14 +134,14 @@ CROWDLOGGER.util.cleanse_string = function( data ){
     // Remove anything that looks like a SSN.
     output_string = output_string.replace( 
          //  /(^|\D)\d\d\d\D{0,1}\d\d\D{0,1}\d\d\d\d(\D|$)/g, function( a ) {
-            /(^|\s)\d\d\d\D\d\d\D\d\d\d\d(\s|$)/g, function( a ) {
+            /(^|\s)\d\d\d\W\d\d\W\d\d\d\d(\s|$)/g, function( a ) {
         return a.replace( /\d/g, "#" );
     } );
 
     // Remove anything that looks like a phone number.
     output_string = output_string.replace( 
 //  /(((%28)|\(){0,1}\d\d\d((%29)|\)){0,1}){0,1}\D{0,2}\d\d\d\D{0,2}\d\d\d\d/g,
-   /(\s|^)(((%28)|\(){0,1}\d\d\d((%29)|\)){0,1}){0,1}\D\d\d\d\D\d\d\d\d(\s|$)/g,
+   /(\s|^)(((%28)|\(){0,1}\d\d\d((%29)|\)){0,1}){0,1}\W\d\d\d\W\d\d\d\d(\s|$)/g,
         function( a ) {
             var replace = a.replace( /%28/, "____BEGIN_PAREN" );
             replace = replace.replace( /%29/, "____END_PAREN" );
@@ -734,6 +734,22 @@ CROWDLOGGER.util.check_args = function(argsMap, requiredFields, functionName,
             ' is missing the following required fields: '+ 
             missingArgs.join(','));
     }
+};
+
+/**
+ * Makes a copy of the given object.
+ * 
+ * @param  {object} obj  The object to copy.
+ * @return {object} A copy of obj.
+ */
+CROWDLOGGER.util.copy_obj = function(obj){
+    var new_obj = {}, i;
+    if( obj ){
+        for(i in obj){
+            new_obj[i] = obj[i];
+        }
+    }
+    return new_obj;
 };
 
 

@@ -25,10 +25,12 @@ CROWDLOGGER.logging = {
     CLICK: "click",
     SEARCH: "search",
     PAGE_FOCUS: "pagefocus",
+    PAGE_BLUR: "pageblur",
     PAGE_LOAD: "pageload",
     LOGGING_STATUS_CHANGE: "loggingstatuschange",
     TAB_ADD: "tabadd",
     TAB_REMOVE: "tabremove",
+    TAB_SELECT: "tabselect",
 
 
     is_click: function(entry){ 
@@ -37,6 +39,8 @@ CROWDLOGGER.logging = {
         return entry.e === CROWDLOGGER.logging.SEARCH; },
     is_page_focus: function(entry){ 
         return entry.e ===CROWDLOGGER.logging. PAGE_FOCUS; },
+    is_page_blur: function(entry){ 
+        return entry.e ===CROWDLOGGER.logging. PAGE_BLUR; },
     is_page_load: function(entry){ 
         return entry.e === CROWDLOGGER.logging.PAGE_LOAD; },
     is_logging_status_change: function(entry){ 
@@ -44,7 +48,9 @@ CROWDLOGGER.logging = {
     is_tab_add: function(entry){ 
         return entry.e === CROWDLOGGER.logging.TAB_ADD; },
     is_tab_remove: function(entry){ 
-        return entry.e === CROWDLOGGER.logging.TAB_REMOVE; }
+        return entry.e === CROWDLOGGER.logging.TAB_REMOVE; },
+    is_tab_select: function(entry){ 
+        return entry.e === CROWDLOGGER.logging.TAB_SELECT; }
 };
  
  
@@ -129,13 +135,16 @@ CROWDLOGGER.logging.remove_logs = function(){
  *
  * @param {int} time The time stamp associated with the click.
  * @param {string} clicked_url The url that was clicked.
- * @param {string} originating_page_url The url of the page on which the link
+ * @param {string} source_page_url The url of the page on which the link
  *      was clicked.
+ * @param {string} source_tab_id The id of the tab where the click originated.
  * @param {string} button The button that was pressed.
  * @param {string} query The query (can be omitted or blank).
+ * @param {int} rank The rank of the document of the click (can be null).
+ * @param {string} anchor_text The anchor text of the link that was clicked.
  */
 CROWDLOGGER.logging.log_click = function( time, clicked_url, 
-        originating_page_url, button, query ){
+        source_page_url, source_tab_id, button, query, rank, anchor_text ){
     var click_event, is_search_result, log_entry;
 
     // Make sure that logging is turned on. If not, just return.
@@ -156,10 +165,17 @@ CROWDLOGGER.logging.log_click = function( time, clicked_url,
         e: CROWDLOGGER.logging.CLICK,
         t: time,
         turl: CROWDLOGGER.util.cleanse_string(clicked_url),
-        surl: CROWDLOGGER.util.cleanse_string(originating_page_url),
-        sr: is_search_result,
-        q: CROWDLOGGER.util.cleanse_string(query)  
+        surl: CROWDLOGGER.util.cleanse_string(source_page_url),
+        stid: source_tab_id+'',
+        anc: anchor_text 
     };
+
+    if( is_search_result ){
+        log_entry.s = {
+            q: CROWDLOGGER.util.cleanse_string(query),
+            r: rank
+        };
+    }
 
     // Announce the event.
     CROWDLOGGER.messages.trigger('link-clicked', log_entry);
@@ -192,9 +208,9 @@ CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id,
     var log_entry = {
         e: CROWDLOGGER.logging.TAB_ADD,
         t: time,
-        ttid: tab_id,
+        ttid: tab_id+'',
         turl: CROWDLOGGER.util.cleanse_string(url),
-        stid: src_tab_id,
+        stid: src_tab_id+'',
         surl: CROWDLOGGER.util.cleanse_string(src_url) 
     };
 
@@ -208,8 +224,8 @@ CROWDLOGGER.logging.log_tab_added = function( time, tab_id, url, src_tab_id,
 /**
  * Logs that a tab has been removed.
  *
- * @param {int} time The time stamp associated with the click.
- * @param {string} tab_id The id of the tab that was opened.
+ * @param {int} time The time stamp associated with the removal.
+ * @param {string} tab_id The id of the tab that was removed.
  */
 CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
     // Make sure that logging is turned on. If not, just return.
@@ -222,11 +238,39 @@ CROWDLOGGER.logging.log_tab_removed = function( time, tab_id ){
     var log_entry = {
         e: CROWDLOGGER.logging.TAB_REMOVE,
         t: time,
-        tid: tab_id
+        tid: tab_id+''
     };
 
     // Announce the event.
     CROWDLOGGER.messages.trigger('tab-removed', log_entry);
+
+    // Log it.
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
+};
+
+/**
+ * Logs that a tab has been selected.
+ *
+ * @param {int} time The time stamp associated with the selection.
+ * @param {string} tab_id The id of the tab that was selected.
+ */
+CROWDLOGGER.logging.log_tab_selected = function( time, tab_id, url ){
+    // Make sure that logging is turned on. If not, just return.
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
+        return false;
+    }
+
+    // Create the log entry.
+    var log_entry = {
+        e: CROWDLOGGER.logging.TAB_SELECT,
+        t: time,
+        tid: tab_id+'',
+        url: url
+    };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('tab-select', log_entry);
 
     // Log it.
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
@@ -250,7 +294,7 @@ CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
     var log_entry = {
         e: CROWDLOGGER.logging.PAGE_LOAD,
         t: time,
-        tid: tab_id,
+        tid: tab_id+'',
         url: CROWDLOGGER.util.cleanse_string(url)
     };
     // Announce the event.
@@ -260,15 +304,14 @@ CROWDLOGGER.logging.log_page_loaded = function( time, tab_id, url ){
     CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
 };
 
-
 /**
  * Logs that a page has come into focus.
  *
- * @param {int} time The time stamp associated with the click.
- * @param {string} tab_id The id of the tab that was opened.
- * @param {string} url The url of the page in the tab.
+ * @param {int} time The time stamp associated with the event.
+ * @param {string} tab_id The id of the tab that contains the page.
+ * @param {string} url The url of the page.
  */
-CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
+CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url, title ){
     // Make sure that logging is turned on. If not, just return.
     if( !CROWDLOGGER.enabled ||
             !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
@@ -279,8 +322,9 @@ CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
     var log_entry = {
         e: CROWDLOGGER.logging.PAGE_FOCUS,
         t: time,
-        tid: tab_id,
-        url: CROWDLOGGER.util.cleanse_string(url)
+        tid: tab_id+'',
+        url: CROWDLOGGER.util.cleanse_string(url),
+        ttl: title
     };
 
     // Announce the event.
@@ -291,31 +335,71 @@ CROWDLOGGER.logging.log_page_focused = function( time, tab_id, url ){
 };
 
 /**
- * Logs a search event.
+ * Logs that a page has left focus.
  *
- * @param {int} time The time stamp associated with the search.
- * @param {string} query The query entered.
- * @param {string} search_engine The search engine to which the query was posed.
- * @param {string} url The url of the search results page.
-
+ * @param {int} time The time stamp associated with the event.
+ * @param {string} tab_id The id of the tab containing the page.
+ * @param {string} url The url of the page in the tab.
  */
-CROWDLOGGER.logging.log_search = function( time, query, search_engine, url ){
-    // Make sure that logging is turned on. Also check how long the query is --
-    // if it's too long, we're not going to log it. 
+CROWDLOGGER.logging.log_page_blur = function( time, tab_id, url, title ){
+    // Make sure that logging is turned on. If not, just return.
     if( !CROWDLOGGER.enabled ||
-            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )||
-        query.length > CROWDLOGGER.logging.MAX_QUERY_LENGTH ){
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
         return false;
     }
 
     // Create the log entry.
     var log_entry = {
-        e: CROWDLOGGER.logging.SEARCH,
+        e: CROWDLOGGER.logging.PAGE_BLUR,
         t: time,
-        q: CROWDLOGGER.util.cleanse_string( query ),
-        se: search_engine,
-        url: CROWDLOGGER.util.cleanse_string(url)
+        tid: tab_id+'',
+        url: CROWDLOGGER.util.cleanse_string(url),
+        ttl: title
     };
+
+    // Announce the event.
+    CROWDLOGGER.messages.trigger('page-blurred', log_entry);
+
+    // Log it.
+    CROWDLOGGER.io.log.write_to_activity_log( {data: [log_entry]} );
+};
+
+/**
+ * Logs a search event.
+ *
+ * @param {int} time The time stamp associated with the search.
+ * @param {string} tab_id The id of the tab in which the query was entered.
+ * @param {string} query The query entered.
+ * @param {string} search_engine The search engine to which the query was posed.
+ * @param {string} url The url of the search results page.
+
+ */
+CROWDLOGGER.logging.log_search = function( search ){
+    // Make sure that logging is turned on. Also check how long the query is --
+    // if it's too long, we're not going to log it. 
+    if( !CROWDLOGGER.enabled ||
+            !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false )){
+
+        return false;
+    }
+    var clean = CROWDLOGGER.util.cleanse_string;
+
+    CROWDLOGGER.debug.log('Logging search: '+ search.query);
+
+
+    // Create the log entry.
+    var log_entry = JSON.parse(clean(JSON.stringify({
+        e: CROWDLOGGER.logging.SEARCH,
+        t: search.time,
+        tid: search.tab_id+'',
+        q: search.query.slice(0, CROWDLOGGER.logging.MAX_QUERY_LENGTH),
+        se: search.search_engine,
+        url: search.url,
+        res: search.results,
+        rcnt: search.results_returned, 
+        srnk: search.rank_start
+    })));
+
 
     // Announce the event.
     CROWDLOGGER.messages.trigger('query-entered', log_entry);
@@ -374,26 +458,11 @@ CROWDLOGGER.logging.init = function(){
 
     // This actually does the work.
     /** @ignore */
-    add_search_candidate = function( time, query, search_engine, 
-            search_results_url, is_dummy ){
+    add_search_candidate = function( search_data, is_dummy ){
+        is_dummy = is_dummy || false;
 
-        is_dummy = (is_dummy === undefined) ? false : is_dummy;
-
-        // Create an object for this search candidate.
-        var current_search = { 
-            time: time, 
-            query: query, 
-            search_engine: search_engine, 
-            search_results_url: search_results_url,
-            is_dummy: is_dummy
-        };
-
-        /*//B_DEBUG
-        CROWDLOGGER.debug.log( "current search: " + 
-            JSON.stringify( current_search ) + "\n" );
-        CROWDLOGGER.debug.log( "prev search: " + 
-            JSON.stringify( previous_search ) + "\n" );
-        //E_DEBUG*/
+        var current_search = CROWDLOGGER.util.copy_obj(search_data);
+        current_search.is_dummy = is_dummy;
 
         // Buffer an undefined search to flush out the current search,
         // but only if that's not what the previous search is. This
@@ -402,25 +471,10 @@ CROWDLOGGER.logging.init = function(){
             previous_search = current_search;
             if( !is_dummy ){
                 setTimeout( function(){ 
-                    CROWDLOGGER.logging.add_search_candidate( 
-                        time+sufficient_delta, query,
-                        search_engine, search_results_url, true)
+                    CROWDLOGGER.logging.add_search_candidate(search_data, true);
                 }, sufficient_delta );
             }
             return false;
-        }
-
-        // First, determine if these are even in the right order.
-        if( previous_search !== undefined &&
-                current_search.time < previous_search.time ){
-            CROWDLOGGER.io.log.write_to_error_log( {data: [{
-                f: "CROWDLOGGER.logging.init",
-                err: "Searches out of order! prev: [" + 
-                        previous_search.query + ", " + previous_search.time + 
-                        "] cur:[ " + current_search.query + ", " + 
-                        current_search.time + "]",
-                t: new Date().getTime()
-            }]} );
         }
 
         // Logs the previous query.
@@ -428,10 +482,7 @@ CROWDLOGGER.logging.init = function(){
         var log_previous = function(){
             if( !previous_search.is_dummy){
                 CROWDLOGGER.logging.log_search( 
-                    previous_search.time,
-                    previous_search.query,
-                    previous_search.search_engine,
-                    previous_search.search_results_url
+                    search_data
                 );
             }
         };
@@ -442,13 +493,7 @@ CROWDLOGGER.logging.init = function(){
         var searches_are_identical = 
               current_search.query === previous_search.query &&
               current_search.search_engine === previous_search.search_engine &&
-              current_search.search_results_url ===
-                previous_search.search_results_url;
-   
-        /*//B_DEBUG
-        CROWDLOGGER.debug.log( "searches_are_identical: " + 
-            searches_are_identical + "\n" );
-        //E_DEBUG*/
+              current_search.url === previous_search.url;
 
         // Are the times sufficiently different and the queries different?
         // Their search engines?
@@ -459,8 +504,7 @@ CROWDLOGGER.logging.init = function(){
         if( (!searches_are_identical && 
               current_search.time - previous_search.time >= sufficient_delta ) ||
              (current_search.search_engine !== previous_search.search_engine)||
-             (current_search.search_results_url !== 
-                previous_search.search_results_url) ||
+             (current_search.url !== previous_search.url) ||
              (current_search.query.indexOf( previous_search.query ) !== 0) ||
              (searches_are_identical && current_search.is_dummy) ) {
 
@@ -481,12 +525,10 @@ CROWDLOGGER.logging.init = function(){
         // should prevent duplicate queries from being logged.
         if( !current_search.is_dummy ){
             setTimeout( function(){
-                CROWDLOGGER.logging.add_search_candidate( 
-                    time+sufficient_delta, query,
-                    search_engine, search_results_url, true);
+                current_search.time += sufficient_delta;
+                CROWDLOGGER.logging.add_search_candidate(current_search, true);
             }, sufficient_delta );
         }
-
     };
 
     // This will make sure we're not stepping on anyone's toes and that
@@ -494,58 +536,27 @@ CROWDLOGGER.logging.init = function(){
     // a binary lock, which might result in things being processed out of order
     // because of time delays.
     /** @ignore */
-    lock_buffer = function( time, query, search_engine, 
-            search_results_url, is_dummy, ticket_number ){
-
-        // Not sure if it makes sense to have this here, or if we should
-        // just leave the catch at the 'log search' function.
-        /*
-        // Make sure that logging is turned on. If not, just return.
-        if( !CROWDLOGGER.preferences.get_bool_pref( "logging_enabled", false ) ){
-            return false;
-        }
-        */
-
+    lock_buffer = function( search_data, is_dummy, ticket_number ){
         // If we don't have a ticket number, get one.
         ticket_number = 
             (ticket_number === undefined) ? get_ticket_number() : ticket_number;
 
-        /*//B_DEBUG
-        CROWDLOGGER.debug.log( "In lock_buffer.\n\t" +
-            "QUERY:  " + query + "\n\t" +
-            "SE:     " + search_engine + "\n\t" +
-            "TICKET: " + ticket_number + "\n\t" +
-            "NEXT:   " + serving_ticket_number + "\n" );
-        //E_DEBUG*/
-
         // See if it's our turn.
         if( ticket_number === serving_ticket_number ){
             try{
-                add_search_candidate( time, query, search_engine, 
-                search_results_url, is_dummy );
+                add_search_candidate( search_data, is_dummy );
             } catch (e) {
-                CROWDLOGGER.io.log.write_to_error_log( {data: [{
-                    f: "CROWDLOGGER.logging.add_seach_candidate",
-                    err: "Failed on: query="+ query + 
-                        "; search_engine="+ search_engine + 
-                        "; search_results_url="+ search_results_url + 
-                        "; is_dummy: "+ is_dummy +"; for ticket number: "+ 
-                        ticket_number +"; ERROR: "+ e,
-                    t: new Date().getTime()
-                }]});
+                CROWDLOGGER.debug.log('Error in lock_buffer: '+ e);
             }
             // Important: this gets set _after_ we've processed the current
             // search.
             serving_ticket_number = (ticket_number + 1) % max_ticket_number;
         } else {
-            setTimeout( function(){ lock_buffer(
-              time, query, search_engine, search_results_url, is_dummy,
-              ticket_number);},
-               3 );
+            setTimeout( function(){ 
+                lock_buffer( search_data, is_dummy, ticket_number);
+            }, 3 );
         }
-
     };
-
 
     CROWDLOGGER.logging.add_search_candidate = lock_buffer;
 };
