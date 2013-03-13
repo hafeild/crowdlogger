@@ -1,0 +1,169 @@
+
+#log-area {
+    /*font-family:    fixed-width, courier, "courier new";*/
+    /*white-space:    pre-wrap;*/
+    font-size:      10pt;
+    border:         1px gray solid;
+    width:          100%;
+    /*height:         300px;*/
+    padding-bottom: 5px;
+}
+
+#log-header {
+    width: 100%;
+    background-color: lightsteelblue;
+    color: #555;
+    padding: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 0px;
+
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box; 
+    border-bottom: 1px gray solid;
+    cursor: default;
+    height: 30px;
+}
+
+.log-nav-button {
+    font-size: 140%;
+    width: 30px;
+
+    height: 100%;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin: 0;
+    vertical-align: bottom;
+}
+
+.log-nav-button:hover {
+    cursor: pointer;
+    color: orange;
+    /*background-color: #ddd;*/
+}
+
+.off.log-nav-button {
+    color: #bbb;
+}
+.off.log-nav-button:hover {
+    cursor: default;
+    color: #bbb;
+    /*background-color: lightsteelblue;*/
+}
+
+#backward {
+    display: inline-block; 
+    -moz-transform: matrix(-1, 0, 0, 1, 0, 0);
+    -webkit-transform: matrix(-1, 0, 0, 1, 0, 0);
+    -moz-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    vertical-align: top;
+}
+
+#entries, .entry {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box; 
+    width: 100%;
+}
+
+
+
+#entries {
+    overflow: auto;
+    padding-left: 10px;
+    height: 300px;
+}
+
+#entries .button {
+    float: right;
+    height: 13px;
+    padding-bottom: 5px;
+}
+.confirm-delete {
+    float: right;
+    display: none;
+    text-decoration: underline;
+    color: red;
+    cursor: pointer;
+}
+.deleted, .deleting {
+    color: gray;
+    font-style: italic;
+    display: none;
+    float:right;
+    padding-right: 10px;
+}
+
+.entry {
+    min-height: 25px;
+}
+
+.expanders {
+    display: inline-block;
+    cursor: pointer;
+    width: 20px;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.open, .closed {
+    cursor: pointer;
+    width: 100%;
+}
+
+.open {
+    display: none;
+}
+
+.more {
+    display: none;
+    margin-left: 5px;
+    padding-left: 40px;
+    border: 1px dotted gray;
+    border-top: none;
+    border-right: none;
+    margin-right: 50px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+#jump-box {
+    float: right;
+}
+
+#jump-id {
+    width: 60px; 
+    text-align: right;
+}
+
+.id {
+    color: gray;
+    font-size: 85%;
+    margin-right: 5px;
+    /*text-align: right*/
+}
+
+.event-name {
+    margin-right: 10px;
+    color: #555;
+}
+
+.event-summary {
+
+}
+
+.error {
+    color: red;
+    font-style: italic;
+    display: none;
+}
+
+span.date {
+    margin-left: 10px;
+    color: gray;
+    font-weight: normal;
+    font-size: 90%;
+}

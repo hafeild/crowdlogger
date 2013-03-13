@@ -21,7 +21,6 @@ function add_listeners(){
         refresh_page();
         return false;
     });
-
 }
 
 /**

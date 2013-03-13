@@ -1,15 +1,21 @@
 /* 
 %%LICENSE%%
 */
-
 @font-face {
+    font-family: 'OpenSans';
+    src: url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*@font-face {
     font-family: 'OpenSans';
     src: local('☺'), 
         url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
-
+*/
 body.chrome-menu ul.flush {
     margin: 0px;
     padding: 0px;

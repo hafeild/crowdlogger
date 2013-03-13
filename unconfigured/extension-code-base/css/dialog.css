@@ -14,11 +14,18 @@ src: local('fonts/open-sans-condensed/OpenSans-CondLight-webfont.woff') format('
 
 @font-face {
     font-family: 'OpenSans';
+    src: url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*@font-face {
+    font-family: 'OpenSans';
     src: local('☺'), 
         url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
-}
+}*/
 
 html {
     /*font-family: "Open Sans Condensed", arial;*/
@@ -407,13 +414,6 @@ td.click, td.serpClick {
     border-bottom:          2px steelblue solid;
 }
 
-#log-area {
-    font-family:    fixed-width, courier, "courier new";
-    overflow:       auto;
-    white-space:    pre-wrap;
-    font-size:      10pt;
-    border:         1px lightgray solid;
-}
 
 .inProgress {
     color: #ffcc66;

@@ -29,7 +29,9 @@ var CROWDLOGGER = {
     jq: jQuery,
     messages: null,
     enabled: true,
-    clrmi: undefined
+    clrmi: undefined,
+    faviconService: null,
+    ioService: null
 };
 
 CROWDLOGGER.check_if_new_instance = function() {
@@ -195,6 +197,15 @@ CROWDLOGGER.initialize = function(){
             CROWDLOGGER.study.notify_of_new_consent_form();
             CROWDLOGGER.logging.set_logging( false );
         }
+
+        try{
+            CROWLOGGER.ioService = 
+                Components.classes["@mozilla.org/network/io-service;1"].
+                getService(Components.interfaces.nsIIOService);
+            CROWDLOGGER.faviconService = Components.classes[
+                "@mozilla.org/browser/favicon-service;1"].
+                 getService(Components.interfaces.nsIFaviconService);
+        } catch(e) {}
 
         CROWDLOGGER.initialized = true;
     };

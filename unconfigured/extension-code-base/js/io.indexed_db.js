@@ -36,7 +36,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     var create_table, clear_log, write_to_db, read_from_db, open_db, 
         write_to_log, read_log, run_transaction, foreach_entry,
         raise_error, on_crowlogger_db_upgraded, on_extension_db_upgraded,
-        create_store, truncate_store, update_log, get_range;
+        create_store, truncate_store, update_log, get_range, read_log_cursor,
+        db_cursor_chunk;
 
     // Some constants
     const DATABASE_NAME = 'crowdlogger',
@@ -538,7 +539,58 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
 
         // Read the data and send it to callback.
         return read_log( opts );
-    };    
+    };   
+
+
+    /**
+     * Reads the activity log store and sends the data to the given callback
+     * (on_chunk) function. The callback should expect an array of data db
+     * entries and a next callback. If chunk_size > 0, then invoking 'next' will
+     * cause the next chunk of data to be read in. This is different from 
+     * read_activity_log in that the caller can easily go forwards, backwards,
+     * and jump to an id with this function. Moreover, reaching the end does
+     * not mean that the on_success function will be invoked.
+     *
+     *
+     * @function
+     * @member CROWDLOGGER.io.indexed_db
+     *
+     * @param {object} opts        A map of additional options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
+     *                                 are processed asynchronously.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
+     *                                 chunk_size = 50 will cause 50 entries to
+     *                                 be read, stored in an array, and then
+     *                                 passed to the on_chunk function. If <=0,
+     *                                 100 entries will be read in before 
+     *                                 calling on_chunk. This is approximate
+     *                                 because ranges are used and therefore
+     *                                 deleted items within that range will not
+     *                                 be read (their id's are not reused).
+     *                                 Default: 0.
+     *    <li>{bool} reverse:          If true, the data will be read in reverse
+     *                                 order of id. Default is 'false'.
+     *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
+     *    <li>{int} upper_bound:       The largest id to retrieve; default: -1
+     *                                 (all ids >= lower_bound are retrieved).
+     * </ul>
+     */
+    this.cursor_activity_log = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_name = ACTIVITY_LOG_STORE_NAME;
+
+        return read_log_cursor( opts );
+    } ;
 
     /**
      * Reads data from a CrowdLogger extension file. This is pretty extensible,
@@ -1215,6 +1267,301 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     };
 
     /**
+     * This is a generic read function that will take care of opening
+     * a database, creating the table (if need be), and reading the given
+     * data from it.
+     * @function
+     * @private
+     * @member CROWDLOGGER.io.indexed_db
+     *
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} db_name:        The database name.
+     *    <li>{function} on_upgrade:   Invoked if the database needs to be 
+     *                                 updated.
+     *    <li>{string} store_name:     The name of the store to read.
+     *    <li>{function} on_chunk:     Invoked per chunk. Chunks
+     *                                 are processed asynchronously. Gives
+     *                                 options to move forward, backwards, or
+     *                                 abort.
+     * </ul>             
+     * OPTIONAL:
+     * <ul>
+     *    <li>{int} db_version:        The version of the db.                      
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
+     *                                 chunk_size = 50 will cause 50 entries to
+     *                                 be read, stored in an array, and then
+     *                                 passed to the on_chunk function. If <=0,
+     *                                 100 entries will be read in before 
+     *                                 calling on_chunk. This is approximate
+     *                                 because ranges are used and therefore
+     *                                 deleted items within that range will not
+     *                                 be read (their id's are not reused). 
+     *                                 Default: 100.
+     *    <li>{bool} reverse:          If true, the data will be read in reverse
+     *                                 order of id. Default is 'false'.
+     *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
+     *    <li>{int} upper_bound:       The largest id to retrieve; default: -1
+     *                                 (all ids >= lower_bound are retrieved).
+     * </ul>
+     *
+     * @throws {Error} If required opts fields are missing.
+     */
+    read_log_cursor = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        if( !opts.db_name|| !opts.on_upgrade ||
+                !opts.store_name || !opts.on_chunk ){ 
+            return raise_error("Missing parameters in call to read_log_cursor.", 
+                opts.on_error);
+        }
+
+        if( db_connections[opts.db_name] ){
+            opts.chunk_size = opts.chunk_size===undefined? 100:opts.chunk_size;
+            opts.db = db_connections[opts.db_name];
+            return db_cursor_chunk(opts);
+        } else {
+            return open_db({
+                db_name: opts.db_name,
+                db_version: opts.db_version,
+                on_upgrade: opts.on_upgrade,
+                on_error: opts.on_error,
+                on_success: function(db){
+                    // add_database_connection(db);
+                    read_log_cursor(opts);
+                }
+            });
+        }
+    };
+
+    /**
+     * Reads the given store. 
+     * @function
+     * @private
+     * @member CROWDLOGGER.io.indexed_db
+     *
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *     <li>{object} db:            The database.
+     *     <li>{string} store_name:    The name of the store to read.
+     *     <li>{function} on_chunk:    Invoked per chunk (see below). Chunks
+     *                                 are processed asynchronously. Should 
+     *                                 expect an object:
+     *                                 <ul>
+     *                                    <li>{array} batch:  the entries
+     *                                    <li>{function} forward: moves to the
+     *                                            next chunk
+     *                                    <li>{function} backward: moves to the
+     *                                            previous chunk
+     *                                    <li>{function} jump(id): moves to the
+     *                                            given id
+     *                                    <li>{function} abort: will close 
+     *                                            things up and invoke the
+     *                                            on_success function if passed 
+     *                                            nothing, on_error if passed 
+     *                                            'true, errorMsg'.
+     *                                </ul>
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read
+     *                                 and processed by on_chunk.
+     *                                 Note that the 'next' function needs to
+     *                                 be invoked from the on_chunk function
+     *                                 in order for this to trigger.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
+     *                                 chunk_size = 50 will cause 50 entries to
+     *                                 be read, stored in an array, and then
+     *                                 passed to the on_chunk function. If <=0,
+     *                                 100 entries will be read in before 
+     *                                 calling on_chunk. This is approximate
+     *                                 because ranges are used and therefore
+     *                                 deleted items within that range will not
+     *                                 be read (their id's are not reused).
+     *    <li>{bool} reverse:          If true, the data will be read in reverse
+     *                                 order of id. Default is 'false'.
+     *    <li>{int} lower_bound:       Smallest id to retrieve. Default: 0
+     *    <li>{int} upper_bound:       Largest id to retrieve. Default:undefined
+     *                                 (all ids > lower_bound are retrieved).
+     * </ul>
+     * 
+     * @throws {Error} If required opts fields are missing.
+     */
+    db_cursor_chunk = function( opts ){
+        if( !opts || !opts.db || !opts.store_name || !opts.on_chunk ){
+            opts = opts || {};
+            return raise_error("Missing parameters in call to read_from_db.", 
+                opts.on_error);
+        }
+
+
+        var upper_bound = opts.upper_bound, 
+            lower_bound = opts.lower_bound,
+            finished = (opts.reverse && !upper_bound) || 
+                       (!opts.reverse && lower_bound === 0),
+            sent_upper_bound, sent_lower_bound,
+            last_call_backwards = false,
+            nothing_sent = false;
+
+
+        // This is a wrapper to assist with the issue of closures. If we just
+        // pass batch to opts.on_chunk, then opts.on_chunk will get whatever
+        // version of the buffer exists at the time of its execution, not
+        // invocation. This wrapper freezes it, so to speak, so that the version
+        // at invocation is the same as the version at execution.
+        function on_chunk(b){
+            var params = {
+                batch: b,
+                abort: abort,
+                jump: jump
+            };
+
+            if( !finished || last_call_backwards ){
+                params.forward = forward;
+            }
+            if( !finished || !last_call_backwards ){
+                params.backward = backward;
+            }
+
+            if( !finished ){
+                sent_upper_bound = Math.max(b[0].id,b[b.length-1].id);
+                sent_lower_bound = Math.min(b[0].id,b[b.length-1].id);
+                nothing_sent = false;
+            } else {
+                nothing_sent = true;
+            }
+
+            crowdlogger.debug.log('In on_chunk; '+
+                'sent_upper_bound: '+ sent_upper_bound +'; '+
+                'sent_lower_bound: '+ sent_lower_bound );
+            return function(){ opts.on_chunk(params) };
+        }
+
+        function abort(is_error, error_msg){
+            finished = true;
+            if( is_error && opts.on_error ){
+                setTimeout( function(){opts.on_error( error_msg );}, T );
+            } else if( !is_error && opts.on_success ){
+                setTimeout( opts.on_success, T );
+            }
+        }
+
+        function forward(){
+            crowdlogger.debug.log('In forward;');
+            last_call_backwards = false;
+            if( nothing_sent ){
+                upper_bound = undefined;
+                lower_bound = 1;
+            }
+            next_chunk(opts.reverse);
+        }
+
+        function backward(){
+            crowdlogger.debug.log('In backward;');
+            last_call_backwards = true;
+            if( opts.reverse ){
+                upper_bound = undefined;
+                lower_bound = sent_upper_bound+1;
+                next_chunk(false, true);
+            } else {
+                upper_bound = sent_lower_bound-1;
+                lower_bound = 0;
+                next_chunk(true, true);
+            }
+        }
+
+        function jump(id){
+            crowdlogger.debug.log('In jump;');
+            last_call_backwards = false;
+            if( opts.reverse ){
+                upper_bound = id;
+                lower_bound = 0;
+            } else {
+                upper_bound = undefined;
+                lower_bound = id;
+            }
+            next_chunk(opts.reverse);
+        }
+
+        // Process one chunk.
+        function next_chunk(reverse, unshift){
+            // This will hold the batches of items. It's essentially a buffer.
+            var batch = [],
+                sent = false,
+                size = 0;
+            finished = false;
+
+            crowdlogger.debug.log('In next_chunk; '+
+                'upper_bound: '+ upper_bound +'; '+
+                'lower_bound: '+ lower_bound +'; '+
+                'reverse: '+ reverse +'; '+
+                'unshift: '+ unshift);
+
+            // Iterate over the entries.
+            return foreach_entry({
+                db: opts.db,
+                store_name: opts.store_name,
+                on_entry: function(entry){
+                    if(!entry){
+                        return {stop: false};
+                    }
+
+                    if( unshift ){
+                        batch.unshift(entry);
+                    } else {
+                        batch.push(entry);
+                    }
+
+                    size = batch.length;
+
+                    // If the buffer is at capacity (chunk_size), then empty it
+                    // by invoking on_chunk.
+                    if( opts.chunk_size > 0 && batch.length >= opts.chunk_size){
+
+                        // This sync call is okay, because it's execution has 
+                        // nothing to do with the advancement of the cursor.
+                        setTimeout(on_chunk(batch), T);
+                        sent = true;
+                        if( reverse ){
+                            upper_bound = entry.id-1;
+                        } else {
+                            lower_bound = entry.id+1;
+                        }
+                        return {stop: true};
+                    }
+
+                    return {stop: false};
+                },
+                mode: READONLY,
+                range: get_range(upper_bound, lower_bound),
+                direction: reverse ? PREV : NEXT,
+                on_success: function(){
+                    console.log('In on_success');
+                    // At the end, check if we need to empty the buffer one last 
+                    // time.
+                    if( !opts.chunk_size || size < opts.chunk_size ){
+                        finished = true;
+                    }
+                        
+                    if( !sent ){
+                        setTimeout(on_chunk(batch), T);
+                    }
+                },
+                on_error: opts.on_error
+            });
+        }
+
+        // Read in the first chunk.
+        return next_chunk(opts.reverse);
+    };
+
+
+
+    /**
      * Runs the on_entry function on every item within the specified range
      * (opts.range or all if not defined) for the specific db/store_name combo.
      * The on_entry function must not be asynchronous or the transaction will
@@ -1562,7 +1909,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      * <ul>
      *    <li>{object} db:    The database object.
      *    <li>{Array} stores: The stores that the transaction will operate over.
-     *    <li>{String} mode:  One of "readonly", "readwrite", or "versionchange".
+     *    <li>{String} mode: One of "readonly", "readwrite", or "versionchange".
      *    <li>{function} f:   The function to invoke during the transaction.
      * </ul>
      * OPTIONAL:

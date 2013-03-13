@@ -140,7 +140,7 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
         this.link = link;    // A link to attach to the label.
         this.se = se;       // The search engine.
         this.to_s = function(){ 
-            return [this.time, this.type, this.dipslay, this.link, 
+            return [this.time, this.type, this.display, this.link, 
                 this.se].join( ", " ); 
         };
     };
@@ -175,16 +175,6 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
             cur_search_trail.add_event( trail_event );
         }
 
-        var to_search_url = function( query, search_engine ){
-            if( search_engine.match( /google/ ) !== null ){
-                return  "http://www.google.com/search?q=" + encodeURI( query );
-            } else if( search_engine.match( /yahoo/ ) !== null ) {
-                return "http://search.yahoo.com/search?p=" + encodeURI( query );
-            } else if( search_engine.match( /bing/ ) !== null ) {
-                return "http://www.bing.com/search?q=" + encodeURI( query );
-            }
-        };
-
         // So we can track the time between queries. We're only going to
         // emit a query if it is the last in a line of rapidly submitted
         // queries (this line is allowed to consist of only one element
@@ -203,7 +193,8 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
                 var search_trail_event = new Search_Trail_Event( 
                     entry.t, "search",
                     entry.q,
-                    to_search_url( entry.q, entry.se), entry.se
+                    CROWDLOGGER.util.to_search_url( entry.q, entry.se), 
+                    entry.se
                 );
 
                 if( (search_trail_event.time - previous_search_event.time) < 
@@ -400,18 +391,202 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
         if( !CROWDLOGGER.util.okay_to_refresh_page(doc, refresh) ){ return; }
         CROWDLOGGER.util.mark_page_as_initialized(doc);
 
+        if( refresh ){
+            return;
+        }
+
         var win = CROWDLOGGER.window,
-            save_log_elm,
             done = false,
             jq = doc.defaultView.jQuery,
-            next_button = jq(
-                '<span class="button" style="height: 20px">Next</span>').
-                insertAfter('#log-area'),
             save,
-            process_entries;
+            jump,
+            load,
+            display_entries,
+            on_refresh,
+            clear_listeners,
+            remove_entry,
+            generate_entry_elm,
+            get_description,
+            listeners = [],
+            event_display_names = {
+                tabadd: 'Tab added',
+                tabremove: 'Tab removed',
+                click: 'Link click',
+                search: 'Search',
+                pagefocus: 'Page focused',
+                pageblur: 'Page unfocused',
+                loggingstatuschange: 'Logging status changed',
+                tabselect: 'Tab selected',
+                pageload: 'Page loaded'
+            },
+            refresh_elm = jq('#refresh'),
+            save_elm = jq('#save-log'),
+            forward_elm = jq('#forward'),
+            backward_elm = jq('#backward'),
+            jump_elm = jq('#jump-button'),
+            jump_id_elm = jq('#jump-id'),
+            entries_elm = jq('#entries');
+
+        clear_listeners = function(){
+            CROWDLOGGER.debug.log('Removing listeners...');
+            while( listeners.length > 0 ){
+                var listener = listeners.shift();
+                CROWDLOGGER.debug.log('\t'+ listener.event);
+                listener.jqelm.off(listener.event, listener.callback);
+            }
+        };
+
+        add_listener = function(jqelm, event, callback){
+            CROWDLOGGER.debug.log('Adding listener ('+ event +')...');
+            jqelm.on(event, callback);
+            listeners.push({jqelm: jqelm, event: event, callback: callback});
+        };
+
+        get_description = function(entry){
+            if( entry.__deleted__ ){
+                return 'Removed';
+            }
+            switch(entry.e){
+                case 'search':
+                    return CROWDLOGGER.util.to_search_url(
+                        entry.q, entry.se, true) +' '+
+                        CROWDLOGGER.util.getFaviconHTML(entry.url, true);
+                case 'pagefocus':
+                case 'pageblur':
+                case 'pageload':
+                    return CROWDLOGGER.util.gen_link(entry.url, 
+                        entry.ttl ? entry.ttl : entry.url, 25) +' '+
+                        CROWDLOGGER.util.getFaviconHTML(entry.url, true); 
+                case 'tabremove':
+                case 'tabselect':
+                    return 'Tab id: '+ entry.tid;
+                case 'tabadd':
+                case 'click':
+                    return CROWDLOGGER.util.gen_link(entry.turl, entry.turl,25)+
+                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,true); 
+                case 'loggingstatuschange':
+                    return entry.le ? 'Logging enabled' : 'Logging disabled';
+                default: 
+                    return "?";
+            };
+        };
+
+        generate_entry_elm = function(entry){
+            var entry_elm = jq('<div>').attr('id',entry.id).addClass('entry');
+
+            // Expanders
+            entry_elm.html('<span class="expanders">'+
+                '<span class="closed">&#9658;</span>'+
+                '<span class="open">&#9660;</span>'+
+                '</span>');
+
+            entry_elm.data('entry', entry);
+
+            // Entry ID.
+            jq('<span>').addClass('id').text(entry.id).appendTo(entry_elm);
+
+            // Event name.
+            jq('<span>').addClass('event-name').
+                text(event_display_names[entry.e]).appendTo(entry_elm);
+
+            // Event Summary.
+            var summary = jq('<span>').addClass('event-summary').html(
+                '<span>'+get_description(entry)+'</span>');
+            jq('<span>').addClass('date').text(
+                    CROWDLOGGER.util.format_date(entry.t)).appendTo(summary);
+            summary.appendTo(entry_elm);
+
+            jq('<span>').addClass('confirm-delete').text('Click to finalize').
+                appendTo(entry_elm);
+            jq('<span>').addClass('button delete').text('Remove').
+                appendTo(entry_elm);
+            jq('<span>').addClass('deleting').text('Removing...').
+                appendTo(entry_elm);
+            jq('<span>').addClass('deleted').text('Removed').
+                appendTo(entry_elm);
+            jq('<span>').addClass('error').text('Error deleting...').
+                appendTo(entry_elm);
+
+            if(entry.__deleted__){
+                entry_elm.find('.delete').hide();
+                entry_elm.find('.deleted').show();
+            }
+
+            jq('<div>').addClass('more').text(
+                JSON.stringify(entry, null, '\t')).appendTo(entry_elm);
+
+            return entry_elm;
+        };
+
+        jump = function(){
+            clear_listeners();
+            load(parseInt(jump_id_elm.val()));
+        };
+
+        remove_entry = function(entry){
+            CROWDLOGGER.debug.log('Removing entry '+ entry.id);
+
+            var new_entry = {
+                id: entry.id,
+                t: entry.t,
+                e: entry.e,
+                __deleted__: true
+            };
+
+            CROWDLOGGER.io.log.write_to_activity_log({
+                data: [new_entry],
+                on_success: function(){
+                    CROWDLOGGER.debug.log('Successfully deleted.');
+                    jq('#'+entry.id).replaceWith(generate_entry_elm(new_entry));
+                },
+                on_error: function(e){
+                    CROWDLOGGER.debug.log('Error while deleting: '+ e);
+                    var elm = jq('#'+entry.id);
+                    elm.find('.deleting').hide();
+                    elm.find('.error').show().fadeOut(function(){
+                        elm.find('.delete').show();
+                    });
+                }
+            });
+        };
+
+        on_click = function(e){
+            var jqelm = jq(e.target);
+            if(jqelm.hasClass('expanders') || jqelm.parent('.expanders')[0]){
+                var parent = jqelm.parents('.entry');
+                parent.find('.open').toggle();
+                parent.find('.closed').toggle();
+                parent.find('.more').toggle();
+            } else if(jqelm.hasClass('delete')){
+                jqelm.hide();
+                jqelm.siblings('.confirm-delete').show();
+            } else if(jqelm.hasClass('confirm-delete')){
+                jqelm.hide();
+                jqelm.siblings('.deleting').show();
+                remove_entry(jqelm.parents('.entry').data('entry'));
+            }
+        };
+
+        load = function(id){
+            // This controls what is displayed directly on the export page (i.e.,
+            // it's not for storing the data to a file).
+            CROWDLOGGER.io.log.cursor_activity_log( {
+                on_chunk: display_entries,
+                chunk_size: 100,
+                on_success: function(){
+                    next_button.hide();
+                    done = true;
+                },
+                reverse: true,
+                upper_bound: id,
+                on_error: function(e){
+                    CROWDLOGGER.debug.log('Error getting entries: '+ e);
+                }
+            } );
+        };
 
         save = function(){
-            const FILE_TYPE = 'application/x-download'; //'text/plain;charset=utf-8'; //text/javascript'; //'application/x-download';
+            const FILE_TYPE = 'application/x-download'; 
             var blob,
                 firstEntry = true,
                 oldestDate, 
@@ -430,15 +605,15 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 }
             }
 
-            save_log_elm.removeClass('button');
-            save_log_elm.off('click', save);
-            save_log_elm.html('');
+            save_elm.removeClass('button');
+            save_elm.off('click', save);
+            save_elm.html('');
 
-            append_entries_to_save = function( entries, next ){
-                if(save_log_elm.html().length === 3){
-                    save_log_elm.html('');
+            append_entries_to_save = function( entries, next, abort ){
+                if(save_elm.html().length === 3){
+                    save_elm.html('');
                 } else {
-                    save_log_elm.html( save_log_elm.html()+'.');
+                    save_elm.html( save_elm.html()+'.');
                 }
 
                 var i, size;
@@ -459,15 +634,15 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 }
 
                 // Serialize the entries.
-                while( entries.length > 0 ){
+                while( entries.length > 0 && (limit>0 || data.length < limit)){
                     data.push(',');
                     data.push(JSON.stringify(entries.shift(), null, '\t'));
                 }
 
-                size = data.length / 4500.0; // Rough estimate of 4.5k/MB.
-                console.log(size);
+                // size = data.length / 4500.0; // Rough estimate of 4.5k/MB.
+                // console.log(size);
 
-                if(limit === 0 || size < limit){
+                if(limit === 0 || data.length < limit){
                     setTimeout(next, 5);
                 } else {
                     setTimeout(save_file, 5);
@@ -492,13 +667,13 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                     var e = jq('<a href="'+url+'" download="log.'+
                         oldestDate+'-'+
                         newestDate+'.json"></a>').
-                        insertAfter(save_log_elm);
+                        insertAfter(save_elm);
 
                     e.click(function(){
                         var link = jq(this);
-                        save_log_elm.html('Save');
-                        save_log_elm.addClass('button');
-                        save_log_elm.on('click', save); 
+                        save_elm.html('Save');
+                        save_elm.addClass('button');
+                        save_elm.on('click', save); 
                         setTimeout(function(){
                             link.remove();
                             URL.revokeObjectURL(url);
@@ -519,38 +694,51 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
         };
 
         // Called when the activity log has been parsed.
-        process_entries = function( entries, next ){
-            doc.getElementById( 'log-area' ).innerHTML = 
-                JSON.stringify(entries, null, '\t');
+        display_entries = function( info ){
+            CROWDLOGGER.debug.log('Displaying results');
+
+            clear_listeners();
+
+            forward_elm.addClass('off');
+            backward_elm.addClass('off');
+
+            entries_elm.empty();
 
 
-            var next_wrapper = function(){
-                next_button.off('click', next_wrapper);
-                next_button.hide();
+            while( info.batch.length > 0 ){
+                entries_elm.append(generate_entry_elm(info.batch.shift()));
             }
-            next_button.on('click', next_wrapper);
-            if( !done ){
-                next_button.show();
+
+            if( info.forward ){
+                add_listener(forward_elm, 'click', function(){
+                    CROWDLOGGER.debug.log('FORWARD CLICKED');
+                    clear_listeners(); 
+                    info.forward();
+                });
+                forward_elm.removeClass('off');
             }
+
+            if( info.backward ){
+                add_listener(backward_elm, 'click',  function(){
+                    CROWDLOGGER.debug.log('BACKWARD CLICKED');
+                    clear_listeners(); 
+                    info.backward();
+                });
+                backward_elm.removeClass('off');
+            }
+
+
         };
 
-        // Attach the code that forms the blob to download to the 'Save' button.
-        save_log_elm = jq('#save-log');
-        if( !refresh ){
-            save_log_elm.on('click', save); 
-        }    
+        refresh_elm.on('click', clear_listeners);
+        jump_elm.on('click', jump);
 
-        // This controls what is displayed directly on the export page (i.e.,
-        // it's not for storing the data to a file).
-        CROWDLOGGER.io.log.read_activity_log( {
-            on_chunk: process_entries,
-            chunk_size: 1000,
-            on_success: function(){
-                next_button.hide();
-                done = true;
-            },
-            reverse: true
-        } );
+        // Attach the code that forms the blob to download to the 'Save' button.
+        save_elm.on('click', save); 
+        
+        jq('#entries').click(on_click);
+
+        load();
     };
 
     if( doc === undefined ){

@@ -376,7 +376,6 @@ CROWDLOGGER.util.save_dynamic_text = function( doc, data ) {
     return true;    
 };
 
-
 CROWDLOGGER.util.save_dynamic_text_stream = function( doc ) {
     var builder = undefined, bit_array, saveas, removeURL, createURL;
     var save_functions = CROWDLOGGER.util.get_dynamic_save_functions();
@@ -424,8 +423,6 @@ CROWDLOGGER.util.save_dynamic_text_stream = function( doc ) {
         save_as: save
     };    
 };
-
-
 
 /**
  * Based on: http://www.js-x.com/page/javascripts__example.html?view=745
@@ -751,6 +748,98 @@ CROWDLOGGER.util.copy_obj = function(obj){
     }
     return new_obj;
 };
+
+/**
+ * Makes the given string safe to be displayed as text. Does not preserve
+ * whitespace.
+ *
+ * @param {string} str The string to escape.
+ * @return {string} The escaped string.
+ */
+CROWDLOGGER.util.escapeHTML = function(str){
+    return CROWDLOGGER.jq('<div>').text(str).html();
+};
+
+/**
+ * Makes a nicely formatted string out of a time.
+ *
+ * @param {obj} search   The query object -- must have at least a time
+ *                       field. This gets passed to Date...should be the
+ *                       time as a Unix epoch, but some string formats
+ *                       are also okay.
+ * @return The time as a date string in the format:
+ *      dddd, MMMM d, yyyy @ h:mm tt
+ */
+CROWDLOGGER.util.format_date = function( time, format ){
+    format = format === undefined ? 'dddd, MMMM d, yyyy @ h:mm tt' : format;
+    return new Date(time).toString(format);
+}
+
+/**
+ * Generates the url for a search. Currently only Google, Bing, and Yahoo! are
+ * supported.
+ * @param {string}  query         The query text.
+ * @param {string}  search_engine The search engine.
+ * @param {boolean} html          Optional; if <code>true</code>, the query will
+ *                                be returned as a link HTML element.
+ * @return {string} The URL or link associated with the search.
+ */
+CROWDLOGGER.util.to_search_url = function( query, search_engine, html ){
+    var url = '';
+    if( search_engine.match( /google/ ) !== null ){
+        url = 'http://www.google.com/search?q=' + encodeURI( query );
+    } else if( search_engine.match( /yahoo/ ) !== null ) {
+        url = 'http://search.yahoo.com/search?p=' + encodeURI( query );
+    } else if( search_engine.match( /bing/ ) !== null ) {
+        url = 'http://www.bing.com/search?q=' + encodeURI( query );
+    }
+
+    if( url && html ){
+        return '<a href="'+ url +'">'+ query +'</a>';
+    } else {
+        return url;
+    }
+};
+
+/**
+ * Gets the URL of the favicon associated with the given page URL. The URL
+ * of the default favicon will be returned if no favicon is found. The
+ * generated URL is a browser resource and can only access cached favicons.
+ *
+ * @param {string} url  The URL of the page to get the favicon for.
+ * @param {boolean} shorten  Default: true; uses just the domain of the URL.
+ * @return The URL of the favicon associated with the given URL.
+ */
+CROWDLOGGER.util.getFaviconURL = function(url, shorten){
+    shorten = shorten === undefined || shorten;
+    url = url || '';
+
+    if( shorten ){
+        var match = url.match('[^/]*/[^/]*/[^/]*');
+        url = match ? match[0] : url;
+    }
+
+    if( CROWDLOGGER.faviconService ){
+        return CROWDLOGGER.faviconService.getFaviconImageForPage(
+            CROWDLOGGER.ioService.newURI(url, null, null)).spec;
+    } else {
+        return 'chrome://favicon/'+ url;
+    }
+};
+
+CROWDLOGGER.util.getFaviconHTML = function(url, shorten){
+    return '<img src="'+
+        CROWDLOGGER.util.getFaviconURL(url, shorten) +'"/>';
+}
+
+CROWDLOGGER.util.gen_link = function(url, display, limit){
+    limit = limit || 500;
+    url = url || '';
+    display = display || '';
+    return '<a href="'+ url +'">'+
+        (display.length > limit ? display.substring(0, limit)+'...' : display )+
+        '</a>';
+}
 
 
 } // END CROWDLOGGER.util NAMESPACE
