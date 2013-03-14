@@ -199,13 +199,16 @@ CROWDLOGGER.initialize = function(){
         }
 
         try{
-            CROWLOGGER.ioService = 
+            CROWDLOGGER.ioService = 
                 Components.classes["@mozilla.org/network/io-service;1"].
                 getService(Components.interfaces.nsIIOService);
             CROWDLOGGER.faviconService = Components.classes[
                 "@mozilla.org/browser/favicon-service;1"].
                  getService(Components.interfaces.nsIFaviconService);
-        } catch(e) {}
+        } catch(e) {
+            CROWDLOGGER.debug.log('Error setting ioService and '+
+                'faviconService: '+ e);
+        }
 
         CROWDLOGGER.initialized = true;
     };

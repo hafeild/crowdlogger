@@ -167,3 +167,8 @@ span.date {
     font-weight: normal;
     font-size: 90%;
 }
+
+#log-area img {
+    width: 16px;
+    height: 16px;
+}

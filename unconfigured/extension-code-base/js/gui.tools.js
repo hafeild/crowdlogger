@@ -450,20 +450,20 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 case 'search':
                     return CROWDLOGGER.util.to_search_url(
                         entry.q, entry.se, true) +' '+
-                        CROWDLOGGER.util.getFaviconHTML(entry.url, true);
+                        CROWDLOGGER.util.getFaviconHTML(entry.url, false);
                 case 'pagefocus':
                 case 'pageblur':
                 case 'pageload':
                     return CROWDLOGGER.util.gen_link(entry.url, 
                         entry.ttl ? entry.ttl : entry.url, 25) +' '+
-                        CROWDLOGGER.util.getFaviconHTML(entry.url, true); 
+                        CROWDLOGGER.util.getFaviconHTML(entry.url, false); 
                 case 'tabremove':
                 case 'tabselect':
                     return 'Tab id: '+ entry.tid;
                 case 'tabadd':
                 case 'click':
                     return CROWDLOGGER.util.gen_link(entry.turl, entry.turl,25)+
-                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,true); 
+                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,false); 
                 case 'loggingstatuschange':
                     return entry.le ? 'Logging enabled' : 'Logging disabled';
                 default: 
