@@ -52,13 +52,6 @@ several sub namespaces:
 <h2>Interaction events</h2>
 
 <p>
-<!-- The user's browsing history, as logged by CrowdLogger, can be accessed via the
-<code>CROWDLOGGER.io.log</code> interface. Currently, this uses IndexedDB as a 
-backend, which is important if you want to store your own data 
-(<a href="#user:save">see below</a>). CrowdLogger has two default logs:
-the <i>activity log</i> and the <i>error log</i>. The former contains all 
-browsing and search activity, including clicks, queries, tab events, and
-page loads.  -->
 CrowdLogger tracks several user-browser interactions: clicks, queries, tab events, page loads, and page focuses. When any of these events are detected, an object is
 created describing the event. This is then broadcasted and logged.
 Here's a description of the object fields for each kind of event.
@@ -69,196 +62,114 @@ some new events that don't include a timestamp.
 </p>
 
 
-<!-- <table>
-    <tr>
-        <th>Event</th> <th>Fields</th> 
-    </tr><tr>
-        <td>search</td> 
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>q</code>: The parsed query.
-                <li><code>se</code>: The search engine.
-                <li><code>url</code>: The URL of the results page.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'search', 
- t: 1360168716158, 
- q: 'upcoming movies', 
- se: 'google', 
- url: 'https://www.google.com/search?q=upcoming+movies'}
-</pre>
-        </td>
-    </tr><tr>
-        <td>click</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>turl</code>: The clicked URL.
-                <li><code>surl</code>: The URL of the page on which the click 
-                    occurred.
-                <li><code>sr</code>: 
-                    <code>true</code> if the source url (<code>surl</code>) is a
-                    Search Engine Results Page and the target URL is a
-                    <i>search result</i> on that page.
-                <li><code>q</code>: If <code>sr==true</code>, then this contains
-                    the associated query.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'click', 
- t: 1360168716158, 
- turl: 'http://en.wikipedia.org/wiki/Panda', 
- surl: 'https://www.google.com/search?q=panda',
- sr: true,
- q: panda}
-</pre>
-        </td>
-    </tr><tr>
-        <td>tabadd</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>ttid</code>: The target tab id (the one being added).
-                <li><code>turl</code>: The URL loaded in the new tab.
-                <li><code>stid</code>: The source tab id (the one from which the
-                    new one was added).
-                <li><code>surl</code>: The URL loaded in the source tab.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'tabadd', 
- t: 1360168716158, 
- ttid: 2k3,
- turl: 'http://www.cnn.com', 
- stid: 4wi5a,
- surl: 'http://en.wikipedia.org/wiki/Panda'}
-</pre>
-        </td>
-    </tr><tr>
-        <td>tabremove</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>tid</code>: The id of the removed tab.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'tabremove', 
- t: 1360168716158, 
- tid: 2k3}
-</pre>
-        </td>
-    </tr><tr>
-        <td>pageload</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>tid</code>: The id of the tab in which the page was 
-                    loaded.
-                <li><code>url</code>: The loaded URL.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'pageload', 
- t: 1360168716158, 
- tid: 2k3,
- url: 'http://www.cnn.com'}
-</pre>
-        </td>
-    </tr><tr>
-        <td>pagefocus</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>tid</code>: The id of the tab in which the page was 
-                    focused.
-                <li><code>url</code>: The URL of the focused page.
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'pagefocus', 
- t: 1360168716158, 
- tid: 2k3,
- url: 'http://www.cnn.com'}
-</pre>
-        </td>
-    </tr><tr>
-        <td>loggingstatuschange</td>
-        <td>
-            <ul>
-                <li><code>t</code>: The timestamp.
-                <li><code>le</code>: Logging enabled: <code>true</code> or 
-                    <code>false</code>
-            </ul>
-E.g.:
-<pre class='prettyprint'>{id: 1,
- e: 'loggingstatuschange', 
- t: 1360168716158, 
- le: false}
-</pre>
-        </td>
-    </tr>
-</table>
- -->
 
 <ul>
     <li><a href="#user:search">Search</a>
     <li><a href="#user:click">Click</a>
     <li><a href="#user:tabadd">Tab Add</a>
+    <li><a href="#user:tabselect">Tab Select</a>
     <li><a href="#user:tabremove">Tab Remove</a>
     <li><a href="#user:pageload">Page Load</a>
     <li><a href="#user:pagefocus">Page Focus</a>
+    <li><a href="#user:pageblur">Page Blur</a>
     <li><a href="#user:loggingstatuschange">Logging Status Change</a>
 </ul>
 
+<!-- SEARCH -->
 <a name="search"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Search</h3>
     A query submitted to a search engine. Currently, only a few search engines
     are supported (Google, Yahoo!, and Bing).
 
     <h4>Fields</h4>
     <ul>
-        <li>{string} <code>e: 'search'</code>.
-        <li>{int} <code>id</code>: A unique identifier.
-        <li>{int} <code>t</code>: The timestamp.
-        <li>{string} <code>q</code>: The parsed query.
-        <li>{string} <code>se</code>: The search engine.
-        <li>{string} <code>url</code>: The URL of the results page.
+        <li>{string}    <code>e: 'search'</code>.
+        <li>{int}       <code>id</code>: A unique identifier.
+        <li>{int}       <code>t</code>: The timestamp.
+        <li>{int}       <code>tid</code>: The id of the tab in which the search
+            occurred.
+        <li>{string}    <code>q</code>: The query.
+        <li>{string}    <code>se</code>: The search engine.
+        <li>{string}    <code>url</code>: The URL of the results page.
+        <li>{int}       <code>srnk</code>: The starting rank of the results.
+        <li>{string}    <code>rcnt</code>: The result count as displayed.
+        <li>{array of objects} <code>res</code>: A list of the search results.
+            Each object in the array represents a single result and has the 
+            following structure:
+            <ul>
+                <li>{int} <code>rnk</code>: The rank.
+                <li>{string} <code>ttltxt</code>: The title text.
+                <li>{string} <code>ttlurl</code>: The title URL.
+                <li>{string} <code>durl</code>: The displayed URL.
+                <li>{string} <code>shtml</code>: The summary HTML.
+                <li>{array of objects} <code>l</code>: An array of links from
+                    the result (including the title):
+                    <ul>
+                        <li>{string} <code>anc</code>: The anchor text.
+                        <li>{string} <code>url</code>: The URL.
+                    </ul>
+            </ul>
+
     </ul>
 
     <h4>Example</h4>
 <pre class='prettyprint'>
-{id: 1,
- e: 'search', 
- t: 1360168716158, 
- q: 'upcoming movies', 
- se: 'google', 
- url: 'https://www.google.com/search?q=upcoming+movies'}
+ e: "search", 
+ t: 1363369838589, 
+ tid: "1363369830328", 
+ q: "html symbols", 
+ se: "http://www.bing.com/search", 
+ url: "http://www.bing.com/search?q=html+symbols&amp;form=MOZSBR&amp;pc=MOZI",    
+ rcnt: "280,000,000 results", 
+ srnk: 1, 
+ id: 929,
+ res: [{ 
+     rnk: 1, 
+     ttltxt: "&lt;strong&gt;HTML&lt;/strong&gt; &lt;strong&gt;Symbol&lt;/strong&gt; Entities Reference", 
+     ttlurl: "http://www.w3schools.com/tags/ref_symbols.asp", 
+     durl: "www.w3schools.com/tags/ref_&lt;strong&gt;symbols&lt;/strong&gt;.asp", 
+     shtml: "&lt;strong&gt;HTML&lt;/strong&gt; &lt;strong&gt;Symbol&lt;/strong&gt; Entities. This entity reference includes mathematical &lt;strong&gt;symbols&lt;/strong&gt;, Greek &lt;strong&gt;characters&lt;/strong&gt;, various arrows, technical &lt;strong&gt;symbols&lt;/strong&gt; and shapes. Note: Entity names are ...", 
+     l: [ { 
+        anc: "&lt;strong&gt;HTML&lt;/strong&gt; &lt;strong&gt;Symbol&lt;/strong&gt; Entities Reference", 
+        url: "http://www.w3schools.com/tags/ref_symbols.asp" 
+     }]
+    },
+    ...
+  ]
+}
 </pre>
 </div>
 
+<!-- CLICK -->
 <a name="click"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Click</h3>
     Clicks on URLs, whether search engine result URLs or otherwise.
 
     <h4>Fields</h4>
     <ul>
-        <li>{string} <code>e: 'click'</code>
-        <li>{int} <code>id</code>: A unique identifier.
-        <li>{int} <code>t</code>: The timestamp.
-        <li>{string} <code>turl</code>: The clicked URL.
-        <li>{string} <code>surl</code>: The URL of the page on which the click 
+        <li>{string}    <code>e: 'click'</code>
+        <li>{int}       <code>id</code>: A unique identifier.
+        <li>{int}       <code>t</code>: The timestamp.
+        <li>{string}    <code>turl</code>: The clicked URL.
+        <li>{string}    <code>surl</code>: The URL of the page on which the 
+            click occurred.
+        <li>{string}    <code>stid</code>: The id of the tab in which the click
             occurred.
-        <li>{boolean} <code>sr</code>: 
-            <code>true</code> if the source url (<code>surl</code>) is a
-            Search Engine Results Page and the target URL is a
-            <i>search result</i> on that page.
-        <li>{string} <code>q</code>: If <code>sr==true</code>, then this contains
-            the associated query.
+        <li>{string}    <code>anc</code>: The anchor text of the link.
+        <li>{object}    <code>s</code>: Only present if this was a click from
+            a search page. Contains the following fields:
+            <ul>
+                <li>{string}    <code>q</code>: The associated query.
+                <li>{string}    <code>r</code>:  The rank (will be 
+                    <code>null</code> if the click was not on a result link 
+                    (e.g., on an ad)).
+            </ul>
     </ul>
 
     <h4>Example</h4>
@@ -266,14 +177,20 @@ E.g.:
  e: 'click', 
  t: 1360168716158, 
  turl: 'http://en.wikipedia.org/wiki/Panda', 
- surl: 'https://www.google.com/search?q=panda',
- sr: true,
- q: panda}
+ surl: 'https://www.google.com/search',
+ s: {
+    q: 'panda',
+    r: '1'
+ }
+}
 </pre>
 </div>
 
+<!-- TAB ADDED -->
 <a name="tabadd"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Tab Add</h3>
     Fired any time a tab (or new window) is opened.
 
@@ -294,15 +211,46 @@ E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'tabadd', 
  t: 1360168716158, 
- ttid: 2k3,
+ ttid: '333445',
  turl: 'http://www.cnn.com', 
- stid: 4wi5a,
+ stid: '333444',
  surl: 'http://en.wikipedia.org/wiki/Panda'}
 </pre>
 </div>
 
+<!-- TAB SELECTED -->
+<a name="tabselect"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Tab Select</h3>
+    Fired any time a tab is selected. This is not incredibly reliable, e.g.,
+    it is not fired when switching to a tab from another window.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'tabselect'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>tid</code>: The id of the selected tab.
+        <li>{string} <code>url</code>: The URL of the page loaded in the 
+            selected tab.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'tabremove', 
+ t: 1360168716158, 
+ tid: '333444',
+ url: 'http://en.wikipedia.org/wiki/Panda'}
+</pre>
+</div>
+
+<!-- TAB REMOVED -->
 <a name="tabremove"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Tab Remove</h3>
     Fired any time a tab (or window) is closed.
 
@@ -318,14 +266,19 @@ E.g.:
 <pre class='prettyprint'>{id: 1,
  e: 'tabremove', 
  t: 1360168716158, 
- tid: 2k3}
+ tid: '333444'}
 </pre>
 </div>
 
+
+<!-- PAGE LOAD -->
 <a name="pageload"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Page Load</h3>
-    Fires any time a page is loaded.
+    Fires any time a page starts to load (it does not actually mean the page
+    has finished loading).
 
     <h4>Fields</h4>
     <ul>
@@ -346,8 +299,11 @@ E.g.:
 </pre>
 </div>
 
+<!-- PAGE FOCUS -->
 <a name="pagefocus"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Page Focus</h3>
     Fires any time a page is brought into focus.
 
@@ -359,19 +315,53 @@ E.g.:
         <li>{string} <code>tid</code>: The id of the tab in which the page was 
             focused.
         <li>{string} <code>url</code>: The URL of the focused page.
+        <li>{string} <code>ttl</code>: The page's title.
     </ul>
 
     <h4>Example</h4>
 <pre class='prettyprint'>{id: 1,
  e: 'pagefocus', 
  t: 1360168716158, 
- tid: 2k3,
- url: 'http://www.cnn.com'}
+ tid: '354235',
+ url: 'http://www.cnn.com',
+ ttl: 'CNN.com &ndash; Breaking News'}
 </pre>
 </div>
 
+<!-- PAGE BLUR -->
+<a name="pageblur"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Page Blur</h3>
+    Fires any time a page looses focus.
+
+    <h4>Fields</h4>
+    <ul>
+        <li>{string} <code>e: 'pageblur'</code>
+        <li>{int} <code>id</code>: A unique identifier.
+        <li>{int} <code>t</code>: The timestamp.
+        <li>{string} <code>tid</code>: The id of the tab in which the page was 
+            focused.
+        <li>{string} <code>url</code>: The URL of the focused page.
+        <li>{string} <code>ttl</code>: The page's title.
+    </ul>
+
+    <h4>Example</h4>
+<pre class='prettyprint'>{id: 1,
+ e: 'pageblur', 
+ t: 1360168717445, 
+ tid: '354235',
+ url: 'http://www.cnn.com',
+ ttl: 'CNN.com &ndash; Breaking News'}
+</pre>
+</div>
+
+<!-- LOGGING STATUS CHANGE -->
 <a name="loggingstatuschange"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Logging Status Change</h3>
     Fires any time the user toggles logging or when the browser is started.
 
@@ -416,6 +406,8 @@ have been logged). There are several functions available to you:
 <!-- Read log entries. -->
 <a name="read-all"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Reading all interactions<br/>
         <code>api.user.history.getInteractionHistory</code></h3>
     <h4>Parameters</h4>
@@ -574,6 +566,8 @@ need to?
 <!-- Read past searches. -->
 <a name="read-searches"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Reading all interactions<br/>
         <code>api.user.history.getPastSearches</code></h3>
     <h4>Parameters</h4>
@@ -587,6 +581,8 @@ need to?
 <!-- Read past clicks. -->
 <a name="read-clicks"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Reading all interactions<br/>
         <code>api.user.history.getPastClicks</code></h3>
     <h4>Parameters</h4>
@@ -600,6 +596,8 @@ need to?
 <!-- Read past page visits. -->
 <a name="read-visits"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Reading all interactions<br/>
         <code>api.user.history.getPastPageVisits</code></h3>
     <h4>Parameters</h4>
@@ -614,6 +612,8 @@ need to?
 <!-- Read past sessions (queries and sets of visited pages). -->
 <a name="read-sessions"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Read past search sets (queries and sets of visited pages)<br/>
         <code>api.user.history.getPastSessions</code></h3>
     <h4>Parameters</h4>
@@ -630,6 +630,8 @@ need to?
 <!-- Read past search and browsing trails. -->
 <a name="read-trails"></a>
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Read past search and browsing trails<br/>
         <code>api.user.history.getPastSearchTrails</code></h3>
     <h4>Parameters</h4>
@@ -657,6 +659,8 @@ need to?
 <h2>Accessing Real-time User Activity</h2>
 
 <div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Attaching listeners<br/>
         <code>api.user.realtime.addActivityListeners</code></h3>
 

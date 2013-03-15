@@ -461,8 +461,10 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 case 'tabselect':
                     return 'Tab id: '+ entry.tid;
                 case 'tabadd':
-                case 'click':
                     return CROWDLOGGER.util.gen_link(entry.turl, entry.turl,25)+
+                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,false); 
+                case 'click':
+                    return CROWDLOGGER.util.gen_link(entry.turl, entry.anc,25)+
                         ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,false); 
                 case 'loggingstatuschange':
                     return entry.le ? 'Logging enabled' : 'Logging disabled';
@@ -498,8 +500,12 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
             jq('<span>').addClass('confirm-delete').text('Click to finalize').
                 appendTo(entry_elm);
-            jq('<span>').addClass('button delete').text('Remove').
-                appendTo(entry_elm);
+            // jq('<span>').addClass('button delete').text('Remove').
+            //     appendTo(entry_elm);
+            jq('<span>').addClass('delete').html('&#10008;').
+                attr('label', 'Remove').appendTo(entry_elm);
+
+
             jq('<span>').addClass('deleting').text('Removing...').
                 appendTo(entry_elm);
             jq('<span>').addClass('deleted').text('Removed').
@@ -568,8 +574,6 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
         };
 
         load = function(id){
-            // This controls what is displayed directly on the export page (i.e.,
-            // it's not for storing the data to a file).
             CROWDLOGGER.io.log.cursor_activity_log( {
                 on_chunk: display_entries,
                 chunk_size: 100,
@@ -737,7 +741,10 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
         };
 
-        refresh_elm.on('click', clear_listeners);
+        refresh_elm.on('click', function(){
+            clear_listeners();
+            load();
+        });
         jump_elm.on('click', jump);
 
         // Attach the code that forms the blob to download to the 'Save' button.

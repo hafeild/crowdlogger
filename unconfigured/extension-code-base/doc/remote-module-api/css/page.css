@@ -201,7 +201,7 @@ a:active {
     color: lightsteelblue;
 }
 
-.logo {
+/*.logo {
     width: 200px;
     float: left;
 }
@@ -223,7 +223,7 @@ a:active {
     right: 15px;
     top: 0px;
     font-weight: lighter;
-}
+}*/
 
 .highlight {
     /*color: #ffa500;*/
@@ -238,6 +238,10 @@ code, pre {
     color: #cc8400;
     /*font-weight: bold;*/
     font-size: 110%;
+}
+
+pre {
+    white-space: pre-wrap;
 }
 
 .prettyprint {

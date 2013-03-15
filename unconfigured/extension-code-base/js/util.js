@@ -827,11 +827,28 @@ CROWDLOGGER.util.getFaviconURL = function(url, shorten){
     }
 };
 
+/**
+ * Gets the URL of the favicon associated with the given page URL and places
+ * it in the src attribute of an img tag. The URL of the default favicon will 
+ * be returned if no favicon is found. The generated URL is a browser resource 
+ * and can only access cached favicons.
+ *
+ * @param {string} url  The URL of the page to get the favicon for.
+ * @param {boolean} shorten  Default: true; uses just the domain of the URL.
+ * @return The URL of the favicon associated with the given URL.
+ */
 CROWDLOGGER.util.getFaviconHTML = function(url, shorten){
     return '<img src="'+
         CROWDLOGGER.util.getFaviconURL(url, shorten) +'"/>';
 }
 
+/**
+ * Generates an HTML link.
+ * @param  {string} url     The URL to use as the href.
+ * @param  {string} display The text to display.
+ * @param  {int} limit      The maximum number of characters to display.
+ * @return {string}         The generated HTML link (a) element.
+ */
 CROWDLOGGER.util.gen_link = function(url, display, limit){
     limit = limit || 500;
     url = url || '';

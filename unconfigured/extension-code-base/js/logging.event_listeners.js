@@ -614,7 +614,47 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             if( link && !link.hasAttribute(ORIG_HREF_ATTRIBUTE) ){
                 link.setAttribute(ORIG_HREF_ATTRIBUTE, link.href);
             }
-        }
+        };
+
+        var SearchResultHelper = function(){
+            var that = this;
+            this.result = {
+                l: []
+            };
+
+            this.set_title_text = function(title_text){
+                that.result.ttltxt = title_text;
+            };
+
+            this.set_title_url = function(title_url){
+                that.result.ttlurl = title_url;
+            };
+
+            this.set_rank = function(rank){
+                that.result.rnk = rank;
+            };
+
+            this.set_display_url_text = function(display_url_text){
+                that.result.durl = display_url_text;
+            };
+
+            this.set_summary_html = function(summary_html){
+                that.result.shtml = summary_html;
+            };
+
+            this.add_link = function(url, anchor_text){
+                that.result.l.push({
+                    anc: anchor_text,
+                    url: url
+                });
+            };
+
+            this.clear = function(){
+                that.result = {
+                    l: []
+                };
+            };
+        };
 
         /**
          * Logs a click on a link. Includes information about the search engine
@@ -855,8 +895,10 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
         var traverse_google_results = function(){
             var i, j, result_list_elm = search_page_info.result_list_elm,
                 result_node, result, title_elm, link_elms, rank, cite_elm,
-                snippet_elm, search_box_elms;
+                snippet_elm, search_box_elms, helper;
             rank = search_page_info.result_starting_rank;
+
+            helper = new SearchResultHelper();
 
             result_list_elm.setAttribute(DATA_MARK_ATTRIBUTE, 'true');
 
@@ -866,24 +908,24 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             for( i = 0; i < result_list_elm.childNodes.length; i++ ){
                 result_node =  result_list_elm.childNodes[i];
                 if( result_node.tagName === 'LI' ){
-                    result = {
-                        rank: rank
-                    };
+                    helper.clear();
+                    result = helper.result;
+                    helper.set_rank(rank);
 
                     title_elm = null;
                     try{
                         title_elm = result_node.getElementsByTagName('H3')[0].
                             getElementsByTagName('A')[0];
 
-                        result.title_text = title_elm.innerHTML;
-                        result.title_url = title_elm.getAttribute('href');
+                        helper.set_title_text( title_elm.innerHTML );
+                        helper.set_title_url( title_elm.getAttribute('href') );
                     } catch(e) {
                         log('title_elm: '+ e);
                     }
 
                     cite_elm = result_node.getElementsByTagName('CITE')[0];
                     if(cite_elm){
-                        result.display_url_text = cite_elm.innerHTML;
+                        helper.set_display_url_text( cite_elm.innerHTML );
                     } else {
                         log('cite: '+ cite_elm);
                     }
@@ -893,18 +935,16 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                         if( snippet_elm[j].hasAttribute('class') &&
                                 snippet_elm[j].getAttribute('class').
                                     match(/\bst\b/) ){
-                            result.summary = snippet_elm[j].innerHTML;
+                            helper.set_summary_html( snippet_elm[j].innerHTML );
                             break;
                         }
                     }
 
-                    result.links = [];
                     link_elms = result_node.getElementsByTagName('A');
                     for( j = 0; j < link_elms.length; j++ ){
-                        result.links.push({
-                            text: link_elms[j].innerHTML,
-                            href: link_elms[j].getAttribute('href')
-                        });
+                        helper.add_link(
+                            link_elms[j].getAttribute('href'),
+                            link_elms[j].innerHTML);
 
                         link_elms[j].setAttribute(RANK_DATA_ATTRIBUTE, rank);
                     }
@@ -938,8 +978,10 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
         var traverse_bing_results = function(){
             var i, j, result_list_elm = search_page_info.result_list_elm,
                 result_node, result, title_elm, link_elms, rank, cite_elm,
-                snippet_elm, search_box_elm;
+                snippet_elm, search_box_elm, helper;
             rank = search_page_info.result_starting_rank;
+
+            helper = new SearchResultHelper();
 
             result_list_elm.setAttribute(DATA_MARK_ATTRIBUTE, 'true');
 
@@ -950,40 +992,38 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             for( i = 0; i < result_list_elm.childNodes.length; i++ ){
                 result_node =  result_list_elm.childNodes[i];
                 if( result_node.tagName === 'LI' ){
-                    result = {
-                        rank: rank
-                    };
+                    helper.clear();
+                    result = helper.result;
+                    helper.set_rank(rank);
 
                     title_elm = null;
                     try{
                         title_elm = result_node.getElementsByTagName('H3')[0].
                             getElementsByTagName('A')[0];
 
-                        result.title_text = title_elm.innerHTML;
-                        result.title_url = title_elm.getAttribute('href');
+                        helper.set_title_text( title_elm.innerHTML );
+                        helper.set_title_url( title_elm.getAttribute('href') );
                     } catch(e) {
                         log('title_elm: '+ e);
                     }
 
                     cite_elm = result_node.getElementsByTagName('CITE')[0];
                     if(cite_elm){
-                        result.display_url_text = cite_elm.innerHTML;
+                        helper.set_display_url_text( cite_elm.innerHTML );
                     } else {
                         log('cite: '+ cite_elm);
                     }
 
                     snippet_elm = result_node.getElementsByTagName('P')[0];
                     if( snippet_elm ){
-                        result.summary = snippet_elm.innerHTML;
+                        helper.set_summary_html( snippet_elm.innerHTML );
                     }
 
-                    result.links = [];
                     link_elms = result_node.getElementsByTagName('A');
                     for( j = 0; j < link_elms.length; j++ ){
-                        result.links.push({
-                            text: link_elms[j].innerHTML,
-                            href: link_elms[j].getAttribute('href')
-                        });
+                        helper.add_link(
+                            link_elms[j].getAttribute('href'),
+                            link_elms[j].innerHTML );
 
                         link_elms[j].setAttribute(RANK_DATA_ATTRIBUTE, rank);
                     }
@@ -1010,8 +1050,10 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
         var traverse_yahoo_results = function(){
             var i, j, result_list_elm = search_page_info.result_list_elm,
                 result_node, result, title_elm, link_elms, rank, cite_elm,
-                snippet_elm, search_box_elm, span_elms, div_elms;
+                snippet_elm, search_box_elm, span_elms, div_elmsm, helper;
             rank = search_page_info.result_starting_rank;
+
+            helper = new SearchResultHelper();
 
             result_list_elm.setAttribute(DATA_MARK_ATTRIBUTE, 'true');
 
@@ -1022,9 +1064,9 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             for( i = 0; i < result_list_elm.childNodes.length; i++ ){
                 result_node =  result_list_elm.childNodes[i];
                 if( result_node.tagName === 'LI' ){
-                    result = {
-                        rank: rank
-                    };
+                    helper.clear();
+                    result = helper.result;
+                    helper.set_rank(rank);
 
                     link_elms = result_node.getElementsByTagName('A');
 
@@ -1038,8 +1080,8 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                     }
 
                     if( title_elm ){
-                        result.title_text = title_elm.innerHTML;
-                        result.title_url = title_elm.getAttribute('href');
+                        helper.set_title_text( title_elm.innerHTML );
+                        helper.set_title_url( title_elm.getAttribute('href') );
                     } else {
                         log('title_elm: '+ title_elm);
                     }
@@ -1054,7 +1096,7 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                         }
                     }
                     if(cite_elm){
-                        result.display_url_text = cite_elm.innerHTML;
+                        helper.set_display_url_text( cite_elm.innerHTML );
                     } else {
                         log('cite: '+ cite_elm);
                     }
@@ -1069,17 +1111,16 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                         }
                     }
                     if( snippet_elm ){
-                        result.summary = snippet_elm.innerHTML;
+                        helper.set_summary_html( snippet_elm.innerHTML );
                     } else {
                         log('snippet: '+ snippet_elm);
                     }
 
                     result.links = [];
                     for( j = 0; j < link_elms.length; j++ ){
-                        result.links.push({
-                            text: link_elms[j].innerHTML,
-                            href: link_elms[j].getAttribute('href')
-                        });
+                        helper.add_link(
+                            link_elms[j].getAttribute('href'),
+                            link_elms[j].innerHTML )
 
                         link_elms[j].setAttribute(RANK_DATA_ATTRIBUTE, rank);
                     }

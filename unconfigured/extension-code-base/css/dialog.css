@@ -71,16 +71,14 @@ body.welcome {
 }
 
 
-.title {
+/*.title {
     float:                  left;
 }
 
 .titleMain{ 
     font-size:              2.0em;
     font-weight:            normal;
-    /*font-family:            sans-serif;*/
     color:                  black;
-    /*font-style:             italic;*/
     
 }
 
@@ -90,6 +88,30 @@ body.welcome {
     padding-left:           60px;
     font-style:             italic;
     color:                  lightgray;
+}*/
+
+.logo {
+    width: 200px;
+    float: left;
+}
+
+.title {
+    width: 100%;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+.titleMain {
+    display: block;
+    padding: 0;
+    margin: 0;
+    color: #555;
+    font-size: 265%;
+    position: absolute;
+    right: 15px;
+    top: 0px;
+    font-weight: lighter;
 }
 
 
@@ -428,4 +450,12 @@ td.click, td.serpClick {
 table.notifications {
     border-collapse: separate;
     border-spacing: 10px 4px;
+}
+
+a {
+    color: steelblue;
+}
+
+a:hover {
+    color: blue;
 }

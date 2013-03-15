@@ -143,55 +143,60 @@ function load_xul_for_window(win){
     toolbar_palette.appendChild(crowdlogger_button);
     crowdlogger_button.appendChild(crowdlogger_menu);
 
+    crowdlogger_menu.appendChild(create_xul_element(win, 'iframe', {
+        src: HTML_PATH +'chrome_menu.html',
+        id: 'crowdlogger_menu_frame',
+    }) );
+
     // Add menu items.
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-logging-off-button',
-        id:             'crowdlogger-logging-button',
-        tooltiptext:    'Start logging for CrowdLogger',
-        label:          'Start logging',
-        listeners: [['command', CROWDLOGGER.logging.toggle_logging]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-logging-off-button',
+    //     id:             'crowdlogger-logging-button',
+    //     tooltiptext:    'Start logging for CrowdLogger',
+    //     label:          'Start logging',
+    //     listeners: [['command', CROWDLOGGER.logging.toggle_logging]]
+    // }));
 
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-settings-button',
-        id:             'crowdlogger-register-button',
-        tooltiptext:    'Register for CrowdLogger',
-        label:          'Register',
-        listeners: [['command', CROWDLOGGER.study.launch_registration_dialog]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-settings-button',
+    //     id:             'crowdlogger-register-button',
+    //     tooltiptext:    'Register for CrowdLogger',
+    //     label:          'Register',
+    //     listeners: [['command', CROWDLOGGER.study.launch_registration_dialog]]
+    // }));
 
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-refer-a-friend-button',
-        id:             'crowdlogger-refer-a-friend-launch-button',
-        tooltiptext:    'Refer a friend to download CrowdLogger',
-        label:          'Refer a friend',
-        listeners: [['command', CROWDLOGGER.study.launch_refer_a_friend_dialog]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-refer-a-friend-button',
+    //     id:             'crowdlogger-refer-a-friend-launch-button',
+    //     tooltiptext:    'Refer a friend to download CrowdLogger',
+    //     label:          'Refer a friend',
+    //     listeners: [['command', CROWDLOGGER.study.launch_refer_a_friend_dialog]]
+    // }));
 
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-settings-button',
-        id:             'crowdlogger-settings-button',
-        tooltiptext:    'Settings options for CrowdLogger',
-        label:          'Settings',
-        listeners: [['command', 
-            CROWDLOGGER.gui.preferences.launch_preference_dialog]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-settings-button',
+    //     id:             'crowdlogger-settings-button',
+    //     tooltiptext:    'Settings options for CrowdLogger',
+    //     label:          'Settings',
+    //     listeners: [['command', 
+    //         CROWDLOGGER.gui.preferences.launch_preference_dialog]]
+    // }));
 
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-show-messages-button',
-        id:             'crowdlogger-show-status-page-button',
-        tooltiptext:    'Show the study\'s status page',
-        label:          'Go to status page',
-        listeners: [['command', CROWDLOGGER.gui.study.pages.launch_status_page]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-show-messages-button',
+    //     id:             'crowdlogger-show-status-page-button',
+    //     tooltiptext:    'Show the study\'s status page',
+    //     label:          'Go to status page',
+    //     listeners: [['command', CROWDLOGGER.gui.study.pages.launch_status_page]]
+    // }));
 
-    crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-        'class':        'menuitem-iconic crowdlogger-help-button',
-        id:             'crowdlogger-help-button',
-        tooltiptext:    'Information for CrowdLogger',
-        label:          'Help',
-        listeners: [['command', CROWDLOGGER.gui.study.pages.launch_help_page]]
-    }));
+    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
+    //     'class':        'menuitem-iconic crowdlogger-help-button',
+    //     id:             'crowdlogger-help-button',
+    //     tooltiptext:    'Information for CrowdLogger',
+    //     label:          'Help',
+    //     listeners: [['command', CROWDLOGGER.gui.study.pages.launch_help_page]]
+    // }));
 
     win.CROWDLOGGER = CROWDLOGGER;
     CROWDLOGGER.logging.event_listeners.initialize(win);

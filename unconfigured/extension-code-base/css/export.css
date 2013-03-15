@@ -81,6 +81,20 @@
     height: 13px;
     padding-bottom: 5px;
 }
+
+.delete {
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+    font-size: 120%;
+    margin-right: 5px;
+    color: #777;
+}
+
+.delete:hover {
+    color: red;
+}
+
 .confirm-delete {
     float: right;
     display: none;
@@ -107,6 +121,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    color: #777;
 }
 
 .open, .closed {
