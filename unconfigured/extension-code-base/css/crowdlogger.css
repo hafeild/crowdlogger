@@ -48,37 +48,37 @@ body.chrome-menu {
     list-style-image: url("img/pauseLogging.png") !important;
 }
 
-#crowdlogger-start-button {
+/*#crowdlogger-start-button {
     -moz-appearance: none;
     padding-left:18px !important;
     background-size: 20px 20px;
     background-repeat: no-repeat;
     width: 24px;
     height: 20px;
-}
+}*/
 
 .crowdlogger-logging-off-icon {
-    background-image: url("img/crowdlogger-logo.001.not-logging.48x48.png") !important;
+    list-style-image: url("img/crowdlogger-logo.001.not-logging.16x16.png") !important;
 }
 
 .crowdlogger-logging-on-icon {
-    background-image: url("img/crowdlogger-logo.001.logging.48x48.png") !important;
+   list-style-image: url("img/crowdlogger-logo.001.logging.16x16.png") !important;
 }
 
 .crowdlogger-logging-off_low_alert-button {
-    background-image: url("img/crowdlogger-logo.001.not-logging.alert-low.48x48.png") !important;
+    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert-low.16x16.png") !important;
 }
 
 .crowdlogger-logging-on_low_alert-button {
-    background-image: url("img/crowdlogger-logo.001.logging.alert-low.48x48.png") !important;
+    list-style-image: url("img/crowdlogger-logo.001.logging.alert-low.16x16.png") !important;
 }
 
 .crowdlogger-logging-off_high_alert-button {
-    background-image: url("img/crowdlogger-logo.001.not-logging.alert-high.48x48.png") !important;
+    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert-high.16x16.png") !important;
 }
 
 .crowdlogger-logging-on_high_alert-button {
-    background-image: url("img/crowdlogger-logo.001.logging.alert-high.48x48.png") !important;
+    list-style-image: url("img/crowdlogger-logo.001.logging.alert-high.16x16.png") !important;
 }
 
 .crowdlogger-mine-log-button {
