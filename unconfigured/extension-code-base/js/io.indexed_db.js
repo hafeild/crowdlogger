@@ -1398,14 +1398,17 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 opts.on_error);
         }
 
+        const FORWARD = 0,
+              BACKWARD = 1,
+              JUMP = 2;
 
         var upper_bound = opts.upper_bound, 
             lower_bound = opts.lower_bound,
-            finished = (opts.reverse && !upper_bound) || 
-                       (!opts.reverse && lower_bound === 0),
-            sent_upper_bound, sent_lower_bound,
-            last_call_backwards = false,
-            nothing_sent = false;
+            resent = false,
+            last_call = FORWARD,
+            nothing_sent = false,
+            end_reached = false;
+            aborted = false;
 
 
         // This is a wrapper to assist with the issue of closures. If we just
@@ -1414,35 +1417,52 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         // invocation. This wrapper freezes it, so to speak, so that the version
         // at invocation is the same as the version at execution.
         function on_chunk(b){
+            var f;
             var params = {
                 batch: b,
                 abort: abort,
                 jump: jump
             };
 
-            if( !finished || last_call_backwards ){
-                params.forward = forward;
-            }
-            if( !finished || !last_call_backwards ){
-                params.backward = backward;
-            }
+            nothing_sent = b.length === 0;
 
-            if( !finished ){
-                sent_upper_bound = Math.max(b[0].id,b[b.length-1].id);
-                sent_lower_bound = Math.min(b[0].id,b[b.length-1].id);
-                nothing_sent = false;
+            // If there's nothing to send, we're in one of two cases:
+            //  1. we've run off the end
+            //  2. there's nothing in the db
+            // This top part takes care of case 1. Case 2 is handled below --
+            // we send nothing and don't set the 'sent_upper/lower_bound' 
+            // variables.
+            if( nothing_sent && sent_upper_bound !== undefined ){
+                lower_bound = sent_lower_bound;
+                upper_bound = sent_upper_bound;
+                resent = true;
+                f = function(){ next_chunk(opts.reverse) };
             } else {
-                nothing_sent = true;
-            }
+                end_reached = b.length < opts.chunk_size;
+                // Decide whether to provide forward/backward capabilities.
+                if( resent || end_reached ){
+                    if( last_call !== FORWARD ){
+                        params.forward = forward;
+                    } else if( last_call !== BACKWARD ){
+                        params.backward = backward
+                    }
+                } else {
+                    params.forward = forward;
+                    params.backward = backward;
+                }
 
-            crowdlogger.debug.log('In on_chunk; '+
-                'sent_upper_bound: '+ sent_upper_bound +'; '+
-                'sent_lower_bound: '+ sent_lower_bound );
-            return function(){ opts.on_chunk(params) };
+                resent = false;
+                f = function(){ opts.on_chunk(params) };
+                if( !nothing_sent ){
+                    sent_upper_bound = Math.max(b[0].id,b[b.length-1].id);
+                    sent_lower_bound = Math.min(b[0].id,b[b.length-1].id);
+                }
+            }
+            return f;
         }
 
         function abort(is_error, error_msg){
-            finished = true;
+            aborted = true;
             if( is_error && opts.on_error ){
                 setTimeout( function(){opts.on_error( error_msg );}, T );
             } else if( !is_error && opts.on_success ){
@@ -1452,17 +1472,21 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
 
         function forward(){
             crowdlogger.debug.log('In forward;');
-            last_call_backwards = false;
-            if( nothing_sent ){
+            last_call = FORWARD;
+            if( opts.reverse ){
+                upper_bound = sent_lower_bound-1;
+                lower_bound = 0;
+                next_chunk(true);
+            } else {
                 upper_bound = undefined;
-                lower_bound = 1;
-            }
-            next_chunk(opts.reverse);
+                lower_bound = sent_upper_bound+1;
+                next_chunk(false);
+            }            
         }
 
         function backward(){
             crowdlogger.debug.log('In backward;');
-            last_call_backwards = true;
+            last_call = BACKWARD;
             if( opts.reverse ){
                 upper_bound = undefined;
                 lower_bound = sent_upper_bound+1;
@@ -1476,7 +1500,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
 
         function jump(id){
             crowdlogger.debug.log('In jump;');
-            last_call_backwards = false;
+            last_call = JUMP;
             if( opts.reverse ){
                 upper_bound = id;
                 lower_bound = 0;
@@ -1489,11 +1513,16 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
 
         // Process one chunk.
         function next_chunk(reverse, unshift){
-            // This will hold the batches of items. It's essentially a buffer.
+            if( aborted ){
+                if( opts.on_success ){
+                    setTimeout(opts.on_success, T);
+                }
+                return;                
+            }
+
+            // This will hold the batches of items. 
             var batch = [],
-                sent = false,
-                size = 0;
-            finished = false;
+                sent = false;
 
             crowdlogger.debug.log('In next_chunk; '+
                 'upper_bound: '+ upper_bound +'; '+
@@ -1509,14 +1538,11 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                     if(!entry){
                         return {stop: false};
                     }
-
                     if( unshift ){
                         batch.unshift(entry);
                     } else {
                         batch.push(entry);
                     }
-
-                    size = batch.length;
 
                     // If the buffer is at capacity (chunk_size), then empty it
                     // by invoking on_chunk.
@@ -1542,11 +1568,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 on_success: function(){
                     console.log('In on_success');
                     // At the end, check if we need to empty the buffer one last 
-                    // time.
-                    if( !opts.chunk_size || size < opts.chunk_size ){
-                        finished = true;
-                    }
-                        
+                    // time.                    
                     if( !sent ){
                         setTimeout(on_chunk(batch), T);
                     }

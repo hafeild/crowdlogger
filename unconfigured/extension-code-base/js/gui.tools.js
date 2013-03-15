@@ -704,11 +704,18 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
             entries_elm.empty();
 
-
+            // Populate the screen.
             while( info.batch.length > 0 ){
-                entries_elm.append(generate_entry_elm(info.batch.shift()));
+                var entry = info.batch.shift();
+                try{
+                    entries_elm.append(generate_entry_elm(entry));
+                } catch(e) {
+                    CROWDLOGGER.debug.log('Error displaying entry: '+ e);
+                    CROWDLOGGER.debug.log(JSON.stringify(entry));
+                }
             }
 
+            // Add the forward/backward buttons.
             if( info.forward ){
                 add_listener(forward_elm, 'click', function(){
                     CROWDLOGGER.debug.log('FORWARD CLICKED');

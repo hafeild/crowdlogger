@@ -812,7 +812,7 @@ CROWDLOGGER.util.to_search_url = function( query, search_engine, html ){
  */
 CROWDLOGGER.util.getFaviconURL = function(url, shorten){
     shorten = shorten === undefined || shorten;
-    url = url || '';
+    url = url || 'about:blank';
 
     if( shorten ){
         var match = url.match('[^/]*/[^/]*/[^/]*');
