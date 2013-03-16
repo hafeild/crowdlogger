@@ -1,10 +1,11 @@
 <html>
 <head>
-<!-- Load jQuery first. -->
+<!-- Load jQuery first and supporting libraries. -->
 <script src="../js/external_lib/jquery.min.js"></script>
 <script src="../js/external_lib/jquery-ui.min.js"></script>
 <script src="../js/external_lib/date.js"></script>
 
+<!-- All the core CrowdLogger stuff. -->
 <script src="../js/main.js" ></script>
 <script src="../js/version.info.js" ></script>
 <script src="../js/debug.js" ></script>
@@ -12,8 +13,6 @@
 <script src="../js/preferences.js" ></script>
 <script src="../js/version.util.js" ></script>
 <script src="../js/preferences.defaults.js" ></script>
-<!-- <script src="../js/io.file.js" ></script>
-<script src="../js/io.web_sql.js" ></script> -->
 <script src="../js/io.indexed_db.js" ></script>
 <script src="../js/io.log.js" ></script>
 <script src="../js/logging.js" ></script>
@@ -23,10 +22,6 @@
 <script src="../js/gui.buttons.js" ></script>
 <script src="../js/session_data.js" ></script>
 <script src="../js/study.js" ></script>
-<!--
-<script src="../js/crypto.sjcl.js" ></script>
-<script src="../js/crypto.js" ></script>
--->
 <script src="../js/gui.windows.js" ></script>
 <script src="../js/logging.event_listeners.js"></script>
 <script src="../js/gui.tools.js" ></script>
@@ -62,29 +57,14 @@
 <script src="../js/external_lib/pidcrypt/prng4.js"></script>
 <script src="../js/external_lib/pidcrypt/rsa.js"></script>
 <script src="../js/ssss.js"></script>
-<!--
-<script>
-// Initialize everything.
-CROWDLOGGER.initialize();
-</script>
--->
-<script src="../html-js/chrome_main.js"></script>
-</head>
 
+<!-- This'll get things started. -->
+<script src="../html-js/background.js"></script>
+</head>
 <body>
 
 <textarea id="tmp-clipboard"></textarea>
-
-<iframe id="clrm"> 
-<!--
-src='data:text/html,%3Chtml%3E%3Chead%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//js/external_lib/jquery.min.js%22%3E%3C/script%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//js/api.clrmi.base.js%22%3E%3C/script%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//js/api.clrmi.user.js%22%3E%3C/script%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//js/api.clrmi.ui.js%22%3E%3C/script%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//js/api.clrmi.init.js%22%3E%3C/script%3E%3Cscript%20src=%22chrome-extension://clpdnnnfopghlajldkgmjkhdnhjnekig//html-js/clrm.js%22%3E%3C/script%3E%3Cscript%3Econsole.log(%22hi!%22)%3C/script%3E%3C/head%3E%3Cbody%3E%3C/body%3E%3C/html%3E'> 
--->
-</iframe>
-<!-- <iframe id="clrm" src="clrm.html"></iframe> -->
-<!-- <iframe id="clrm" src="http://localhost:8000/test-chrome-extension/html/clrm.html"></iframe> -->
-<!-- <iframe id="clrm" src="http://csdhcp079.csdhcp.cs.local:8000/test-chrome-extension/html/clrm.html"></iframe> -->
-
-
+<iframe id="clrm"></iframe>
 <div id='messages'></div>
 
 </body>

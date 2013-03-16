@@ -16,15 +16,16 @@
     font-style: normal;
 }
 */
-body.chrome-menu ul.flush {
+body.menu ul.flush {
     margin: 0px;
     padding: 0px;
     padding-left: 5px;
 }
-body.chrome-menu {
+body.menu {
     min-width: 300px;
-    margin-bottom:   25px;
+    /*margin-bottom:   25px;*/
     font-family: OpenSans, arial;
+    font-size: 10pt;
 }
 
 /*.menuitem-iconic, .menu-iconic-left, .menuitem-iconic-left {
@@ -58,27 +59,33 @@ body.chrome-menu {
 }*/
 
 .crowdlogger-logging-off-icon {
-    list-style-image: url("img/crowdlogger-logo.001.not-logging.16x16.png") !important;
+    list-style-image: url(
+        "img/crowdlogger-logo.001.not-logging.16x16.png") !important;
 }
 
 .crowdlogger-logging-on-icon {
-   list-style-image: url("img/crowdlogger-logo.001.logging.16x16.png") !important;
+   list-style-image: url(
+       "img/crowdlogger-logo.001.logging.16x16.png") !important;
 }
 
 .crowdlogger-logging-off_low_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert-low.16x16.png") !important;
+    list-style-image: url(
+        "img/crowdlogger-logo.001.not-logging.alert-low.16x16.png") !important;
 }
 
 .crowdlogger-logging-on_low_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.logging.alert-low.16x16.png") !important;
+    list-style-image: url(
+        "img/crowdlogger-logo.001.logging.alert-low.16x16.png") !important;
 }
 
 .crowdlogger-logging-off_high_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.not-logging.alert-high.16x16.png") !important;
+    list-style-image: url(
+        "img/crowdlogger-logo.001.not-logging.alert-high.16x16.png") !important;
 }
 
 .crowdlogger-logging-on_high_alert-button {
-    list-style-image: url("img/crowdlogger-logo.001.logging.alert-high.16x16.png") !important;
+    list-style-image: url(
+        "img/crowdlogger-logo.001.logging.alert-high.16x16.png") !important;
 }
 
 .crowdlogger-mine-log-button {
@@ -216,4 +223,17 @@ li.crowdlogger-dynamic-highlight-menu-item-end:hover {
 
 .welcome li {
     margin-bottom: 10px;
+}
+
+
+#crowdlogger-menu-frame {
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#crowdloggertoolbarmenupopup {
+    padding: 0;
+    margin: 0;
 }

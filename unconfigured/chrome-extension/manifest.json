@@ -14,13 +14,13 @@
             "48": "css/img/crowdlogger-logo.001.not-logging.48x48.png",
             "16": "css/img/crowdlogger-logo.001.not-logging.16x16.png"
         },
-        "default_popup": "html/chrome_menu.html",
+        "default_popup": "html/menu.html",
         "default_title": "%%PROJECT_NAME%%"
     },
     "update_url": "%%SERVER_BASE_URL%%/updates/chrome/update.xml",
     "options_page": "html/preferences.html",
     "background": {
-        "page": "html/chrome_main.html"
+        "page": "html/background.html"
     },
     "permissions": [
         "notifications",

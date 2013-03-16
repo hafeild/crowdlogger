@@ -90,60 +90,6 @@ CROWDLOGGER.gui.notifications.init = function(){
         }
         CROWDLOGGER.gui.buttons.update_logging_buttons();
     };
-
-//    // Firefox.
-//    if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null ){
-//        /** @ignore */
-//        notify_function = function( title, message, callback ){
-//
-//            var click_observer = {
-//                observe: function(x, status, y){ 
-//                    if( status === "alertclickcallback" ){
-//                        callback();
-//                    }
-//                }
-//            };
-//
-//            var win =
-//                Components.classes['@mozilla.org/embedcomp/window-watcher;1'].
-//                getService(Components.interfaces.nsIWindowWatcher).
-//                openWindow(null,
-//                    'chrome://crowdlogger/content/xul/alert.xul',
-//                    '_blank', 
-//                    'chrome,titlebar=no,popup=yes', 
-//                    null);
-//    
-//            win.arguments = [notification_image_url, title, message, true, null,
-//                0 /* default bottom right */, click_observer];
-//        };
-//    // Chrome.
-//    } else {
-//        /** @ignore */
-//        notify_function = function( title, message, callback ){
-//            var notification_url = CROWDLOGGER.preferences.get_char_pref(
-//                "notification_url", "notification.html" );
-//            var full_notification_url = 
-//                CROWDLOGGER.version.info.get_extension_html_prefix() + 
-//                notification_url + 
-//                "?title=" + escape( title ) + 
-//                "&text=" + escape( message ) +
-//                "&onclick=" + escape( callback );
-//
-//
-//            // Create the popup notification.
-//            var notification = webkitNotifications.createHTMLNotification(
-//                full_notification_url );
-//        
-//            // Then show the notification.
-//            notification.show();
-//
-//            // Remove it in 30 seconds.
-//            setTimeout( function(){ notification.cancel(); }, 30*1000 );
-//        };
-//    }
-//    
-//   
-//    CROWDLOGGER.gui.notifications.notify = notify_function;
 };
 
 } // END CROWDLOGGER.gui.notifications NAMESPACE

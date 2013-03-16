@@ -76,12 +76,14 @@ CROWDLOGGER.check_if_new_instance = function() {
     while(enumerator.hasMoreElements()) {
         var win = enumerator.getNext();
 
-        var util = win.QueryInterface(Components.interfaces.nsIInterfaceRequestor).
+        var util = win.QueryInterface(
+                Components.interfaces.nsIInterfaceRequestor).
                 getInterface(Components.interfaces.nsIDOMWindowUtils); 
         var window_id = util.outerWindowID;
 
 
-        if( win.CROWDLOGGER !== undefined && win.CROWDLOGGER.initialization_in_progress ) {
+        if( win.CROWDLOGGER !== undefined && 
+                win.CROWDLOGGER.initialization_in_progress ) {
             window.CROWDLOGGER = win.CROWDLOGGER;
             add_listeners();
             return;
@@ -217,16 +219,18 @@ CROWDLOGGER.initialize = function(){
     function init_buttons(){
         // These are things that need to be done for Firefox.
 
-        if( browser_name === "ff3" || browser_name === "ff4" ){
+        if( CROWDLOGGER.version.info.is_firefox ){
             //B_DEBUG
-            CROWDLOGGER.debug.log( "This is firefox. Checking if buttons have been added.\n" );
+            CROWDLOGGER.debug.log( 'This is firefox. Checking if buttons have '+
+                'been added.' );
             //E_DEBUG
 
             // Initialize the logger button if necessary.
-            CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff();
+            // CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff();
     
             // Check if this window needs a "Experiments ready to run" button.
-            CROWDLOGGER.gui.buttons.check_if_experiments_button_should_be_shown_ff();
+            CROWDLOGGER.gui.buttons.
+                check_if_experiments_button_should_be_shown_ff();
         }
 
         // Updates all of the logging buttons.
@@ -260,7 +264,7 @@ CROWDLOGGER.initialize = function(){
             
 
             // Firefox.
-            if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null){
+            if( CROWDLOGGER.version.info.is_firefox ){
 
                 var init_called = false;
 
@@ -301,7 +305,9 @@ CROWDLOGGER.check_if_new_instance();
 
 
 /*
- else if( (window.opener !== null && window.opener.CROWDLOGGER !== undefined) || (opener !== null && opener.CROWDLOGGER !== undefined) || window.parent !== window ) {
+ else if( (window.opener !== null && window.opener.CROWDLOGGER !== undefined) || 
+ (opener !== null && opener.CROWDLOGGER !== undefined) || 
+ window.parent !== window ) {
 
     var init_child_window = function( opener ) {
         var CROWDLOGGER = opener.CROWDLOGGER; 

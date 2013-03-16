@@ -9,7 +9,6 @@
  * @version %%VERSION%%
  */
 
-
 if( CROWDLOGGER.notifications === undefined ) {
 
 /**
@@ -31,7 +30,6 @@ CROWDLOGGER.notifications = {
     show_update_message:    false,
 };
 
-
 /**
  * Sets the preference 'registration_dismissed' to the given value.
  *
@@ -40,7 +38,6 @@ CROWDLOGGER.notifications = {
 CROWDLOGGER.notifications.set_registration_dismissed = function( value ) {
     CROWDLOGGER.preferences.set_bool_pref( "registration_dismissed", value );
 };
-
 
 /**
  * Returns the value of the preference 'registration_dismissed'.
@@ -52,8 +49,6 @@ CROWDLOGGER.notifications.registration_dismissed = function() {
     return CROWDLOGGER.preferences.get_bool_pref( 
         "registration_dismissed", false );
 };
-
-
 
 /**
  * Unsets the given otification (assuming it's a valid notification). This also
@@ -93,7 +88,6 @@ CROWDLOGGER.notifications.set_notification = function( notification ) {
     }
 };
 
-
 /**
  * Notifies the user that there are important notifications available. 
  * When clicked, the user will be redirected to the extension's status page.
@@ -108,30 +102,6 @@ CROWDLOGGER.notifications.launch_notification_init = function(){
     CROWDLOGGER.notifications.launch_notifications_available_alert = function(){
         CROWDLOGGER.gui.notifications.notify( "low", message );
     };
-
-    /*
-    // Firefox.
-    if( CROWDLOGGER.version.info.get_browser_name().match( /^ff/ ) !== null ){
-
-        CROWDLOGGER.notifications.launch_notifications_available_alert = 
-          function(){
-            CROWDLOGGER.gui.notifications.notify( title, message,
-                function(){
-                    CROWDLOGGER.gui.study.pages.launch_status_page();
-                }
-            );
-        };
-    // Chrome.
-    } else {
-        CROWDLOGGER.notifications.launch_notifications_available_alert = 
-          function(){
-            CROWDLOGGER.gui.notifications.notify( title, message,
-                "CROWDLOGGER.gui.study.pages.launch_status_page(); " +
-                "window.close();" );
-        };
-    }
-    */
 };
-
 
 } // END CROWDLOGGER.notifications NAMESPACE

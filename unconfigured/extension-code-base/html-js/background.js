@@ -1,5 +1,5 @@
 /**
- * @fileOverview Companion script for ../html/chrome_main.html. 
+ * @fileOverview Companion script for ../html/background.html. 
  * 
  * %%VERSION%%
  * 

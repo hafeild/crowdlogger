@@ -9,7 +9,6 @@
  * @version %%VERSION%%
  */
 
-
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://gre/modules/AddonManager.jsm')
@@ -18,17 +17,18 @@ const APP_SHELL_SERVICE = Cc['@mozilla.org/appshell/appShellService;1'].
 const XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
 var that = this;
-//var window = undefined;
 
 var CROWDLOGGER;
-var HTML_PATH = 'chrome://crowdlogger/content/html/';
-var CSS_PATH = 'chrome/content/css/';
-var CSS_FILES = ['crowdlogger.css'];
+
+const HTML_PATH = 'chrome://crowdlogger/content/html/';
+const CSS_PATH = 'chrome/content/css/';
+const CSS_FILES = ['crowdlogger.css'];
+const MENU = HTML_PATH +'menu.html';
+const BACKGROUND_PAGE = HTML_PATH+'background.html';
 
 // A map of ids to an array of 2-d elements.
 // The first is a type and the second is a function. 
 var listeners_placed = {};
-
 
 (function(scope){ 
     scope.include =  function(path){
@@ -45,7 +45,6 @@ function load_css(addon){
             css.USER_SHEET);
     }
 }
-
 
 /**
  * Creates a new XUL element of the specified name and adds all of the given 
@@ -92,19 +91,12 @@ function load_xul(){
 }
 
 function load_xul_for_window(win){
-    // If this is the first window, initialize CrowdLogger.
-    // if( !that.window ) {
-    //     that.window = win;
-    //     init_crowdlogger();
-    // }
-
     if( win === that.win ){
         return;
     }
 
     // Find the toolbar menu.
-    var toolbar_palette = 
-        win.document.getElementById('nav-bar');
+    var toolbar_palette = win.document.getElementById('nav-bar');
 
     // If the toolbar palette doesn't exist, it probably hasn't been
     // initialized yet. If CrowdLogger hasn't been completely initialized yet,
@@ -115,28 +107,23 @@ function load_xul_for_window(win){
         return;
     }
 
-    dump('In load_xul_for_window\n');
-    dump('\ttoolbar_palette: '+ toolbar_palette +'\n');
-    dump('\tCROWDLOGGER: '+ CROWDLOGGER +'\n');
-    dump('\tCROWDLOGGER.initialized: '+ CROWDLOGGER.initialized +'\n');
-
     // Add the buttons to the palette.
     // Toolbar button, which goes on the palette.
     var crowdlogger_button = create_xul_element(win, 'toolbarbutton', {
         id:             'crowdlogger-start-button',
         tooltiptext:    'Toggle search activity logging.',
         label:          'Toggle Logging',
-        // 'class':        'menu-iconic  crowdlogger-logging-off-button '+
         'class':        'menu-iconic crowdlogger-logging-off-icon',
-                        //'menu-iconic  '+
-                        //'chromeclass-toolbar-additional crowdlogger-logging-off-icon',
         type:           'menu',
         listeners:    [['load', CROWDLOGGER.gui.buttons.update_logging_buttons]]
     });
 
     // The toolbar menu -- holds all of the items (added next).
-    var crowdlogger_menu = create_xul_element(win, 'menupopup', {
-        id:             'crowdloggertoolbarmenupopup'
+    // var crowdlogger_menu = create_xul_element(win, 'menupopup', {
+    var crowdlogger_menu = create_xul_element(win, 'panel', {
+        id:             'crowdloggertoolbarmenupopup',
+        height: 'auto',
+        width: 'auto'
     });
 
     // This ties together each of the elements defined above.
@@ -144,59 +131,12 @@ function load_xul_for_window(win){
     crowdlogger_button.appendChild(crowdlogger_menu);
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'iframe', {
-        src: HTML_PATH +'chrome_menu.html',
-        id: 'crowdlogger_menu_frame',
+        src: MENU,
+        id: 'crowdlogger-menu-frame',
+        height: '100%',
+        width: '100%',
+        scrolling: 'no'
     }) );
-
-    // Add menu items.
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-logging-off-button',
-    //     id:             'crowdlogger-logging-button',
-    //     tooltiptext:    'Start logging for CrowdLogger',
-    //     label:          'Start logging',
-    //     listeners: [['command', CROWDLOGGER.logging.toggle_logging]]
-    // }));
-
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-settings-button',
-    //     id:             'crowdlogger-register-button',
-    //     tooltiptext:    'Register for CrowdLogger',
-    //     label:          'Register',
-    //     listeners: [['command', CROWDLOGGER.study.launch_registration_dialog]]
-    // }));
-
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-refer-a-friend-button',
-    //     id:             'crowdlogger-refer-a-friend-launch-button',
-    //     tooltiptext:    'Refer a friend to download CrowdLogger',
-    //     label:          'Refer a friend',
-    //     listeners: [['command', CROWDLOGGER.study.launch_refer_a_friend_dialog]]
-    // }));
-
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-settings-button',
-    //     id:             'crowdlogger-settings-button',
-    //     tooltiptext:    'Settings options for CrowdLogger',
-    //     label:          'Settings',
-    //     listeners: [['command', 
-    //         CROWDLOGGER.gui.preferences.launch_preference_dialog]]
-    // }));
-
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-show-messages-button',
-    //     id:             'crowdlogger-show-status-page-button',
-    //     tooltiptext:    'Show the study\'s status page',
-    //     label:          'Go to status page',
-    //     listeners: [['command', CROWDLOGGER.gui.study.pages.launch_status_page]]
-    // }));
-
-    // crowdlogger_menu.appendChild(create_xul_element(win, 'menuitem', {
-    //     'class':        'menuitem-iconic crowdlogger-help-button',
-    //     id:             'crowdlogger-help-button',
-    //     tooltiptext:    'Information for CrowdLogger',
-    //     label:          'Help',
-    //     listeners: [['command', CROWDLOGGER.gui.study.pages.launch_help_page]]
-    // }));
 
     win.CROWDLOGGER = CROWDLOGGER;
     CROWDLOGGER.logging.event_listeners.initialize(win);
@@ -251,15 +191,7 @@ function initHiddenWindow(callback, addon){
     if( hiddenWindow && hiddenWindow.document && 
             hiddenWindow.document.readyState === "complete" ){
         that.win = hiddenWindow;
-
-        that.win.location.href = HTML_PATH+'chrome_main.html';
-
-        //var browser = hiddenWindow.document.createElementNS(XUL_NS, 'browser')
-        //var browser = hiddenWindow.document.createElement('iframe');
-        //browser.setAttribute('src', HTML_PATH +'chrome_main.html');
-        //hiddenWindow.document.documentElement.appendChild(browser);
-        //that.win = browser.contentWindow;
-
+        that.win.location.href = BACKGROUND_PAGE;
         callback();
     } else {
         setTimeout(function(){ initHiddenWindow(callback,addon); }, 20);
@@ -330,6 +262,7 @@ var WindowListener = {
   },
 
   onCloseWindow: function(xulWindow) {
+
   },
 
   onWindowTitleChange: function(xulWindow, newTitle) {
