@@ -37,7 +37,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         write_to_log, read_log, run_transaction, foreach_entry,
         raise_error, on_crowlogger_db_upgraded, on_extension_db_upgraded,
         create_store, truncate_store, update_log, get_range, read_log_cursor,
-        db_cursor_chunk;
+        db_cursor_chunk, get_entry_from_index;
 
     // Some constants
     const DATABASE_NAME = 'crowdlogger',
@@ -45,8 +45,11 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         EXTENSION_STORE_NAME = 'data',
         ACTIVITY_LOG_STORE_NAME = 'activity_log',
         ERROR_LOG_STORE_NAME = 'error_log',
+        CLRM_STORE_NAME = 'clrms',
+        CLRM_INDEX_NAME = 'clrmid'
+        CLRM_INDEX_KEY = 'clrmid'
         DATABASE_SIZE = 10 * 1024 * 1024, // 10 MB
-        VERSION = 1,
+        VERSION = 2,
         VERSIONCHANGE = //IDBTransaction ? IDBTransaction.VERSION_CHANGE : 
             'versionchange',
         READONLY = //IDBTransaction ? IDBTransaction.READ_ONLY : 
@@ -74,6 +77,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     this.write_to_activity_log;
     this.log;
     this.write_to_extension_log;
+    this.write_to_clrm_db;
 
     // Updaters. For modifying or deleting batches of entries.
     this.update_error_log;
@@ -84,6 +88,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     this.read_error_log;
     this.read_activity_log;
     this.read_extension_log;
+    this.read_clrm_db;
+    this.get_clrm_entry;
 
     // Clearers. For dropping entire tables.
     this.clear_error_log;
@@ -221,6 +227,40 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         }
         opts.on_upgrade = opts.on_upgrade || on_extension_db_upgraded;
         opts.store_name = opts.store_name || EXTENSION_STORE_NAME;
+
+        // Write the data.
+        return write_to_log( opts );
+    };
+
+    /**
+     * Writes the given data to the activity log store.
+     *
+     * @param {object} opts  A map of options:
+     * REQUIRED:
+     * <ul>
+     *     <li>{string} data:             An array of data objects to write to 
+     *                                    the database.
+     * </ul> 
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:      Invoked when writing is complete.
+     *    <li>{function} on_error:        Invoked if there's an error.
+     * </ul>  
+     * 
+     * @throws {Error} If the required opts fields are not present.
+     */
+    this.write_to_clrm_db = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        if( !opts.data ){
+            return raise_error(
+                "Missing parameters in call to write_to_clrm_db.", 
+                opts.on_error);
+        }
+
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_name = CLRM_STORE_NAME;
 
         // Write the data.
         return write_to_log( opts );
@@ -371,6 +411,52 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         // Read the data and send it to callback.
         return update_log( opts );
     }
+
+    /**
+     * Updates entries in the activity log. 
+     * @example
+     * update_activity_log({
+     *   foreach: function(entry){ 
+     *        if(isOld(entry))              return {delete:true};
+     *        else if(needsUpdating(entry)) return {entry: update(entry)});
+     *        else                          return {}; // Do nothing.
+     *   },
+     *   on_success: function(entry)
+     * })
+     *
+     * @param {object} opts     A map consisting of several options, including:
+     * REQUIRED:
+     * <ul>
+     *    <li>{function} foreach:         A function to run on each entry. It
+     *                                    should take an entry object as its
+     *                                    only parameter and optionally return
+     *                                    an object with three optional fields:
+     *                                    entry (new data, ids must match),
+     *                                    stop (true or false),
+     *                                    delete (true or false).
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:      A function to call when all data
+     *                                    has been processed.
+     *    <li>{function} on_error:        Invoked when an error occurs.
+     * </ul>
+     */
+    this.update_clrm_db = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        if( !opts.foreach ){
+            return raise_error(
+                'Missing parameters in call to update_clrm_db.',
+                opts.on_error)
+        }
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_name = CLRM_STORE_NAME;
+
+        // Read the data and send it to callback.
+        return update_log( opts );
+    };
 
     // ** CLEARERS ** //
     /**
@@ -541,6 +627,53 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         return read_log( opts );
     };   
 
+    /**
+     * Reads the CLRM store and sends the data to the given callback
+     * (on_chunk) function. The callback should expect an array of data db
+     * entries and a next callback. If chunk_size > 0, then invoking 'next' will
+     * cause the next chunk of data to be read in.
+     *
+     * @function
+     * @member CROWDLOGGER.io.indexed_db
+     *
+     * @param {object} opts        A map of additional options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{function} on_chunk:     Invoked per chunk (see below). Chunks
+     *                                 are processed asynchronously.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
+     *                                 chunk_size = 50 will cause 50 entries to
+     *                                 be read, stored in an array, and then
+     *                                 passed to the on_chunk function. If <=0,
+     *                                 all entries will be read in before 
+     *                                 calling on_chunk. This is approximate
+     *                                 because ranges are used and therefore
+     *                                 deleted items within that range will not
+     *                                 be read (their id's are not reused).
+     *                                 Default: 0.
+     *    <li>{bool} reverse:          If true, the data will be read in reverse
+     *                                 order of id. Default is 'false'.
+     *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
+     *    <li>{int} upper_bound:       The largest id to retrieve; default: -1
+     *                                 (all ids >= lower_bound are retrieved).
+     * </ul>
+     */
+    this.read_clrm_db = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_name = CLRM_STORE_NAME;
+
+        // Read the data and send it to callback.
+        return read_log( opts );
+    }; 
+
 
     /**
      * Reads the activity log store and sends the data to the given callback
@@ -648,6 +781,41 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         // Read the data.
         return read_log( opts );
     }; 
+
+    /**
+     * Retrieves the CLRM entry with the specified clrmid name, if it exists.
+     * 
+     * @param {object} opts        A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} clrmid:       The id of the CLRM entry to get.
+     *    <li>{function} on_success: Invoked when everything has been read.
+     *                               Should expect the matching entry.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:   Invoked if there's an error.
+     * </ul>     
+     */
+    this.get_clrm_entry = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        if( !opts.on_success || !opts.clrmid ){
+            return raise_error(
+                "Missing parameters in call to get_clrm_entry.",
+                opts.on_error);
+        }
+
+        opts = crowdlogger.util.copy_obj(opts);
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_name = CLRM_STORE_NAME;
+        opts.key = opts.clrmid;
+        opts.index_name = CLRM_INDEX_NAME;
+
+        // Read the data.
+        return get_entry_from_index( opts );
+    };
+
 
     /**
      * Gets the version of the specified database.
@@ -846,6 +1014,13 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
             db: db, 
             store_name: ERROR_LOG_STORE_NAME
         });
+        var store = create_store({
+            db: db,
+            store_name: CLRM_STORE_NAME
+        });
+        if( store ){
+            store.createIndex(CLRM_INDEX_NAME, CLRM_INDEX_KEY, {unique: true});
+        }        
     }
 
     /**
@@ -1666,6 +1841,65 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     };
 
     /**
+     * Reads an entry from an index.
+     *
+     * @param {function} opts      A map of options:
+     * REQUIRED:
+     * <ul>
+     *     <li>{object} db_name:    The name of the database.
+     *     <li>{String} store_name: The store name.
+     *     <li>{function} on_success: Called with the entry as a parameter. 
+     *     <li>{string} index_name: The name of the index.
+     *     <li>{string} key:        The key of the entry to look up.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:  What to call when there's an error. 
+     * </ul>
+     * 
+     * @throws {Error} If there are missing required opts fields.
+     */
+    get_entry_from_index = function(opts){
+        if( !opts || !opts.db_name || !opts.store_name || !opts.on_success ||
+                !opts.on_upgrade || !opts.index_name || !opts.key ){
+            opts = opts || {};
+            return raise_error(
+                "Missing parameters in call to get_entry_from_index.", 
+                opts.on_error);
+        }
+
+        if( db_connections[opts.db_name] ){
+            return run_transaction({
+                db: db_connections[opts.db_name],
+                stores: [opts.store_name],
+                mode: READONLY,
+                f: function(t){
+                    var store = t.objectStore(opts.store_name);
+                    var request = store.index(opts.index_name).get(opts.key);
+                    request.onsuccess = function(event){
+                        opts.on_success(request.result);
+                    };
+                    request.onerror = function(e){
+                        if( opts.on_error ){ opts.on_error(e.target.errorCode); }
+                    }
+                },
+                on_success: opts.on_success,
+                on_error: opts.on_error
+            });
+        } else {
+            return open_db({
+                db_name: opts.db_name,
+                db_version: opts.db_version,
+                on_upgrade: opts.on_upgrade,
+                on_error: opts.on_error,
+                on_success: function(db){
+                    get_entry_from_index(opts);
+                }
+            });
+        }
+    };
+
+    /**
      * Writes data to the given database and table. Each item in the
      * data is written as a single entry (i.e., no columns). The item's id field
      * will be used as the key. If it has no id field, then a new one will be
@@ -1844,7 +2078,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
             return opts.db.createObjectStore(opts.store_name, 
                 {keyPath: "id", autoIncrement: true});
         } else {
-            return true;
+            return false;
         }
     };
 

@@ -354,7 +354,7 @@ CROWDLOGGER.study.launch_registration_dialog = function(){
     var url = extension_prefix + registration_page;
 
     // Open the window and call the handler when the page loads.
-    CROWDLOGGER.gui.windows.open_dialog( url, "registration", 
+    CROWDLOGGER.gui.windows.open_dialog( url, '', //"registration", 
         CROWDLOGGER.study.registration.initialize_registration_page );
 };
 

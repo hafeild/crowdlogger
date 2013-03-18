@@ -53,7 +53,7 @@ CROWDLOGGER.gui.study.pages.welcome.modify_start_page = function(  welcome_doc,
     // Is this a new install or an update?
     var new_install_elm = starter_doc.getElementById( "new_install" );
     var update_elm = starter_doc.getElementById( "update" );
-    if( CROWDLOGGER.preferences.get_bool_pref( "first_load", true ) ){
+    if( CROWDLOGGER.version.info.first_start_after_install ){
         new_install_elm.style.display = "block";
         update_elm.style.display = "none";
         CROWDLOGGER.preferences.set_bool_pref( "first_load", false )

@@ -12,7 +12,7 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
 html {
-    font-family: "Open Sans", arial;
+    font-family: "Open Sans", times;
 }
 
 body {
@@ -21,7 +21,8 @@ body {
     padding-bottom:         10px;
     /*width:                  850px;*/
     color: #464646;
-    size: 12pt;
+    font-size: 12pt;
+    position: relative;
 }
 
 body.welcome {
@@ -31,13 +32,67 @@ body.welcome {
 }
 
 body.menu, body.copyright {
-    background-color:       white;
+    background-color:rgba(255,255,255,0.0);
     text-align:             center;
 }
 
+body.share {
+    background-color:rgba(255,255,255,0.0);
+    padding: 3px;
+    height: 60px;    
+    width: 450px;
+}
+
+.share-container div.icon {
+    display: inline-block;
+    overflow: visible;
+    margin-left: 0;
+    float: left;
+    height: 40px;
+}
+
+.share-container .fb_ltr {
+    margin-top: -3px;
+}
+
+.icon.gplus-one{
+    width: 65px !important;
+}
+
+.icon.gplus-share iframe, .icon.facebook iframe {
+    height: 30px !important;
+}
+.icon.facebook iframe  {
+    width: 150px !important;
+}
+.icon.twitter{
+    width: 80px !important;
+}
+
 .menu-frame {
-    margin-top: 30px;
-    margin-bottom: -20px;
+    z-index: 10;*/
+    position: absolute;
+    top: 65px;
+    margin-left: auto;
+    margin-right:auto;
+}
+
+div.share-iframe {
+    position: absolute;
+    top: 3px;
+    width: 450px;
+    left: 230px;
+    overflow: visible;
+    opacity: .3;
+}
+
+div.share-iframe:hover {
+    opacity: 1.0;
+}
+
+.share-iframe iframe {
+    height: 60px;
+    width: 450px;
 }
 
 .copyright {
@@ -67,48 +122,61 @@ body.menu, body.copyright {
     width:                  350px;
 }
 
-
 .title {
-    float:                  left;
     width: 100%;
     position: relative;
+    padding: 0;
+    margin: 0;
+    /*height: 30px;*/
+    height: 70px;
 }
 
-.titleMain{ 
-    display: block;
-    /*float: right;*/
+.logo {
+    /*width: 150px;*/
+    /*float: left;*/
+    height: 70px;
     position: absolute;
-    right: 20px;
-    bottom:0px;
-    margin-top: 20px;
-    margin-right: 25px;
-
-    color: #666;
-    font-size: 260%;
-
-/*    font-size:              2.0em;
-    font-weight:            normal;
-    font-family:            sans-serif;
-    color:                  black;*/
-    /*font-style:             italic;*/
-    
+    left: 0px;
+    top: 0px;
 }
 
-.titleSmall{ 
-    font-size:              1.1em;
-    line-height:            8px;
-    padding-left:           60px;
-    font-style:             italic;
-    color:                  lightgray;
+.titleMain {
+    /*display: block;*/
+    padding: 0;
+    margin: 0;
+    color: #555;
+    font-size: 265%;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-weight: lighter;
 }
 
+.titleSub {
+    display: block;
+    padding: 0;
+    margin: 0;
+    color: #555;
+    font-size: 200%;
+    position: absolute;
+    left: 15px;
+    top: 0px;
+    font-weight: lighter;
+}
 
-.titleSub{ 
-    font-size:              1.5em;
-    padding-left:           25px;
+.logo-version{ 
+    display: block;
+    position:absolute;
+    left: 60px;
+    top: 5px;
+    font-size:              93%;
     font-weight:            normal;
     font-style:             italic;
-    color:                  lightgray;
+    color:                  orange;
+}
+
+.header {
+    height: 90px;
 }
 
 .headerBuffer {
@@ -253,7 +321,9 @@ span.disabled:active {
     text-align:             center;
 }
 
-
+h1, h2, h3, h4 {
+    font-weight: normal;
+}
 
 h1 {
     /*margin-top: 20px;*/
@@ -427,11 +497,6 @@ span.messageSummary {
     color:                  steelblue;
     padding:                10px;
     border:                 2px orange solid;
-}
-
-.logo {
-    width: 200px;
-    float: left;
 }
 
 a {

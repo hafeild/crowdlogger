@@ -1,5 +1,12 @@
+<!DOCTYPE html>
+<!--
+%%LICENSE%%
+Version: %%VERSION%%
+-->
 <html>
 <head>
+    <link rel="shortcut icon" type="image/png"
+        href="images/crowdlogger-logo.001.16x16.png"/>
     <title>Uninstalling %%PROJECT_NAME%%</title>
     <link rel="stylesheet" type="text/css" media="screen" href="style/style.css">
 </head>
@@ -9,22 +16,28 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
+            <span class="logo-version">version %%VERSION%%</span>
             <img class="logo" src="images/crowdlogger-logo.002.png"/>
             <span class="titleMain">Uninstall</span><br>
             </span>
         </div>
+
+        <div id="iframe" class="menu-frame">
+           <iframe src="menu.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="70px">
+           </iframe>
+        </div>
+        <div id="share-iframe" class="share-iframe">
+           <iframe src="share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+           </iframe>
+        </div>
+
     </div>
 
     <!-- Brings us down to just below the title. -->
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
-
-
-<div id="iframe" class="menu-frame">
-   <iframe src="menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
-        height=70px>
-   </iframe>
-</div>
 
 <h1>Uninstalling %%PROJECT_NAME%%</h1>
 

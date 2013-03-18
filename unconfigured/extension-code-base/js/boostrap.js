@@ -85,6 +85,7 @@ function load_xul(){
         var win = enumerator.getNext();
         dump('Calling load_xul_for_window on current window.\n')
         load_xul_for_window(win);
+        
     }
     dump('Done with open windows.\n');
     wm.addListener(WindowListener);
@@ -97,6 +98,7 @@ function load_xul_for_window(win){
 
     // Find the toolbar menu.
     var toolbar_palette = win.document.getElementById('nav-bar');
+    var i, tabbrowser = win.gBrowser;
 
     // If the toolbar palette doesn't exist, it probably hasn't been
     // initialized yet. If CrowdLogger hasn't been completely initialized yet,
@@ -123,7 +125,8 @@ function load_xul_for_window(win){
     var crowdlogger_menu = create_xul_element(win, 'panel', {
         id:             'crowdloggertoolbarmenupopup',
         height: 'auto',
-        width: 'auto'
+        width: 'auto',
+        tooltiptext: ''
     });
 
     // This ties together each of the elements defined above.
@@ -131,7 +134,8 @@ function load_xul_for_window(win){
     crowdlogger_button.appendChild(crowdlogger_menu);
 
     crowdlogger_menu.appendChild(create_xul_element(win, 'iframe', {
-        src: MENU,
+        // Add a bit of randomness to ensure a fresh load.
+        src: MENU+'?time='+new Date().getTime(),
         id: 'crowdlogger-menu-frame',
         height: '100%',
         width: '100%',
@@ -139,6 +143,31 @@ function load_xul_for_window(win){
     }) );
 
     win.CROWDLOGGER = CROWDLOGGER;
+
+    // Reconnect any open dialog windows.
+    for(i = 0; i < tabbrowser.browsers.length; i++){
+        var tab = tabbrowser.getBrowserAtIndex(i);
+        var tab_win = tab.contentWindow;
+        if( tab_win.location.href.indexOf(HTML_PATH) === 0 ){
+            try{
+                if( tab_win.document.readyState === "complete" ){
+                    tab_win.CROWDLOGGER = CROWDLOGGER;
+                    tab_win.init();
+                } else {
+                    tab_win.location.reload();
+                    CROWDLOGGER.debug.log('Adding listener ######');
+                    tab.addEventListener('load', function(){
+                        CROWDLOGGER.debug.log('Dialog loaded; connected!');
+                        tab.contentWindow.CROWDLOGGER = CROWDLOGGER;
+                        tab.contentWindow.init();
+                    }, true);
+                };
+            } catch(e) {
+                tab_win.close();
+            }
+        }
+    }
+
     CROWDLOGGER.logging.event_listeners.initialize(win);
 }
 
@@ -223,6 +252,9 @@ function startup(data, reason) {
 }
 
 function shutdown(data, reason) {
+    CROWDLOGGER.debug.log('In shutdown function...');
+    CROWDLOGGER.gui.windows.close_all_dialogs();
+
     CROWDLOGGER.enabled = false;
 
     // Uninstall all of the listeners placed by CROWDLOGGER.

@@ -35,9 +35,9 @@ function check_if_initialized(){
         ["registration.html",
             CROWDLOGGER.gui.study.pages.welcome.modify_registration_page, 
             CROWDLOGGER.gui.study.pages.welcome.should_registration_page_be_shown], 
-        ["refer_a_friend.html",
-            CROWDLOGGER.gui.study.pages.welcome.modify_refer_a_friend_page,
-            CROWDLOGGER.gui.study.pages.welcome.should_refer_a_friend_page_be_shown],
+        // ["refer_a_friend.html",
+            // CROWDLOGGER.gui.study.pages.welcome.modify_refer_a_friend_page,
+            // CROWDLOGGER.gui.study.pages.welcome.should_refer_a_friend_page_be_shown],
         ["preferences.html",
             CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page, 
             CROWDLOGGER.gui.study.pages.welcome.should_preference_page_be_shown],
@@ -49,10 +49,15 @@ function check_if_initialized(){
     // Set the title with the appropriate version. If we cannot get
     // the version of the url, then we just don't set any version number
     // in the title (so it doesn't look weird).
-    var version_elm = document.getElementById( "version" );
     var version = get_url_param( "version" );
     if( version !== "" ){
-        version_elm.innerHTML = "version " + version;
+        jQuery('.version').text('version '+ version);
+    }
+
+    if( CROWDLOGGER.version.info.first_start_after_install ){
+        jQuery('#upgrade').hide();
+    } else {
+        jQuery('#new-install').hide();
     }
 }
 

@@ -40,9 +40,8 @@ CROWDLOGGER.gui.windows = {
  *      width and height.
  */
 CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
-    var browser_name = CROWDLOGGER.version.info.get_browser_name();
 
-    if( browser_name.match( /^ff/ ) !== null ){
+    if( CROWDLOGGER.version.info.is_firefox ){
         var tab, main_window, tab_browser, on_unload, doc;
 
         // See if there's already a tab for this dialog -- we'll only open one.
@@ -68,21 +67,6 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
         // Save the windows so we can access them later.
         CROWDLOGGER.gui.windows.open_dialogs[url]=[tab,main_window,tab_browser];
 
-        
-
-        // var on_unload = function(){
-        //     // As soon as the dialog content is unloaded (either the tab is
-        //     // closed or the user navigates away), remove the entry in the
-        //     // open_dialogs map.
-        //     CROWDLOGGER.debug.log('Url: '+ doc.location.href);
-        //     if( doc.location.href === url ){
-        //         tab_browser.contentWindow.addEventListener('unload',
-        //             on_unload, true);
-        //     } else {
-        //         delete CROWDLOGGER.gui.windows.open_dialogs[url];
-        //     }
-        // };
-
         // Invoke the callback and establish a connection to the CROWDLOGGER
         // variable so the dialog has access.
         tab_browser.addEventListener('load', function(){
@@ -95,8 +79,17 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
             // tab_browser.contentWindow.addEventListener('unload',on_unload,true);
         }, true);
 
-    } else if( browser_name === "chrome" ) {
+    } else {
         var created_tab_id;
+
+        if( CROWDLOGGER.gui.windows.open_dialogs[url] &&
+                CROWDLOGGER.gui.windows.open_dialogs[url][2].contentWindow &&
+                CROWDLOGGER.gui.windows.open_dialogs[url][2].
+                    contentWindow.location.href === url ){
+            chrome.tabs.update(CROWDLOGGER.gui.windows.open_dialogs[url][1], 
+                {selected: true});
+            return;
+        } 
 
         // This function will be called every time a tab is changed.
         // It checks if the updated tab is the one we created and if it
@@ -121,6 +114,10 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
                     // Remove the tab.
                     chrome.tabs.onUpdated.removeListener( change_listener );
             
+                    CROWDLOGGER.gui.windows.open_dialogs[url] = [
+                        url, tab_id, doc.defaultView
+                    ]
+
                     // Invoke the caller's callback function with the
                     // document object.
                     callback( doc );
@@ -133,9 +130,23 @@ CROWDLOGGER.gui.windows.open_dialog = function( url, name, callback, options ){
 
         // Create the tab and store the tab id.
         chrome.tabs.create( {url: url}, function(tab){ 
-            created_tab_id = tab.id; } ); 
+            created_tab_id = tab.id; } );
     }
 };
+
+CROWDLOGGER.gui.windows.close_all_dialogs = function(){
+    CROWDLOGGER.debug.log('Closing open dialogs...');
+    var i;
+    for( i = 0; i < CROWDLOGGER.gui.windows.open_dialogs.length; i++ ){
+        try {
+            CROWDLOGGER.debug.log('\tclosing '+ 
+                CROWDLOGGER.gui.windows.open_dialogs[i][0]);
+            CROWDLOGGER.gui.windows.open_dialogs[i][2].close();
+        } catch(e) {
+
+        }
+    }
+}
 
 /**
  * Opens the given url in a new tab in the most recent window. If a callback
@@ -175,7 +186,6 @@ CROWDLOGGER.gui.windows.open_tab = function( url, callback ){
     
 };
 
-
 /**
  * Opens a small popup window that points to the given url.
  *
@@ -186,5 +196,6 @@ CROWDLOGGER.gui.windows.open_popup = function( url, name ) {
     var popup = window.open( url, name, 'height=400,width=875,resizable' );
     popup.focus();
 };
+
 
 } // END CROWDLOGGER.gui.windows NAMESPACE

@@ -168,7 +168,6 @@ CROWDLOGGER.version.util.is_first_start_after_update = function(){
  * @return {boolean} <tt>true</tt> if this is the first start after an install.
  */
 CROWDLOGGER.version.util.is_first_start_after_install = function(){
-    var extension_version = CROWDLOGGER.version.info.get_extension_version();
     var stored_version = CROWDLOGGER.preferences.get_char_pref( 'version', '' );
 
     return stored_version === '';
@@ -201,12 +200,14 @@ CROWDLOGGER.version.util.check_if_first_startup_after_update = function(){
         CROWDLOGGER.debug.log( 'First start after install.\n' ); 
         //E_DEBUG
 
+        CROWDLOGGER.version.info.first_start_after_install = true;
         CROWDLOGGER.version.util.launch_welcome_page();
         return true;
     } else if( CROWDLOGGER.version.util.is_first_start_after_update() ) {
         //B_DEBUG
         CROWDLOGGER.debug.log( 'First start after update.\n' ); 
         //E_DEBUG
+        CROWDLOGGER.version.info.first_start_after_update = true;
 
         // Create appropriate notifications.
         if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){

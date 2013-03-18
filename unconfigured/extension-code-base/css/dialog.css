@@ -39,6 +39,8 @@ body {
     height:                 100%;
     padding-bottom:         10px;
     /*width:                  850px;*/
+    color: #464646;
+    position: relative;
 }
 
 body.welcome {
@@ -50,6 +52,7 @@ body.welcome {
 .welcome table, .welcome tr, .welcome td{
     margin:                 0;
     padding:                0;
+    width: 100%;
 }
 
 .bodyWrapper {
@@ -90,9 +93,17 @@ body.welcome {
     color:                  lightgray;
 }*/
 
+.header {
+    width: 100%;
+}
+
 .logo {
-    width: 200px;
-    float: left;
+    /*width: 150px;*/
+    /*float: left;*/
+    height: 70px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
 }
 
 .title {
@@ -100,10 +111,15 @@ body.welcome {
     position: relative;
     padding: 0;
     margin: 0;
+    /*height: 35px;*/
+}
+
+.title.with-logo {
+    height: 70px;
 }
 
 .titleMain {
-    display: block;
+    /*display: block;*/
     padding: 0;
     margin: 0;
     color: #555;
@@ -114,13 +130,28 @@ body.welcome {
     font-weight: lighter;
 }
 
+.titleSub {
+    display: block;
+    padding: 0;
+    margin: 0;
+    color: #555;
+    font-size: 200%;
+    position: absolute;
+    left: 15px;
+    top: 0px;
+    font-weight: lighter;
+}
 
-.titleSub{ 
-    font-size:              1.5em;
-    padding-left:           25px;
+
+.logo-version{ 
+    display: block;
+    position:absolute;
+    left: 60px;
+    top: 5px;
+    font-size:              93%;
     font-weight:            normal;
     font-style:             italic;
-    color:                  lightgray;
+    color:                  orange;
 }
 
 .headerBuffer {
@@ -243,18 +274,56 @@ span.disabled:active {
 }
 
 
+h1, h2, h3, h4 {
+    font-weight: normal;
+}
+
+h1 {
+    /*margin-top: 20px;*/
+    font-size: 180%;
+    color: #666;
+    border: none;
+}
+
+h2, h3 {/*
+    margin-top: 25px;
+    margin-bottom: 0px;*/
+    padding: 0px;
+    font-size: 130%;
+    color: steelblue;
+    border: none;
+}
+
+h3 {
+    color: #97bad7;
+    font-weight: normal;
+    /*margin-top: 20;*/
+    font-size: 120%;
+    /*font-style: italic;*/
+}
+
+h4 {
+    font-weight: normal;
+    font-size: 115%;
+/*    margin-top: 15;
+    margin-bottom: 15;*/
+    color: #3b709a;
+}
+
+h2 {
+    /*margin-top: 50px;*/
+}
+
+/*
 h1, h2 {
     font-size:              1.3em;
-    /*font-family:            sans-serif;*/
     font-weight:            normal;
-/*    width:                  80%;*/
-    border-bottom:          1px lightsteelblue solid;
 }
 
 h2 {
     font-size:              1.1em;
 }
-
+*/
 h2 a {
     text-decoration:        none;
 }
@@ -325,8 +394,6 @@ td.date {
     font-style:             italic;
 }
 
-
-
 .alreadyRegistered {
     color:                  red;
 }
@@ -370,7 +437,6 @@ span.messageSummary {
     color:          gray;
 }
 
-
 .update_message {
     /*font-weight:            bold;*/
     font-size:              1.1em;
@@ -387,9 +453,6 @@ span.messageSummary {
     border:                 steelblue 1px solid;
     padding:                5px;
 }
-
-
-
 
 .click, .click a {
     color:                  maroon;

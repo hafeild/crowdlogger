@@ -211,7 +211,7 @@ li.crowdlogger-dynamic-highlight-menu-item-end {
 
 li.crowdlogger-dynamic-highlight-menu-item-end:hover {
     color: black;
-    cursor: default;
+    cursor: pointer;
     background-color: #FFCC66;
     border:         2px darkorange solid;
     font-weight:    bold;

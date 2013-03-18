@@ -713,10 +713,6 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                     (!force && e.type === 'focus' && is_focused) ){
                 return;
             }
-
-            CROWDLOGGER.debug.log(
-                'e.type: '+ e.type +'; is_focused: '+ is_focused +'; url: '+
-                doc.URL+'');
     
             info = {
                     time: new Date().getTime(),

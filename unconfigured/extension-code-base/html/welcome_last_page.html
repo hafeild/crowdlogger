@@ -1,12 +1,13 @@
+<!DOCTYPE html>
 <!--
  File:      welcome_last_page.html
  Author:    Henry Feild
  Date:      06-Apr-2011
  Purpose:   This is a blank template for html files in this extension.
 
-%%VERSION%%
+%%LICENSE%%
+Version: %%VERSION%%
 -->
-
 <html>
 <head>
     <link rel="shortcut icon" type="image/png"
@@ -26,7 +27,7 @@
 <div class="bodyWrapper">
 
     <!-- The header. -->
-    <div class="header">
+<!--     <div class="header">
         <div class="title"> 
             <span class="titleMain">Important Information</span><br>
             <span id="subtitle">
@@ -35,14 +36,29 @@
                 <br>
             </span>
         </div>
+    </div> -->
+
+    <div class="header">
+        <div class="title with-logo"> 
+            <span class="logo-version version titleSub">version %%VERSION%%</span>
+            <img class="logo" src="../css/img/crowdlogger-logo.002.png"/>
+            <span class="titleMain">A couple last things</span>
+        </div>
     </div>
-    
+   
+
     <!-- Brings us down to just below the title. -->
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-    <h1>Using the logger</h1>
+    <h1>Let your friends know about %%PROJECT_NAME%%!</h1>
+    <div style="height:40px; overflow: visible">
+        <iframe src="%%HOMEPAGE%%/share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+        </iframe>
+    </div>
 
+    <h1>Using %%PROJECT_NAME%%</h1>
     Before you exit this wizard, we just want to let you know how to interact with the logger. Here are some important notes:
 
     <ul class="welcome">

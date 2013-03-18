@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
  File:      registration.html
  Author:    Henry Feild
@@ -5,8 +6,8 @@
  Purpose:   Provides a registration GUI for the user.
 
 %%LICENSE%%
+Version: %%VERSION%%
 -->
-
 <html>
 <head>
     <link rel="shortcut icon" type="image/png"
@@ -25,7 +26,7 @@
 <span class="hidden" id="init"></span>
 <div class="bodyWrapper">
 
-    <div class="header">
+<!--     <div class="header">
         <div class="title"> 
             <span class="titleMain">Preferences Page</span><br>
             <span id="subtitle">
@@ -35,7 +36,17 @@
             </span>
         </div>
     </div>
-    
+     -->
+
+    <div class="header">
+        <div class="title with-logo"> 
+            <span class="logo-version version titleSub">version %%VERSION%%</span>
+            <img class="logo" src="../css/img/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Settings</span>
+        </div>
+    </div>
+
+
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 

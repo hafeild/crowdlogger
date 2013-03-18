@@ -53,7 +53,9 @@ CROWDLOGGER.gui.buttons.current = {
     logging_off_hover_text: 
         CROWDLOGGER.gui.buttons.defaults.logging_off_hover_text,
     status_page_class: 
-        CROWDLOGGER.gui.buttons.defaults.status_page_class
+        CROWDLOGGER.gui.buttons.defaults.status_page_class,
+    menu_label_logging_on: '[Logging: on] Click to pause logging',
+    menu_label_logging_off: '[Logging: paused] Click to start logging'
 };
  
 /**
@@ -123,7 +125,8 @@ CROWDLOGGER.gui.buttons.update_logging_buttons = function( turn_logging_on ) {
             CROWDLOGGER.gui.buttons.defaults.logging_off_hover_text,
         menu_label: '[Logging: paused] Click to start logging',
         status_page_class: 
-            CROWDLOGGER.gui.buttons.current.status_page_class
+            CROWDLOGGER.gui.buttons.current.status_page_class,
+
     };
 
     var display_data = logging_off_data;

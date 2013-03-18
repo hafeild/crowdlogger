@@ -25,7 +25,9 @@ if( CROWDLOGGER.version.info === undefined ){
  */
 CROWDLOGGER.version.info = {
     is_firefox: false,
-    is_chrome: false
+    is_chrome: false,
+    first_start_after_update: false,
+    first_start_after_install: false
 };
 
 CROWDLOGGER.version.info.init = function(){

@@ -1,7 +1,7 @@
 /**
  * @fileOverview Companion script for ../html/menu.html. 
  * 
- * %%VERSION%%
+ * %%LICENSE%%
  * 
  * @author hfeild
  * @version %%VERSION%%
@@ -34,7 +34,7 @@ jQuery(document).ready(function(){
     }
 
     // Re-style the status page button (this class name might be empty).
-    jQuery('crowdlogger-show-status-page-button').
+    jQuery('#crowdlogger-show-status-page-button').
         addClass(CROWDLOGGER.gui.buttons.current.status_page_class);
 
     // In Firefox, the default behavior is for this popup to be loaded once
@@ -50,6 +50,12 @@ jQuery(document).ready(function(){
 
         // We also need to resize because the popup is kind of small...
         resize();
+
+
+        // jQuery('li').each(function(i,e){
+        //     var e = jQuery(e);
+        //     e.attr('tooltiptext', e.attr('title'));
+        // });
     }
 });
 
@@ -58,12 +64,22 @@ jQuery(document).ready(function(){
  */
 function refresh_icon(){
     var logging_button = jQuery('#crowdlogger-logging-button');
+    // Logging is enabled.
     if( CROWDLOGGER.preferences.get_bool_pref('logging_enabled', false ) ){
         logging_button.addClass('crowdlogger-logging-on-button').
                        removeClass('crowdlogger-logging-off-button');
+        logging_button.html(
+            CROWDLOGGER.gui.buttons.current.menu_label_logging_on);
+        logging_button.attr('title', 
+            CROWDLOGGER.gui.buttons.current.logging_on_hover_text);
+    // Logging is disabled.
     } else {
         logging_button.removeClass('crowdlogger-logging-on-button').
-                       addClass('crowdlogger-logging-off-button');        
+                       addClass('crowdlogger-logging-off-button'); 
+        logging_button.html(
+            CROWDLOGGER.gui.buttons.current.menu_label_logging_off);
+        logging_button.attr('title', 
+            CROWDLOGGER.gui.buttons.current.logging_off_hover_text);       
     }
 }
 
@@ -112,8 +128,8 @@ function add_listeners(){
                 break;
 
             case 'crowdlogger-show-status-page-button':
-               CROWDLOGGER.gui.study.pages.launch_status_page(); 
-               exit();  
+                CROWDLOGGER.gui.study.pages.launch_status_page(); 
+                exit();  
                 break;
 
             case 'crowdlogger-help-button':
