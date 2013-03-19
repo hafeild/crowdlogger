@@ -10,8 +10,6 @@
  * @version %%VERSION%% 
  */
 
-
-
 if( CROWDLOGGER === undefined ) {
     
 /**
@@ -152,6 +150,7 @@ CROWDLOGGER.initialize = function(){
         CROWDLOGGER.uninstall.init();
         CROWDLOGGER.version.util.init();
         CROWDLOGGER.api = {cli: new CLI(CROWDLOGGER)};
+        CROWDLOGGER.clrm = new CLRM(CROWDLOGGER);
 
         // Print out version info.
         report_version_info();

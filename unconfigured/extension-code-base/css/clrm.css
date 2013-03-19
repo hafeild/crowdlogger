@@ -1,0 +1,82 @@
+.clrm {
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    border: 2px lightgray solid;
+    border-radius: 10px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.clrm:hover {
+    cursor: pointer;
+    background-color: #f6f6f6;
+    /*color: white;*/
+    border: 2px orange solid;
+}
+
+.clrm img {
+    width: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2px;
+}
+.clrm .name {
+    display: block;
+    font-size: 8pt;
+    position: absolute;
+    bottom: 2px;
+    width: 100%;
+    text-align: center;
+}
+
+.info {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    display: none;
+    background-color: white;
+    border: 1px gray solid;
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 10pt;
+    z-index: 10;
+    box-shadow: 0px 0px 20px #888888;
+}
+.info h2 { 
+    margin: 0;
+    line-height: 1;
+}
+
+
+.install-ribbon {
+    background-color: orange;
+    font-size: 8pt;
+    color: white;
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    right: -40px;
+    box-shadow: 0px 2px 3px #888888;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+}
+
+.clrm-container {
+    position: static;
+    display: inline;
+    margin: 5px;
+}
+
+.clrm-container.installed .not-installed {
+    display: none;
+}
+
+.clrm-container.not-installed .installed {
+    display: none;
+}

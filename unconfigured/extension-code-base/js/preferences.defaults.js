@@ -71,6 +71,7 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     consent_body_url: ['/consent/consentBody.php' , '1.7.4'],
     consent_accepted_url: ['/consent/consentAccepted.php' , '1.7.4'],
     registration_id_verification_url: ['/register/verifyId.php', '1.7.4'],
+    clrm_listing_url: ['/clrms/clrms.json', '1.7.4'],
 
     // Client-side pages.
     consent_dialog_url: ['consent_form.html', '1.4.2'],
@@ -86,6 +87,8 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     firefox_4_update_help_url: ['firefox_4_update_help.html', '1.4.2'],
     chrome_update_help_url: ['chrome_update_help.html', '1.4.2'],
     dev_tools_url: ['dev_tools.html', '1.7.3'],
+    clrm_library_url: ['clrm-library.html', '1.7.4'],
+    
     version: ['', '0'],
     'crowdlogger-logging-off-icon': 
         ['crowdlogger-logo.001.not-logging.48x48.png', '1.7.4'],

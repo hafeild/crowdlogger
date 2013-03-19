@@ -132,6 +132,11 @@ function add_listeners(){
                 exit();  
                 break;
 
+            case 'crowdlogger-clrm-library-button':
+                CROWDLOGGER.clrm.launchCLRMLibraryPage(); 
+                exit();  
+                break;
+
             case 'crowdlogger-help-button':
                 CROWDLOGGER.gui.study.pages.launch_help_page(); 
                 exit(); 

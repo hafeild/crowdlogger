@@ -197,5 +197,12 @@ CROWDLOGGER.gui.windows.open_popup = function( url, name ) {
     popup.focus();
 };
 
+/**
+ * Gets the local url for a page given its preference name.
+ */
+CROWDLOGGER.gui.windows.get_local_page = function(pref_name){
+    return CROWDLOGGER.version.info.get_extension_html_prefix() +
+           CROWDLOGGER.preferences.get_char_pref(pref_name, 'not_found.html' );
+};
 
 } // END CROWDLOGGER.gui.windows NAMESPACE

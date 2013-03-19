@@ -102,24 +102,6 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
                 // We want to inject this script into all frames.
                 allFrames: true
             });
-
-            // Update the tab information and log a focus, if necessary.
-            // if( tab.selected ){
-            // // &&
-            // // tab.url !== CROWDLOGGER.session_data.last_selected_tab.url ){
-
-            //     // Log the focus event.
-            //     // CROWDLOGGER.logging.log_page_focused(new Date().getTime(),
-            //     //     tab_id, tab.url );
-            //     CROWDLOGGER.logging.log_tab_selected( new Date().getTime(),
-            //         tab_id, tab.url );
-
-            //     // Update the last selected tab information.
-            //     CROWDLOGGER.session_data.last_selected_tab = {
-            //         tab_id: tab_id,
-            //         url: tab.url
-            //     };
-            // }
         }
     };
 
@@ -203,52 +185,6 @@ CROWDLOGGER.logging.event_listeners.initialize_for_firefox = function(
         current_window );
 };
 
-
-
-
-// /**
-//  * Injects the script that attaches search and link listeners on content
-//  * pages Also logs that a page has been loaded. This could be called from, 
-//  * e.g., a tab updated listener.
-//  *
-//  * @param {int} tab_id The id of the tab where the script will be injected.
-//  * @param {Object} change_info An object listing what has changed.
-//  * @param {Object} tab An object describing the tab.
-//  */
-// CROWDLOGGER.logging.event_listeners.tab_update_listener_chrome = function(
-//         tab_id, change_info, tab ){
-
-//     // If this is a new page that is finished loading, inject the page code.
-//     if( change_info.status ===  "complete" ){
-//         // Log the page load.
-//         CROWDLOGGER.logging.log_page_loaded( new Date().getTime(), tab_id,
-//             tab.url );
-
-//         // Inject the code.
-//         // //B_DEBUG
-//         // CROWDLOGGER.debug.log( "Injecting script:\n" +
-//         //     String(
-//         //        CROWDLOGGER.logging.event_listeners.inject_page_listeners).
-//         //             replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, "" ).
-//         //             replace( /\s*\}\s*$/, "") );
-//         // //E_DEBUG
-
-//         chrome.tabs.executeScript( tab_id, {
-//             // Stringify the function above and remove the 'function(..){'
-//             // and '}' parts.
-//             code: String(
-//                 CROWDLOGGER.logging.event_listeners.inject_page_listeners).
-//                     replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, "" ).
-//                     replace( /\s*\}\s*$/, "").
-//                     replace( /TAB_ID/, '"'+ tab_id +'"' ).
-//                     replace( /IS_CHROME/, 'true' ).
-//                     replace( /TAB_SELECTED/, tab.selected.toString()),
-//             // We want to inject this script into all frames.
-//             allFrames: true
-//         });
-//     }
-// };
-
 /**
  * Extracts the tab id of a Firefox browser object. The method of doing this
  * is different between FF3 and FF4.
@@ -264,7 +200,6 @@ CROWDLOGGER.logging.event_listeners.extract_tab_id_ff = function(browser){
 
     return browser.uniqueID;
 };
-
 
 /**
  * Injects the script that attaches search and link listeners on content pages.
@@ -289,7 +224,6 @@ CROWDLOGGER.logging.event_listeners.add_page_load_listeners_firefox =
     }, false);
 
 };
-
 
 CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener = 
         function(the_window){
@@ -332,7 +266,6 @@ CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener =
                 Components.utils.reportError(e);
             }
         }
-
 
         var observer = CROWDLOGGER.logging.event_listeners.
             mk_listener_observer(function(){
@@ -476,11 +409,6 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
         var tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff(
             browser );
 
-        /*//B_DEBUG
-        CROWDLOGGER.debug.log(
-            "State of tab " + tab_id + " has changed: " + the_status + "\n");
-        //E_DEBUG*/
-
         // Check if the event refers to a page having finished loading.
         if ( ( state_flags & Components.interfaces.
                     nsIWebProgressListener.STATE_STOP ) &&
@@ -490,8 +418,14 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
             CROWDLOGGER.logging.event_listeners.inject_page_listeners(
                 web_progress.DOMWindow, tab_id, false,
                 CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id);
-        }
 
+            var win = browser.contentWindow;
+            if( win.location.href.indexOf(
+                    CROWDLOGGER.version.info.get_extension_html_prefix())===0 &&
+                    win.location.href.match(/\bclrm.html\b/) === null ){
+                browser.contentWindow.CROWDLOGGER = CROWDLOGGER;
+            }
+        } 
     },
 
     // This handles the event that the location bar changes, i.e., focuses.
@@ -499,29 +433,9 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
         var tab_id = CROWDLOGGER.logging.event_listeners.extract_tab_id_ff(
             browser );
         var url = the_location.spec;
-       
-        /*//B_DEBUG 
-        dump( "Location change!\n\turl: " + url + "\n\tlast url: " + 
-            CROWDLOGGER.session_data.last_selected_tab.url + "\n\ttab_id: " + 
-            tab_id + "\n\tlast tab: " + 
-            CROWDLOGGER.session_data.last_selected_tab.tab_id + "\n" );
-        //E_DEBUG*/
-
-        // Are we still on the same tab that we last selected? If so,
-        // we must have just updated the url we're looking at. Log a
-        // focus event and update the last_selected_tab info.
-        // if( tab_id === CROWDLOGGER.session_data.last_selected_tab.tab_id  &&
-        //     url !== CROWDLOGGER.session_data.last_selected_tab.url ){
-            
-        //     //CROWDLOGGER.logging.log_tab_selected(new Date().getTime(),
-        //     //    tab_id, url );
-
-        //     CROWDLOGGER.session_data.last_selected_tab.url = url; 
-        // }
 
         // Log a page load.
         CROWDLOGGER.logging.log_page_loaded( new Date().getTime(), tab_id, url); 
-
     },
 
     onProgressChange : function( a_browser, web_progress, request, 
@@ -530,8 +444,7 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
 
     onSecurityChange : function( a_browser, web_progress, request, state ) {},
 
-    onStatusChange : function( a_browser, web_progress, request, status, 
-            message ) {
+    onStatusChange: function(a_browser, web_progress, request, status, message){
         // CROWDLOGGER.debug.log('tab status change: '+ status);
     },
 
@@ -540,9 +453,6 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
 
     onLinkIconAvailable : function( a_browser ) {}
 }
-
-
-
 
 /**
  * This is a function that will attach the necessary listeners on a page,

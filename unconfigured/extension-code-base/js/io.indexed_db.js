@@ -1430,6 +1430,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                         
                         if( batch.length > 0 ){
                             setTimeout(on_chunk(batch), T);
+                        } else if( opts.on_success ){
+                            setTimeout(opts.on_success, T);
                         }
                     }
                 },

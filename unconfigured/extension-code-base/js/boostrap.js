@@ -152,16 +152,16 @@ function load_xul_for_window(win){
             try{
                 if( tab_win.document.readyState === "complete" ){
                     tab_win.CROWDLOGGER = CROWDLOGGER;
-                    tab_win.init();
-                } else {
-                    tab_win.location.reload();
-                    CROWDLOGGER.debug.log('Adding listener ######');
-                    tab.addEventListener('load', function(){
-                        CROWDLOGGER.debug.log('Dialog loaded; connected!');
-                        tab.contentWindow.CROWDLOGGER = CROWDLOGGER;
-                        tab.contentWindow.init();
-                    }, true);
-                };
+                //    tab_win.init();
+                // } else {
+                //     tab_win.location.reload();
+                //     CROWDLOGGER.debug.log('Adding listener ######');
+                //     tab.addEventListener('load', function(){
+                //         CROWDLOGGER.debug.log('Dialog loaded; connected!');
+                //         tab.contentWindow.CROWDLOGGER = CROWDLOGGER;
+                //         tab.contentWindow.init();
+                //     }, true);
+                }
             } catch(e) {
                 tab_win.close();
             }

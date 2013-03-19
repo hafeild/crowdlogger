@@ -17,6 +17,8 @@
  * script.
  */
 function init(){
+    console.log('Entering init.');
+
     // If the current page is being loaded in an iframe, this code will 
     // set the "frame_loaded" variable in the parent's window.
     try{
@@ -41,7 +43,7 @@ function init(){
             if( parent && parent.CROWDLOGGER ){
                 CROWDLOGGER = parent.CROWDLOGGER;
             } else {
-                setTimeout( init, 20 );
+                setTimeout( init, 100 );
                 return false;
             }
         }
