@@ -17,6 +17,8 @@ CLRMI.prototype.Storage = function( api, id ){
     var that = this,
         dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase();
 
+
+
     // Private function declarations.
     var init, wrapCallback;
 
@@ -25,13 +27,17 @@ CLRMI.prototype.Storage = function( api, id ){
 
     // Public function declarations.
     this.addStores, this.removeStores, this.clearStores, this.listStores,
-    this.save, this.read, this.update, this.removeDatabase; 
+    this.save, this.read, this.update, this.removeDatabase, this.preferences; 
 
     // Private function definitions.
 
     /**
      */
     init = function(){
+        that.preferences = new that.Preferences(api, {
+            wrapCallback: wrapCallback,
+            dbName: dbName
+        });
     };
 
     wrapCallback = function(opts){
@@ -242,7 +248,6 @@ CLRMI.prototype.Storage = function( api, id ){
         });
     };
 
-
     /**
      * Reads all of the data from the given store in chunks.
      *
@@ -420,6 +425,130 @@ CLRMI.prototype.Storage = function( api, id ){
         });
     };
 
+
+    init();
+};
+
+/**
+ * Provides an easy interface for setting or getting preferences. Values 
+ * can be anything serializable. This uses the same IndexedDB instance as
+ * is used for the Storage API.
+ */
+CLRMI.prototype.Storage.prototype.Preferences = function( api, storage ){
+    var that = this;
+    const PREFERENCE_STORE = '__preferences__',
+          PREFERENCE_KEY_NAME = 'name',
+          PREFERENCE_VALUE_NAME = 'value',
+          PREFERENCE_INDEX_NAME = 'name';
+
+    // Private method declarations.
+    var init;
+
+    // Public method declarations.
+    this.get, this.set;
+
+    // Private method definitions.
+    /**
+     * Initializes the preference storage.
+     */
+    init = function() {
+        var callbackID = storage.wrapCallback({});
+
+        return api.base.invokeCLIFunction({
+            apiName: 'storage',
+            functionName: 'upgradeDB',
+            options: {
+                callbackID: callbackID,
+                dbName: storage.dbName,
+                storeNames: [PREFERENCE_STORE],
+                keyName: PREFERENCE_KEY_NAME,
+                indexName: PREFERENCE_INDEX_NAME,
+                storeOp: 'createIndexStore'
+            }
+        });
+    };
+
+    // Public method definitions.
+    /**
+     * Sets a preference.
+     *
+     * @param {object} opts A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} pref          The name of the preference to set.
+     *    <li>{*} value              The value to set pref to. This can be
+     *                               anything that can be serializable.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success  The function to invoke when the value has
+     *                               been retrieved.
+     *    <li>{function} on_error    Called on error.
+     * </ul>
+     */
+    this.set = function(opts) {
+        api.util.checkArgs(opts, ['pref','value'], 
+            'clrmi.storage.preferences.get');
+        var callbackID = storage.wrapCallback(opts);
+
+        var data = {};
+        data[PREFERENCE_KEY_NAME] = opts.pref;
+        data[PREFERENCE_VALUE_NAME] = opts.value;
+
+        return api.base.invokeCLIFunction({
+            apiName: 'storage',
+            functionName: 'save',
+            options: {
+                callbackID: callbackID,
+                dbName: storage.dbName,
+                storeName: PREFERENCE_STORE,
+                data: [data]
+            }
+        });
+    };
+
+    /**
+     * Gets a preference value (or the default value if none is present.)
+     *
+     * @param {object} opts A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} pref          The name of the preference whose value 
+     *                               should be retrieved.
+     *    <li>{function} on_success  The function to invoke when the value has
+     *                               been retrieved.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error    Called on error.
+     *    <li>{*} defaultValue       What to return if the value of the pref
+     *                               has not been set.
+     * </ul>
+     */
+    this.get = function(opts){
+        api.util.checkArgs(opts, ['pref','on_success'], 
+            'clrmi.storage.preferences.get');
+
+        var newOpts = api.util.copyObj(opts);
+        var addDefault = function(data){
+            opts.on_success(data ? data.value : opts.defaultValue);
+        }
+        newOpts.on_success = addDefault;
+
+        var callbackID = storage.wrapCallback(newOpts);
+
+        return api.base.invokeCLIFunction({
+            apiName: 'storage',
+            functionName: 'getFromIndex',
+            options: {
+                callbackID: callbackID,
+                dbName: storage.dbName,
+                storeName: PREFERENCE_STORE,
+                indexName: PREFERENCE_INDEX_NAME,
+                key: opts.pref
+            }
+        });        
+    };
 
     init();
 };

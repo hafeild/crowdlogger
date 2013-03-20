@@ -45,6 +45,20 @@ CLRMI.prototype.Util = function(){
         }
     };
 
-
+    /**
+     * Makes a 1-level copy of the given object.
+     * 
+     * @param  {object} obj  The object to copy.
+     * @return {object} A copy of obj.
+     */
+    this.copyObj = function(obj){
+        var new_obj = {}, i;
+        if( obj ){
+            for(i in obj){
+                new_obj[i] = obj[i];
+            }
+        }
+        return new_obj;
+    };
 
 };

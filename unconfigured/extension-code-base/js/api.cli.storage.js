@@ -95,9 +95,14 @@ CLI.prototype.Storage = function(crowdlogger, cli){
      * Generates a function (to be used as an upgradeneeded function) that
      * adds each store in a list of stores to the database.
      *
-     * @param {array of strings} stores  The names of the stores to add.
+     * @param {object} opts  A map of options.
+     * REQUIRED:
+     * <ul>
+     *    <li>{array of strings} storeNames  The names of the stores to add.
+     * </ul>
      */
-    storeOps.addStores = function(stores){
+    storeOps.addStores = function(opts){
+        var stores = opts.storeNames;
         return function(db){
             var i;
             for(i = 0; i < stores.length; i++){
@@ -112,11 +117,50 @@ CLI.prototype.Storage = function(crowdlogger, cli){
 
     /**
      * Generates a function (to be used as an upgradeneeded function) that
+     * adds each store in a list of stores to the database.
+     *
+     * @param {object} opts  A map of options.
+     * REQUIRED:
+     * <ul>
+     *    <li>{array of strings} storeNames  The names of the stores to add.
+     *    <li>{string} indexName             The name of the index to create.
+     *    <li>{string} keyName               The name of the key to index.
+     * </ul>
+     * @throws CLIException if required options are missing.
+     */
+    storeOps.createIndexStore = function(opts){
+        crowdlogger.util.check_args(opts, 
+            ['storeNames', 'indexName', 'keyName'],
+            'api.cli.storage.upgradeDB', cli.CLIException, 
+            storeOps[opts.storeOp] );
+        var stores = opts.storeNames;
+
+        return function(db){
+            var i;
+            for(i = 0; i < stores.length; i++){
+                if( !db.objectStoreNames.contains(stores[i]) ){
+                    var store = db.createObjectStore(stores[i], 
+                        {keyPath: opts.keyName});
+                    store.createIndex(opts.indexName,
+                        opts.keyName,{unique: true});
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * Generates a function (to be used as an upgradeneeded function) that
      * removes each store in a list of stores from the database.
      *
-     * @param {array of strings} stores  The names of the stores to remove.
+     * @param {object} opts  A map of options.
+     * REQUIRED:
+     * <ul>
+     *    <li>{array of strings} storeNames  The names of the stores to add.
+     * </ul>
      */
-    storeOps.removeStores = function(stores){
+    storeOps.removeStores = function(opts){
+        var stores = opts.storeNames;
         return function(db){
             var i;
             for(i = 0; i < stores.length; i++){
@@ -148,7 +192,17 @@ CLI.prototype.Storage = function(crowdlogger, cli){
      *        </ul>
      *    <li>{string} dbName          The name of the database to open.
      *    <li>{string} storeNames      The names of the stores to work with.
-     *    <li>{string} storeOp         One of 'remove' or 'add'.
+     *    <li>{string} storeOp         One of:
+     *                                 <ul>
+     *                                    <li>'removeStores'
+     *                                    <li>'addStores'
+     *                                    <li>'createIndexStore'
+     *                                 </ul>
+     * </ul>
+     * REQUIRED FOR storeOp == 'createIndexStore':
+     * <ul>
+     *    <li>{string} indexName       The name of the index to create.
+     *    <li>{string} keyName         The name of the key to index.
      * </ul>
      * @throws CLIException if required options are missing.
      */
@@ -161,7 +215,7 @@ CLI.prototype.Storage = function(crowdlogger, cli){
 
         crowdlogger.io.log.upgrade_db({
             db_name:     opts.dbName,
-            on_upgrade:  storeOps[opts.storeOp](opts.storeNames),
+            on_upgrade:  storeOps[opts.storeOp](opts),
             on_success:  callbacks.on_success(opts.callbackID),
             on_error:    callbacks.on_error(opts.callbackID)
         });
@@ -316,6 +370,46 @@ CLI.prototype.Storage = function(crowdlogger, cli){
             lower_bound: opts.lower_bound,
             upper_bound: opts.upper_bound,
             on_chunk:    callbacks.on_chunk(opts.callbackID),
+            on_success:  callbacks.on_success(opts.callbackID),
+            on_error:    callbacks.on_error(opts.callbackID)
+        });
+    };
+
+    /**
+     * Gets the entry associated with the key (or undefined if not found). This
+     * should only be used with stores that have an index that is indexed on the
+     * given key. 
+     *
+     * @param {object} opts     A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{int} callbackID:        The id of the CLRMI function to invoke.
+     *                                 This is invoked for the following
+     *                                 events (stored in 'event') along with
+     *                                 their parameters ('params'):
+     *    <ul>
+     *        <li>{function} on_success:   Invoked when everything is read.
+     *                                     Should expect the entry.
+     *        <li>{function} on_error:     Invoked if there's an error.
+     *    </ul>
+     *    <li>{string} key:            The key value to lookup.
+     *    <li>{string} indexName:      The index to look at in the store.
+     *    <li>{string} dbName          The name of the database to open.
+     *    <li>{string} storeName       The name of the store to read.
+     * </ul>
+     * @throws Exception if required options are missing.
+     */
+    this.getFromIndex = function(opts){
+        crowdlogger.util.check_args(opts,
+            ['callbackID','dbName','storeName','indexName','key'],
+            'api.cli.storage.save', cli.CLIException, true);
+
+        // Read the log.
+        crowdlogger.io.log.get_indexed_entry({
+            db_name:     opts.dbName,
+            store_name:  opts.storeName,
+            index_name:  opts.indexName,
+            key:         opts.key,
             on_success:  callbacks.on_success(opts.callbackID),
             on_error:    callbacks.on_error(opts.callbackID)
         });

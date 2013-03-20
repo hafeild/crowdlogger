@@ -839,6 +839,41 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         return get_entry_from_index( opts );
     };
 
+    /**
+     * Retrieves an entry from a store with an index.
+     *
+     * @param {function} opts      A map of options:
+     * REQUIRED:
+     * <ul>
+     *     <li>{object} db_name:    The name of the database.
+     *     <li>{String} store_name: The store name.
+     *     <li>{function} on_success: Called with the entry as a parameter. 
+     *     <li>{string} index_name: The name of the index.
+     *     <li>{string} key:        The key of the entry to look up.
+     *     <li>{function} on_upgrade: Invoked if the database needs to be 
+     *                              updated.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_error:  What to call when there's an error. 
+     * </ul>
+     * 
+     * @throws {Error} If there are missing required opts fields.
+     */
+    this.get_indexed_entry = function( opts ){
+        opts = crowdlogger.util.copy_obj(opts);
+        if( !opts.db_name || !opts.on_success || !opts.key || !opts.index_name
+                || !opts.store_name ){
+            return raise_error(
+                "Missing parameters in call to get_indexed_entry.",
+                opts.on_error);
+        }
+
+        opts = crowdlogger.util.copy_obj(opts);
+
+        // Read the data.
+        return get_entry_from_index( opts );
+    };
 
     /**
      * Gets the version of the specified database.
@@ -1886,7 +1921,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      */
     get_entry_from_index = function(opts){
         if( !opts || !opts.db_name || !opts.store_name || !opts.on_success ||
-                !opts.on_upgrade || !opts.index_name || !opts.key ){
+                 !opts.index_name || !opts.key ){
             opts = opts || {};
             return raise_error(
                 "Missing parameters in call to get_entry_from_index.", 
