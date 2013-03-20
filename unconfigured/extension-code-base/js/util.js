@@ -107,7 +107,8 @@ CROWDLOGGER.util.disable_button = function( button_array ){
 /**
  * Cleanses a string (data) by:
  * <ul>
- *   <li>if it's a non-encrypted-google https URL, all arguments are removed</li>
+ *   <li>if it's a non-encrypted-google https URL, all arguments are removed
+ *    </li>
  *   <li>whatever it is, substrings matching the patterns are removed:
  *   <ul>
  *      <li>phone number</li> 
@@ -198,11 +199,11 @@ CROWDLOGGER.util.compare_version_numbers = function( v1, v2 ) {
     v2_parts = v2.split( /\./ );
 
     // We want to compare the overlapping segments between the two versions.
-    length = Math.min( v1_parts.length, v2_parts.length );
+    length = Math.max( v1_parts.length, v2_parts.length );
 
     for( var i = 0; i < length; i++ ) {
-        var cur_v1 = parseInt( v1_parts[i] );
-        var cur_v2 = parseInt( v2_parts[i] );
+        var cur_v1 = parseInt( v1_parts.length > i ? v1_parts[i] : '0' );
+        var cur_v2 = parseInt( v2_parts.length > i ? v2_parts[i] : '0' );
 
         if( cur_v1 < cur_v2 ){
             return -1;
@@ -210,17 +211,18 @@ CROWDLOGGER.util.compare_version_numbers = function( v1, v2 ) {
             return 1;
         }
     }
-
-    // If we got here, then the two version agree at least on their overlapping
-    // segments. However, if one is longer than the other, than that one is
-    // the higher version.
-    if( v1_parts.length > v2_parts.length ){
-        return 1;
-    } else if( v1_parts.length < v2_parts.length ) {
-        return -1;
-    } else {
-        return 0;
-    }
+    return 0;
+    
+    // // If we got here, then the two version agree at least on their overlapping
+    // // segments. However, if one is longer than the other, than that one is
+    // // the higher version.
+    // if( v1_parts.length > v2_parts.length ){
+    //     return 1;
+    // } else if( v1_parts.length < v2_parts.length ) {
+    //     return -1;
+    // } else {
+    //     return 0;
+    // }
 
 };
 
@@ -415,7 +417,8 @@ CROWDLOGGER.util.save_dynamic_text_stream = function( doc ) {
 
         // // After some period of time, remove this object (it could get big).
         // setTimeout( 
-        //     function(){ save_functions.revoke_object_url( saveas.src ); }, 50000 )
+        //     function(){ save_functions.revoke_object_url( saveas.src ); }, 
+        // 50000 )
     };
 
     return {
@@ -857,6 +860,8 @@ CROWDLOGGER.util.gen_link = function(url, display, limit){
         (display.length > limit ? display.substring(0, limit)+'...' : display )+
         '</a>';
 }
+
+
 
 
 } // END CROWDLOGGER.util NAMESPACE

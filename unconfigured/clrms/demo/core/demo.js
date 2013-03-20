@@ -127,7 +127,7 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
     /**
      * Removes all listeners and closes windows.
      */
-    this.unload = function(oncomplete){
+    this.unload = function(oncomplete, onerror){
         var id;
         elm.off('load.demo');
         elm.remove();
@@ -135,6 +135,16 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             openWindows[id].close();
         }
         oncomplete();
+    };
+
+    /**
+     * Deletes all databases.
+     */
+    this.uninstall = function(oncomplete, onerror){
+        clrmAPI.storage.removeDatabase({
+            on_success: oncomplete,
+            on_error: onerror
+        });
     };
 
     /**

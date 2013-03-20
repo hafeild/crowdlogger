@@ -37,10 +37,11 @@ CLI.prototype.Base = function(crowdlogger, cli){
     const MAX_INIT_ATTEMPTS = 100;
 
     // Private function declarations.
-    var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
+    var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback,
+        simpleCallbackWrapper;
 
     // Public function declarations.
-    this.loadCLRM, this.sendMessage, this.registerCallback, 
+    this.loadCLRM, this.unloadCLRM, this.sendMessage, this.registerCallback, 
     this.unregisterCallback, this.invokeCLRMICallback; 
 
 
@@ -109,6 +110,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
         messageHandlers.cliRequest = invokeCLIFunction;
         messageHandlers.cliCallback = invokeCLICallback;
+        setTimeout(crowdlogger.clrm.loadAllEnabledCLRMs, 2000);
     };
 
     /**
@@ -250,6 +252,21 @@ CLI.prototype.Base = function(crowdlogger, cli){
         return true;
     };
 
+    simpleCallbackWrapper = function(onsuccess, onerror){
+        var callbackID;
+        var callback = function(opts, callbackID){
+            if( opts.error && onerror ){
+                onerror(opts.error);
+            } else if( !opts.error && onsuccess ) {
+                onsuccess();
+            }
+
+            that.unregisterCallback(callbackID);
+        };
+        callbackID = that.registerCallback(callback);
+        return callbackID;
+    };
+
     // Public function definitions.
 
     /**
@@ -294,8 +311,26 @@ CLI.prototype.Base = function(crowdlogger, cli){
      *
      * @param {string} package     The CLRM Package as serialized JSON.
      */
-    this.loadCLRMFromString = function(package){
-        that.sendMessage({command: 'loadCLRM', package: package});
+    this.loadCLRMFromString = function(package, onsuccess, onerror){
+        that.sendMessage({
+            command: 'loadCLRM', 
+            package: package,
+            callbackID: simpleCallbackWrapper(onsuccess, onerror)
+        });
+    };
+
+    /**
+     * Unloads a CLRM Package by id.
+     *
+     * @param {string} package     The CLRM Package as serialized JSON.
+     */
+    this.unloadCLRM = function(clrmid, reason, onsuccess, onerror){
+        that.sendMessage({
+            command: 'unloadCLRM', 
+            clrmid: clrmid, 
+            reason: reason,
+            callbackID: simpleCallbackWrapper(onsuccess, onerror)
+        });
     };
 
     /**

@@ -1,29 +1,12 @@
 {
-    "app1": {
-        "clrmid": "app1",
-        "name": "APP 1",
-        "version": 1.0,
+    "demo1": {
+        "clrmid": "demo1",
+        "name": "Demo 1",
+        "version": "1.0",
         "categories": ["app"],
-        "logoURL": "",
-        "packageURL": "%%SERVER_BASE_URL%%/clrms/demo.js",
-        "description": "This is my very brief description."
-    },
-    "study1": {
-        "clrmid": "study1",
-        "name": "Study 1",
-        "version": 1.0,
-        "categories": ["study"],
-        "logoURL": "",
-        "packageURL": "%%SERVER_BASE_URL%%/clrms/study.js",
-        "description": "This is my very brief description."
-    },
-    "studyapp1": {
-        "clrmid": "studyapp1",
-        "name": "Study/App 1",
-        "version": 1.0,
-        "categories": ["study","app"],
-        "logoURL": "",
-        "packageURL": "%%SERVER_BASE_URL%%/clrms/studyapp.js",
-        "description": "This is my very brief description."
+        "description": "A simple CrowdLogger Remote Module demonstration. It shows off the ability to open windows, access user data, and use the storage API.",
+        "packageURL": "http://localhost:8000/demo.json",
+        "permissions": ["userdata", "ui", "storage"],
+        "logoURL": "http://localhost:8000/demo.jpg"
     }
 }

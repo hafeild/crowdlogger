@@ -27,7 +27,7 @@ var CLRMI = function(cli){
         // Public functions -- what will be exposed to a CLRM.
         this.user    = that.user;
         this.ui      = that.ui;
-        this.storage = new that.Storage(that, clrmiPackage.id);
+        this.storage = new that.Storage(that, clrmiPackage.metadata.clrmid);
     };
 };
 

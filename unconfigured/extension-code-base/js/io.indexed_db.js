@@ -83,6 +83,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     this.update_error_log;
     this.update_activity_log;
     this.update_extension_log;
+    this.update_clrm_db;
 
     // Readers. For reading all or subsets of entries.
     this.read_error_log;
@@ -95,6 +96,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     this.clear_error_log;
     this.clear_activity_log;
     this.clear_extension_log
+    this.clear_clrm_db;
 
     // Accessors.
     this.get_version;
@@ -530,6 +532,27 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         //opts.store_name = opts.store_name || EXTENSION_STORE_NAME;
 
         // Read the data and send it to callback.
+        return clear_log( opts );
+    };
+
+    /**
+     * Truncates the CLRM store.
+     * 
+     * @param {object} opts        A map of options:
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>     
+     */
+    this.clear_clrm_db = function( opts ) {
+        opts = crowdlogger.util.copy_obj(opts);
+        opts.db_name = DATABASE_NAME;
+        opts.db_version = VERSION;
+        opts.on_upgrade = on_crowlogger_db_upgraded;
+        opts.store_names = [CLRM_STORE_NAME];
+
+        // Clear the log.
         return clear_log( opts );
     };
 
@@ -1882,10 +1905,9 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                         opts.on_success(request.result);
                     };
                     request.onerror = function(e){
-                        if( opts.on_error ){ opts.on_error(e.target.errorCode); }
+                        if( opts.on_error ){ opts.on_error(e.target.errorCode);}
                     }
                 },
-                on_success: opts.on_success,
                 on_error: opts.on_error
             });
         } else {

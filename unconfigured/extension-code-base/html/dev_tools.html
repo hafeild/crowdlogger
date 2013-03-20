@@ -95,12 +95,14 @@ Version: %%VERSION%%
     <!-- Test CLRM loading. -->
     <div class="tools section">
         <a name="clrm"></a>
-        <h1>CrowdLogger Remote Loading Test</h1>
+        <h1>CrowdLogger Remote Module Loading Test</h1>
         <div id="clrm-loading">
             Add the URL of the JS file to load:<br/>
             <input style="width: 200px" type="text" id="clrm-url" 
                 value="http://localhost:8000/demo.json"/> 
             <a href="#" id="load-clrm">Load</a>
+            <span id="clrm-success" style="display: none; color: green;">Success</span>
+            <span id="clrm-error" style="display: none; color: red;">ERROR</span>
         </div>
     </div>
 

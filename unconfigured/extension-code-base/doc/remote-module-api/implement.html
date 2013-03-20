@@ -55,6 +55,13 @@ A CLRM Package is a JSON object with the following fields:
     <tr>
         <th>Field</th> <th width="125px">Type</th> <th>Description</th> 
     </tr><tr>
+        <td><code>metadata</code></td>
+        <td>object</td>
+        <td>Contains information about the package, such as id, as well as
+            display information (e.g., name and description). 
+            <a href="#implement:metadata">We describe metadata further here</a>.
+        </td>
+    </tr><tr>
         <td><code>module</code></td>
         <td>string</td>
         <td>The core module code. 
@@ -99,7 +106,83 @@ A CLRM Package is a JSON object with the following fields:
     </tr>
 </table>
 
-
+<a name="metadata"></a>
+<h3>Metadata</h3>
+<table>
+    <tr>
+        <th>Field</th> <th width="125px">Type</th> <th>Description</th>
+    </tr><tr>
+        <td><code>clrmid</code></td>
+        <td>string</td>
+        <td>The id of the CLRM. This should be unique from other CLRMs, but
+            consistent across versions of the same CLRM.
+        </td>
+    </tr><tr>
+        <td><code>name</code></td>
+        <td>string</td>
+        <td>The display name of the CLRM. This will be shown to users.</td>
+    </tr><tr>
+        <td><code>version</code></td>
+        <td>string</td>
+        <td>The version; should only consist of digits and decimals. The 
+            following are valid versions: <code>1.0</code>, 
+            <code>5.4.005.3</code>, <code>2</code>. Version comparisons work
+            left to right, parsing each block (between dots) as an int and
+            comparing corresponding blocks. Missing blocks are assumed 0. 
+            E.g., <code>5.4.005.3 &gt; 5.4</code>, 
+            <code>6 &gt; 5.4.005.3</code>, and 
+            <code>5.01 == 5.01.00.0000.0</code>.
+        </td>
+    </tr><tr>
+        <td><code>categories</code></td>
+        <td>array of strings</td>
+        <td>The CLRM categories this CLRM falls into. Right now, there is no
+            real divide between categories except for the connotations they 
+            carry and that they are divided on the CLRM Library page.
+            Can be any and all of the following: 
+            <ul>
+                <li><code>'app'</code>
+                    <ul>
+                        an app; this should not be tied to an IRB protocol or
+                        other study-like aspects. Examples of apps include
+                        search visualizations and bookmarkers. Many of these
+                        will not require uploading information (unless an
+                        algorithm requires it).
+                    </ul>
+                <li><code>'study'</code>
+                    <ul>
+                        a study module; this will likely involve an IRB 
+                        informed consent form and will need to upload certain
+                        amounts of information.
+                    </ul>
+            </ul>
+        </td>
+    </tr><tr>
+        <td><code>logoURL</code></td>
+        <td>string</td>
+        <td>The URL of an image to display to the user on the CLRM library
+            page. This is not required, but will make the app look prettier.
+            Images are scaled to 30&times;30 pixels.
+        </td>
+    </tr><tr>
+        <td><code>packageURL</code></td>
+        <td>string</td>
+        <td>The URL where the corresponding CLRM Package can be found.
+        </td>
+    </tr><tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>A long description of the CLRM. This will be displayed to users
+            before the install the CLRM.
+        </td>
+    </tr><tr>
+        <td><code>permissions</code></td>
+        <td>array of strings</td>
+        <td>A list of the APIs this CLRM requires access to. This will be
+            shown to users before they are able to install the CLRM.
+        </td>
+    </tr>
+</table>
 
 <!-- <pre class="prettyprint">
 {
@@ -120,15 +203,36 @@ the CRLM Package. At a minimum, core modules must:
         two parameters: the containing CLRM Package and a copy of the CLRM API.
         <span class="highlight">Note: this should be the only thing you add to
             the global space!</span>
-    <li>make available an <code>id</code> field within the 
-        <code>RemoteModule</code> instance
-    <li>make available an <code>init</code> function within the 
-        <code>RemoteModule</code> instance; <span class="highlight">Nothing 
-        should be initialized outside of the <code>init</code> function! (<a
-            href="#implement:note-on-init">see this note</a>)</span>
-    <li>make available an <code>unload</code> function within the
-        <code>RemoteModule</code> instance that takes a callback 
-        function&mdash;this should be called when unloading is complete
+    <li>make the following methods available within the 
+        <code>RemoteModule</code> instance:
+    <ul>
+        <li>{function} <code>init</code> 
+        <ul>This should initialize the module.
+            <span class="highlight">Nothing should be initialized outside of 
+            the <code>init</code> function! 
+            (<a href="#implement:note-on-init">see this note</a>)</span>
+        </ul>
+        <li>{function} <code>unload</code>
+        <ul>
+            Should accept the following parameters:
+            <ul>
+                <li>{string} <code>reason</code>
+                    <ul>Why the module is being unloaded:
+                        <li><code>'shutdown'</code>&mdash;a routine shutdown
+                        <li><code>'disable'</code>&mdash;the user or extension
+                            want to disable, but not uninstall, the CLRM
+                        <li><code>'uninstall'</code>&mdash;the user or extension
+                            want to completely remove the CLRM; all stored data
+                            should be removed
+                        <li><code>'newversion'</code>&mdash;unloading as a 
+                            precursor to installing a new version
+                    </ul>
+                <li>{function} onComplete
+                    <ul>Invoke when unloading has successfully completed.</ul>
+                <li>{function} onError
+                    <ul>Invoke if a error is encountered.</ul>
+            </ul>
+        </ul>
 </ul>
 
 <p>

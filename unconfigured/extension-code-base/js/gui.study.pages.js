@@ -158,19 +158,11 @@ CROWDLOGGER.gui.study.pages.launch_update_help = function(){
 CROWDLOGGER.gui.study.pages.launch_status_page = function(){
 
     // Get the url of the status page.
-    var status_page = CROWDLOGGER.preferences.get_char_pref(
-        'status_page_url', 'not_found.html' );
-
-    // The prefix for the extension's html files.
-    var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
-
-    // The full url.
-    var url = extension_prefix + status_page;
+    var url = CROWDLOGGER.gui.windows.get_local_page('status_page_url');
 
     // Once the new tab has opened, this will give us a handle on it.
     CROWDLOGGER.gui.windows.open_dialog( url, '%%FULL_PROJECT_NAME%% Status Page',
             CROWDLOGGER.gui.study.pages.refresh_status_page );
-
 };
 
 
@@ -1029,8 +1021,6 @@ CROWDLOGGER.gui.study.pages.send_auto_email = function( doc, form ){
         on_server_response,
         on_error,
         'POST' );
-
-    
 };
 
 

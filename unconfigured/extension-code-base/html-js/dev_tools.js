@@ -41,7 +41,17 @@ function add_listeners(){
 
     jQuery('#load-clrm').click(function(){
         CROWDLOGGER.debug.log('Retrieving JS from '+ jQuery('#clrm-url').val());
-        CROWDLOGGER.api.cli.base.loadCLRMFromURL( jQuery('#clrm-url').val() );
+        console.log('Retrieving JS from '+ jQuery('#clrm-url').val());
+        //CROWDLOGGER.api.cli.base.loadCLRMFromURL( jQuery('#clrm-url').val() );
+        CROWDLOGGER.io.network.send_get_data(jQuery('#clrm-url').val(), null,
+            function(response){
+                CROWDLOGGER.clrm.installLocalCLRM(
+                    JSON.parse(response),
+                    function(){ jQuery('#clrm-success').show().fadeOut(600);},
+                    function(){ jQuery('#clrm-error').show().fadeOut(600);}  
+                )
+            }
+        );
         return false;
     });
 }

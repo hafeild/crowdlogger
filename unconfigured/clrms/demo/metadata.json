@@ -1,0 +1,10 @@
+{
+    "clrmid": "demo1",
+    "name": "Demo 1",
+    "version": "1.0",
+    "categories": ["app"],
+    "description": "A simple CrowdLogger Remote Module demonstration. It shows off the ability to open windows, access user data, and use the storage API.",
+    "packageURL": "http://localhost:8000/demo.json",
+    "permissions": ["userdata", "ui", "storage"],
+    "logoURL": "http://localhost:8000/demo.jpg"
+}

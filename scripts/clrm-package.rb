@@ -20,8 +20,37 @@ Where:
         the CSS and JavaScript files are resources you'd like to load in those
         HTML file.
 
-    --id=<id>
-        The string to assign to the id field in the resulting package.
+    --metadata-file=<json file>
+        REQUIRED. The file should be formatted in JSON and will be placed under
+        the 'metadata' field name. This should have the following fields:
+
+        REQUIRED FIELDS:
+            clrmid:  {string} 
+                The id of the CLRM.
+            name:    {string} 
+                The display name of the CLRM.
+            version: {string} 
+                The version -- should consist only of digits and dots.
+            categories: {array of strings} 
+                The categories in which the CLRM falls. Can be any or all of: 
+                'app', 'study'
+            description: {string} 
+                A long description of the CLRM; this will be displayed to users.
+            packageURL: {string} 
+                The URL where the CLRM package can be found
+            permissions: {array of strings}
+                The APIs this CRLM requires access to. These are:
+                    userdata
+                    ui
+                    storage
+                    privacy
+                    serveraccess
+                    globaldata
+
+        OPTIONAL FIELDS:
+            logoURL: {string}
+                The URL of the logo to display to users. This will be scaled to
+                30x30 pixels.
 
 Output:
 
@@ -73,6 +102,60 @@ Processing occurs as follows:
 ################################################################################ 
 require 'net/http'
 require 'json'
+require 'set'
+
+## A class to assist with verifying metadata and whatnot.
+class ParamVerifier
+    def initialize(klass, onVerify=Proc.new{|x| true})
+        @klass = klass
+        @onVerify = onVerify
+    end
+
+    def verify(param)
+        param.class == @klass && @onVerify.call(param)
+    end
+end
+
+## The following pertain to metadata.
+VALID_PERMISSION_VALS = Set.new([
+    :userdata,
+    :ui,
+    :storage,
+    :privacy,
+    :serveraccess,
+    :globaldata
+])
+
+VALID_CATEGORY_VALS = Set.new([
+    :app,
+    :study
+])
+
+REQUIRED_METADATA_FIELDS = {
+    :clrmid     => ParamVerifier.new("".class),
+    :name       => ParamVerifier.new("".class),
+    :version    => ParamVerifier.new("".class, Proc.new{|v| v=~/^[\d\.]*$/}),
+    :categories => ParamVerifier.new([].class, 
+        Proc.new{|a| 
+            a.select{|e| !VALID_CATEGORY_VALS.member?(e.to_sym)}.size==0}),
+    :description=> ParamVerifier.new("".class),
+    :packageURL => ParamVerifier.new("".class),
+    :permissions=> ParamVerifier.new([].class, 
+        Proc.new{|a| 
+            a.select{|e| !VALID_PERMISSION_VALS.member?(e.to_sym)}.size==0})
+}
+
+OPTIONAL_METADATA_FIELDS = {
+    :logoURL    => ParamVerifier.new("".class)
+}
+
+## Checks if the given version string is valid, i.e., that it consists of only
+## digits and decimals.
+## @param version  The version string to check.
+## @return True if the version is valid.
+def isValidVersionString(version)
+    version =~ /^(\d\.)*$/
+end
 
 ## Extracts the extension as a symbol from the given name.
 ## @param name     The name from which to extract the extension.
@@ -185,6 +268,35 @@ def concatenateCoreModules(files, clrmPackage)
     clrmPackage
 end
 
+## Reads in the Metadata file (assumed to be in JSON format) and then verifies
+## that it contains the necessary fields. Only those fields that are verified
+## as being required or optional are allowed through. They are then set in the
+## metadata field of the CLRM package passed in.
+##
+## @param filename     The metadata filename.
+## @param clrmPackage  The CLRM package.
+## @return A pointer back to the clrmPackage passed in.
+def readAndVerifyMetadataFile(filename, clrmPackage)
+    origMetadata = JSON.parse(IO.read(filename))
+    metadata = {}
+    origMetadata.each do |key, val|
+        key = key.to_sym
+        [REQUIRED_METADATA_FIELDS, OPTIONAL_METADATA_FIELDS].each do |test|
+            metadata[key] = val if test.has_key?( key ) && test[key].verify(val)
+        end
+    end
+    missingFields = REQUIRED_METADATA_FIELDS.keys.select{|k| 
+        !metadata.has_key?(k.to_sym)}
+
+    if missingFields.size > 0
+        STDERR.puts "WARNING: your metadata is missing the following fields: "
+        STDERR.puts missingFields.join(", ")
+    end
+
+    clrmPackage[:metadata] = metadata
+    clrmPackage
+end
+
 ## Check args.
 if ARGV.size < 1
     STDERR.puts Usage
@@ -209,8 +321,8 @@ ARGV.each do |arg|
     ## Add resources.
     if arg =~ /^--resource-dir=/
         gatherResources(arg.gsub(/^--resource-dir=/,""), clrmPackage)
-    elsif arg =~ /^--id=/
-        clrmPackage[:id] = arg.gsub(/^--id=/,"")
+    elsif arg =~ /^--metadata-file=/
+        readAndVerifyMetadataFile(arg.gsub(/^--metadata-file=/,""), clrmPackage)
     elsif File.exists?(arg)
         moduleFiles << arg
     else
@@ -219,8 +331,8 @@ ARGV.each do |arg|
     end
 end
 
-unless clrmPackage.has_key?(:id)
-    STDERR.puts "\nWARNING: no id was specified.\n\n"
+unless clrmPackage.has_key?(:metadata)
+    STDERR.puts "\nWARNING: no metadata was specified.\n\n"
 end
 
 ## Add in the core module.

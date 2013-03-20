@@ -415,11 +415,15 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
                  ( state_flags & Components.interfaces.
                     nsIWebProgressListener.STATE_IS_WINDOW ) ) {
 
+            var win = browser.contentWindow;
+
+            // Add the page listeners (for clicks and searches, etc.)
             CROWDLOGGER.logging.event_listeners.inject_page_listeners(
-                web_progress.DOMWindow, tab_id, false,
+                win, tab_id, false,
                 CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id);
 
-            var win = browser.contentWindow;
+            // If this is a non 'clrm.html' extension page, set the CROWDLOGGER
+            // variable so it can finish loading itself.
             if( win.location.href.indexOf(
                     CROWDLOGGER.version.info.get_extension_html_prefix())===0 &&
                     win.location.href.match(/\bclrm.html\b/) === null ){

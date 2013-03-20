@@ -24,8 +24,8 @@ CLRMI.prototype.Storage = function( api, id ){
     
 
     // Public function declarations.
-    this.addStore, this.removeStore, this.clearStore, this.listStores,
-    this.save, this.read, this.update; 
+    this.addStores, this.removeStores, this.clearStores, this.listStores,
+    this.save, this.read, this.update, this.removeDatabase; 
 
     // Private function definitions.
 

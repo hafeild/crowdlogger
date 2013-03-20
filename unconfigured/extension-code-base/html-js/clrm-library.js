@@ -27,7 +27,14 @@ function check_if_initialized(){
 // Initialize the search for the CROWDLOGGER variable.
 init_crowdlogger();
 
+var onerror = function(e){
+    alert('There was an error: '+ e);
+}
 
+var show_popup = function(message){
+    jQuery('#message').html(message);
+    jQuery('#popup').show();
+}
 
 var add_listeners = function(){
     jQuery(document).on('click', '.clrm', function(e){
@@ -38,24 +45,67 @@ var add_listeners = function(){
     });
     jQuery(document).on('click', '.info .button', function(e){
         var target = jQuery(this);
-        var clrmiID = target.parent().attr('data-clrmid');
-        if(target.attr('data-type') === 'install'){
+        var clrmid = target.parent().attr('data-clrmid');
+        var container = jQuery('.clrm-container[data-clrmid='+clrmid+']');
+        var metadata =JSON.parse(target.parent().attr('data-metadata'));
+        switch( target.attr('data-type') ){
             // Install.
-            CROWDLOGGER.clrm.installCLRM(
-                JSON.parse(target.parent().attr('data-metadata')),function(){
-                jQuery('.clrm-container[data-clrmid='+clrmiID+']').
-                    removeClass('not-installed').addClass('installed');
-            });
-        } else if(target.attr('data-type') === 'uninstall') {
-            // Uninstall.
-            CROWDLOGGER.clrm.uninstallCLRM(clrmiID, function(){
-                jQuery('.clrm-container[data-clrmid='+clrmiID+']').
-                    removeClass('installed').addClass('not-installed');
-            });
+            case 'install':
+                CROWDLOGGER.clrm.installCLRM(metadata, function(){
+                    container.removeClass('not-installed').
+                        addClass('installed');
+                    CROWDLOGGER.clrm.enableCLRM(clrmid, function(){
+                        container.removeClass('not-enabled').
+                            addClass('enabled');
+                    });
+                });
+                break
+            case 'enable':
+                CROWDLOGGER.clrm.enableCLRM(clrmid, function(){
+                    container.removeClass('not-enabled').addClass('enabled');
+                }, function(e){
+                    show_popup('There was an error enabling the CLRM: '+ e);
+                });
 
-        } else {
-            target.parent().hide({easing: 'slide', duration: 300});
+                break;
+            // Uninstall.
+            case 'uninstall':
+                if( metadata.localOnly ){
+                    var response = confirm(
+                        'This is a local-only app/study; once you remove it, '+
+                        'you will not be able to reinstall it. Do you wish '+
+                        'to remove it?');
+                    if( !response ){
+                        return;
+                    }
+                }
+                CROWDLOGGER.clrm.uninstallCLRM(clrmid, function(){
+                    if( metadata.localOnly ){
+                        container.remove();
+                    } else {
+                       container.removeClass('installed').
+                           addClass('not-installed');
+                    }
+                }), function(e){
+                    show_popup('There was an error uninstalling the CLRM: '+ e);
+                };
+                break;
+
+            case 'disable':
+                CROWDLOGGER.clrm.disableCLRM(clrmid, function(){
+                    container.removeClass('enabled').addClass('not-enabled');
+                });
+
+                break;
+
+            // Dismiss.
+            default:
+                target.parent().hide({easing: 'slide', duration: 300});
         }
+    });
+
+    jQuery('#message-dismiss').click(function(){
+        jQuery('#popup').hide();
     });
 };
 

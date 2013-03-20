@@ -25,7 +25,7 @@ CLRMI.prototype.Base = function(api) {
         nextFunctionID = 1;
         
     // Private function declarations.
-    var init, extractData, onMessage, setExtensionPath, loadCLRM, 
+    var init, extractData, onMessage, setExtensionPath, loadCLRM, unloadCLRM, 
         invokeCLRMICallback;
 
     // Public function declarations.
@@ -39,6 +39,7 @@ CLRMI.prototype.Base = function(api) {
     init = function(){
         console.log('Initializing CLRMIBaseAPI.\n');
         messageHandlers.loadCLRM = loadCLRM;
+        messageHandlers.unloadCLRM = unloadCLRM;
         messageHandlers.setExtensionPath = setExtensionPath;
         jQuery(window).bind( 'message', onMessage );
 
@@ -98,32 +99,125 @@ CLRMI.prototype.Base = function(api) {
     /**
      * Loads a CrowdLogger Remote Module. 
      *
-     * @param {string} script   The JavaScript module.
+     * @param {string} data   Should contain a 'package' field whose value is
+     *                        the JavaScript module code to load.
      */
     loadCLRM = function(data){
-        console.log('Loading CLRM');
-        var clrm = new CLRM(JSON.parse(data.package), api.API);
+        that.log('In loadCLRM');
+        try{
+            var package = JSON.parse(data.package);
+            that.log('Finished parsing the clrm...');
+            var clrm = new CLRM(package, api.API, that.log);
+            that.log('Finished instantiating the clrm...');
 
-        // Wrapping this in a function in case we need to unload an existing
-        // version of the module, and therefore need to call load after the
-        // unloading has occurred.
-        var load = function(){
-            modules[clrm.module.id] = clrm.module;
-            clrm.module.init();
-            that.log('Module '+ clrm.module.id +' loaded!');
-        };
+            // Wrapping this in a function in case we need to unload an existing
+            // version of the module, and therefore need to call load after the
+            // unloading has occurred.
+            var load = function(){
+                that.log('Calling init on the clrm...');
 
-        // Check if it already exists. If so, unload the previous version.
-        if( modules[clrm.module.id] ){
-            try{
-                that.log('Unloading module '+ clrm.module.id);
-                modules[clrm.module.id].unload(load);
-            } catch(e){
+                modules[clrm.id] = clrm.module;
+                clrm.module.init();
+
+                that.log('Module '+ clrm.id +' loaded!');
+                if( data.callbackID ){
+                    that.invokeCLICallback({
+                        callbackID: data.callbackID,
+                        options: {}
+                    });
+                }
+            };
+
+            // Check if it already exists. If so, unload the previous version.
+            if( modules[clrm.id] ){
+                try{
+                    that.log('Unloading module '+ clrm.id);
+                    modules[clrm.id].unload('newversion', load);
+                } catch(e){
+                    that.log('There was an error unloading the old module: '+ 
+                        e.toString());
+
+                    load();
+                }
+            } else {
                 load();
             }
-        } else {
-            load();
+        } catch(error) {
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {error: error.toString()}
+                });
+            }
         }
+    };
+
+    /**
+     * Unloads a CrowdLogger Remote Module. 
+     *
+     * @param {string} data  A map of options containing the following fields:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} clrimd:   The id of the CLRM to unload.
+     *    <li>{string} reason:   The reason for unloading; one of: 
+     *                            'shutdown' (the extension or browser is 
+     *                                shutting down),
+     *                            'disable' (the user disabled it), 
+     *                            'uninstall' (the user or CL has decided to 
+     *                                remove the CLRM altogether),
+     *                            'newversion' (making way for a new version)
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{int} callbackID:  The id of the CLI callback to invoke on success
+     *                           or error. An error will result in the 'error'
+     *                           field of the returned options to be set.
+     * </ul>
+     */
+    unloadCLRM = function(data){
+        // Check if we have all the necessary params.
+        if( !data || !data.clrmid || !data.reason ){
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {error: 'Not enough arguments to '+
+                        'clrmi.base.unloadCLRM'}
+                });
+            }
+            return;
+        }
+        // Check if the module is loaded.
+        if( !modules[data.clrmid] ){
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {error: '[clrmi.base.unloadCLRM] '+ data.clrmid +
+                        ' is not currently loaded and so cannot be unloaded.'}
+                });
+            }
+            return;
+        }
+
+        // Invoked when the CLRM has been unloaded.
+        var onsuccess = function(){
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {}
+                });
+            }
+        }
+
+        // Invoked on an error.
+        var onerror = function(error){
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {error: error}
+                });
+            }
+        }
+        modules[data.clrmid].unload(data.reason, onsuccess, onerror)
     };
 
     /**
@@ -300,12 +394,17 @@ CLRMI.prototype.Base = function(api) {
  * @param {function} CrowdLoggerAPI  A reference to the CrowdLogger API -- this
  *                                   is how the CLRM will access the CLRMI.
  */
-var CLRM = function(clrmPackage, CrowdLoggerAPI){
+var CLRM = function(clrmPackage, CrowdLoggerAPI, log){
+    log('In CLRM, about to run eval...');
     eval(clrmPackage.module);
+    log('Finished running eval...');
 
     // Every module should have a Module function defined.
     this.module = new RemoteModule(
         clrmPackage, new CrowdLoggerAPI(clrmPackage));
+
+    log('Finished instantiating RemoteModule')
+    this.id = clrmPackage.metadata.clrmid;
 
     // Clear it out so no one else has access to it.
     RemoteModule = undefined;

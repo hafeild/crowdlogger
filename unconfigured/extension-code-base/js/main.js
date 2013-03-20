@@ -149,8 +149,8 @@ CROWDLOGGER.initialize = function(){
         CROWDLOGGER.logging.init();
         CROWDLOGGER.uninstall.init();
         CROWDLOGGER.version.util.init();
-        CROWDLOGGER.api = {cli: new CLI(CROWDLOGGER)};
         CROWDLOGGER.clrm = new CLRM(CROWDLOGGER);
+        CROWDLOGGER.api = {cli: new CLI(CROWDLOGGER)};
 
         // Print out version info.
         report_version_info();
@@ -212,6 +212,7 @@ CROWDLOGGER.initialize = function(){
         }
 
         CROWDLOGGER.initialized = true;
+
     };
 
     // Initializes any buttons that need to be attached to the browser.
