@@ -15,12 +15,13 @@
 CLRMI.prototype.Storage = function( api, id ){
     // Private variables.
     var that = this,
-        dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase();
+        dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase(),
+        upgrading = true;
 
 
 
     // Private function declarations.
-    var init, wrapCallback;
+    var init, wrapCallback, addUpgradeCheck;
 
     // Public variables.
     
@@ -37,7 +38,11 @@ CLRMI.prototype.Storage = function( api, id ){
         that.preferences = new that.Preferences(api, {
             wrapCallback: wrapCallback,
             dbName: dbName
+        }, function(){
+            api.base.log('Storage.init heard back from storage.Preferences');
+            upgrading = false;
         });
+
     };
 
     wrapCallback = function(opts){
@@ -82,6 +87,27 @@ CLRMI.prototype.Storage = function( api, id ){
         return callbackID;
     }
 
+    addUpgradeCheck = function(func, opts){ 
+        if( upgrading ){
+            setTimeout( function(){addUpgradeCheck(func, opts);}, 100 );
+            return;
+        }
+
+        upgrading = true;
+        var newOpts = api.util.copyObj(opts||{});
+        newOpts.on_success = function(data){
+            api.base.log('Removing upgrading lock...');
+            upgrading = false;
+            if(opts.on_success){ opts.on_success(data); }
+        }
+        newOpts.on_error = function(e){
+            api.base.log('Removing upgrading lock...');
+            upgrading = false;
+            if(opts.on_error){ opts.on_error(e); }
+        }
+        func(newOpts);
+    };
+
     // Public function definitions.
 
     /**
@@ -101,21 +127,28 @@ CLRMI.prototype.Storage = function( api, id ){
      * @throws CLRMIException if required arguments are missing.
      */
     this.addStores = function(opts) {
+        api.base.log('Adding stores '+ JSON.stringify(opts.stores));
         // This will throw an exception if there are missing arguments.
         api.util.checkArgs(opts, ['stores'], 'clrmi.storage.addStore');
 
-        var callbackID = wrapCallback(opts);
+        var run = function(newOpts){
+            api.base.log('In addStores.run for '+ JSON.stringify(opts.stores));
+            var callbackID = wrapCallback(newOpts);
 
-        return api.base.invokeCLIFunction({
-            apiName: 'storage',
-            functionName: 'upgradeDB',
-            options: {
-                callbackID: callbackID,
-                dbName: dbName,
-                storeNames: opts.stores,
-                storeOp: 'addStores'
-            }
-        });
+            api.base.invokeCLIFunction({
+                apiName: 'storage',
+                functionName: 'upgradeDB',
+                options: {
+                    callbackID: callbackID,
+                    dbName: dbName,
+                    storeNames: opts.stores,
+                    storeOp: 'addStores'
+                }
+            });
+        }
+
+        // If we're in the middle of an upgrade, we can't upgrade here, too.
+        addUpgradeCheck(run, opts);
     };
 
     /**
@@ -137,18 +170,23 @@ CLRMI.prototype.Storage = function( api, id ){
         // This will throw an exception if there are missing arguments.
         api.util.checkArgs(opts, ['stores'], 'clrmi.storage.removeStore');
 
-        var callbackID = wrapCallback(opts);
+        var run = function(newOpts){
+            var callbackID = wrapCallback(newOpts);
 
-        return api.base.invokeCLIFunction({
-            apiName: 'storage',
-            functionName: 'upgradeDB',
-            options: {
-                callbackID: callbackID,
-                dbName: dbName,
-                storeNames: opts.stores,
-                storeOp: 'removeStores'
-            }
-        });
+            return api.base.invokeCLIFunction({
+                apiName: 'storage',
+                functionName: 'upgradeDB',
+                options: {
+                    callbackID: callbackID,
+                    dbName: dbName,
+                    storeNames: opts.stores,
+                    storeOp: 'removeStores'
+                }
+            });
+        }
+
+        // If we're in the middle of an upgrade, we can't upgrade here, too.
+        addUpgradeCheck(run, opts);
     };
 
     /**
@@ -199,16 +237,21 @@ CLRMI.prototype.Storage = function( api, id ){
      * </ul>
      */
     this.listStores = function(opts) {
-        var callbackID = wrapCallback(opts);
+        var run = function(newOpts){
+            var callbackID = wrapCallback(newOpts);
 
-        return api.base.invokeCLIFunction({
-            apiName: 'storage',
-            functionName: 'listStores',
-            options: {
-                callbackID: callbackID,
-                dbName: dbName
-            }
-        });
+            return api.base.invokeCLIFunction({
+                apiName: 'storage',
+                functionName: 'listStores',
+                options: {
+                    callbackID: callbackID,
+                    dbName: dbName
+                }
+            });
+        }
+
+        // If we're in the middle of an upgrade, we can't upgrade here, too.
+        addUpgradeCheck(run, opts);
     };
 
     /**
@@ -413,16 +456,22 @@ CLRMI.prototype.Storage = function( api, id ){
      * </ul>
      */
     this.removeDatabase = function(opts){
-        var callbackID = wrapCallback(opts || {});
 
-        return api.base.invokeCLIFunction({
-            apiName: 'storage',
-            functionName: 'removeDB',
-            options: {
-                callbackID: callbackID,
-                dbName: dbName
-            }
-        });
+        var run = function(newOpts){
+            var callbackID = wrapCallback(newOpts);
+
+            return api.base.invokeCLIFunction({
+                apiName: 'storage',
+                functionName: 'removeDB',
+                options: {
+                    callbackID: callbackID,
+                    dbName: dbName
+                }
+            });
+        }
+
+        // If we're in the middle of an upgrade, we can't upgrade here, too.
+        addUpgradeCheck(run, opts);
     };
 
 
@@ -434,7 +483,7 @@ CLRMI.prototype.Storage = function( api, id ){
  * can be anything serializable. This uses the same IndexedDB instance as
  * is used for the Storage API.
  */
-CLRMI.prototype.Storage.prototype.Preferences = function( api, storage ){
+CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
     var that = this;
     const PREFERENCE_STORE = '__preferences__',
           PREFERENCE_KEY_NAME = 'name',
@@ -452,7 +501,10 @@ CLRMI.prototype.Storage.prototype.Preferences = function( api, storage ){
      * Initializes the preference storage.
      */
     init = function() {
-        var callbackID = storage.wrapCallback({});
+        var callbackID = storage.wrapCallback({
+            on_success: callback,
+            on_error: callback
+        });
 
         return api.base.invokeCLIFunction({
             apiName: 'storage',

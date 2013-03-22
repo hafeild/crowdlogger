@@ -17,11 +17,12 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         openWindows = {},
         elmsToUpdateOnActivity = [];
 
-    const STORE_NAME = 'userInput';
+    const STORE_NAME = 'userInput',
+          MAX_UNLOAD_ATTEMPTS = 100;
 
     // Private function declarations.
     var initializeWindow, init, onWindowUnload, printToWindows, 
-        addGlobalActivityListeners;
+        addGlobalActivityListeners, isInitialized = false, unloadAttempts=0;
 
     // Public variables.
     this.clrmAPI = clrmAPI;
@@ -72,7 +73,8 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
             on_success: function(stores){
                 if( stores.indexOf(STORE_NAME) < 0 ){
                     clrmAPI.storage.addStores({
-                        stores: [STORE_NAME]
+                        stores: [STORE_NAME],
+                        on_success: function(){isInitialized = true;}
                     })
                 }
             }
@@ -115,12 +117,16 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
      *
      * @param {string} url     The URL of the resource to open.
      */
-    this.launchWindow = function(url){ 
+    this.launchWindow = function(url, callback){ 
         clrmAPI.ui.openWindow({
             content: clrmPackage.html[url],
             resources: clrmPackage,
             name: url,
-            specsMap: windowSpecs
+            specsMap: windowSpecs,
+            callback: function(win){
+                openWindows[win.name] = win;
+                if(callback){ callback(win); }
+            }
         });
     };
 
@@ -128,6 +134,10 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
      * Removes all listeners and closes windows.
      */
     this.unload = function(oncomplete, onerror){
+        if( !isInitialized && unloadAttempts < MAX_UNLOAD_ATTEMPTS ){
+            unloadAttempts += 1;
+            setTimeout(function(){that.unload(oncomplete, onerror);},50);
+        }
         var id;
         elm.off('load.demo');
         elm.remove();

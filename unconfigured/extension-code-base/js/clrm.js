@@ -329,7 +329,8 @@ var CLRM = function(crowdlogger){
             that.loadCLRMIfNecessary( clrmid, unload, onError );
         };
 
-        load();
+        //load();
+        unload();
     };
 
     this.removeCLRMFromDB = function( clrmid, onSuccess, onError ){
@@ -428,7 +429,7 @@ var CLRM = function(crowdlogger){
             chunk_size: 5,
             on_success: function(){ 
                 crowdlogger.debug.log('getInstalledCLRMListing is finished!');
-                callback(installedCLRMs); 
+                if(onSuccess){onSuccess();}
             },
             on_chunk: function(batch, next){
                 crowdlogger.debug.log('Processing chunk!');

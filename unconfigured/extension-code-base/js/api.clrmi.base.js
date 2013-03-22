@@ -186,17 +186,6 @@ CLRMI.prototype.Base = function(api) {
             }
             return;
         }
-        // Check if the module is loaded.
-        if( !modules[data.clrmid] ){
-            if( data.callbackID ){
-                that.invokeCLICallback({
-                    callbackID: data.callbackID,
-                    options: {error: '[clrmi.base.unloadCLRM] '+ data.clrmid +
-                        ' is not currently loaded and so cannot be unloaded.'}
-                });
-            }
-            return;
-        }
 
         // Invoked when the CLRM has been unloaded.
         var onsuccess = function(){
@@ -216,8 +205,33 @@ CLRMI.prototype.Base = function(api) {
                     options: {error: error}
                 });
             }
+        }        
+
+        var removeDB = function(){
+            var storage = new api.Storage(api, data.clrmid);
+            storage.removeDatabase({
+                on_success: onsuccess,
+                on_error: onerror
+            });
+        };
+
+        // Check if the module is loaded.
+        if( !modules[data.clrmid] ){
+            if( data.reason === 'uninstall' ){
+                removeDB();
+            } else if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {error: '[clrmi.base.unloadCLRM] '+ data.clrmid +
+                        ' is not currently loaded and so cannot be unloaded.'}
+                });
+            }
+            return;
         }
-        modules[data.clrmid].unload(data.reason, onsuccess, onerror)
+
+        modules[data.clrmid].unload(data.reason, 
+            data.reason==='uninstall' ? removeDB : onsuccess, 
+            onerror)
     };
 
     /**
