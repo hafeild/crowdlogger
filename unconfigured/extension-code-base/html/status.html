@@ -56,7 +56,7 @@
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-    <span id="update_message" class="update_message hidden">
+    <div id="update_message" class="update_message hidden">
 
         %%PROJECT_NAME%% has been updated to <span
 name="version_no"></span>. 
@@ -67,7 +67,7 @@ Please take a look at the <a
 href="#notifications">notifications section</a> to be aware of and address any
 outstanding issues concerning %%FULL_PROJECT_NAME%%.
         
-    </span>
+    </div>
 
 
     <p>
@@ -80,18 +80,22 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
  -->
     <div id="content" class="content">
    
+        <!-- Columns to hold the tiles (gets populated after 
+             everything has rendered). -->
         <div id="left-column"></div>
         <div id="right-column"></div>
  
+        <!-- Notifications. -->
         <div id="notifications-wrapper" class="notifications section" style="display: none;">
             <a name="notifications"></a>
             <h1>Notifications</h1>
-            <div id="notifications">
-            
-            </div>
+            <table id="notifications" class="notifications">
+
+            </table>
         </div>
     
     
+        <!-- Messages. -->
         <div class="messages section">
             <a name="messages"></a>
             <h1>Recent Messages</h1>
@@ -99,49 +103,8 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
     
             </div>
         </div> 
-    
-    
-<!--         <div class="experiments section">
-            <a name="experiments"></a>
-            <h1>Experiment Status</h1>
-            <div id="experiments">
-                <table>
-                    <tr>
-                        <td class='label'>Running experiments:</td>
-                        <td id=running_experiments><span class='note'>None</span></td>
-                    </tr>
-
-                    <tr>
-                        <td class='label'>Upcoming experiments:</td>
-                        <td id=upcoming_experiments><span class='note'>None</span></td>
-                    </tr>
-
-                    <tr>
-                        <td class='label'>Last completed experiment:</td>
-                        <td id=last_completed_experiment><span class='note'>N/A</span></td>
-                    </tr>
-
-                    <tr>
-                        <td class='label'>Number of completed experiments:</td>
-                        <td id=number_completed_experiments><span class='note'>0</span></td>
-                    </tr>
-
-                </table>
-            </div>
-        </div>   -->      
-
-<!--         <p>
- 
-        <div class="raffleWins section">
-            <a name="rafleWins"></a>
-            <h1>Raffle Wins</h1>
-            <div id="raffleWins">
-    
-            </div>
-        </div>  -->
-    
-        
-     
+   
+        <!-- Tools. -->
         <div class="tools section">
             <a name="tools"></a>
             <h1>Tools</h1>
@@ -200,43 +163,7 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             </div>
         </div>
 
-        <!-- Template. -->
-        <div class="templates">
-            <div id="clrm-template" class="clrm-container">
-                <div class="clrm app" data-id="clrm">
-                    <span class="ribbon installed enabled">installed</span>
-                    <span class="ribbon installed not-enabled">disabled</span>
-                    <img data-id="logo" alt="" src=""/>
-                    <span class="name" data-id="name"></span>
-                </div>
-                <div class="access">
-                   <!--  <table>
-                        <tr>
-                            <td colspan=3 class="message"> -->
-                                <div class="message">
-                                No messages.
-                                </div>
-                         <!--    </td>
-                        </tr><tr>
-                        </tr><tr>
-                            <td> -->
-                                <span class="button installed enabled" data-type="open">Open</span>
-                            <!-- </td>
-                            <td> -->
-                                <span class="button installed enabled" data-type="configure">Configure</span>
-                            <!-- </td>
-                            <td> -->
-                                <span class="button installed enabled" data-type="disable">Disable</span>
-                                <span class="button installed not-enabled" data-type="enable">Enable</span>
-                                <span class="button installed" data-type="uninstall">Remove</span>
-                                <span class="button not-installed" data-type="install">Install</span>
-                           <!--  </td>
-                        </tr>
-                    </table> -->
-                </div>
-            </div>  
-        </div>
-
+        <!-- Apps. -->
         <div id="apps" class="apps section">
             <a name="apps"></a>
             <h1>Apps</h1>
@@ -244,12 +171,14 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
 
         </div>
 
+        <!-- Studies. -->
         <div id="studies" class="studies section">
             <a name="studies"></a>
             <h1>Studies</h1>
 
         </div>
 
+        <!-- Feedback. -->
         <div class="feedback section">
             <a name="feedback"></a>
             <h1>Feedback</h1>
@@ -263,11 +192,56 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
         <p>
     </div>
 
-<!--     <div class="header">
-        <span class="refreshLink">
-            [<a href="#" class="close_button">Close page</a>]
-        </span>
-    </div> -->
+    <!-- Templates. -->
+    <div class="templates">
+        <!-- Notifications -->
+        <table>
+        <tr id="notification">
+            <td class="alert"></td>
+            <td>
+                <div data-type="message"></div>
+                <div data-type="buttons"></div>
+            </td>
+        </tr>
+        </table>
+
+        <span id="notification-button" class="button"></span>
+
+        <!-- CLRMs -->
+        <div id="clrm-template" class="clrm-container">
+            <div class="clrm app" data-id="clrm">
+                <span class="ribbon installed enabled">installed</span>
+                <span class="ribbon installed not-enabled">disabled</span>
+                <img data-id="logo" alt="" src=""/>
+                <span class="name" data-id="name"></span>
+            </div>
+            <div class="access">
+               <!--  <table>
+                    <tr>
+                        <td colspan=3 class="message"> -->
+                            <div class="message">
+                            No messages.
+                            </div>
+                     <!--    </td>
+                    </tr><tr>
+                    </tr><tr>
+                        <td> -->
+                            <span class="button installed enabled" data-type="open">Open</span>
+                        <!-- </td>
+                        <td> -->
+                            <span class="button installed enabled" data-type="configure">Configure</span>
+                        <!-- </td>
+                        <td> -->
+                            <span class="button installed enabled" data-type="disable">Disable</span>
+                            <span class="button installed not-enabled" data-type="enable">Enable</span>
+                            <span class="button installed" data-type="uninstall">Remove</span>
+                            <span class="button not-installed" data-type="install">Install</span>
+                       <!--  </td>
+                    </tr>
+                </table> -->
+            </div>
+        </div>  
+    </div>
 
     <div class="buffer">
     </div>

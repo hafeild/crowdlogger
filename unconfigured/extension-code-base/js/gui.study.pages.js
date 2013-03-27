@@ -166,6 +166,7 @@ CROWDLOGGER.gui.study.pages.launch_status_page = function(){
 };
 
 
+
 CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // TODO Implement all the dynamic things to stick on the page.
     var jq = doc.defaultView.jQuery; 
@@ -227,10 +228,7 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     // Reveal the update message if need be.
     if( CROWDLOGGER.notifications.show_update_message ){
-        var update_message = doc.getElementById( 'update_message' );
-        if( update_message ){
-            update_message.style.display = 'block';
-        }
+        jq('#update_message').show();
 
         setTimeout( 
             function(){ 
@@ -239,307 +237,227 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     }
 
     // Insert the notifications.
-    if( notification_elm.size() > 0 ){
+    if( CROWDLOGGER.notifications.new_notifications > 0 ){
         jq('#notifications-wrapper').show();
-        var notifications = jq('<table class="notifications">');
+        var notifications = jq('#notifications');
         // This will keep track of how many notifications have
         // been posted.
         var notifications_posted = 0;
         var note_board = CROWDLOGGER.notifications;
 
-            // Check for notifications about an available update.
-            if( note_board.extension_update > 0 ){
-                notifications_posted++;
-                notifications.append('<tr><td class="alert"></td>' +
-                    '<td>There is a new version of %%PROJECT_NAME%% ' +
-                    'available. Please download and install it '+
-                    'as soon as you can.</td><td><span class="button" ' +
-                    'style="width: 100%" id="launch_update_help>'+
-                    'See how to update</span></td><td></td></tr>');
-
-                notifications.find('#launch_update_help').click(function(){
-                    CROWDLOGGER.gui.study.pages.launch_update_help(); 
-                    return false;
-                });
+        var attach_notification = function(id, message, buttons){
+            var i;
+            var notification = jq('#notification').clone().attr('id', id);
+            notification.appendTo(notifications);
+            notification.find('[data-type=message]').html(message);
+            for(i = 0; i < buttons.length; i++){
+                var button = jq('#notification-button').clone().
+                    attr('id',  buttons[i].id).
+                    html(buttons[i].label).
+                    appendTo(notification.find('[data-type=buttons]'));
+                if( buttons[i].on_click ){
+                    button.click(buttons[i].on_click);
+                }
             }
+        }
 
-            
-            // Check for notifications about a new consent form.
-            if( note_board.consent > 0 ){
-                notifications_posted++;
-                notifications.append('<tr><td class="alert"></td>' +
-                    '<td>There is a new consent form that '+
-                    'you must read and accept before more data can be ' +
-                    'logged and mined.</td><td><span class="button" ' +
-                    'style="width: 100%" id="launch_consent_form">' +
-                    'Read consent form</span></td><td></td></tr>');
+        // Check for notifications about an available update.
+        if( note_board.extension_update > 0 ){
+            notifications_posted++;
 
-                jq('#launch_consent_form').click(function(){
-                    CROWDLOGGER.gui.study.pages.launch_consent_form_page();
-                });
-            }
+            attach_notification(
+                'extension_update_notification',
+                'There is a new version of %%PROJECT_NAME%% '+
+                'available. Please download and install it '+
+                'as soon as you can.', [{
+                    id: 'launch_update_help',
+                    label: 'See how to update',
+                    on_click: function(){
+                        CROWDLOGGER.gui.study.pages.launch_update_help(); 
+                        return false;
+                    }
+                }]
+            );
 
-            // Register.
-            if( note_board.register > 0 ) {
-                notifications_posted++;
-                notifications.append('<tr id="register_notification">' +
-                    '<td class="alert"></td>'+
-                    '<td>You have not registered yet, would you like to now?' +
-                    '</td><td><span class="button" ' +
-                      'style="width: 100%" id="launch_registration_dialog">' +
-                        'Register</span></td><td>'+
-                    '<span class="button" ' +
-                      'style="width: 100%" id="dismiss_registration_notification">'+
-                      'Dismiss</span></td></tr>');
+        }
 
-                // Clear this after a minute.
-                setTimeout(
-                    function(){
+        // Register.
+        if( note_board.register > 0 ) {
+            notifications_posted++;
+
+            attach_notification(
+                'register_notification',
+                'You have not registered yet, would you like to now?', [{
+                    id: 'launch_registration_dialog',
+                    label: 'Register',
+                    on_click: function(){
+                        CROWDLOGGER.study.launch_registration_dialog();
+                        CROWDLOGGER.notifications.
+                            set_registration_dismissed(false);
+                        jq('#register_notification').hide();
+                    }
+                },{
+                    id: 'dismiss_registration_notification',
+                    label: 'Dismiss',
+                    on_click: function(){
+                        CROWDLOGGER.notifications.
+                            unset_notification('register');
+                        jq('#register_notification').hide();
+                        CROWDLOGGER.notifications.
+                            set_registration_dismissed(true);
+                        return false;
+                    }
+                }]
+            );
+
+            // Clear this after a minute.
+            setTimeout(
+                function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'register' );
+                }, clear_update_notification_delay );
+
+        } else if( note_board.registration_dismissed() ) {
+            notifications_posted++;
+
+            attach_notification(
+                'register_notification',
+                'You have not registered yet, would you like to now?', [{
+                    id: 'launch_registration_dialog',
+                    label: 'Register',
+                    on_click: function(){
+                        CROWDLOGGER.study.launch_registration_dialog();
+                        CROWDLOGGER.notifications.
+                            set_registration_dismissed(false);
+                        jq('#register_notification').hide();
+                    }
+                }]
+            );
+        }         
+
+
+        // Update Registration.
+        if( note_board.update_registration > 0 ) {
+            notifications_posted++;
+
+            attach_notification(
+                'update_registration_notification',
+                'Would you like to update your registration?', [{
+                    id: 'update_registration',
+                    label: 'Update registration',
+                    on_click: function(){
+                        CROWDLOGGER.study.launch_registration_dialog();
                         CROWDLOGGER.notifications.unset_notification(
-                            'register' );
-                    }, clear_update_notification_delay );
-
-            } else if( note_board.registration_dismissed() ) {
-                notifications_posted++;
-                notifications.append('<tr id="register_notification">' +
-                    '<td class="alert"></td>'+
-                    '<td>You have not registered yet, would you like to now?' +
-                    '</td><td><span class="button" ' +
-                        'style="width: 100%" id="launch_registration_dialog">'+
-                    'Register</span></td><td></td></tr>');
-            }
-
-            // For the registration.
-            notifications.find('#launch_registration_dialog').click(function(){
-                CROWDLOGGER.study.launch_registration_dialog();
-                CROWDLOGGER.notifications.set_registration_dismissed(false);
-                jq('#register_notification').hide();
-            });
-
-            notifications.find('#dismiss_registration_notification').
-                      click(function(){
-                CROWDLOGGER.notifications.unset_notification('register');
-                jq('#register_notification').hide();
-                CROWDLOGGER.notifications.set_registration_dismissed(true);
-                return false;
-            });            
-
-
-            // Update Registration.
-            if( note_board.update_registration > 0 ) {
-                notifications_posted++;
-                notifications.append('<tr id="update_registration_notification">'+
-                    '<td class="alert"></td>'+
-                    '<td>Would you like to update your registration?' +
-                    '</td><td><span class="button" ' +
-                      'style="width: 100%" id="update_registration">' +
-                        'Update registration</span> </td><td>' +
-                    '<span class="button" ' +
-                      'style="width: 100%" '+
-                      'id="dismiss_update_registration_notification">' +
-                    'Dismiss</span></td></tr>');
-
-                notifications.find('#update_registration').click(function(){
-                    CROWDLOGGER.study.launch_registration_dialog();
-                    CROWDLOGGER.notifications.unset_notification(
-                        'update_registration'); 
-                    return false;
-                });
-
-                notifications.find(
-                  '#dismiss_update_registration_notification').click(function(){
-                    CROWDLOGGER.notifications.unset_notification(
+                            'update_registration'); 
+                        return false;
+                    }
+                }, {
+                    id: 'dismiss_update_registration_notification',
+                    label: 'Dismiss',
+                    on_click: function(){
+                        CROWDLOGGER.notifications.unset_notification(
                             'update_registration');
-                    jq('#update_registration_notification').hide();
-                    return false;
-                });
+                        jq('#update_registration_notification').hide();
+                        return false;
+                    }
+                }]
+            );
 
-                // Clear this after a minute.
-                setTimeout( 
-                    function(){
+            // Clear this after a minute.
+            setTimeout( 
+                function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'update_registration' );
+                }, clear_update_notification_delay );
+        }
+
+
+        // Set a pass phrase.
+        if( note_board.set_passphrase > 0 ) {
+            notifications_posted++;
+
+            attach_notification(
+                'set_passphrase_notification',
+                'You have not set a pass phrase yet!', [{
+                    id: 'set_passphrase',
+                    label: 'Set pass phrase',
+                    on_click: function(){
+                        CROWDLOGGER.gui.preferences.launch_preference_dialog();
+                        jq('#set_passphrase_notification').hide();  
+                        return false;
+                    }
+                }, {
+                    id: 'dismiss_passphrase_notification',
+                    label: 'Dismiss',
+                    on_click: function(){
                         CROWDLOGGER.notifications.unset_notification(
-                            'update_registration' );
-                    }, clear_update_notification_delay );
-            }
+                            'set_passphrase');
+                        jq('#set_passphrase_notification').hide();
+                        return false;
+                    }
+                }]
+            );
+        }
 
-            // Refer a friend.
-            if( note_board.refer_a_friend > 0 ) {
-                notifications_posted++;
-                notifications.append('<tr id="refer_a_friend_notification">' +
-                    '<td class="alert"></td>'+
-                    '<td>Would you like to refer a friend to this study?' +
-                    '</td><td><span class="button" ' +
-                      'style="width: 100%" id="launch_refer_a_friend">' +
-                      'Refer a friend</span></td><td>' +
-                    '<span class="button" ' +
-                      'style="width: 100%" id="unset_refer_a_friend_notification">'+
-                      'Dismiss</span></td></tr>');
+        // Update settings.
+        if( note_board.update_settings > 0 ) {
+            notifications_posted++;
 
-                notifications.find('#launch_refer_a_friend').click(function(){
-                    CROWDLOGGER.study.launch_refer_a_friend_dialog();
-                    CROWDLOGGER.notifications.unset_notification(
-                       'refer_a_friend'); 
-                    return false; 
-                });
-
-                notifications.find(
-                        '#unset_refer_a_friend_notification').click(function(){
-                    CROWDLOGGER.notifications.unset_notification(
-                        'refer_a_friend');
-                    jq('#refer_a_friend_notification').hide();
-                    return false;
-                });
-
-                // Clear this after a minute.
-                setTimeout( 
-                    function(){
+            attach_notification(
+                'update_settings_notification',
+                'Would you like to update your settings?', [{
+                    id: 'launch_preference_dialog',
+                    label: 'Update settings',
+                    on_click: function(){
+                        CROWDLOGGER.gui.preferences.launch_preference_dialog(); 
                         CROWDLOGGER.notifications.unset_notification(
-                            'refer_a_friend' );
-                    }, clear_update_notification_delay );
-            }
-
-
-            // Set a pass phrase.
-            if( note_board.set_passphrase > 0 ) {
-                notifications_posted++;
-                notifications.append('<tr id="set_passphrase_notification">' +
-                    '<td class="alert"></td>'+
-                    '<td>You have not set a pass phrase yet. This means we ' +
-                    'cannot run experiments on your search log.</td><td>' +
-                    '<span class="button" ' +
-                        'style="width: 100%" id="set_passphrase">' +
-                        'Set pass phrase</span></td><td>' +
-                    '<span class="button" ' +
-                      'style="width: 100%" id="dismiss_passphrase_notification">' +
-                      'Dismiss</span></td></tr>');
-
-                notifications.find('#set_passphrase').click(function(){
-                    CROWDLOGGER.gui.preferences.launch_preference_dialog();
-                    jq('#set_passphrase_notification').hide(); 
-                });
-
-                notifications.find('#dismiss_passphrase_notification').click(function(){
-                    CROWDLOGGER.notifications.unset_notification(
-                        'set_passphrase');
-                    jq('#set_passphrase_notification').hide();
-                    return false;
-                });
-            }
-
-            // Update settings.
-            if( note_board.update_settings > 0 ) {
-                notifications_posted++;
-                notifications.append('<tr id="update_settings_notification">' +
-                    '<td class="alert"></td>'+
-                    '<td>Would you like to update your settings?</td><td>' +
-                    '<span class="button" ' +
-                        'style="width: 100%" id="launch_preference_dialog">' +
-                        'Update settings</span></td><td>' +
-                    '<span class="button" ' +
-                      'style="width: 100%" '+
-                      'id="unset_update_settings_notification">'+
-                      'Dismiss</span></td></tr>');
-
-                notifications.find('#launch_preference_dialog').click(function(){
-                    CROWDLOGGER.gui.preferences.launch_preference_dialog(); 
-                    CROWDLOGGER.notifications.unset_notification(
-                        'update_settings'); 
-                    return false;
-                });
-
-                notifications.find('#launch_preference_dialog').click(function(){
-                    CROWDLOGGER.notifications.unset_notification(
-                        'update_settings');
-                    jq('#update_settings_notification').hide();
-                    return false;
-                });
-
-                // Clear this after a minute.
-                setTimeout( 
-                    function(){
+                            'update_settings'); 
+                        return false;
+                    }
+                }, {
+                    id: 'unset_update_settings_notification',
+                    label: 'Dismiss',
+                    on_click: function(){
                         CROWDLOGGER.notifications.unset_notification(
-                            'update_settings' );
-                    }, clear_update_notification_delay );
-            }
+                            'update_settings');
+                        jq('#update_settings_notification').hide();
+                        return false;
+                    }
+                }]
+            );
 
-            // Check for notifications about new experiments.
-            if( note_board.new_experiments > 0 ){
-
-                CROWDLOGGER.debug.log( 'Posting experiment' );
-                notifications_posted++;
-                notifications.append('<tr id="new_experiments_notification">' +
-                    '<td class="alert"></td>' +
-                    '<td>There are new experiments to run!</td><td>' +
-                    '<span class="buttonPanel" style="height: auto;">' +
-                    '<span class="button" style="width: 100%" '+
-                       'id="run_new_experiments">'+
-                       'Run experiments now</span><p>' +
-                    '<span class="button" style="width: 100%" '+
-                        'id="run_experiments_automatically">'+
-                        'Run now and run automatically in the future</span>'+
-                    '</span><p>' +
-                    '<span class="button" style="width: 100%" '+
-                        'id="run_experiments_later">'+
-                        'Run experiments later</span></td><td>' +
-                    '</td></tr>');
-
-                notifications.find('#run_new_experiments').click(function(){
-                    CROWDLOGGER.experiments.run_available_experiments();
+            // Clear this after a minute.
+            setTimeout( 
+                function(){
                     CROWDLOGGER.notifications.unset_notification(
-                        'new_experiments');
-                    jq('#new_experiments_notification').hide();
-                });
+                        'update_settings' );
+                }, clear_update_notification_delay );
+        }
 
-                notifications.find(
-                        '#run_experiments_automatically').click(function(){
-                    CROWDLOGGER.preferences.set_bool_pref(
-                       'run_experiments_automatically', true );
-                    CROWDLOGGER.experiments.run_available_experiments();
-                    CROWDLOGGER.notifications.unset_notification(
-                        'new_experiments');
-                    jq('#new_experiments_notification').hide();
-                });
+        // Check for notifications about unread messages.
+        if( note_board.new_messages > 0 ){
+            notifications_posted++;
 
-                notifications.find('#run_experiments_later').click(function(){
-                    CROWDLOGGER.notifications.unset_notification(
-                        'new_experiments');
-                    jq('#new_experiments_notification').hide();
-                });
-            }
+            attach_notification(
+                'update_settings_notification',
+                'There are <a href="#messages">new messages</a> ' +
+                ' from the project researchers.',[]
+            );
+        }
 
-            // Check for notifications about unread messages.
-            if( note_board.new_messages > 0 ){
-                notifications_posted++;
-                notifications.append('<tr><td class="alert"></td>' +
-                    '<td>There are <a href="#messages">new messages</a> ' +
-                    ' from the project researchers.</td><td></td></tr>');
-            }
+        // if( notifications_posted === 0 ){
+        //     notification_elm.html('No new notifications');
+        //     note_board.new_notifications = 0;
+        // } else {
+        //     //notifications += '</table>';
+        //     //B_DEBUG   
+        //     // CROWDLOGGER.debug.log( 'Added ' + notifications + 
+        //     //     ' to the status page.\n' );
+        //     //E_DEBUG
+        //     //notification_elm.innerHTML = notifications;
+        //     notification_elm.append(notifications);
+        // }
 
-            // Check for notifications about raffle wins.
-            if( note_board.unredeemed_raffle_win > 0 ){
-                notifications_posted++;
-                notifications.append('<tr><td class="alert"></td>' +
-                    '<td>You have <a href="#raffleWins">un-redeemed</a> ' + 
-                    ' raffle wins.</td><td></td></tr>');
-            }
-
-            if( notifications_posted === 0 ){
-                notification_elm.html('No new notifications');
-                note_board.new_notifications = 0;
-            } else {
-                //notifications += '</table>';
-                //B_DEBUG   
-                // CROWDLOGGER.debug.log( 'Added ' + notifications + 
-                //     ' to the status page.\n' );
-                //E_DEBUG
-                //notification_elm.innerHTML = notifications;
-                notification_elm.append(notifications);
-            }
-
-
-            // Place listeners.
-            
-//        }
         doc.defaultView.refreshLayout();
     } 
 

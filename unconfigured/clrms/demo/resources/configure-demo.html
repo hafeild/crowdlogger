@@ -17,6 +17,9 @@ var start = function(){
     populateForm();
 };
 
+/**
+ * Populates the preferences with their currently stored values.
+ */
 var populateForm = function(){
     var seenNames = {};
     jQuery('input').each(function(i,elm){
@@ -35,6 +38,9 @@ var populateForm = function(){
     });
 };
 
+/**
+ * Saves all of the user input in the form.
+ */
 var saveForm = function(){
     var data = jQuery('form').serializeArray();
     var i;
@@ -44,6 +50,10 @@ var saveForm = function(){
     return false;
 };
 
+/** 
+ * Retrieves an individual preference value and passes it on to the given
+ * on_success function.
+ */
 var getPrefValue = function(pref, defaultVal, on_success){
     demoBackend.clrmAPI.storage.preferences.get({
         pref: pref,
@@ -52,6 +62,9 @@ var getPrefValue = function(pref, defaultVal, on_success){
     });
 };
 
+/**
+ * Saves a preference value.
+ */
 var savePrefValue = function(pref, value){
     demoBackend.clrmAPI.storage.preferences.set({
         pref: pref,
@@ -65,6 +78,9 @@ var savePrefValue = function(pref, value){
     });
 };
 
+/**
+ * Displays and then fades the given jQuery element.
+ */
 var displayAndFade = function(jqElm){
     jqElm.show().fadeOut(2000);
 };
