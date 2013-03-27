@@ -51,6 +51,33 @@ Version: %%VERSION%%
 
     Click on an app or study to find out more information and install. You'll be able to configure these later.
 
+        <!-- Template. -->
+        <div class='templates'>
+            <div id="clrm-template" class="clrm-container">
+                <div class="clrm app" data-id="clrm">
+                    <span class="ribbon installed enabled">installed</span>
+                    <span class="ribbon installed not-enabled">disabled</span>
+                    <img data-id="logo" alt="" src=""/>
+                    <span class="name" data-id="name"></span>
+                </div>
+                <div class="info" data-id="info">
+                    <h2 data-id="name"></h2>
+                    <p data-id="description">
+                    </p>
+
+                    <span class="button installed enabled" data-type="open">Open</span>
+                    <span class="button installed enabled" data-type="configure">Configure</span>
+                    <span class="button installed" data-type="uninstall">Remove</span>
+                    <span class="button not-installed" data-type="install">Install</span>
+                    <span class="button installed enabled" data-type="disable">Disable</span>
+                    <span class="button installed not-enabled" data-type="enable">Enable</span>
+                    <span class="button" data-type="dismiss">Dismiss</span>
+                </div>
+            </div>  
+        </div>
+
+
+
     <h1>Apps</h1>
     <div id="apps" class="clrm-listing apps">
     </div>

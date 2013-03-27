@@ -58,6 +58,11 @@ function set_click_listeners(){
         window.open('%%PING_SERVER_BASE_URL%%/feedback/leaveFeedback.html');
         return false;
     });
+
+    jQuery('#app-library-button').click(function(){
+        CROWDLOGGER.clrm.launchCLRMLibraryPage(); 
+        return false;
+    });
   
 }
 
@@ -77,15 +82,15 @@ function refresh_page(){
  * page has been initialized yet.
  */
 function check_if_initialized(){
-    if( jQuery('#init').html() !== 'initialized' ){
+    if( jQuery('#init').html() === '' ){
         CROWDLOGGER.debug.log('Initializing from status.js\n');
         CROWDLOGGER.gui.study.pages.refresh_status_page( document );
     }
 
-    if( !experimentRefreshActivated ) {
-        experimentRefreshActivated = true;
-        refreshExperimentStats();
-    }
+    // if( !experimentRefreshActivated ) {
+    //     experimentRefreshActivated = true;
+    //     refreshExperimentStats();
+    // }
 }
 
 
@@ -104,6 +109,22 @@ function refreshExperimentStats() {
     setTimeout( refreshExperimentStats, experimentRefreshInterval );
 }
 
+
+function refreshLayout(){
+    console.log('In refreshLayout');
+    var rcol = jQuery('#right-column');
+    var lcol = jQuery('#left-column');
+    jQuery('.section').each(function(i, elm){
+        console.log('-------')
+        console.log('rcol.height: '+ rcol.height());
+        console.log('lcol.height: '+ lcol.height());
+        if( rcol.height() < lcol.height() ){
+            jQuery(elm).appendTo(rcol);
+        } else {
+            jQuery(elm).appendTo(lcol);
+        }
+    });
+}
 
 // Initialize the search for the CROWDLOGGER variable.
 init_crowdlogger();

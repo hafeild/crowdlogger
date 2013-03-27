@@ -41,6 +41,9 @@ function check_if_initialized(){
         ["preferences.html",
             CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page, 
             CROWDLOGGER.gui.study.pages.welcome.should_preference_page_be_shown],
+        ["clrm-library.html",
+            CROWDLOGGER.gui.study.pages.welcome.modify_clrm_library_page, 
+            function(){return true;}],
         ["welcome_last_page.html", 
             CROWDLOGGER.gui.study.pages.welcome.modify_last_page,
             function(){return true;}]

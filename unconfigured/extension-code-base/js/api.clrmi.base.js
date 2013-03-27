@@ -26,7 +26,7 @@ CLRMI.prototype.Base = function(api) {
         
     // Private function declarations.
     var init, extractData, onMessage, setExtensionPath, loadCLRM, unloadCLRM, 
-        invokeCLRMICallback;
+        invokeCLRMICallback, invokeCLRMMethod;
 
     // Public function declarations.
     this.postMessage, this.log, this.invokeCLIFunction;
@@ -38,9 +38,13 @@ CLRMI.prototype.Base = function(api) {
      */
     init = function(){
         console.log('Initializing CLRMIBaseAPI.\n');
+
+        // Populate the handlers.
         messageHandlers.loadCLRM = loadCLRM;
         messageHandlers.unloadCLRM = unloadCLRM;
         messageHandlers.setExtensionPath = setExtensionPath;
+        messageHandlers.invokeCLRMMethod = invokeCLRMMethod;
+
         jQuery(window).bind( 'message', onMessage );
 
         // Ask CLI for the extension path so we can open CrowdLogger pages.
@@ -123,7 +127,7 @@ CLRMI.prototype.Base = function(api) {
                 if( data.callbackID ){
                     that.invokeCLICallback({
                         callbackID: data.callbackID,
-                        options: {}
+                        options: {event: 'on_success'}
                     });
                 }
             };
@@ -180,8 +184,11 @@ CLRMI.prototype.Base = function(api) {
             if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
-                    options: {error: 'Not enough arguments to '+
-                        'clrmi.base.unloadCLRM'}
+                    options: {
+                        event: 'on_error', 
+                        errorMsg: 'Not enough arguments to '+
+                            'clrmi.base.unloadCLRM'
+                    }
                 });
             }
             return;
@@ -192,7 +199,7 @@ CLRMI.prototype.Base = function(api) {
             if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
-                    options: {}
+                    options: {event: 'on_success'}
                 });
             }
         }
@@ -202,7 +209,7 @@ CLRMI.prototype.Base = function(api) {
             if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
-                    options: {error: error}
+                    options: {event: 'on_error', errorMsg: error}
                 });
             }
         }        
@@ -222,7 +229,9 @@ CLRMI.prototype.Base = function(api) {
             } else if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
-                    options: {error: '[clrmi.base.unloadCLRM] '+ data.clrmid +
+                    options: {
+                        event: 'on_error',
+                        errorMsg: '[clrmi.base.unloadCLRM] '+ data.clrmid +
                         ' is not currently loaded and so cannot be unloaded.'}
                 });
             }
@@ -232,6 +241,67 @@ CLRMI.prototype.Base = function(api) {
         modules[data.clrmid].unload(data.reason, 
             data.reason==='uninstall' ? removeDB : onsuccess, 
             onerror)
+    };
+
+    /**
+     * Invokes a method of a CLRM.
+     *
+     * @param {object} data  A map of options.
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} clrmid     The id of the CLRM.
+     *    <li>{string} method     The name of the method to invoke.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{int} callbackID    The id of a callback to invoke.
+     *    <li>{object} opts       A map of parameters to pass to the method.
+     * </ul>
+     */
+    invokeCLRMMethod = function(data){
+        var sendErrorMessage = function(msg){
+            if( data.callbackID ){
+                that.invokeCLICallback({
+                    callbackID: data.callbackID,
+                    options: {
+                        event: 'on_error',
+                        errorMsg: msg
+                    }
+                });
+            }
+        };
+
+        // Check if we have all the necessary params.
+        if( !data || !data.clrmid || !data.method ){
+            sendErrorMessage('Not enough arguments to '+
+                        'clrmi.base.invokeCLRMMethod');
+            return;
+        }
+
+        // Check if the CLRM is loaded.
+        if( !modules[data.clrmid] ){
+            sendErrorMessage('[clrmi.base.invokeCLRMMethod] '+ 
+                data.clrmid +' is not currently loaded.');
+            return;
+        }
+
+        // Check if the method exists.
+        if( !modules[data.clrmid][data.method] ){
+            sendErrorMessage('[clrmi.base.invokeCLRMMethod] '+
+                data.method +' is not a method for '+ data.clrmid +'.');
+        }
+
+        // Invoke the function.
+        var returnValue = modules[data.clrmid][data.method](data.opts);
+        if( data.callbackID ){
+            that.invokeCLICallback({
+                callbackID: data.callbackID,
+                options: {
+                    event: 'on_success',
+                    data: returnValue
+                }
+            });
+        }
     };
 
     /**

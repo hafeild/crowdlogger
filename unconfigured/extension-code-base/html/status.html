@@ -14,12 +14,15 @@
         href="../css/img/crowdlogger-logo.001.16x16.png"/>
     <title>%%FULL_PROJECT_NAME%% Status Page</title>
     <link href="../css/dialog.css" rel="stylesheet" type="text/css">
+    <link href="../css/clrm.css" rel="stylesheet" type="text/css">
 
     <!-- Load jQuery first. -->
     <script src="../js/external_lib/jquery.min.js"></script>
     
     <script src="../js/dialog.js"></script>
+    <script src="../html-js/clrm-library.js"></script>
     <script src="../html-js/status.js"></script>
+
 
 </head>
 <body id="status_page_body">
@@ -69,17 +72,18 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
 
     <p>
 
-    <span class="note">Note: This page can be accessed by clicking on the 
+    <!-- <span class="note">Note: This page can be accessed by clicking on the 
         %%PROJECT_NAME%% menu icon&mdash;
         <img src="../css/img/crowdlogger-logo.001.logging.16x16.png"/> 
         &mdash;and selecting "Show status page".
     </span>
-
-    <div class="content">
+ -->
+    <div id="content" class="content">
    
-
+        <div id="left-column"></div>
+        <div id="right-column"></div>
  
-        <div class="notifications section">
+        <div id="notifications-wrapper" class="notifications section" style="display: none;">
             <a name="notifications"></a>
             <h1>Notifications</h1>
             <div id="notifications">
@@ -87,7 +91,6 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             </div>
         </div>
     
-        <p>
     
         <div class="messages section">
             <a name="messages"></a>
@@ -97,7 +100,6 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             </div>
         </div> 
     
-        <p>
     
 <!--         <div class="experiments section">
             <a name="experiments"></a>
@@ -138,62 +140,119 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             </div>
         </div>  -->
     
-        <p>
+        
      
         <div class="tools section">
             <a name="tools"></a>
             <h1>Tools</h1>
             <div id="tools">
-                <ul>
-                    <h2><a href="#" 
-                        id="search_histogram_button">Search histogram</a>
-                    </h2>
-                    See the searches you have entered and how frequently. You
-                    can sort by search or frequency.
+                <!-- Search histogram. -->
+                <div class="tool-container">
+                    <div class="tool" title="See the searches you have entered and how frequently. You can sort by search or frequency." id="search_histogram_button">
+                        <img alt="" src=""/>
+                        <span class="name">Search histogram</span>
+                    </div>
+                </div>
 
-                    <p>
+                <!-- Search trails. -->
+                <div class="tool-container">
+                    <div class="tool" title="See the searches you have conducted and pages you've visited in chronological order." id="search_trails_button">
+                        <img alt="" src=""/>
+                        <span class="name">Search trails</span>
+                    </div>
+                </div>
 
-                    <h2><a href="#" 
-                        id="search_trails_button">Search trails</a>
-                    </h2>
-                    See the searches you have conducted and pages you've visited 
-                    in chronological order.
+                <!-- Export search log. -->
+                <div class="tool-container">
+                    <div class="tool" title="View your raw search log and save it to disk." id="export_log_button">
+                        <img alt="" src=""/>
+                        <span class="name">Export search log</span>
+                    </div>
+                </div>
 
-                    <p>
-                    <h2><a href="#"
-                        id="export_log_button">Export search log</a>
-                    </h2>
-                    View the raw search log and save it to disk.
-
-                    <p>
-
-
-                    <h2><a href="#" 
-                        id="clear_log_button">Clear log</a>
-                            <span id="confirm_clear"
-                                style="color:red; display: none"
+                <!-- Clear log. -->
+                <div class="tool-container">
+                    <div class="tool" title="Remove everything&mdash;all of your searches, visited pages, etc.&mdash;from your search log." id="clear_log_button">
+                        <img alt="" src=""/>
+                        <span class="name">                        
+                            <span id="confirm_clear" 
+                                style="color:#800000; display: none"
                                 >Are you sure?
-                            <a href="#"
-                                id="clear_log_confirm_button">Yes</a></span>
-                        <span id="cleared" 
-                                style="display: none" class="cleared">
-                            &ndash; Cleared
+                                <span style="text-decoration: underline; color: white;"
+                                id="clear_log_confirm_button">Yes</span><br/></span>
+                            <span id="cleared" 
+                                style="display: none" class="cleared">Cleared<br/>
+                            </span>
+                            Clear entire log
                         </span>
-                    </h2>
-                    Remove everything&mdash;all of your searches, visited 
-                    pages, etc.&mdash;from your search log.
-                </ul>
-                
+                    </div>
+
+                </div>
+
+                <!-- Apps and studies. -->
+                <div class="tool-container">
+                    <div class="tool" title="Manage new and existing apps and studies" id="app-library-button">
+                        <img alt="" src=""/>
+                        <span class="name">App &amp; study library</span>
+                    </div>
+                </div>                
+
             </div>
         </div>
 
-        <p>
+        <!-- Template. -->
+        <div class="templates">
+            <div id="clrm-template" class="clrm-container">
+                <div class="clrm app" data-id="clrm">
+                    <span class="ribbon installed enabled">installed</span>
+                    <span class="ribbon installed not-enabled">disabled</span>
+                    <img data-id="logo" alt="" src=""/>
+                    <span class="name" data-id="name"></span>
+                </div>
+                <div class="access">
+                   <!--  <table>
+                        <tr>
+                            <td colspan=3 class="message"> -->
+                                <div class="message">
+                                No messages.
+                                </div>
+                         <!--    </td>
+                        </tr><tr>
+                        </tr><tr>
+                            <td> -->
+                                <span class="button installed enabled" data-type="open">Open</span>
+                            <!-- </td>
+                            <td> -->
+                                <span class="button installed enabled" data-type="configure">Configure</span>
+                            <!-- </td>
+                            <td> -->
+                                <span class="button installed enabled" data-type="disable">Disable</span>
+                                <span class="button installed not-enabled" data-type="enable">Enable</span>
+                                <span class="button installed" data-type="uninstall">Remove</span>
+                                <span class="button not-installed" data-type="install">Install</span>
+                           <!--  </td>
+                        </tr>
+                    </table> -->
+                </div>
+            </div>  
+        </div>
+
+        <div id="apps" class="apps section">
+            <a name="apps"></a>
+            <h1>Apps</h1>
+
+
+        </div>
+
+        <div id="studies" class="studies section">
+            <a name="studies"></a>
+            <h1>Studies</h1>
+
+        </div>
 
         <div class="feedback section">
             <a name="feedback"></a>
             <h1>Feedback</h1>
-            <p>
-
             If you have any comments or suggestions about the %%PROJECT_NAME%%
             system that you would like to let us know, you can
             email us at %%CONTACT_EMAIL%% or  <a href="#"
@@ -209,7 +268,6 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             [<a href="#" class="close_button">Close page</a>]
         </span>
     </div> -->
-                
 
     <div class="buffer">
     </div>

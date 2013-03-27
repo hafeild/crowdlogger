@@ -37,12 +37,12 @@ CLI.prototype.Base = function(crowdlogger, cli){
     const MAX_INIT_ATTEMPTS = 100;
 
     // Private function declarations.
-    var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback,
-        simpleCallbackWrapper;
+    var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
 
     // Public function declarations.
     this.loadCLRM, this.unloadCLRM, this.sendMessage, this.registerCallback, 
-    this.unregisterCallback, this.invokeCLRMICallback; 
+    this.unregisterCallback, this.invokeCLRMICallback, 
+    this.simpleCallbackWrapper; 
 
 
     // Private function definitions.
@@ -252,12 +252,14 @@ CLI.prototype.Base = function(crowdlogger, cli){
         return true;
     };
 
-    simpleCallbackWrapper = function(onsuccess, onerror){
+    // Public function definitions.
+
+    this.simpleCallbackWrapper = function(onsuccess, onerror){
         var callbackID;
         var callback = function(opts, callbackID){
-            if( opts.error && onerror ){
+            if( opts.event === 'on_error' && onerror ){
                 onerror(opts.error);
-            } else if( !opts.error && onsuccess ) {
+            } else if( opts.event === 'on_success' && onsuccess ) {
                 onsuccess();
             }
 
@@ -266,8 +268,6 @@ CLI.prototype.Base = function(crowdlogger, cli){
         callbackID = that.registerCallback(callback);
         return callbackID;
     };
-
-    // Public function definitions.
 
     /**
      * Loads a CrowdLogger Remote Module. This can be from a URL or a string.
@@ -315,7 +315,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
         that.sendMessage({
             command: 'loadCLRM', 
             package: package,
-            callbackID: simpleCallbackWrapper(onsuccess, onerror)
+            callbackID: that.simpleCallbackWrapper(onsuccess, onerror)
         });
     };
 
@@ -329,9 +329,43 @@ CLI.prototype.Base = function(crowdlogger, cli){
             command: 'unloadCLRM', 
             clrmid: clrmid, 
             reason: reason,
-            callbackID: simpleCallbackWrapper(onsuccess, onerror)
+            callbackID: that.simpleCallbackWrapper(onsuccess, onerror)
         });
     };
+
+    /**
+     * Invokes a public method of the given (loaded) CLRM. 
+     *
+     * @param {object} params  A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} clrmid   The id of the CLRM whose method will be invoked.
+     *    <li>{string} method   The name of the method to invoke.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{object} opts     A map of options to pass to the method.
+     *    <li>{function} on_success Invoked on success, including any associated
+     *                          data (e.g., the return value of a getter).
+     *    <li>{function} on_error   Invoked on error.
+     * </ul>
+     */
+    this.invokeCLRMMethod = function(params){
+        if( !params || !params.clrmid || !params.method ){
+            throw 'cli.invokeCLRMMethod requires at least a '+
+                'clrmid and method field in the parameters map.';
+            return false;
+        }
+
+        that.sendMessage({
+            command: 'invokeCLRMMethod', 
+            clrmid: params.clrmid, 
+            method: params.method,
+            opts: params.opts,
+            callbackID: that.simpleCallbackWrapper(
+                params.on_success ,params.on_error )
+        });
+    }
 
     /**
      * Sends a message to the CLRMI.

@@ -442,4 +442,40 @@ CROWDLOGGER.gui.study.pages.welcome.modify_preferences_page = function(
     CROWDLOGGER.gui.preferences.refresh_preference_page( preferences_doc );
 };
 
+
+/**
+ * Reconfigures the welcome wizard buttons when the CLRM Library page is
+ * displayed.
+ *
+ * @param {object} welcome_doc The document for the welcome page.
+ * @param {object} clrm_library_doc The document for the CLRM Library page.
+ */
+CROWDLOGGER.gui.study.pages.welcome.modify_clrm_library_page = function(
+        welcome_doc, clrm_library_doc ){
+
+    var jq = welcome_doc.defaultView.jQuery;
+
+    var register_button_enabled = jq('#welcome_wizzard_next_button');
+    var register_button_disabled = jq('#welcome_wizzard_next_button_disabled');
+    var skip_button = jq('#welcome_wizzard_skip_button');
+
+    // If we can't get this button, pretty much everything is lost, so just
+    // exit.
+    if(register_button_enabled.length === 0){
+        return;
+    }
+
+    // Change the button text.
+    register_button_enabled.html('Continue');
+    register_button_enabled.unbind('click').click(welcome_doc.defaultView.next);
+
+
+    // Make sure the correct buttons are enabled.
+    CROWDLOGGER.util.enable_button( [register_button_enabled[0], 
+        register_button_disabled[0]] );
+    skip_button.hide();
+};
+
+
+
 } // END CROWDLOGGER.gui.study.pages.welcome NAMESPACE

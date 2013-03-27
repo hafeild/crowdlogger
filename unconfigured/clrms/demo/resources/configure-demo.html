@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>CLRM Configure Demo</title>
+
+<link type="text/css" rel="stylesheet" href="demo.css"/>
+
+<script language="javascript" src="jquery-1.7.1.min.js"></script>
+<script language="javascript" src="init.js"></script>
+
+<script>
+/**
+ * Called after the window has connected with the demo background script.
+ * The demoBackend variable will be available when start is called.
+ */
+var start = function(){
+    jQuery('#save').click(saveForm);
+    populateForm();
+};
+
+var populateForm = function(){
+    var seenNames = {};
+    jQuery('input').each(function(i,elm){
+        if( seenNames[elm.name] ){ return; }
+        seenNames[elm.name] = 1;
+
+        if( elm.type === 'text' ){
+            getPrefValue(elm.name, '', function(val){ elm.value = val; });
+        } else if( elm.type === 'radio' ) {
+            getPrefValue(elm.name, 'default', function(val){
+                jQuery('input[name='+elm.name+'][value='+val+']').
+                    attr('checked', 'checked');
+            });
+        }
+
+    });
+};
+
+var saveForm = function(){
+    var data = jQuery('form').serializeArray();
+    var i;
+    for(i = 0; i < data.length; i++){
+        savePrefValue(data[i].name, data[i].value);
+    }
+    return false;
+};
+
+var getPrefValue = function(pref, defaultVal, on_success){
+    demoBackend.clrmAPI.storage.preferences.get({
+        pref: pref,
+        defaultValue: defaultVal,
+        on_success: on_success
+    });
+};
+
+var savePrefValue = function(pref, value){
+    demoBackend.clrmAPI.storage.preferences.set({
+        pref: pref,
+        value: value,
+        on_success: function(){
+            displayAndFade(jQuery('#save-success'));
+        },
+        on_error: function(){
+            displayAndFade(jQuery('#save-error'));
+        }
+    });
+};
+
+var displayAndFade = function(jqElm){
+    jqElm.show().fadeOut(2000);
+};
+
+</script> 
+
+</head>
+<body>
+
+    <h1>CrowdLogger Remote Module (CLRM)</h1>
+    <h2>Configure Demo</h2>
+
+    <h3>Please set the following preferences.</h3>
+
+    <form>
+        <p>
+        What is your favorite color? <input type="text" name="favorite-color"/> 
+        </p>
+        <p>
+        What age are you? 
+            <input type="radio" name="age" value="10-30"/>10&ndash;30
+            <input type="radio" name="age" value="31+"/>31 or older
+        </p>
+    </form>
+
+    <button id="save">Save</button>
+    <span id="save-success" class="success notice">Success</span>
+    <span id="save-error" class="error notice">Error!</span>
+</body>
+</html>

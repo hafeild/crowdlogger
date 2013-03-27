@@ -36,7 +36,7 @@ html {
 
 body {
     background-color:       lightsteelblue; 
-    height:                 100%;
+    /*height:                 100%;*/
     padding-bottom:         10px;
     /*width:                  850px;*/
     color: #464646;
@@ -390,7 +390,7 @@ td.date {
 }
 
 .cleared {
-    color:                  gray;
+    color:                  white;
     font-style:             italic;
 }
 
@@ -521,4 +521,106 @@ a {
 
 a:hover {
     color: blue;
+}
+
+.tool-container {
+    position: static;
+    display: inline;
+    margin: 5px;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box;
+}
+
+.tool {
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    border: 2px lightgray solid;
+    border-radius: 4px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    background-color: lightsteelblue;
+    color: #444;
+    font-size: 9pt;
+}
+
+.tool:hover {
+    cursor: pointer;
+    background-color: steelblue;
+    color: white;
+    border: 2px orange solid;
+}
+
+.tool .name {
+    display: table-cell;
+    vertical-align: middle;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+}
+
+#status_page_body h1, #status_page_body h2, #status_page_body h3 {
+    margin: 0;
+    margin-bottom: 4px;
+}
+#status_page_body h1 {
+    font-size: 130%;
+}
+
+#status_page_body h2 {
+    font-size: 120%;
+}
+
+#status_page_body h3 {
+    font-size: 110%;
+}
+
+#right-column, #left-column {
+    width: 390px;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#status_page_body .section {
+    float: left;
+    margin: 10px;
+    width: 365px;
+    display: inline-block;
+    vertical-align: top;
+    padding: 5px;
+    border: 1px #e2e2e2 solid;
+}
+
+#status_page_body .content {
+    width: 100%;
+    font-size: 90%;
+    overflow: auto;
+}
+
+#status_page_body .access {
+    width: 250px;
+    display: inline-block;
+    vertical-align: bottom;
+    padding: 5px;
+    font-size: 90%;
+}
+
+#status_page_body .access .message {
+    margin-left: 5px;
+    margin-bottom: 10px;
+}
+
+#status_page_body .access .button {
+    /*height: 30px;*/
+    /*display: table-cell;*/
+    height: 17px;
+}
+
+.templates {
+    display: none;
 }

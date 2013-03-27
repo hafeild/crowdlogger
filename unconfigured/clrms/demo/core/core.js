@@ -5,10 +5,6 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
 
     this.init = function(){
         demo = new that.Demo( clrmPackage, clrmAPI );
-        // Launch the window in about 1 sec from now.
-        setTimeout( function(){ 
-            demo.launchWindow('demo.html');
-        }, 1000 );
     };
 
     this.unload = function(reason, oncomplete, onerror){
@@ -25,5 +21,17 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
             default:
                 demo.unload(oncomplete, onerror);
         }
+    };
+
+    this.getMessage = function(){
+        return "No messages.";
+    };
+
+    this.open = function(){
+        demo.launchWindow('demo.html');
+    };
+
+    this.configure = function(){
+        demo.launchWindow('configure-demo.html');
     };
 }

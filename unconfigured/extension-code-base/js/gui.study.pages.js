@@ -172,20 +172,24 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     if( !jq ){ return };
 
+    var init_elm         = doc.getElementById( 'init' );
+    
+    if( init_elm.innerHTML.length > 0 ){ return; }
+    // This tells the page that it's been initialized.
+    init_elm.innerHTML = 'initialized';
+
     // Get the elements we need to populate.
     var notification_elm = jq('#notifications').html('');
     var messages_elm     = doc.getElementById( 'messages' );
     var experiments_elm  = doc.getElementById( 'experiments' );
     var raffle_wins_elm  = doc.getElementById( 'raffleWins' );
-    var init_elm         = doc.getElementById( 'init' );
-    
-    // This tells the page that it's been initialized.
-    init_elm.innerHTML = 'starting';
 
     // For the special update notifications (shown after an update is installed).
     var clear_update_notification_delay = 30*1000; // 30-seconds
     var clear_update_message_delay = 30*60*1000; // 30-minutes
 
+
+    CROWDLOGGER.clrm.populateCLRMLibraryPage(doc, null, null, true);
 
     /*
     CROWDLOGGER.study.notify_of_new_consent_form();
@@ -236,6 +240,7 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
     // Insert the notifications.
     if( notification_elm.size() > 0 ){
+        jq('#notifications-wrapper').show();
         var notifications = jq('<table class="notifications">');
         // This will keep track of how many notifications have
         // been posted.
@@ -535,7 +540,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             // Place listeners.
             
 //        }
-    }
+        doc.defaultView.refreshLayout();
+    } 
 
     // Now take care of the messages section.
     if( messages_elm ){
@@ -558,8 +564,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
         }, 5 );
     }
 
-    // This tells the page that it's been initialized.
-    init_elm.innerHTML = "done";
+    // // This tells the page that it's been initialized.
+    // init_elm.innerHTML = "initialized";
 
     if( CROWDLOGGER.preferences.get_bool_pref('dev_mode', false) &&
             jq('#dev_tools').length == 0) {

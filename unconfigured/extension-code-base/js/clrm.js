@@ -17,7 +17,8 @@ var CLRM = function(crowdlogger){
     var getAvailableCLRMListing, // I.e., from the server.
         getInstalledCLRMListing, // Some of these will be local.
         getOverviewCLRMListings, // Includes available and installed.
-        generateCLRMElement;
+        generateCLRMElement,
+        populateCLRMElement;
 
 
     // Private function definitions.
@@ -173,6 +174,46 @@ var CLRM = function(crowdlogger){
         return elm;
     };
 
+    /**
+     *
+     * @param {jquery} jq  The jQuery object for the page on which the CLRM
+     *                     will be placed.
+     * @param {object} clrmMetadata  The metadata for the CLRM to generate
+     *                               the DOM element for.
+     */
+    populateCLRMElement = function( elm, clrmMetadata ){
+        //elm.attr('data-clrmid', clrmMetadata.clrmid);
+        elm.attr({
+            'data-clrmid': clrmMetadata.clrmid,
+            'data-metadata': JSON.stringify(clrmMetadata)
+        });
+
+        if( clrmMetadata.installed ){
+            elm.addClass('installed');
+        } else {
+            elm.addClass('not-installed');
+        }
+
+        if( clrmMetadata.enabled ){
+            elm.addClass('enabled');
+        } else {
+            elm.addClass('not-enabled');
+        }
+
+        elm.find('[data-id=clrm]').attr('data-clrmid', clrmMetadata.clrmid);
+
+
+        if( clrmMetadata.logoURL ){
+            elm.find('[data-id=logo]').attr('src', clrmMetadata.logoURL);
+        }
+
+        elm.find('[data-id=name]').html(clrmMetadata.name);
+
+        elm.find('[data-id=description]').html(clrmMetadata.description);
+
+        return elm;
+    };
+
     // Public functions.
     /**
      * Adds available and installed CLRMs (apps and studies) to the given
@@ -184,7 +225,7 @@ var CLRM = function(crowdlogger){
      *                            completion.
      * @param {function} onError  The function to invoke on an error.
      */
-    this.populateCLRMLibraryPage = function( doc, callback, onError ){
+    this.populateCLRMLibraryPage = function(doc, callback, onError, installedOnly){
         var jq = doc.defaultView.jQuery;
 
         var onSuccess = function(allMetadata){
@@ -192,11 +233,19 @@ var CLRM = function(crowdlogger){
             var clrmid;
             for(clrmid in allMetadata){
                 var metadata = allMetadata[clrmid];
+
+                if( !metadata.installed && installedOnly ){
+                    continue;
+                }
+
                 crowdlogger.debug.log('Attempting to add '+ clrmid);
                 crowdlogger.debug.log('Metadata: '+ JSON.stringify(metadata));
                 try{
                     var used = false;
-                    var jqElm = generateCLRMElement(jq, metadata);
+                    //var jqElm = generateCLRMElement(jq, metadata);
+                    var jqElm = populateCLRMElement(
+                        jq('#clrm-template').clone(), metadata);
+                    jqElm.show();
 
                     if(metadata.categories.indexOf('app') >= 0){
                         crowdlogger.debug.log('Adding to apps.');
@@ -519,4 +568,31 @@ var CLRM = function(crowdlogger){
         });
     };
 
+
+    this.open = function(clrmid, onSuccess, onError){
+        crowdlogger.api.cli.base.invokeCLRMMethod({
+            clrmid: clrmid,
+            method: 'open',
+            on_success: onSuccess,
+            on_error: onError
+        });
+    };
+
+    this.configure = function(clrmid, onSuccess, onError){
+        crowdlogger.api.cli.base.invokeCLRMMethod({
+            clrmid: clrmid,
+            method: 'configure',
+            on_success: onSuccess,
+            on_error: onError
+        });
+    };
+
+    this.getMessage = function(clrmid, onSuccess, onError){
+        crowdlogger.api.cli.base.invokeCLRMMethod({
+            clrmid: clrmid,
+            method: 'getMessage',
+            on_success: onSuccess,
+            on_error: onError
+        });
+    };
 }

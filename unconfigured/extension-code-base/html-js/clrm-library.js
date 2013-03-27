@@ -17,6 +17,16 @@ function check_if_initialized(){
     if( initElm.html() === '' ){
         CROWDLOGGER.clrm.populateCLRMLibraryPage(document, function(){
             console.log('success!');
+
+            try{
+                // jQuery('#content').isotope({
+                //   // options
+                //   itemSelector : '.section',
+                //   layoutMode : 'masonry'
+                // });
+            } catch(e){
+                
+            }
         }, function(e){ 
             console.log('Error: '+ e);
         });
@@ -43,11 +53,12 @@ var add_listeners = function(){
         target.parents('.clrm-container').find('.info').
             show({easing: 'clip', duration: 300});
     });
-    jQuery(document).on('click', '.info .button', function(e){
+    jQuery(document).on('click', '.info .button, .access .button', function(e){
         var target = jQuery(this);
-        var clrmid = target.parent().attr('data-clrmid');
+        var clrmid = target.parents('.clrm-container').attr('data-clrmid');
         var container = jQuery('.clrm-container[data-clrmid='+clrmid+']');
-        var metadata =JSON.parse(target.parent().attr('data-metadata'));
+        var metadata = JSON.parse(container.attr('data-metadata')); 
+        //JSON.parse(target.parent().attr('data-metadata'));
         switch( target.attr('data-type') ){
             // Install.
             case 'install':
@@ -98,9 +109,20 @@ var add_listeners = function(){
 
                 break;
 
+            case 'open':
+                CROWDLOGGER.clrm.open(clrmid);
+                break;
+
+            case 'configure':
+                CROWDLOGGER.clrm.configure(clrmid);
+                break;
+
             // Dismiss.
-            default:
+            case 'dismiss':
                 target.parent().hide({easing: 'slide', duration: 300});
+                break;
+
+            default:
         }
     });
 
