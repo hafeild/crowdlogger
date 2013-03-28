@@ -1,5 +1,4 @@
 <?php
-
 /** 
  * File:    messages.php
  * Date:    17-Dec-2010
@@ -12,37 +11,49 @@
 $DATE = 1;
 $MESSAGE = 2;
 ?>
-
+<!DOCTYPE html>
+<!--
+%%LICENSE%%
+Version: %%VERSION%%
+-->
 <html>
 <head>
-    <title>CrowdLogger Messages</title>
+    <link rel="shortcut icon" type="image/png"
+        href="images/crowdlogger-logo.001.16x16.png"/>
+    <title>%%PROJECT_NAME%% Messages</title>
     <link rel="stylesheet" type="text/css" media="screen"
       href="../style/style.css" />
 </head>
-
 <body>
-
 <div class="bodyWrapper">
 
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">CrowdLogger</span><br>
-            <span id="subtitle">
-                <span class="titleSub">Messages</span>
-                <br>
+            <span class="logo-version">version %%VERSION%%</span>
+            <img class="logo" src="../images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Messages</span><br>
             </span>
         </div>
+
+        <div id="iframe" class="menu-frame">
+           <iframe src="../menu.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="70px">
+           </iframe>
+        </div>
+        <div id="share-iframe" class="share-iframe">
+           <iframe src="../share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+           </iframe>
+        </div>
+
     </div>
 
-<div id="iframe">
-   <iframe src="../menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
-        height=70px>
-   </iframe>
-</div>
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
 
-
-<h1>Messages from the Privacy Preserving Search Logger Project Researchers</h1>
+<h1>Messages from the %%PROJECT_NAME%% researchers</h1>
 
 Below is a listing of important messages from the study researchers, sorted
 by date. You can get messages emailed to you by signing up with <a href="http://groups.google.com/group/crowdlogger-project-news?pli=1">this Google Group</a>.
