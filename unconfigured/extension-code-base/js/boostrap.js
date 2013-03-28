@@ -16,6 +16,17 @@ const APP_SHELL_SERVICE = Cc['@mozilla.org/appshell/appShellService;1'].
     getService(Components.interfaces.nsIAppShellService);
 const XUL_NS = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul';
 
+const REASONS = {
+    APP_STARTUP: 1,
+    APP_SHUTDOWN: 2,
+    ADDON_ENABLE: 3,
+    ADDON_DISABLE: 4,
+    ADDON_INSTALL: 5,
+    ADDON_UNINSTALL: 6,
+    ADDON_UPGRADE: 7,
+    ADDON_DOWNGRADE: 8,
+};
+
 var that = this;
 
 var CROWDLOGGER;
@@ -85,7 +96,6 @@ function load_xul(){
         var win = enumerator.getNext();
         dump('Calling load_xul_for_window on current window.\n')
         load_xul_for_window(win);
-        
     }
     dump('Done with open windows.\n');
     wm.addListener(WindowListener);
@@ -183,6 +193,8 @@ function unload_xul(){
         var win = enumerator.getNext();
         remove_buttons_from_window(win, listeners_placed);
     }
+
+    that.win.location.href = 'about:blank';
 }
 
 function remove_buttons_from_window( win, listeners ) {
@@ -200,7 +212,7 @@ function remove_buttons_from_window( win, listeners ) {
             dump('\tremoving element: '+ x +'\n');
         }
     }
-    win.CROWDLOGGER = undefined;
+    win.CROWDLOGGER = null;
 }
 
 function setTimeout(callback, delay) {
@@ -237,34 +249,66 @@ function initCrowdLogger(callback){
     }
 }
 
-function startup(data, reason) {
-    //setTimeout(load_xul, 1500);
-    //watchWindows(load_xul_for_window);
+
+function startCrowdLogger(data, onComplete){
     AddonManager.getAddonByID(data.id, function(addon) {
 
         initHiddenWindow( function(){
             load_css(addon);
-            initCrowdLogger(load_xul);
+            initCrowdLogger(onComplete);
         }, addon );
 
         //dump('CROWDLOGGER enabled? : '+ CROWDLOGGER.enabled );
     });
 }
 
-function shutdown(data, reason) {
-    CROWDLOGGER.debug.log('In shutdown function...');
-    CROWDLOGGER.gui.windows.close_all_dialogs();
+function startup(data, reason) {
+    //setTimeout(load_xul, 1500);
+    //watchWindows(load_xul_for_window);
 
+    startCrowdLogger(data, load_xul);
+
+    dump('Exiting startup\n');
+}
+
+function shutdownEverything(){
+    dump('setting enabled = false...\n');
     CROWDLOGGER.enabled = false;
 
+    dump('removing listeners...\n');
+    //dump('value of: '+ CROWDLOGGER.logging.event_listeners.uninstall_listener+'\n');
     // Uninstall all of the listeners placed by CROWDLOGGER.
-    CROWDLOGGER.logging.event_listeners.uninstall_listener();
+    dump(CROWDLOGGER.logging.event_listeners.uninstall_listener());
 
+    dump('unloading xul...\n');
     // Remove all of the buttons.
     unload_xul();
 
+    dump('unsetting crowdlogger...\n');
     // Unset CROWDLOGGER.
-    CROWDLOGGER = undefined;
+    CROWDLOGGER = null;
+}
+
+function shutdown(data, reason) {
+    dump('In shutdown function...; reason: '+ reason +'\n');
+    // CROWDLOGGER.gui.windows.close_all_dialogs();
+
+    // Skip shutdown if this is an uninstall (the uninstall function
+    // will take care of the shutdown).
+    if( reason === REASONS.ADDON_DISABLE ){
+        var wm = Cc['@mozilla.org/appshell/window-mediator;1']
+                    .getService(Components.interfaces.nsIWindowMediator);
+        var browser = wm.getMostRecentWindow('navigator:browser');
+        var yes = browser.confirm(
+            'Would you like to remove ALL %%PROJECT_NAME%% data?');
+        if(yes){
+            uninstall(data, REASONS.ADDON_UNINSTALL);
+            return;
+        }
+    }
+
+    shutdownEverything();
+
 }
 
 function install(data, reason) {
@@ -272,6 +316,40 @@ function install(data, reason) {
 }
 
 function uninstall(data, reason) {
+    dump('In uninstall function...; reason: '+ reason +'\n');
+    if( reason === REASONS.ADDON_UNINSTALL ){
+        if( CROWDLOGGER ){
+            removeData();
+        } else {
+            startCrowdLogger(data, removeData);
+        }
+    }
+}
+
+function removeData(){
+    dump('In removeData...\n');
+    // 3. Remove preferences.
+    var rmPref = function(){
+        dump('removing preferences...\n');
+        try{
+            CROWDLOGGER.preferences.clear();
+        } catch(e){}
+        // 4. Shut down everything.
+        shutdownEverything();
+    };
+
+    // 2. Remove the CrowdLogger database.
+    var rmDB = function(){
+        dump('removing CL database...\n');
+        CROWDLOGGER.io.log.remove_cl_database({
+            on_success: rmPref,
+            on_error: rmPref
+        });
+    };
+
+    dump('removing CLRMs...\n');
+    // 1. Uninstall all of the extensions.
+    CROWDLOGGER.clrm.unloadAllCLRMs('uninstall', rmDB, rmDB);
 
 }
 

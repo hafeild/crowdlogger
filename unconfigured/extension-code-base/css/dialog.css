@@ -367,6 +367,13 @@ tr:nth-child(odd) {
     margin-right:           auto;
 }
 
+#tools {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    vertical-align: top;
+}
+
 tr.newMessage {
 /*    color:                  #FF9900;*/
     color:                  #CC9900;
@@ -525,8 +532,9 @@ a:hover {
 
 .tool-container {
     position: static;
-    display: inline;
-    margin: 5px;
+    display: inline-block;
+    margin-right: 3px;
+    margin-bottom: 5px;
     box-sizing:border-box;
     -moz-box-sizing:border-box; 
     -webkit-box-sizing:border-box;

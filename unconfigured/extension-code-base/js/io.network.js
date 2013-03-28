@@ -65,7 +65,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
     // first to make sure there is an internet connection. This is a precaution
     // in the event that the user's computer has pulled an ip address, but is
     // behind a firewall (e.g., at a hotel with a sign-in page).
-    if( !bypass_firewall_check && url.match( /^https/ ) !== null ){
+    if( bypass_firewall_check || url.match(/^https/) ){
         CROWDLOGGER.io.network.send_data( 
             CROWDLOGGER.preferences.get_char_pref( "ping_server_url", 
                                                    "http://www.google.com" ),
@@ -114,7 +114,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
                 on_success( response );
             } else {
                 //B_DEBUG
-                CROWDLOGGER.debug.log( "Error while posting data to  "+url+": " +
+                CROWDLOGGER.debug.log( "Error while posting data to  "+url+": "+
                     httpReq.status + 
                     "\n\ttext: " + httpReq.responseText +  
                     "\n\ttext: " + httpReq.responseXML + "\n" ); 
@@ -127,9 +127,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
     // Send the data.
     httpReq.send( data );
 
-    // Note that returning true here just means that we've made it this far.
     return true;
-
 };
 
 

@@ -58,20 +58,30 @@ CROWDLOGGER.logging.event_listeners.initialize = function(current_window){
 };
 
 CROWDLOGGER.logging.event_listeners.uninstall_listener = function( id ){
+    var msgs = [];
+    msgs.push('In CROWDLOGGER.logging.event_listeners.uninstall_listener...\n');
     if( id === undefined ){
+        msgs.push('Removing all event listeners...\n');
         var x;
         for( x in CROWDLOGGER.logging.event_listeners.placed_listeners ){
-            if( CROWDLOGGER.logging.event_listeners.placed_listeners[x] ){
-                CROWDLOGGER.logging.event_listeners.
-                    placed_listeners[x].on_unload();
+            msgs.push('Removing listener: '+ x +'...');
+            try{
+                if( CROWDLOGGER.logging.event_listeners.placed_listeners[x] ){
+                    CROWDLOGGER.logging.event_listeners.
+                        placed_listeners[x].on_unload();
+                }
+                delete CROWDLOGGER.logging.event_listeners.placed_listeners[x];
+                msgs.push('done!\n');
+            } catch(e){
+                msgs.push('Exception caught: '+ e +'\n');
             }
-            delete CROWDLOGGER.logging.event_listeners.placed_listeners[x];
         }
     } else {
         var obj = CROWDLOGGER.logging.event_listeners.placed_listeners[id];
         if( obj ){ obj.on_unload(); }
         delete CROWDLOGGER.logging.event_listeners.placed_listeners[id];
     }
+    return msgs.join('');
 }
 
 /**

@@ -36,6 +36,16 @@ CROWDLOGGER.preferences = {
     }
 };
 
+/**
+ * Clears all preferences.
+ */
+CROWDLOGGER.preferences.clear = function(){
+    if( CROWDLOGGER.version.info.is_firefox ){
+        CROWDLOGGER.preferences.pref.deleteBranch('');
+    } else {
+        CROWDLOGGER.preferences.pref.clear();
+    }
+};
 
 /**
  * This is a closure that will define the g/set_char_pref, g/set_bool_pref,
@@ -48,8 +58,7 @@ CROWDLOGGER.preferences.init = function(){
     //E_DEBUG
 
     // The bowser we're using.
-    var browser_name = CROWDLOGGER.version.info.get_browser_name();
-    if( browser_name === "ff3" || browser_name === "ff4" ) {
+    if( CROWDLOGGER.version.info.is_firefox ) {
         var pref = Components.classes["@mozilla.org/preferences-service;1"]
             .getService(Components.interfaces.nsIPrefService).
             getBranch("crowdlogger.");
@@ -57,16 +66,9 @@ CROWDLOGGER.preferences.init = function(){
         CROWDLOGGER.debug.log( "\tpref: " + pref + "\n" );
         //E_DEBUG
         CROWDLOGGER.preferences.pref = pref;
-    } else if( browser_name === "chrome" ){
+    } else if( CROWDLOGGER.version.info.is_chrome ){
         CROWDLOGGER.preferences.pref = localStorage;
     }
-
-
-    //B_DEBUG
-    CROWDLOGGER.debug.log( "Entering anonymous closure to set up " +
-        "g/set_*_pref functions.\n" );
-    CROWDLOGGER.debug.log( "\tBrowser name: " + browser_name + "\n" );
-    //E_DEBUG
 
     /**
      * Retrieves the preference in Firefox.
@@ -217,7 +219,7 @@ CROWDLOGGER.preferences.init = function(){
 
     
     // Figure out which browser this is and set the function to use accordingly.
-    if( browser_name === "ff3" || browser_name === "ff4" ) {
+    if( CROWDLOGGER.version.info.is_firefox ) {
         /**
          * Gets the value of the specified string preference.
          * @name CROWDLOGGER.preferences.get_char_pref
@@ -273,7 +275,7 @@ CROWDLOGGER.preferences.init = function(){
         CROWDLOGGER.preferences.set_int_pref = set_int_pref_firefox;
 
 
-    } else if( browser_name === "chrome" ) {
+    } else if( CROWDLOGGER.version.info.is_chrome ) {
         CROWDLOGGER.preferences.get_char_pref = 
             function(k,v){ return get_pref_chrome(k,v,"string");};
         CROWDLOGGER.preferences.set_char_pref = set_pref_chrome;

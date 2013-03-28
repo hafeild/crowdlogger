@@ -56,71 +56,6 @@ CROWDLOGGER.gui.study.pages.add_listeners = function(the_window){
 
 };
 
-
-/**
- * Launches the page containing the most recent consent form.
- */
-CROWDLOGGER.gui.study.pages.launch_consent_form_page = function(){
-    //B_DEBUG
-    CROWDLOGGER.debug.log( 'In launch_consent_form_page\n' );
-    //E_DEBUG
-
-
-    // Get the url of the status page.
-    var consent_form_page = CROWDLOGGER.preferences.get_char_pref(
-        'consent_dialog_url', 'not_found.html' );
-
-    // The prefix for the extension's html files.
-    var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
-
-    // The full url.
-    var url = extension_prefix + consent_form_page;
-
-   
-    // Populates the page.
-    var on_load = function( doc ){
-        CROWDLOGGER.gui.study.pages.refresh_consent_page( doc );
-    } 
-
-
-    // Once the new tab has opened, this will give us a handle on it.
-    CROWDLOGGER.gui.windows.open_dialog( url, 
-        '%%FULL_PROJECT_NAME%% Consent Page', on_load );
-};
-
-/**
- * Adds the consent form to the consent frame in the given document.
- *
- * @param {object} doc The consent form page document.
- */
-CROWDLOGGER.gui.study.pages.refresh_consent_page = function( doc ){
-    var extension_prefix = CROWDLOGGER.version.info.get_extension_html_prefix();
-    var consent_body_url = CROWDLOGGER.io.network.get_server_url(
-        'consent_body_url', extension_prefix + 'not_found.html' );
-
-    // Once we get the consent body HTML from the server, this function
-    // will place it in the page.
-    var on_server_response = function( consent_body ){
-        var init_elm         = doc.getElementById( 'init' );
-       
-        var consent_frame = doc.getElementById( 'consent_frame' );
-        if( consent_frame ){
-            //consent_frame.setAttribute( 'src',  consent_body_url );
-            consent_frame.innerHTML = consent_body + consent_frame.innerHTML;
-        }
-    
-        if( init_elm ){
-            init_elm.innerHTML = 'true';
-        }
-    
-    }
-
-    // Ask the server for the consent form body.
-    CROWDLOGGER.io.network.send_data( consent_body_url, null, 
-        on_server_response, function(){}, 'GET' );
-};
-
-
 /**
  * Launches the update help popup.
  */
@@ -191,19 +126,6 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
 
 
     CROWDLOGGER.clrm.populateCLRMLibraryPage(doc, null, null, true);
-
-    /*
-    CROWDLOGGER.study.notify_of_new_consent_form();
-    CROWDLOGGER.notifications.set_notification( "update_registration" );
-    CROWDLOGGER.notifications.set_notification( "refer_a_friend" );
-    CROWDLOGGER.notifications.set_notification( "register" );
-    CROWDLOGGER.notifications.set_notification( "set_passphrase" );
-    CROWDLOGGER.notifications.set_notification( "update_settings" );
-    CROWDLOGGER.notifications.set_notification( "new_messages" );
-    CROWDLOGGER.notifications.set_notification( "unredeemed_raffle_win" );
-    CROWDLOGGER.notifications.set_notification( "extension_update" );
-    CROWDLOGGER.notifications.set_notification( "new_experiments" );
-    */
 
     // Place the version number.
     var version = CROWDLOGGER.version.info.get_extension_version();
@@ -457,8 +379,6 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
         //     //notification_elm.innerHTML = notifications;
         //     notification_elm.append(notifications);
         // }
-
-        doc.defaultView.refreshLayout();
     } 
 
     // Now take care of the messages section.
@@ -499,6 +419,7 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
         });
     }
 
+    doc.defaultView.refreshLayout();
 };
 
 /**

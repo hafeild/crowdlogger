@@ -28,26 +28,28 @@ CROWDLOGGER.debug = {};
  */
 CROWDLOGGER.debug.init = function(){
     // Get the current browser name.
-    var browser_version = CROWDLOGGER.version.info.get_browser_name();
+    //var browser_version = CROWDLOGGER.version.info.get_browser_name();
 
     // This will store the logging function to use.
     /** @ignore */
-    var logging_function;
+    // var logging_function;
 
     // For Firefox.
-    if( browser_version.match( /^ff/ ) !== null ){
+    if( CROWDLOGGER.version.info.is_firefox ){
         /** @ignore */
-        logging_function = function( message ) { 
+        CROWDLOGGER.debug.logging_function = function( message ) { 
             dump( message.replace(/\n$/,'')+ '\n' );
         };
     // For Chrome.
-    } else if( browser_version === "chrome" ) {
+    } else if( CROWDLOGGER.version.info.is_chrome ) {
         /** @ignore */
-        logging_function = function( message ) { console.log( message ); };
+        CROWDLOGGER.debug.logging_function = function( message ) { 
+            console.log( message ); 
+        };
     }
    
     /** @ignore */
-    CROWDLOGGER.debug.log = logging_function;
+    CROWDLOGGER.debug.log = CROWDLOGGER.debug.logging_function;
 };
 
 /**
@@ -58,6 +60,8 @@ CROWDLOGGER.debug.reinit = function(){
     if( !CROWDLOGGER.preferences.get_bool_pref( "dev_mode", false ) ){
         CROWDLOGGER.debug.log("Not in dev mode; disabling console logging.");
         CROWDLOGGER.debug.log = function( message ){};
+    } else {
+        CROWDLOGGER.debug.log = CROWDLOGGER.debug.logging_function;
     }
 }
 

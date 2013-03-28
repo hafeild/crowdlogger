@@ -255,7 +255,6 @@ CLI.prototype.Base = function(crowdlogger, cli){
     // Public function definitions.
 
     this.simpleCallbackWrapper = function(onsuccess, onerror){
-        var callbackID;
         var callback = function(opts, callbackID){
             if( opts.event === 'on_error' && onerror ){
                 onerror(opts.error);
@@ -265,8 +264,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
             that.unregisterCallback(callbackID);
         };
-        callbackID = that.registerCallback(callback);
-        return callbackID;
+        return that.registerCallback(callback);
     };
 
     /**
@@ -422,6 +420,8 @@ CLI.prototype.Base = function(crowdlogger, cli){
     this.registerCallback = function(callback){
         var callbackID = nextFunctionID++;
         functionMap[callbackID] = callback;
+        crowdlogger.debug.log('Callback ID ['+ callbackID +'] given to: '+
+            callback);
         return callbackID;
     };
 
@@ -432,6 +432,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
      */
     this.unregisterCallback = function(callbackID){
         if( functionMap[callbackID] ){
+            crowdlogger.debug.log('Unregistering Callback ID ['+callbackID+']');
             delete functionMap[callbackID];
         }
     };

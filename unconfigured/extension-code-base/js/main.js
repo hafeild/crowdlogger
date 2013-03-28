@@ -167,7 +167,7 @@ CROWDLOGGER.initialize = function(){
         //E_DEBUG
 
         // Initializes all of the perpetual checks, e.g., checking for 
-        // experiments, messages, etc.
+        // new versions, messages, etc.
         CROWDLOGGER.study.init_checks();        
 
         //B_DEBUG
@@ -193,12 +193,6 @@ CROWDLOGGER.initialize = function(){
                 function(){}, function(){} );
         }
 
-        // Check consent status.
-        if( CROWDLOGGER.preferences.get_bool_pref( "consent_required", true ) ){
-            CROWDLOGGER.study.notify_of_new_consent_form();
-            CROWDLOGGER.logging.set_logging( false );
-        }
-
         try{
             CROWDLOGGER.ioService = 
                 Components.classes["@mozilla.org/network/io-service;1"].
@@ -217,22 +211,6 @@ CROWDLOGGER.initialize = function(){
 
     // Initializes any buttons that need to be attached to the browser.
     function init_buttons(){
-        // These are things that need to be done for Firefox.
-
-        if( CROWDLOGGER.version.info.is_firefox ){
-            //B_DEBUG
-            CROWDLOGGER.debug.log( 'This is firefox. Checking if buttons have '+
-                'been added.' );
-            //E_DEBUG
-
-            // Initialize the logger button if necessary.
-            // CROWDLOGGER.gui.buttons.init_logging_nav_bar_button_ff();
-    
-            // Check if this window needs a "Experiments ready to run" button.
-            CROWDLOGGER.gui.buttons.
-                check_if_experiments_button_should_be_shown_ff();
-        }
-
         // Updates all of the logging buttons.
         CROWDLOGGER.gui.buttons.update_logging_buttons();
     };

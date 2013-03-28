@@ -48,8 +48,9 @@ CLRMI.prototype.Storage = function( api, id ){
     wrapCallback = function(opts){
         var callbackID;
         var callback = function(params){
-            api.base.log('(in clrmi.storage.callbackWrapper) heard back!')
-            if( params.event === 'on_chunk' ){
+            api.base.log('(in clrmi.storage.callbackWrapper) '+
+                'heard back! event: '+ params.event);
+            if( params.event === 'on_chunk' && opts.on_chunk ){
                 var next = function(){
                     api.base.log('(in clrmi.storage.callbackWrapper) '+
                         'invoking next');
@@ -70,9 +71,6 @@ CLRMI.prototype.Storage = function( api, id ){
                         }
                     });
                 };
-                if( opts.on_chunk ){
-                    opts.on_chunk(params.data, next, abort);
-                }
             } else {
                 if( params.event === 'on_error' && opts.on_error ){
                     opts.on_error(params.error);
@@ -94,6 +92,9 @@ CLRMI.prototype.Storage = function( api, id ){
         }
 
         upgrading = true;
+
+        api.base.log('Acquired lock for '+ func);
+
         var newOpts = api.util.copyObj(opts||{});
         newOpts.on_success = function(data){
             api.base.log('Removing upgrading lock...');

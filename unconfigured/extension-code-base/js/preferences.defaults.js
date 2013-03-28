@@ -68,13 +68,10 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     check_messages_url: ['/messages/newMessages.php', '1.7.4'],
     check_status_url: ['/checkStatus/checkStatus.php' , '1.7.4'],
     redeem_url: ['/checkStatus/redeem.php' , '1.7.4'],
-    consent_body_url: ['/consent/consentBody.php' , '1.7.4'],
-    consent_accepted_url: ['/consent/consentAccepted.php' , '1.7.4'],
     registration_id_verification_url: ['/register/verifyId.php', '1.7.4'],
     clrm_listing_url: ['/clrms/clrms.json', '1.7.4'],
 
     // Client-side pages.
-    consent_dialog_url: ['consent_form.html', '1.4.2'],
     registration_dialog_url: ['registration.html', '1.4.2'],
     refer_a_friend_dialog_url: ['refer_a_friend.html', '1.4.2'],
     search_histogram_dialog_url: ['search_histogram.html', '1.4.2'],
@@ -108,21 +105,16 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     log_encoding: ['UTF-8', '1.4.2'],
     preference_dialog_url: ['preferences.html', '1.4.2'],
     // int preferences.
-    experiment_update_interval:       [1000*60*30, '1.4.2'],   // 30 minutes.
     extension_version_check_interval: [1000*60*60*2, '1.4.2'], // 2 hours.
     check_message_interval:           [1000*60*6, '1.4.2'],     // 6 minutes.
-    check_raffle_status_interval:     [1000*60*60*24, '1.4.2'], // 1 day.
-    check_consent_status_interval:    [1000*60*60*24, '1.4.2'], // 1 day.
     notification_check_interval:      [1000*60*20, '1.4.2'],    // 20 minutes.
     total_experiments_run:            [0, '1.4.7'],
 
     // bool preferences.
     logging_enabled:                 [true, '1.4.2'],
-    logging_enabled_pre_consent:     [true, '1.4.2'],
     added_logging_button_to_nav_bar: [false, '1.4.2'],
     registered:                      [false, '1.4.2'],
     run_experiments_automatically:   [false, '1.4.2'],
-    consent_required:                [true, '1.4.2'],
     first_load:                      [true, '1.4.2'],
     dev_mode:                        [false, '1.7.3']
 };

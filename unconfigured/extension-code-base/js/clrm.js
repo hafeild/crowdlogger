@@ -31,7 +31,7 @@ var CLRM = function(crowdlogger){
     getAvailableCLRMListing = function( callback, onError ){
         crowdlogger.io.network.send_get_data(
             crowdlogger.io.network.get_server_url('clrm_listing_url'),    
-            '', callback, onError );
+            'date='+ (new Date().getTime()), callback, onError );
     };
 
     /**
@@ -486,7 +486,7 @@ var CLRM = function(crowdlogger){
                     if( i >= batch.length ){
                         next();
                     } else {
-                        unloadCLRM({
+                        that.unloadCLRM({
                             clrmid: batch[i].clrmid,
                             reason: reason,
                             onSuccess: function(){ process(i+1); },

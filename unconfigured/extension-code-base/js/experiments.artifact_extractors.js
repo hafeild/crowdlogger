@@ -10,8 +10,11 @@
  */
 
 
+if( !CROWDLOGGER.experiments ){
+    CROWDLOGGER.experiments = {}
+};
 
-if( CROWDLOGGER.experiments.artifact_extractors === undefined ){
+if( !CROWDLOGGER.experiments.artifact_extractors ){
 
 
 /** 

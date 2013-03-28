@@ -102,6 +102,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     this.get_version;
     this.list_stores;
     this.remove_database;
+    this.remove_cl_database;
     this.upgrade_db;
 
     this.IOLogException;
@@ -973,7 +974,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 opts.on_error);
         }
 
-        if( opts.db_name !== DATABASE_NAME ){
+        //if( opts.db_name !== DATABASE_NAME ){
             if(db_connections[opts.db_name]){
                 db_connections[opts.db_name].close();
                 delete db_connections[opts.db_name];
@@ -987,8 +988,31 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 if(opts.on_error){ opts.on_error({
                     errorCode: event.target.errorCode}); }
             };
-        }
+        //}
     }
+
+    /**
+     * Removes the CrowdLogger database (home of the activity log,
+     * CLRM info, and error log).
+     * 
+     * @param {object} opts        A map of options:
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success:   Invoked when everything has been read.
+     *                                 Should expect the array of store names 
+     *                                 as a parameter.
+     *    <li>{function} on_error:     Invoked if there's an error.
+     * </ul>     
+     */
+    this.remove_cl_database = function(opts){
+        opts = opts || {};
+        that.remove_database({
+            db_name: DATABASE_NAME,
+            on_success: opts.on_success,
+            on_error: opts.on_error
+        });
+    }
+
 
     /**
      * Upgrades a database. The version is automatically detected and 

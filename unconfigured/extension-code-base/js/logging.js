@@ -59,16 +59,6 @@ CROWDLOGGER.logging = {
  * @param {Object} event
  */
 CROWDLOGGER.logging.toggle_logging = function( event ){
-    //B_DEBUG
-    // CROWDLOGGER.debug.log( 'Toggling logging.\n' );
-    //E_DEBUG
-  
-    if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){
-        alert( 'Please agree to the Informed Consent (see the status page) ' +
-               'before attempting to turn logging on. Thanks!' );
-        return false;
-    }
- 
     var enable_logging = !CROWDLOGGER.preferences.get_bool_pref(
             'logging_enabled', false );
 
@@ -87,12 +77,8 @@ CROWDLOGGER.logging.set_logging = function( enable_logging ){
     var time = new Date().getTime();
 
     // Check if we're in private browsing mode. If not, go ahead and switch.
-    if( CROWDLOGGER.session_data.get( 'in_private_browsing_mode', false ) ||
-        CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ) {
+    if( CROWDLOGGER.session_data.get( 'in_private_browsing_mode', false ) ) {
         enable_logging = false;
-    } else {
-        CROWDLOGGER.preferences.set_bool_pref( 'logging_enabled_pre_consent',
-            enable_logging );
     }
 
     // Log the change in status.

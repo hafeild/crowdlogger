@@ -115,9 +115,9 @@ function refreshLayout(){
     var rcol = jQuery('#right-column');
     var lcol = jQuery('#left-column');
     jQuery('.section').each(function(i, elm){
-        console.log('-------')
-        console.log('rcol.height: '+ rcol.height());
-        console.log('lcol.height: '+ lcol.height());
+        // console.log('-------')
+        // console.log('rcol.height: '+ rcol.height());
+        // console.log('lcol.height: '+ lcol.height());
         if( rcol.height() < lcol.height() ){
             jQuery(elm).appendTo(rcol);
         } else {

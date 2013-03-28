@@ -209,11 +209,6 @@ CROWDLOGGER.version.util.check_if_first_startup_after_update = function(){
         //E_DEBUG
         CROWDLOGGER.version.info.first_start_after_update = true;
 
-        // Create appropriate notifications.
-        if( CROWDLOGGER.preferences.get_bool_pref( 'consent_required', true ) ){
-            CROWDLOGGER.study.notify_of_new_consent_form();
-        }
-
         if( CROWDLOGGER.preferences.get_bool_pref( 'registered', false ) ){
             // Add a notification about registering or updating the 
             // registration.
