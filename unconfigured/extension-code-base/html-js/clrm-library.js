@@ -53,7 +53,7 @@ var add_listeners = function(){
         target.parents('.clrm-container').find('.info').
             show({easing: 'clip', duration: 300});
     });
-    jQuery(document).on('click', '.info .button, .access .button', function(e){
+    jQuery(document).on('click', '.info button, .access button', function(e){
         var target = jQuery(this);
         var clrmid = target.parents('.clrm-container').attr('data-clrmid');
         var container = jQuery('.clrm-container[data-clrmid='+clrmid+']');

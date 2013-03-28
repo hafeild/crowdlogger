@@ -42,7 +42,7 @@ function set_click_listeners(){
     });
 
     jQuery('#clear_log_button').click(function(){
-        jQuery('#confirm_clear').show();
+        jQuery('#clear_log_confirm_button').show();
         jQuery('#cleared').hide();
         return false;
     });
@@ -50,7 +50,7 @@ function set_click_listeners(){
     jQuery('#clear_log_confirm_button').click(function(){
         CROWDLOGGER.io.log.clear_activity_log();
         jQuery('#cleared').show();
-        jQuery('#confirm_clear').hide();
+        jQuery('#clear_log_confirm_button').hide();
         return false;
     });    
 

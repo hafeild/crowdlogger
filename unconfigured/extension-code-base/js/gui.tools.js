@@ -331,7 +331,7 @@ CROWDLOGGER.gui.tools.diplay_search_trails = function( doc, refresh ){
             entries = null;
             search_trails = null;
 
-            jq('<span class="button" style="height: 20px">').
+            jq('<button>').
                 text('See more').
                 click(function(){
                     next();
@@ -609,7 +609,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 }
             }
 
-            save_elm.removeClass('button');
+            save_elm.addClass('disabled');
             save_elm.off('click', save);
             save_elm.html('');
 
@@ -676,7 +676,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                     e.click(function(){
                         var link = jq(this);
                         save_elm.html('Save');
-                        save_elm.addClass('button');
+                        save_elm.removeClass('disabled');
                         save_elm.on('click', save); 
                         setTimeout(function(){
                             link.remove();

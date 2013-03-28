@@ -539,7 +539,6 @@ CROWDLOGGER.gui.study.pages.populate_experiments_status = function(doc,
             if( html !== last_completed_experiment_elm.innerHTML ){
                 last_completed_experiment_elm.innerHTML = html;
             }
-
         }
 
         // Display the number of experiments completed.
@@ -658,93 +657,6 @@ CROWDLOGGER.gui.study.pages.populate_messages = function( doc_jq, jq ){
     // Check for messages.
     CROWDLOGGER.study.check_for_new_messages(10, false, on_server_response);
     
-};
-
-/**
- * Gets raffle wins from the server and then adds them to the given document
- * element.
- *
- * @param {object} doc_element  The document element to which the raffle wins
- *      should be added. 
- */
-CROWDLOGGER.gui.study.pages.populate_raffle_wins = function( doc_jq, jq ){
-
-    // Called when we hear back from the server.
-    var on_server_response = function( response ){
-        var DATE     = 1;
-        var URL      = 2;
-        var REDEEMED = 3;
-
-
-        // Check if there are any winnings.
-        if( response !== "" && response.match(/^GO\t/) !== null ){
-            CROWDLOGGER.debug.log('Raffle response: '+ response);
-
-            var html_to_add = jq('<div><p>The drawings you have won are listed '+
-             ' below along with the date on which the drawing took place. '+
-             'Click on the "View" button to redeem and view your Amazon.com '+
-             'gift card.</p><div>');
-
-            var table = jq('<table class="raffleWins">');
-            html_to_add.append(table);
-            table.append('<tr><th>Date</th><th>Link</th></tr>');
-            
-            var lines = response.split( '\n' ) ;
-            for( var i = 0; i < lines.length; i++ ) {
-                var line = lines[i];
-
-                //B_DEBUG
-                // CROWDLOGGER.debug.log( 'line: ' + line + '\n' );
-                //E_DEBUG
-
-                var columns = line.split( '\t' );
-
-                // Work out the date.
-                var date = new Date( columns[DATE] );
-
-                var display_date = 
-                    CROWDLOGGER.gui.study.pages.months[date.getMonth()] + ' ' +
-                    date.getDate() + ', ' + date.getFullYear();
-
-                // Form the redemption url.
-                var url = CROWDLOGGER.io.network.get_server_url(
-                    'redeem_url', '' ) + '?url=' + columns[URL] +
-                    '&date=' + escape( columns[DATE] );
-
-
-                //B_DEBUG
-                //CROWDLOGGER.debug.log( 'Display date: ' + displayDate + '\n' );
-                //E_DEBUG
-            
-                var button_text = 'View';
-                if( columns[REDEEMED] === 'no' ){
-                    button_text = 'View (un-redeemed)';
-                }
-
-
-                table.append('<tr><td class="date">' + 
-                    display_date + '</td><td>' +
-                    '<span class="buttonPanel"><span class="button" '+
-                        'id="raffle_win_url">'+ button_text +
-                    '</span></td></tr>');
-
-                table('#raffle_win_url').click(function(){
-                    CROWDLOGGER.gui.windows.open_tab(url);
-                });
-            } // end for
-           
-            // Add all of the html to the element.
-            //doc_element.innerHTML = html_to_add+ '</table>';
-            doc_jq.append(html_to_add);
- 
-        // There haven't, so let the user know.        
-        } else {
-            doc_jq.html('You have not won any drawings at this time.');
-        }
-    };
-
-
-    CROWDLOGGER.study.get_raffle_wins( on_server_response );
 };
 
 /**

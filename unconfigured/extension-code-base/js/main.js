@@ -147,20 +147,12 @@ CROWDLOGGER.initialize = function(){
         CROWDLOGGER.gui.notifications.init();
         CROWDLOGGER.notifications.launch_notification_init();
         CROWDLOGGER.logging.init();
-        CROWDLOGGER.uninstall.init();
         CROWDLOGGER.version.util.init();
         CROWDLOGGER.clrm = new CLRM(CROWDLOGGER);
         CROWDLOGGER.api = {cli: new CLI(CROWDLOGGER)};
 
         // Print out version info.
         report_version_info();
-
-        //B_DEBUG
-        CROWDLOGGER.debug.log( "Setting uninstall observers...\n" );
-        //E_DEBUG
-
-        // Initialize the un-install and quit observers.
-        CROWDLOGGER.uninstall.init_observers();
 
         //B_DEBUG
         CROWDLOGGER.debug.log( "Initializes checks...\n" );

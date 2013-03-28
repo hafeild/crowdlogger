@@ -29,21 +29,6 @@
 <span class="hidden" id="init"></span>
 <div class="bodyWrapper">
 
-<!--     <div class="header">
-        <div class="title"> 
-            <span class="titleMain">Status Page</span><br>
-            <span id="subtitle">
-                <span class="titleSmall">for</span><br>
-                <span class="titleSub">%%FULL_PROJECT_NAME%% <span name="version_no"></span></span>
-                <br>
-            </span>
-        </div>
-        <span class="refreshLink">
-            [<a href="#" id="refresh_button">Refresh</a>] 
-            [<a href="#" class="close_button">Close page</a>]
-        </span>
-    </div> -->
-
     <!-- The header. -->
     <div class="header">
         <div class="title with-logo"> 
@@ -69,15 +54,6 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
         
     </div>
 
-
-    <p>
-
-    <!-- <span class="note">Note: This page can be accessed by clicking on the 
-        %%PROJECT_NAME%% menu icon&mdash;
-        <img src="../css/img/crowdlogger-logo.001.logging.16x16.png"/> 
-        &mdash;and selecting "Show status page".
-    </span>
- -->
     <div id="content" class="content">
    
         <!-- Columns to hold the tiles (gets populated after 
@@ -110,56 +86,27 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
             <h1>Tools</h1>
             <div id="tools">
                 <!-- Search histogram. -->
-                <div class="tool-container">
-                    <div class="tool" title="See the searches you have entered and how frequently. You can sort by search or frequency." id="search_histogram_button">
-                        <img alt="" src=""/>
-                        <span class="name">Search histogram</span>
-                    </div>
-                </div>
+
+                <button title="See the searches you have entered and how frequently. You can sort by search or frequency." id="search_histogram_button">Search histogram</button>
+
 
                 <!-- Search trails. -->
-                <div class="tool-container">
-                    <div class="tool" title="See the searches you have conducted and pages you've visited in chronological order." id="search_trails_button">
-                        <img alt="" src=""/>
-                        <span class="name">Search trails</span>
-                    </div>
-                </div>
+                <button title="See the searches you have conducted and pages you've visited in chronological order." id="search_trails_button">Search trails</button>
+
 
                 <!-- Export search log. -->
-                <div class="tool-container">
-                    <div class="tool" title="View your raw search log and save it to disk." id="export_log_button">
-                        <img alt="" src=""/>
-                        <span class="name">Export search log</span>
-                    </div>
-                </div>
+                <button title="View your raw search log and save it to disk." id="export_log_button">View/export browsing log</button>
+
 
                 <!-- Clear log. -->
-                <div class="tool-container">
-                    <div class="tool" title="Remove everything&mdash;all of your searches, visited pages, etc.&mdash;from your search log." id="clear_log_button">
-                        <img alt="" src=""/>
-                        <span class="name">                        
-                            <span id="confirm_clear" 
-                                style="color:#800000; display: none"
-                                >Are you sure?
-                                <span style="text-decoration: underline; color: white;"
-                                id="clear_log_confirm_button">Yes</span><br/></span>
-                            <span id="cleared" 
-                                style="display: none" class="cleared">Cleared<br/>
-                            </span>
-                            Clear entire log
-                        </span>
-                    </div>
+                <button title="Remove everything&mdash;all of your searches, visited pages, etc.&mdash;from your search log." id="clear_log_button">Clear entire log</button>
+                <button id="clear_log_confirm_button" class="confirm" style="display:none">Confirm delete</button>
+                <span id="cleared" style="display: none" class="cleared">Cleared</span>
 
-                </div>
 
                 <!-- Apps and studies. -->
-                <div class="tool-container">
-                    <div class="tool" title="Manage new and existing apps and studies" id="app-library-button">
-                        <img alt="" src=""/>
-                        <span class="name">App &amp; study library</span>
-                    </div>
-                </div>                
-
+                <button title="Manage new and existing apps and studies" id="app-library-button">Install new apps &amp; studies</button>
+                
             </div>
         </div>
 
@@ -205,7 +152,7 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
         </tr>
         </table>
 
-        <span id="notification-button" class="button"></span>
+        <button id="notification-button"></button>
 
         <!-- CLRMs -->
         <div id="clrm-template" class="clrm-container">
@@ -216,29 +163,16 @@ outstanding issues concerning %%FULL_PROJECT_NAME%%.
                 <span class="name" data-id="name"></span>
             </div>
             <div class="access">
-               <!--  <table>
-                    <tr>
-                        <td colspan=3 class="message"> -->
-                            <div class="message">
-                            No messages.
-                            </div>
-                     <!--    </td>
-                    </tr><tr>
-                    </tr><tr>
-                        <td> -->
-                            <span class="button installed enabled" data-type="open">Open</span>
-                        <!-- </td>
-                        <td> -->
-                            <span class="button installed enabled" data-type="configure">Configure</span>
-                        <!-- </td>
-                        <td> -->
-                            <span class="button installed enabled" data-type="disable">Disable</span>
-                            <span class="button installed not-enabled" data-type="enable">Enable</span>
-                            <span class="button installed" data-type="uninstall">Remove</span>
-                            <span class="button not-installed" data-type="install">Install</span>
-                       <!--  </td>
-                    </tr>
-                </table> -->
+                <div class="message">
+                No messages.
+                </div>
+
+                <button class="installed enabled" data-type="open">Open</button>
+                <button class="installed enabled" data-type="configure">Configure</button>
+                <button class="installed enabled" data-type="disable">Disable</button>
+                <button class="installed not-enabled" data-type="enable">Enable</button>
+                <button class="installed" data-type="uninstall">Remove</button>
+                <button class="not-installed" data-type="install">Install</button>                
             </div>
         </div>  
     </div>

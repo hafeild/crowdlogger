@@ -23,7 +23,7 @@
     box-sizing: border-box; 
     border-bottom: 1px gray solid;
     cursor: default;
-    height: 30px;
+    height: 35px;
 }
 
 .log-nav-button {
@@ -34,7 +34,8 @@
     padding-left: 2px;
     padding-right: 2px;
     margin: 0;
-    vertical-align: bottom;
+    vertical-align: top;
+    display: inline-block;
 }
 
 .log-nav-button:hover {

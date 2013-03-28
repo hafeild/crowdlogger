@@ -25,18 +25,7 @@ Version: %%VERSION%%
 <body id="status_page_body">
 <span class="hidden" id="init"></span>
 <div class="bodyWrapper">
-
-<!--     <div class="header">
-        <div class="title"> 
-            <span class="titleMain">Registration Page</span><br>
-            <span id="subtitle">
-                <span class="titleSmall">for</span><br>
-                <span class="titleSub">%%PROJECT_NAME%%</span>
-                <br>
-            </span>
-        </div>
-    </div> -->
-
+    <!-- Header. -->
     <div class="header">
         <div class="title with-logo"> 
             <span class="logo-version version titleSub">version %%VERSION%%</span>
@@ -306,40 +295,14 @@ as specialty sites, such as Amazon, Wikipedia, and YouTube.
         <p></p>
 
     </span>  
-      
-        <!-- Raffle -->
-        <!-- <h1>Raffle</h1>
-    
-                As a "thank you" for participating in this study, we will
-periodically select one active registrant at random and provide him or her with
-an on-line gift certificate.  If you prefer not to be part of that process,
-check below to opt out of the prize.
-
-        <ul>
-            <input type="checkbox" name="optOut" value="true"/>
-             I would like to opt out of the prize drawing.
-        </ul> -->
-
-        <p></p>
-
-        <!-- Referred by a friend -->
-        <h1>Referred by a friend</h1>
-
-        Where you referred by a friend to check out this study? If so,
-please enter the code they gave you here:
-        <ul>
-            Code: <input type="text" name="referrer" size="30" />
-        </ul>
-
-        <p></p>
 
     </form>
         <span class="buttonPanel" id="register_button_panel">
 <!--            <input type="Submit" value="Register"  name="register" disabled  -->
-            <span class="button disabled" id="register_button_disabled">
+            <button class="disabled" id="register_button_disabled">
                 Register
-            </span>
-            <span class="button" id="register_button_enabled">Register</span>
+            </button>
+            <button id="register_button_enabled">Register</button>
         </span>
 
     <p>

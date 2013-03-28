@@ -45,7 +45,7 @@ Version: %%VERSION%%
     <div id="popup">
         <div id="message-container">
             <div id="message"></div>
-            <span id="message-dismiss" class="button">Dismiss</span>
+            <button id="message-dismiss">Dismiss</button>
         </div>
     </div>
 
@@ -65,13 +65,14 @@ Version: %%VERSION%%
                     <p data-id="description">
                     </p>
 
-                    <span class="button installed enabled" data-type="open">Open</span>
-                    <span class="button installed enabled" data-type="configure">Configure</span>
-                    <span class="button installed" data-type="uninstall">Remove</span>
-                    <span class="button not-installed" data-type="install">Install</span>
-                    <span class="button installed enabled" data-type="disable">Disable</span>
-                    <span class="button installed not-enabled" data-type="enable">Enable</span>
-                    <span class="button" data-type="dismiss">Dismiss</span>
+                    <button class="installed enabled" data-type="open">Open</button>
+                    <button class="installed enabled" data-type="configure">Configure</button>
+                    <button class="installed" data-type="uninstall">Remove</button>
+                    <button class="not-installed" data-type="install">Install</button>
+                    <button class="installed enabled" data-type="disable">Disable</button>
+                    <button class="installed not-enabled" data-type="enable">Enable</button>
+                    <button data-type="dismiss">Dismiss</button>
+
                 </div>
             </div>  
         </div>
