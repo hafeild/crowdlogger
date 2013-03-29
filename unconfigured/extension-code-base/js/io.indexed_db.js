@@ -60,6 +60,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         NEXTUNIQUE = 'nextunique',
         PREV = 'prev',
         PREVUNIQUE = 'prevunique',
+        MAX_CHUNK_SIZE = 200,
         T = 5, // Default timeout.
         IndexedDB = window.indexedDB || window.mozIndexedDB || 
             window.webkitIndexedDB,
@@ -580,12 +581,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
-     *                                 passed to the on_chunk function. If <=0,
-     *                                 all entries will be read in before 
-     *                                 calling on_chunk. This is approximate
-     *                                 because ranges are used and therefore
-     *                                 deleted items within that range will not
-     *                                 be read (their id's are not reused).
+     *                                 passed to the on_chunk function. Max is
+     *                                 200.
      *    <li>{bool} reverse:          If true, the data will be read in reverse
      *                                 order of id. Default is 'false'.
      *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
@@ -599,6 +596,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
         opts.store_name = ERROR_LOG_STORE_NAME;
+        opts.chunk_size = Math.min( (opts.chunk_size || MAX_CHUNK_SIZE), 
+            MAX_CHUNK_SIZE);
 
         // Read the data and send it to callback.
         return read_log( opts );
@@ -626,13 +625,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
-     *                                 passed to the on_chunk function. If <=0,
-     *                                 all entries will be read in before 
-     *                                 calling on_chunk. This is approximate
-     *                                 because ranges are used and therefore
-     *                                 deleted items within that range will not
-     *                                 be read (their id's are not reused).
-     *                                 Default: 0.
+     *                                 passed to the on_chunk function. Max size
+     *                                 is 200.
      *    <li>{bool} reverse:          If true, the data will be read in reverse
      *                                 order of id. Default is 'false'.
      *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
@@ -646,6 +640,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
         opts.store_name = ACTIVITY_LOG_STORE_NAME;
+        opts.chunk_size = Math.min( (opts.chunk_size || MAX_CHUNK_SIZE), 
+            MAX_CHUNK_SIZE);        
 
         // Read the data and send it to callback.
         return read_log( opts );
@@ -673,13 +669,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      *    <li>{int} chunk_size:        The size of the chunks to process. E.g.,
      *                                 chunk_size = 50 will cause 50 entries to
      *                                 be read, stored in an array, and then
-     *                                 passed to the on_chunk function. If <=0,
-     *                                 all entries will be read in before 
-     *                                 calling on_chunk. This is approximate
-     *                                 because ranges are used and therefore
-     *                                 deleted items within that range will not
-     *                                 be read (their id's are not reused).
-     *                                 Default: 0.
+     *                                 passed to the on_chunk function. Max size
+     *                                 200.
      *    <li>{bool} reverse:          If true, the data will be read in reverse
      *                                 order of id. Default is 'false'.
      *    <li>{int} lower_bound:       The smallest id to retrieve; default: 0
@@ -693,6 +684,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         opts.db_version = VERSION;
         opts.on_upgrade = on_crowlogger_db_upgraded;
         opts.store_name = CLRM_STORE_NAME;
+        opts.chunk_size = Math.min( (opts.chunk_size || MAX_CHUNK_SIZE), 
+            MAX_CHUNK_SIZE);
 
         // Read the data and send it to callback.
         return read_log( opts );

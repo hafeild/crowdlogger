@@ -371,6 +371,26 @@ tr:nth-child(odd) {
     line-height: 32px;
 }
 
+#tools ul {
+    margin: 0px;
+    padding: 0px;
+}
+#tools li {
+    line-height: 1.5;
+    cursor: pointer;
+    color: steelblue;
+    text-decoration: underline;
+    float:left;
+    display:inline;
+    width: 50%;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box;
+    /*border-left: 1px dotted steelblue;*/
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 tr.newMessage {
 /*    color:                  #FF9900;*/
     color:                  #CC9900;

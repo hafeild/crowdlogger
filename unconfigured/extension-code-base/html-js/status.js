@@ -19,51 +19,47 @@ jQuery(document).ready(function(){
 
 
 function set_click_listeners(){
-    jQuery('#refresh_button').click(function(){
-        refresh_page();  return false;
-    });
 
-    jQuery('.close_button').click(function(){
-        window.open('', '_self', ''); window.close(); return false;
-    });
+    jQuery('body').on('click', 'li,button,a', function(e){
+        switch(e.target.id){
+            case 'search_histogram_button':
+                CROWDLOGGER.gui.tools.diplay_search_histogram();
+                break;
+            case 'search_trails_button':
+                CROWDLOGGER.gui.tools.diplay_search_trails();
+                break;
+            case 'export_log_button':
+                CROWDLOGGER.gui.tools.export_log();
+                break;
+            case 'clear_log_button':
+                jQuery('#clear_log_confirm_button').show();
+                jQuery('#cleared').hide();
+                break;
+            case 'clear_log_confirm_button':
+                CROWDLOGGER.io.log.clear_activity_log();
+                jQuery('#cleared').show();
+                jQuery('#clear_log_confirm_button').hide();
+                break;
+            case 'feedback_button':
+                window.open(
+                    '%%PING_SERVER_BASE_URL%%/feedback/leaveFeedback.html');
+                break;
+            case 'app-library-button':
+                CROWDLOGGER.clrm.launchCLRMLibraryPage();
+                break;
+            case 'launch_dev_tools':
+                CROWDLOGGER.gui.tools.dev.launch();
+                break;
+            case 'settings_button':
+                CROWDLOGGER.gui.preferences.launch_preference_dialog(); 
+                break;
+            case 'register_button':
+                CROWDLOGGER.study.launch_registration_dialog(); 
+                break;
 
-    jQuery('#whatsnew').click(function(){return false;});
-
-    jQuery('#search_histogram_button').click(function(){
-        CROWDLOGGER.gui.tools.diplay_search_histogram(); return false;
-    });
-
-    jQuery('#search_trails_button').click(function(){
-        CROWDLOGGER.gui.tools.diplay_search_trails(); return false;
-    });
-
-    jQuery('#export_log_button').click(function(){
-        CROWDLOGGER.gui.tools.export_log(); return false;
-    });
-
-    jQuery('#clear_log_button').click(function(){
-        jQuery('#clear_log_confirm_button').show();
-        jQuery('#cleared').hide();
+        }
         return false;
     });
-
-    jQuery('#clear_log_confirm_button').click(function(){
-        CROWDLOGGER.io.log.clear_activity_log();
-        jQuery('#cleared').show();
-        jQuery('#clear_log_confirm_button').hide();
-        return false;
-    });    
-
-    jQuery('#feedback_button').click(function(){
-        window.open('%%PING_SERVER_BASE_URL%%/feedback/leaveFeedback.html');
-        return false;
-    });
-
-    jQuery('#app-library-button').click(function(){
-        CROWDLOGGER.clrm.launchCLRMLibraryPage(); 
-        return false;
-    });
-  
 }
 
 /**
@@ -115,9 +111,9 @@ function refreshLayout(){
     var rcol = jQuery('#right-column');
     var lcol = jQuery('#left-column');
     jQuery('.section').each(function(i, elm){
-        // console.log('-------')
-        // console.log('rcol.height: '+ rcol.height());
-        // console.log('lcol.height: '+ lcol.height());
+        console.log('-------')
+        console.log('rcol.height: '+ rcol.height());
+        console.log('lcol.height: '+ lcol.height());
         if( rcol.height() < lcol.height() ){
             jQuery(elm).appendTo(rcol);
         } else {

@@ -405,20 +405,11 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // // This tells the page that it's been initialized.
     // init_elm.innerHTML = "initialized";
 
-    if( CROWDLOGGER.preferences.get_bool_pref('dev_mode', false) &&
-            jq('#dev_tools').length == 0) {
-        jq('#tools ul').append(
-            '<p id="dev_tools"><h2><a href="#" id="launch_dev_tools">'+
-            'Development tools</a>'+
-            '</h2>View the available development tools.'
-        );
-    
-        jq('#launch_dev_tools').click(function(){
-            CROWDLOGGER.gui.tools.dev.launch();
-            return false;
-        });
-    }
+    if( CROWDLOGGER.preferences.get_bool_pref('dev_mode', false) ){
+        jq('#launch_dev_tools').show();
 
+    }
+    
     doc.defaultView.refreshLayout();
 };
 

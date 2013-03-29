@@ -1,6 +1,11 @@
+<!DOCTYPE html>
+<!--
+%%LICENSE%%
+Version: %%VERSION%%
+-->
 <html>
 <head>
-    <title>CrowdLogger Feedback</title>
+    <title>%%PROJECT_NAME%% Feedback</title>
     <link rel="stylesheet" type="text/css" media="screen" href="../style/style.css">
 </head>
 <body>
@@ -9,24 +14,30 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">Feedback Form</span><br>
-            <span id="subtitle">
-                <span class="titleSmall">for the</span><br>
-                <span class="titleSub">CrowdLogger Project</span>
+            <span class="logo-version">version %%VERSION%%</span>
+            <img class="logo" src="../images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Feedback</span><br>
             </span>
         </div>
+
+        <div id="iframe" class="menu-frame">
+           <iframe src="../menu.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="70px">
+           </iframe>
+        </div>
+        <div id="share-iframe" class="share-iframe">
+           <iframe src="../share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+           </iframe>
+        </div>
+
     </div>
+
 
     <!-- Brings us down to just below the title. -->
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-
-<div id="iframe">
-   <iframe src="../menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
-        height=70px>
-   </iframe>
-</div>
 
 <p> 
 Please leave your feedback in the text area below. Your feedback will be completely anonymous. We only store the content of your message along with the time it was submitted.
@@ -42,7 +53,7 @@ Thank you!
 <textarea rows="10" cols="90" name="message">
 </textarea>
 <p>
-<input type="submit" value="Submit feedback">
+<input type="submit" style="font-size: 12pt" value="Submit feedback">
 </form>
 </div>
 
