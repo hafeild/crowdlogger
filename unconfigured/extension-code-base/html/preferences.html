@@ -50,11 +50,8 @@ Version: %%VERSION%%
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
+    There are not many settings just yet. More will show up as we further develop %%PROJECT_NAME%%.
 
-    Below are preferences you can set. 
-    
-
-    <p>
 
     <span class="note" name="required"><span name="required" class="required">*</span> denotes required fields.</span>
 
@@ -67,38 +64,33 @@ Version: %%VERSION%%
         <p></p>
     </span>
 
-    <form name="preferences" onsubmit="return false;">
+    <form name="settings">
 
-        <!-- Prior Registration -->
-        <h1>Pass phrase</h1>
+<!--         <p>
+            <h3>Search history</h3>
+            How 
+            On <input type="radio" name="dev_mode" data-type='bool' value="true"/> <br/>
+            Off <input type="radio" name="dev_mode" data-type='bool' value="false" checked="checked"/> 
 
-        Set your pass-phrase here. This should be some phrase that you think would be unlikely to be entered by someone else. You are strongly encouraged to use this same phrase across all of your installations of this extension. This is what guards your information from being revealed unless there are many other people with the same information.
-        <ul>
-            Pass phrase:<span name="required" class="required">*</span>
-                <input type="text" name="pass_phrase" size="30" />
-        </ul> 
+        </p> -->
 
-        <p>
 
-        <h1>Experiments</h1>
-        Would you like to have experiments run automatically when they are
-        available?
-        <ul>
-            <input type="radio" name="run_experiments_automatically" 
-                value="true"/>Yes<br>
-            <input type="radio" name="run_experiments_automatically" 
-                value="false"/>No<br>
-        </ul>
+        <div>
+            <h3>Developer mode</h3>
+            <p>
+            Adds a link to the Welcome Wizard in the main menu and a link to developer tools in the "Tools" section of the status page.
+            </p>
+            On <input type="radio" name="dev_mode" value="true"/> <br/>
+            Off <input type="radio" name="dev_mode" value="false" checked="checked"/> 
+        </div>
 
-        <p>
-
-        <span class="buttonPanel" id="save_button_panel">
+        <span class="button-group">
             <button id="save_button">Save</button>
-            <button id="save_and_close_button">Save and close</button>
+            <button id="save_and_close_button"
+                >Save and close</button>
         </span>
+        <span id="saved" style="color: green; display: none">Saved.</span>
     </form>
-
-    <p>
 
     <div class="buffer">
     </div>

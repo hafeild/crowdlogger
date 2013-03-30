@@ -15,13 +15,18 @@ jQuery(document).ready(function(){
 
 // Add click listeners to the buttons.
 function add_listeners() {
-    jQuery('#save_button').click(function(){
-        CROWDLOGGER.gui.preferences.submit_preferences( document ); 
-        return false;
-    });
 
-    jQuery('#save_and_close_button').click(function(){
-        CROWDLOGGER.gui.preferences.submit_preferences( document, window ); 
+    jQuery('body').on('click', 'button', function(e){
+        switch(e.target.id){
+            case 'save_button':
+                CROWDLOGGER.gui.preferences.submit_preferences( document ); 
+                break;
+            case 'save_and_close_button':
+                CROWDLOGGER.gui.preferences.submit_preferences( document, window ); 
+                break;
+            default:
+                return true;
+        }
         return false;
     });
 

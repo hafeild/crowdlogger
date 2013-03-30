@@ -69,7 +69,7 @@ CROWDLOGGER.gui.preferences.refresh_preference_page = function( doc ) {
     preference_cache = {};
 
     // Get the form and make sure it's valid.
-    form = doc.forms.preferences;
+    form = doc.forms.settings;
     if( !form ){
         // Hmm...
     }
@@ -137,7 +137,7 @@ CROWDLOGGER.gui.preferences.submit_preferences = function( doc, win ){
     processed_preferences = {};
 
     // Get the form and make sure it's valid.
-    form = doc.forms.preferences;
+    form = doc.forms.settings;
     if( !form ){
         alert( "There was an error saving your preferences." );
     }
@@ -148,18 +148,14 @@ CROWDLOGGER.gui.preferences.submit_preferences = function( doc, win ){
         var field = form[i];
         var value;
 
-        if( processed_preferences[field.name] ){
+        if( processed_preferences[field.name] || !field.name ){
             continue;
         }
 
         // Extract the value.
         if( field.type === "radio" ){
             value = CROWDLOGGER.util.get_selected_radio_button(form[field.name]);
-            if( value === "true" ){
-                value = true;
-            } else {
-                value = false;
-            }
+            value = (value === "true" )
         } else {
             value = field.value;
         }
@@ -217,6 +213,8 @@ CROWDLOGGER.gui.preferences.submit_preferences = function( doc, win ){
         
             if( win !== undefined ){
                 win.close();
+            } else {
+                doc.defaultView.jQuery('#saved').show().fadeOut(1000);
             }
             return true;
         }

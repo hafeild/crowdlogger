@@ -40,13 +40,14 @@ Version: %%VERSION%%
     <div class="tools section">
         <a name="experiments"></a>
         <h1>Tools</h1>
+        These don't make much sense with the current version of %%PROJECT_NAME%%, but they will in future versions when we enable aggregating data across users in a privacy preserving manner.
         <div id="experiment-central">
             <div class="entry">
                 <h2>Passphrase</h2>
                 <form name="preferences" onsubmit="return false;">
                     Enter here: <input type="text" id="pass_phrase"
                         name="pass_phrase" size="30" />
-                    <span class="buttonPanel">
+                    <span>  <!-- class="buttonPanel"> -->
                         <button 
                         id="passphrase_save_button">Save</button>
                     </span>
@@ -54,7 +55,7 @@ Version: %%VERSION%%
             </div>
             <div class="entry">
                 <h2>Experiments</h2>
-                <span class="buttonPanel">
+                <span>  <!-- class="buttonPanel"> -->
                     <button 
                     id="clear_experiments">Clear ran experiments
                     </button>
@@ -87,7 +88,7 @@ Version: %%VERSION%%
             Add the URL of the JS file to load:<br/>
             <input style="width: 200px" type="text" id="clrm-url" 
                 value="http://localhost:8000/demo.json"/> 
-            <a href="#" id="load-clrm">Load</a>
+            <button id="load-clrm">Load</button>
             <span id="clrm-success" style="display: none; color: green;">Success</span>
             <span id="clrm-error" style="display: none; color: red;">ERROR</span>
         </div>
