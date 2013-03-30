@@ -10,7 +10,8 @@
 
 var CLRM = function(crowdlogger){
     // Private members.
-    const T = 5;
+    const T = 5,
+        UPDATE_CHECK_FREQ = 6*60*60*1000; // 6 hours
     var that = this;
 
     // Private functions.
@@ -18,10 +19,29 @@ var CLRM = function(crowdlogger){
         getInstalledCLRMListing, // Some of these will be local.
         getOverviewCLRMListings, // Includes available and installed.
         generateCLRMElement,
-        populateCLRMElement;
+        populateCLRMElement, 
+        init,
+        trackUpdates;
 
+    // Public functions.
+    this.init, this.populateCLRMLibraryPage, this.launchCLRMLibraryPage,
+    this.installLocalCLRM, this.installCLRM, this.uninstallCLRM, 
+    this.removeCLRMFromDB, this.enableCLRM, this.disableCLRM,
+    this.unloadCLRM, this.unloadAllCLRMs, this.loadCLRMIfNecessary,
+    this.loadAllEnabledCLRMs, this.open, this.configure, this.getMessage,
+    this.updateCLRM, this.updateAllCLRMs;
 
     // Private function definitions.
+
+    /**
+     * Check for CLRM updates and installs updates when available.
+     *
+     * @param {int} freq The frequency to check for udpates.
+     */
+    trackUpdates = function(freq){
+        setInterval(that.updateAllCLRMs, freq);
+    };
+
     /**
      * Fetches the metadata list of available CLRMs from the server. The 
      * listing is a map of clrmid's to their meta data objects (maps).
@@ -121,67 +141,8 @@ var CLRM = function(crowdlogger){
      * @param {object} clrmMetadata  The metadata for the CLRM to generate
      *                               the DOM element for.
      */
-    generateCLRMElement = function( jq, clrmMetadata ){
-        var elm = jq('<div>').addClass('clrm-container').
-            attr('data-clrmid', clrmMetadata.clrmid);
-        if( clrmMetadata.installed ){
-            elm.addClass('installed');
-        } else {
-            elm.addClass('not-installed');
-        }
-
-        if( clrmMetadata.enabled ){
-            elm.addClass('enabled');
-        } else {
-            elm.addClass('not-enabled');
-        }
-
-        var clrm = jq('<div>').addClass('clrm').
-            attr('data-clrmid', clrmMetadata.clrmid).appendTo(elm);
-        jq('<span>').addClass('ribbon installed enabled').html('installed').
-            appendTo(clrm);
-        jq('<span>').addClass('ribbon installed not-enabled').html('disabled').
-            appendTo(clrm);
-
-        if( clrmMetadata.logoURL ){
-            jq('<img/>').attr({src: clrmMetadata.logoURL, alt:''}).
-                appendTo(clrm);
-        }
-        jq('<span>').addClass('name').html(clrmMetadata.name).appendTo(clrm);
-
-        var info = jq('<div>').addClass('info').
-            attr({
-                'data-clrmid': clrmMetadata.clrmid,
-                'data-metadata': JSON.stringify(clrmMetadata)
-            }).appendTo(elm);
-        jq('<h2>').html(clrmMetadata.name).appendTo(info);
-        jq('<p>').html(clrmMetadata.description).appendTo(info);
-
-        jq('<span>').addClass('button installed').
-            attr('data-type', 'uninstall').html('Remove').appendTo(info);
-        jq('<span>').addClass('button not-installed').
-            attr('data-type', 'install').html('Install').appendTo(info);
-
-        jq('<span>').addClass('button installed enabled').
-            attr('data-type', 'disable').html('Disable').appendTo(info);
-        jq('<span>').addClass('button installed not-enabled').
-            attr('data-type', 'enable').html('Enable').appendTo(info);
-
-
-        jq('<span>').addClass('button').
-            attr('data-type', 'dismiss').html('Dismiss').appendTo(info);
-
-        return elm;
-    };
-
-    /**
-     *
-     * @param {jquery} jq  The jQuery object for the page on which the CLRM
-     *                     will be placed.
-     * @param {object} clrmMetadata  The metadata for the CLRM to generate
-     *                               the DOM element for.
-     */
     populateCLRMElement = function( elm, clrmMetadata ){
+        var msg;
         //elm.attr('data-clrmid', clrmMetadata.clrmid);
         elm.attr({
             'data-clrmid': clrmMetadata.clrmid,
@@ -211,10 +172,44 @@ var CLRM = function(crowdlogger){
 
         elm.find('[data-id=description]').html(clrmMetadata.description);
 
+        // Sets the message if there is a spot for it in the element we are
+        // populating.
+        msg = elm.find('[data-id=message]');
+        if( msg.length > 0 ){
+            crowdlogger.api.cli.base.invokeCLRMMethod({
+                clrmid: clrmMetadata.clrmid,
+                method: 'getMessage',
+                on_success: function(message){
+                    crowdlogger.debug.log('Attempting to add message to page:');
+                    crowdlogger.debug.log(message);
+                    msg.html(message);
+                },
+                on_error: function(e){
+                    msg.html('Error retrieving messages...'+ e);
+                }
+            });
+        }
+
         return elm;
     };
 
+
     // Public functions.
+
+    /**
+     * Initializes things, including checking for updates.
+     */
+    this.init = function(){
+
+        // Update all CLRMs and load the enabled ones.
+        that.updateAllCLRMs(
+            that.loadAllEnabledCLRMs, 
+            that.loadAllEnabledCLRMs);
+
+        // Track updates.
+        trackUpdates(UPDATE_CHECK_FREQ);
+    };
+
     /**
      * Adds available and installed CLRMs (apps and studies) to the given
      * page. The page should have a jQuery instances and two DOM elements, one
@@ -225,7 +220,8 @@ var CLRM = function(crowdlogger){
      *                            completion.
      * @param {function} onError  The function to invoke on an error.
      */
-    this.populateCLRMLibraryPage = function(doc, callback, onError, installedOnly){
+    this.populateCLRMLibraryPage = function(doc, callback, onError, 
+            installedOnly){
         var jq = doc.defaultView.jQuery;
 
         var onSuccess = function(allMetadata){
@@ -330,8 +326,10 @@ var CLRM = function(crowdlogger){
      * @param {function} onSuccess      A function to invoke upon successfully
      *                                  installing the CLRM.
      * @param {function} onError        A function to invoke upon error.
+     * @param {object} fields           A set of fields to set in the installed
+     *                                  version, e.g., {enabled: true}.
      */
-    this.installCLRM = function( clrmMetadata, onSuccess, onError ){
+    this.installCLRM = function( clrmMetadata, onSuccess, onError, fields ){
         // Download the CLRM package.
         if( !clrmMetadata.packageURL ){
             if( onError ){ onError('installCLRM requires the CLRM metadata '+
@@ -342,9 +340,12 @@ var CLRM = function(crowdlogger){
         // Fetch the URL and save it.
         crowdlogger.io.network.send_get_data(clrmMetadata.packageURL, null,
             function(response){ 
-                var package = JSON.parse(response);
+                var package = JSON.parse(response), field;
                 if(clrmMetadata.id){
                     package.id = clrmMetadata.id;
+                }
+                for( field in fields ){
+                    package.metadata[field] = fields[field];
                 }
                 package.clrmid = package.metadata.clrmid;
                 crowdlogger.io.log.write_to_clrm_db({
@@ -355,6 +356,16 @@ var CLRM = function(crowdlogger){
         );
     };
 
+    /**
+     * Uninstalls a CLRM by its id. This involves unloading the CLRM and then
+     * with an 'uninstall' reason and then removing it from the database of
+     * installed CLRMs. The CLRM must currently be installed.
+     *
+     * @param {string} clrmid           The id of the CLRM to uninstall.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  uninstalling the CLRM.
+     * @param {function} onError        A function to invoke upon error.
+     */
     this.uninstallCLRM = function( clrmid, onSuccess, onError ){
         crowdlogger.debug.log('In uninstallCLRM...');
         var uninstall =function(){
@@ -382,6 +393,14 @@ var CLRM = function(crowdlogger){
         unload();
     };
 
+    /**
+     * Removes a CLRM from the installed CLRM database.
+     *
+     * @param {string} clrmid     The id of the CLRM to remove.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  removing the CLRM.
+     * @param {function} onError        A function to invoke upon error.
+     */
     this.removeCLRMFromDB = function( clrmid, onSuccess, onError ){
         crowdlogger.io.log.update_clrm_db({
             on_success: onSuccess,
@@ -394,6 +413,16 @@ var CLRM = function(crowdlogger){
         });
     };
 
+    /**
+     * Enables a CLRM by its id. The CLRM must be installed. If there is an
+     * error loading the CLRM, it will be marked in the database as enabled,
+     * but the 'loaded' field will be set to false.
+     *
+     * @param {object} clrmid           The id of the CLRM to enable.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  enabling the CLRM.
+     * @param {function} onError        A function to invoke upon error.
+     */
     this.enableCLRM = function( clrmid, onSuccess, onError ){
         // Get the associated package.
         crowdlogger.io.log.get_clrm_entry({
@@ -409,12 +438,32 @@ var CLRM = function(crowdlogger){
                             data: [package],
                             on_success: onSuccess
                         });
-                    }, onError );
+                    }, function(){
+                        // Once loaded, save the state as enabled.
+                        package.metadata.enabled = true;
+                        package.metadata.loaded = false;
+                        crowdlogger.io.log.write_to_clrm_db({
+                            data: [package],
+                            on_success: onSuccess
+                        });
+                    }
+                );
             },
             on_error: onError
         });
     };
 
+    /**
+     * Disables a CLRM by id. The CLRM must exist in the installed CLRM 
+     * database. If loaded, the CLRM will be unloaded with a reason of 
+     * 'disable'. In the database, the CLRM will be marked as disabled and
+     * unloaded.
+     *
+     * @param {string} clrmid           The id of the CLRM to disable.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  disabling the CLRM.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.disableCLRM = function( clrmid, onSuccess, onError ){
         that.unloadCLRM({
             clrmid: clrmid, 
@@ -422,7 +471,7 @@ var CLRM = function(crowdlogger){
             onSuccess: onSuccess, 
             onError: onError
         });
-    };   
+    };
 
     /**
      * Unloads a CLRM and records this in the CLRM DB.
@@ -472,6 +521,16 @@ var CLRM = function(crowdlogger){
         });
     };
 
+    /**
+     * Unloads each installed CLRM. Any errors encountered are emitted and the
+     * next CLRM is processed.
+     *
+     * @param {string} reason           The reason ('uninstall', 'disable',
+     *                                  'shutdown', 'newversion').
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  installing the CLRM.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.unloadAllCLRMs = function(reason, onSuccess, onError){
         crowdlogger.io.log.read_clrm_db({
             on_error: onError, 
@@ -490,7 +549,12 @@ var CLRM = function(crowdlogger){
                             clrmid: batch[i].clrmid,
                             reason: reason,
                             onSuccess: function(){ process(i+1); },
-                            onError: onError
+                            onError: function(e){
+                                if(onError){
+                                    setTimeout(function(){onError(e)}, T);
+                                }
+                                process(i+1);
+                            }
                         })
                     }
                 }
@@ -499,6 +563,14 @@ var CLRM = function(crowdlogger){
         });
     };
 
+    /**
+     * Loads an installed CLRM, but only if it is not currently loaded.
+     *
+     * @param {string} clrmid           The id of the CLRM to load.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  loading the CLRM.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.loadCLRMIfNecessary = function( clrmid, onSuccess, onError ){
         // Get the associated package.
         crowdlogger.io.log.get_clrm_entry({
@@ -522,53 +594,76 @@ var CLRM = function(crowdlogger){
             },
             on_error: onError
         });
-
     };
 
-
+    /**
+     * Loads all enabled CLRMs. When an error is encountered, it is emitted and
+     * processing moves on to the next CLRM. 
+     *
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  enabling all CLRMs.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.loadAllEnabledCLRMs = function(onSuccess, onError){
-        crowdlogger.io.log.read_clrm_db({
-            on_error: onError, 
-            chunk_size: 5,
-            on_success: function(){ 
-                crowdlogger.debug.log('getInstalledCLRMListing is finished!');
-                if(onSuccess){onSuccess();} 
-            },
-            on_chunk: function(batch, next){
-                crowdlogger.debug.log('Processing chunk!');
-                function process(i) {
-                    if( i >= batch.length ){
-                        next();
-                    } else {
-                        if( batch[i].metadata.enabled ){
-                            crowdlogger.debug.log('Loading '+ batch[i].clrmid);
-                            crowdlogger.api.cli.base.loadCLRMFromString(
-                            JSON.stringify(batch[i]), function(){
-                                // Once loaded, save the state as enabled.
-                                batch[i].metadata.loaded = true;
-                                crowdlogger.io.log.write_to_clrm_db({
-                                    data: [batch[i]],
-                                    on_success: function(){process(i+1);},
-                                    on_error: onError
-                                });
-                            }, onError );
-                        } else {
-                            crowdlogger.debug.log('Skipping '+ batch[i].clrmid);
-                            batch[i].metadata.loaded = false;
-                            crowdlogger.io.log.write_to_clrm_db({
-                                data: [batch[i]],
-                                on_success: function(){process(i+1);},
-                                on_error: onError
-                            });
-                        }
-                    }
-                }
-                process(0);
+        var update, install, enable;
+
+        crowdlogger.debug.log('Loading all enabled CLRMs');
+
+        enable = function(clrmid, onSuccess, onError){
+            crowdlogger.debug.log('Enabling '+ clrmid);
+            that.enableCLRM( clrmid, onSuccess, onError );
+        };
+
+        install = function(clrmMetadata, onSuccess, onError){
+            crowdlogger.debug.log('Updating '+ clrmid);
+            that.installCLRM(clrmMetadata, function(){
+                enable(clrmMetadata.clrmid, onSuccess, onError);
+            }, onError);
+        };
+
+        update = function(clrmListing){
+            var instlledCLRMs = [], processNext, clrmid, onErr;
+
+            for(clrmid in clrmListing){
+                if(clrmListing[clrmid].installed)
+                instlledCLRMs.push(clrmListing[clrmid]);
             }
-        });
+
+            processNext = function(){
+                if(instlledCLRMs.length > 0){
+                    var clrmMetadata = instlledCLRMs.shift();
+                    if( clrmMetadata.updateAvailable ){
+                        install(clrmMetadata, processNext, onErr);
+                    } else if( clrmMetadata.enabled ) {
+                        enable(clrmMetadata.clrmid, processNext, onErr);
+                    } else {
+                        processNext();
+                    }
+                } else {
+                    if(onSuccess){ onSuccess(); }
+                }
+            };
+
+            processNext();
+        };
+
+        onErr = function(e){
+            if(onError){ setTimeout(function(){onError(e)}, T);}
+            processNext();
+        }
+
+        getOverviewCLRMListing(update, onError);
     };
 
 
+    /**
+     * Invokes the given CLRM's 'open' method.
+     *
+     * @param {string} clrmid           The id of the CLRM.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  opening the CLRM.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.open = function(clrmid, onSuccess, onError){
         crowdlogger.api.cli.base.invokeCLRMMethod({
             clrmid: clrmid,
@@ -578,6 +673,14 @@ var CLRM = function(crowdlogger){
         });
     };
 
+    /**
+     * Invokes the given CLRM's 'configure' method.
+     *
+     * @param {string} clrmid           The id of the CLRM.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  opening the CLRM's configuration.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.configure = function(clrmid, onSuccess, onError){
         crowdlogger.api.cli.base.invokeCLRMMethod({
             clrmid: clrmid,
@@ -587,6 +690,14 @@ var CLRM = function(crowdlogger){
         });
     };
 
+    /**
+     * Invokes the given CLRM's 'getMessage' method.
+     *
+     * @param {string} clrmid           The id of the CLRM.
+     * @param {function} onSuccess      A function to invoke with the result of
+     *                                  invoking the getMessage method.
+     * @param {function} onError        A function to invoke upon error.    
+     */
     this.getMessage = function(clrmid, onSuccess, onError){
         crowdlogger.api.cli.base.invokeCLRMMethod({
             clrmid: clrmid,
@@ -594,5 +705,94 @@ var CLRM = function(crowdlogger){
             on_success: onSuccess,
             on_error: onError
         });
+    };
+
+    /**
+     * Updates the given CLRM by unloading and installing the update. If the
+     * currently loaded CLRM is not ready to be updated, the update is installed
+     * in the database, but the currently loaded version is kept untouched.
+     *
+     * @param {object} clrmMetadata     The CLRM's metadata.
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  opening the CLRM.
+     * @param {function} onError        A function to invoke upon error.    
+     */
+    this.updateCLRM = function(clrmMetadata, onSuccess, onError){
+        var install, unload;
+        install = function(){
+            crowdlogger.log('Installing '+ clrmMetadata.clrmid);
+            that.installCLRM(clrmMetadata, function(){
+                if( clrmMetadata.enabled ){
+                    crowdlogger.log('Enabling '+ clrmMetadata.clrmid);
+                    that.enableCLRM(clrmMetadata.clrmid, onSuccess, onError);
+                } else if(onSuccess) {
+                    onSuccess();
+                }
+            }, onError, {enabled: clrmMetadata.enabled});
+        };
+
+        unload = function(isOkayToUpdate){
+            crowdlogger.log('Unloading '+ clrmMetadata.clrmid);
+            if( isOkayToUpdate ){
+                that.unloadCLRM({
+                    clrmid: clrmMetadata.clrmid, 
+                    reason: 'newversion',
+                    on_success: install,
+                    on_error: install
+                });
+            } else if(onSuccess) {
+                onSuccess();
+            }
+        };
+
+        // Check that the CLRM is in a good spot to uninstall.
+        crowdlogger.api.cli.base.invokeCLRMMethod({
+            clrmid: clrmMetadata, 
+            method: 'isOkayToUpdate',
+            on_success: unload,
+            on_error: onError
+        });
+    };
+
+    /**
+     * Updates all installed CLRMs, if updates are available. If a CLRM has an
+     * update, it is unloaded (if possible) prior to being updated. Unless an
+     * error is encountered, the stored version will be updated regardless of
+     * whether a CLRM is loaded or read to be updated. If there is a problem
+     * with any of the CLRMs, an error is emitted and the next one is processed.
+     *
+     * @param {function} onSuccess      A function to invoke upon successfully
+     *                                  updating all the installed CLRMs.
+     * @param {function} onError        A function to invoke upon error.    
+     */
+    this.updateAllCLRMs = function(onSuccess, onError){
+        crowdlogger.debug.log('Updating all CLRMS...');
+
+        var update = function(clrmListing){
+            var updatableCLRMs = [], clrmid, processNext;
+            for(clrmid in clrmListing){
+                if( clrmListing[clrmid].updateAvailable ){
+                    updatableCLRMs.push( clrmListing[clrmid] );
+                }
+            }
+
+            processNext = function(){
+                if(updatableCLRMs.length > 0){
+                    that.updateCLRM(
+                        updatableCLRMs.shift(), 
+                        processNext, 
+                        function(e){
+                            if(onError){ setTimeout(function(){onError(e)});}
+                            processNext();
+                        });
+                } else if(onSuccess){ 
+                    onSuccess();
+                }
+            }
+
+            processNext();
+        };
+
+        getOverviewCLRMListing(update, onError);
     };
 }

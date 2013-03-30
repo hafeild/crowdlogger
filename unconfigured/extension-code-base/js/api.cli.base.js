@@ -42,7 +42,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
     // Public function declarations.
     this.loadCLRM, this.unloadCLRM, this.sendMessage, this.registerCallback, 
     this.unregisterCallback, this.invokeCLRMICallback, 
-    this.simpleCallbackWrapper; 
+    this.simpleCallbackWrapper, this.invokeCLRMMethod; 
 
 
     // Private function definitions.
@@ -62,14 +62,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
         var path = crowdlogger.version.info.get_extension_prefix();
 
-
         if( crowdlogger.version.info.is_firefox ){
-            // var hiddenWindow = Components.classes[
-            //     '@mozilla.org/appshell/appShellService;1'].
-            //      getService(Components.interfaces.nsIAppShellService).
-            //      hiddenDOMWindow;
-            // var frame = hiddenWindow.document.getElementById('clrm');
-
             var clrm_url = 
                     crowdlogger.version.info.get_extension_html_prefix()+
                     'clrm.html';
@@ -81,8 +74,6 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
             crowdlogger.jq(window).bind('message', onMessage);
             clrmi = frame[0].contentWindow;
-
-
         } else {
             var clrm_url = 'data:text/html,'+encodeURIComponent(
                 '<html>'+
@@ -104,13 +95,25 @@ CLI.prototype.Base = function(crowdlogger, cli){
                 '</html>');
             crowdlogger.jq('#clrm').attr('src', clrm_url);
 
-            clrmi = crowdlogger.jq('#clrm')[0].contentWindow;
-            crowdlogger.jq(window).bind( 'message', onMessage );
+            var attachContentWindow = function(){
+                try{
+                    crowdlogger.debug.log('Attempting to attach content window');
+                    clrmi = crowdlogger.jq('#clrm')[0].contentWindow;
+                    crowdlogger.jq(window).bind( 'message', onMessage );
+                } catch (e) {
+                    crowdlogger.debug.log('Error to attaching content window:');
+                    crowdlogger.debug.log(e);
+
+                    setTimeout(attachContentWindow, 10);
+                }
+            }
+
+            attachContentWindow();
         }
 
         messageHandlers.cliRequest = invokeCLIFunction;
         messageHandlers.cliCallback = invokeCLICallback;
-        setTimeout(crowdlogger.clrm.loadAllEnabledCLRMs, 2000);
+        setTimeout(crowdlogger.clrm.init, 2000);
     };
 
     /**
@@ -259,7 +262,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
             if( opts.event === 'on_error' && onerror ){
                 onerror(opts.error);
             } else if( opts.event === 'on_success' && onsuccess ) {
-                onsuccess();
+                onsuccess(opts.data);
             }
 
             that.unregisterCallback(callbackID);

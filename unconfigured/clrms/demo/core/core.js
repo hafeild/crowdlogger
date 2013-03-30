@@ -24,7 +24,7 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
     };
 
     this.getMessage = function(){
-        return "No messages.";
+        return 'Version '+ clrmPackage.metadata.version +'; no messages.';
     };
 
     this.open = function(){
@@ -33,5 +33,9 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
 
     this.configure = function(){
         demo.launchWindow('configure-demo.html');
+    };
+
+    this.isOkayToUpdate = function(){
+        return true;
     };
 }

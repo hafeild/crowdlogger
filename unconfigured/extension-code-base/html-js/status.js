@@ -56,7 +56,8 @@ function set_click_listeners(){
             case 'register_button':
                 CROWDLOGGER.study.launch_registration_dialog(); 
                 break;
-
+            case '':
+                return true;
         }
         return false;
     });
