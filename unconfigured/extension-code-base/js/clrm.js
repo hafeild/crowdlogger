@@ -240,7 +240,7 @@ var CLRM = function(crowdlogger){
                     var used = false;
                     //var jqElm = generateCLRMElement(jq, metadata);
                     var jqElm = populateCLRMElement(
-                        jq('#clrm-template').clone(), metadata);
+                        jq('#clrm-template').clone().attr('id', ''), metadata);
                     jqElm.show();
 
                     if(metadata.categories.indexOf('app') >= 0){

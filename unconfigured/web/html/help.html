@@ -6,9 +6,14 @@ Version: %%VERSION%%
 <html>
 <head>
     <link rel="shortcut icon" type="image/png"
-        href="images/crowdlogger-logo.001.16x16.png"/>
+        href="images/crowdlogger-logo.001.logging.16x16.png"/>
     <title>Help using %%PROJECT_NAME%%</title>
     <link rel="stylesheet" type="text/css" media="screen" href="style/style.css">
+    <style>
+    .spaced li {
+        height: 35px;
+    }
+    </style>
 </head>
 <body>
 <div class="bodyWrapper">
@@ -39,23 +44,23 @@ Version: %%VERSION%%
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-<h1>%%PROJECT_NAME%% Help</h1>
 This page provides help on a variety of actions that are possible with the %%PROJECT_NAME%% extensions for Firefox and Google Chrome. The topics are outlined
 here:
 
 <ul>
-    <li><a href="#pausingLogger">Pausing and resuming the logger</a></li>
-    <li><a href="#toolsMenu">Understanding the %%PROJECT_NAME%% menu</a></li>
-    <ul>
-        <li><a href="#register">Register</a></li>
-        <li><a href="#referAFriend">Refer a friend</a></li>
-        <li><a href="#settings">Settings</a></li>
-        <li><a href="#statusPage">Status page</a></li>
+    <li><a href="#pausing-logger">Pausing and resuming the logger</a></li>
+    <li><a href="#notifications">Notifications</a></li>
+    <li><a href="#menu">Understanding the %%PROJECT_NAME%% menu</a></li>
+    <li><a href="#status-page">The status page</a>
+    <li><a href="#tools">Tools</a>
         <ul>
-    		<!-- <li><a href="#win">Check/redeem winnings</a></li> -->
-	    	<li><a href="#viewLog">View search log</a></li>
+            <li><a href="#register">Register</a></li>
+            <li><a href="#search-histogram">Search histogram</a></li>
+            <li><a href="#view-log">View browsing log</a></li>
+            <li><a href="#clear-log">Clearing you browsing log</a></li>
+            <li><a href="#installing-apps">Installing apps &amp; studies</a></li>
         </ul>
-    </ul>
+    <li><a href="#apps-and-studies">What are <i>apps</i> &amp; <i>studies</i>?</a>
 
 </ul>
 
@@ -67,137 +72,218 @@ versions of the extension.
 <br><br>
 -->
 
-<a name="pausingLogger"></a>
-<h1>Pausing the logger</h1>
+<a name="pausing-logger"></a>
+<h2>Pausing the logger</h2>
 <p>
 By default, the logger will start logging as soon as you install the extension.
-To pause the logger, click the "pause" button <span style="white-space:
-nowrap;">(<img src="images/pauseLogging.png"/>)</span> on the navigation
-bar. When pressed, a menu will pop up. The first entry is another pause button. Click that to pause logging; the icon will change into a
-"play" button <span style="white-space: nowrap;">(<img
-src="images/startLogging.png"/>)</span>.  You can press this button to start
+To pause the logger, click the %%PROJECT_NAME%% icon <img src="images/crowdlogger-logo.001.logging.16x16.png"/> on your browser's navigation bar. That will open the menu for the extension; click the "pause" button <img src="images/pauseLogging.png"/> at the top of the menu. When pressed, the pause icon will change to a "play" button <img
+src="images/startLogging.png"/> and the %%PROJECT_NAME%% icon on the navigation bar will be grayed out.  You can press "play" button to start
 logging again.
 </p>
 
-<a name="toolsMenu"></a>
-<h1>Understanding the %%PROJECT_NAME%% menu</h1>
+<a name="menu"></a>
+<h2>Understanding the %%PROJECT_NAME%% menu</h2>
 <p>
-This section describes the tools available in the %%PROJECT_NAME%% menu. This menu can be accessed by clicking the play or pause button on your navigation bar in Chrome or Firefox.
+This section describes the tools available in the %%PROJECT_NAME%% menu. This menu can be accessed by clicking the %%PROJECT_NAME%% icon <img src="images/crowdlogger-logo.001.logging.16x16.png"/> on the navigation bar in Chrome or Firefox.
 </p>
 
 <div align="center">
-    <img src="images/chrome_menu.png" width="75%"/>
+    <img src="images/menu-dropshadow.png" width="75%"/>
+</div>
+
+
+
+<p>
+The menu consists of four parts:
+<ol>
+    <li><img src="images/pauseLogging.png"/>/<img src="images/startLogging.png"/> buttons to toggle logging (<a href="#pausing-logger">see above</a>)
+    <li>A link to the settings page
+    <li>A link to this page
+    <li>A link to the status page&mdash;this is the page from which you can access notifications, tools, and install/configure  apps &amp; studies (<a href="#status-page">see below</a>)
+</ol>
+</p>
+
+
+<a name="notifications"></a>
+<h2>Notifications</h2>
+<p>
+Every now and then, you may notice a small orange or red dot on the %%PROJECT_NAME%% icon on your browser's navigation bar: <img src="images/crowdlogger-logo.001.logging.alert-low.16x16.png"/> or <img src="images/crowdlogger-logo.001.logging.alert-high.16x16.png"/>. This indicates that one or more notifications are pending. If you click the icon, the %%PROJECT_NAME%% menu will open and the <a href="#status-page">Status page</a> item will be highlighted. Click the "Status page" menu item to see the notifications.
+</p>
+
+<p>
+ There are several notifications you may receive, such as:
+<ul>
+    <li>notices from %%PROJECT_NAME%%, such as when new features or settings are added
+    <li>a reminder to update your registration and settings
+    <li>notices from study researchers if something needs your attention
+</ul>
+</p>
+
+
+<a name="status-page"></a>
+<h2>Status Page</h2>
+<p>
+Clicking the "Status page" menu item will bring up a page that looks something like this:
+</p>
+
+<div align="center">
+    <img width="75%" src="images/status-page.png"/>
 </div>
 
 <p>
-In this section, we go through the 
+This page includes several important pieces:
 <ul>
-    <li><a href="#register">Register</a>,
-    <li><a href="#referAFriend">Refer a friend</a>,  
-    <li><a href="#settings">Settings</a>, and
-    <li><a href="#statusPage">Status page</a>
+    <li>Current notifications (<a href="#notifications">see above</a>)
+
+    <li>New messages</li>
+    <li>Studies and apps you have installed
+    <li>Tools, such as:</li>
+    <ul>
+        <li>visualizations over your search history
+        <li>exporting your search history
+        <li>removing individual records from your search history
+        <li>removing your local search log from you computer
+    </ul>
+    <li>A link to provide anonymous feedback about CrowdLogger
 </ul>
-menu items. The pause/start logging button was 
-discussed above. The Help menu item will bring you to this page.
 </p>
+
+
+<a name="tools"></a>
+<h2>Tools</h2>
+<p>
+As listed above, there are several tools available from the Status Page.
+In this section, we will briefly describe the following:
+<ul>
+    <li><a href="#register">Register</a></li>
+    <li><a href="#search-histogram">Search histogram</a></li>
+    <li><a href="#view-log">View browsing log</a></li>
+    <li><a href="#clear-log">Clearing you browsing log</a></li>
+    <li><a href="#installing-apps">Installing apps &amp; studies</a></li>
+</ul>
 
 <a name="register"></a>
-<h2>Register</h2>
+<h3>Register</h3>
 <p>
-In order for us to understand the demographics of the study participants, and to
-enter you into the periodic Amazon.com gift card raffle, we ask that you
-register. If you would like to opt out of (or back into) the raffle, this is where you would do
-so. This is also where you can enter the code given to you by whoever 
-referred you to %%PROJECT_NAME%%. 
+The purpose of registration is for us to collect demographic information about %%PROJECT_NAME%% users. This information is anonymous and is not tied to you or your search data.
 </p>
 
 <p>
-While you must enter something for (almost) all of the fields, you can
-select "I prefer not to answer" for multiple-choice question or enter "PNA"
-(prefer not to answer) in text fields.
+While you must enter something for all of the fields, you can
+select "I prefer not to answer" for any question.
 </p>
 
 <p>
 When you click "Register" at the bottom (this will only be click-able once 
 you've responded to all of the questions), the extension will attempt to contact
 the registration server. If there is a problem, a pop up box will notify you of
-such. If successful, a prompt will appear, asking if you would like to refer a
-friend.
-</p>
-
-<a name="referAFriend"></a>
-<h2>Refer a friend</h2>
-<p>
-If you click on the "Refer a friend" button in either the menu or the 
-post-registration prompt described above, you will see a dialog that supplies you with the code you need to give to the participants 
-you refer to this study. It will also give you sample text for an email message to send to your friends.  (The %%PROJECT_NAME%% team's experience is that spam filters are less likely to be triggered if you send the message yourself.)
-Your friends should enter this code during their registration. 
-Participants will be given a greater chance of winning the periodic Amazon.com 
-gift card raffles as they refer more participants.
+such. Otherwise, the registration window will close.
 </p>
 
 
-<a name="settings"></a>
-<h2>Settings</h2>
-<p>
-To access the settings for the extension, select the "Settings" option. 
-One of the settings is your <i>pass phrase</i>.
- A pass phrase is used to 
-ensure that, if you use %%PROJECT_NAME%% on multiple computers,  
-we encrypt the information we extract from all of your logs the same way. This 
-way, information extracted from your various computers will not appear as 
-though it came from different users, ensuring that we do not falsely decrypt 
-your information. <span style="color: red"><b>It is important that you use the 
-same pass phrase across all computers.</b></span> 
-</p>
-
-<p>
-Another setting concerns experiments. Currently the only option
-is whether or not to run experiments automatically when they become available. If you select to have experiments run automatically, experiments will run as soon as they are available without your explicit interaction.
-</p>
-
-
-<a name="statusPage"></a>
-<h2>Status Page</h2>
-<p>
-Clicking the "Status Page" menu item will bring you to the %%PROJECT_NAME%% status page. This page includes several important notifications and tools:
-<ul>
-    <li>Current notifications, such as:</li>
-    <ul>
-        <!-- <li>that there are pending study action to run</li> -->
-        <li>alerts from study researchers</li>
-       <!--  <li>a new version of the consent form</li> -->
-        <li>a reminder to set your pass phrase, register, and refer friends</li>
-        <!-- <li>that you have won a raffle</li> -->
-        <!-- <li>that a new version of the extension is available</li> -->
-    </ul>
-    <li>New messages</li>
-    <!-- <li>A list of raffles you have won</li> -->
-    <li>A list of studies you have signed up for</li>
-    <li>Tools, such as:</li>
-    <ul>
-        <li>visualizations over your search history</li>
-        <li>exporting your search history</li>
-        <li>removing individual records from your search history</li>
-        <li>removing your local search log from you computer</li>
-    </ul>
-</ul>
-</p>
-	
-
-	
-<!-- <a name="winning"></a>
-<h3>Notification of winning a raffle</h3>
-
-If you win a raffle, a notification will appear in the status page. You will also be notified via a desktop notification. The status page will provide you with the information you need to claim and download your Amazon.com gift card.
- -->
-
-
-<a name="viewLog"></a>
-<h3>View search log</h3>
+<a name="search-histogram"></a>
 <p>
 You can view your search history&mdash;a list of the searches you have submitted to search 
-engines, as well as their frequency&mdash; by selecting the "Search histogram" link under the "Tools" section of the status page. A dialog will pop up listing your searches. You can sort them alphabetically or by frequency.
+engines, as well as their frequency&mdash; by selecting the "Search histogram" link under the "Tools" section of the status page. A dialog will pop up listing your searches. You can sort them alphabetically or by frequency by clicking the corresponding header.
+</p>
+
+
+
+
+<a name="view-log"></a>
+<h3>View search and browsing history</h3>
+<p>
+You can view your entire browsing history by clicking the "View browsing log"
+link on the Status page. As depicted below, the viewer shows the most recent 100 logged events, including
+page loads and focuses, searches and link clicks. A summary of each entry is
+given and the raw data stored can be viewed by clicking the small <span class="expanders">&#9658;</span> to the
+left of an entry.
+</p>
+
+<div align="center">
+    <img src="images/search-log-viewer.png" width="75%"/>
+</div>
+
+<p>
+You can move further back or forward in time by clicking the arrow buttons located in the left side of the blue header.
+</p>
+
+<p>
+You can delete the specifics of an entry by clicking the <span class="delete">&#10008;</span> to the right of an entry. The time stamp, id, and event type will remain in tact.
+</p>
+
+<p>
+You can export your data in JSON format by clicking the "Save file" button
+at the bottom. By default, only the most recent 1,000 events will be saved. 
+Entering 'all' (without quotes) in the box and clicking "Save file" will cause
+all logged events to be saved. However, this may cause the %%PROJECT_NAME%% 
+extension to crash. We are working on a way to make exporting data more stable.
+</p>
+
+
+
+
+<a name="clear-log"></a>
+<h3>Clearing you browsing log</h3>
+<p>
+You can completely wipe out your browsing log by clicking "Clear entire log"
+on the status page. You have to confirm you want your log removed by clicking 
+the red "Confirm delete" button that appears. Once deletion is finalized, 
+the word "Cleared" will appear in place of the confirmation button.
+</p>
+
+
+
+<a name="installing-apps"></a>
+<h3>Installing apps &amp; studies</h3>
+<p>
+Clicking the "Install apps &amp; studies" link on the Status Page will open
+the Apps and Studies library, as shown below. You can view all installed and 
+available apps and studies from this page. You can install new apps or open, 
+configure, disable, or remove already installed ones. Installed apps and studies
+are denoted by a ribbon in the upper right corner of their icons. Enabled
+apps/studies will have an orange ribbon while disabled ones will have a maroon
+ribbon.
+<p/>
+
+<div align="center">
+    <img src="images/apps-library.png" width="75%"/>
+</div>
+
+<p>
+Clicking on an app or study icon will bring up a description of that app/study
+and buttons for several options:
+</p>
+If not installed:
+<ul class="spaced">
+    <li><button>Install</button> Installs the app or study.
+    <li><button>Dismiss</button> Removes the description box (you can also do this by clicking anywhere outside of the box).
+</ul>
+If installed:
+<ul class="spaced">
+    <li><button>Open</button> Launches the app or study.
+    <li><button>Configure</button> Opens the settings window for the app or study.
+    <li><button>Remove</button> Uninstalls the app or study, removing all of its stored data.
+    <li><button>Disable</button> Unloads the app or study, so that it is not running (its data remains untouched).
+    <li><button>Dismiss</button> Removes the description box (you can also do this by clicking anywhere outside of the box).
+</ul>
+        
+
+
+
+<a name="apps-and-studies"></a>
+<h2>What are <i>apps</i> and <i>studies</i>?</h2>
+<p>
+We currently differentiate between two kinds of CrowdLogger Remote Modules (CLRMs): <i>apps</i> and <i>studies</i>. The differences can be subtle, but the general idea is that:
+</p>
+
+<p>
+    <span style="color: orange">App:</span>
+    User-centric; installed for the purpose of helping users visualize or otherwise leverage their search history.
+</p>
+<p>
+    <span style="color: orange">Study:</span>
+    Researcher-centric; created as a means for researchers to collect information from users, e.g.: collecting search patterns or asking users to annotate data.
 </p>
 
 

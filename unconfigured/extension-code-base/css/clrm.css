@@ -66,6 +66,7 @@
     box-shadow: 0px 2px 3px #888888;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
+    z-index: 5;
 }
 
 .enabled.ribbon {

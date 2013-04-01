@@ -17,16 +17,6 @@ function check_if_initialized(){
     if( initElm.html() === '' ){
         CROWDLOGGER.clrm.populateCLRMLibraryPage(document, function(){
             console.log('success!');
-
-            try{
-                // jQuery('#content').isotope({
-                //   // options
-                //   itemSelector : '.section',
-                //   layoutMode : 'masonry'
-                // });
-            } catch(e){
-                
-            }
         }, function(e){ 
             console.log('Error: '+ e);
         });
@@ -123,6 +113,12 @@ var add_listeners = function(){
                 break;
 
             default:
+        }
+    });
+
+    jQuery(document).on('click', function(e){
+        if( jQuery(e.target).parents('.clrm-container').length === 0 ){
+            jQuery('.info').hide({easing: 'slide', duration: 300});
         }
     });
 

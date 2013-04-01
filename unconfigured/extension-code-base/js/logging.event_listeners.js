@@ -797,8 +797,6 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             }
         };
 
-
-
         var add_dom_mod_listener = function(elm, f){
             var observer = new myMutationObserver(function(mutations){
                 f(mutations);

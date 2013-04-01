@@ -52,9 +52,11 @@ Version: %%VERSION%%
 
     There are not many settings just yet. More will show up as we further develop %%PROJECT_NAME%%.
 
-
+<!--
+    <br/>
+ 
     <span class="note" name="required"><span name="required" class="required">*</span> denotes required fields.</span>
-
+ -->
     <p>
 
     <span class="alertMessage hidden" id="missing_fields_alert">
@@ -84,12 +86,14 @@ Version: %%VERSION%%
             Off <input type="radio" name="dev_mode" value="false" checked="checked"/> 
         </div>
 
-        <span class="button-group">
+        <p>
+        <span class="buttonGroup" id="save_button_panel">
             <button id="save_button">Save</button>
             <button id="save_and_close_button"
                 >Save and close</button>
         </span>
         <span id="saved" style="color: green; display: none">Saved.</span>
+        </p>
     </form>
 
     <div class="buffer">

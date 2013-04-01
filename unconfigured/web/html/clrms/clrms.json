@@ -8,5 +8,15 @@
         "packageURL": "http://localhost:8000/demo.json?39",
         "permissions": ["userdata", "ui", "storage"],
         "logoURL": "http://localhost:8000/demo.jpg"
+    },
+
+    "studydemo1": {
+        "clrmid": "studydemo1",
+        "name": "What do people search for on the Internet?",
+        "version": "1.0",
+        "categories": ["study"],
+        "description": "A study into what people search for on the web. UMass Amherst. Researchers: H. Feild",
+        "packageURL": "http://localhost:8000/studydemo.json?39",
+        "permissions": ["userdata", "ui", "storage"]
     }
 }

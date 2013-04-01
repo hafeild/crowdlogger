@@ -9,8 +9,52 @@ Version: %%VERSION%%
         href="images/crowdlogger-logo.001.16x16.png"/>
     <title>Download %%PROJECT_NAME%%</title>
     <link rel="stylesheet" type="text/css" href="style/style.css">
+    <script src="lib/jquery.min.js"></script>
+
+<style>
+    .note {
+        color: red;
+    }
+
+    li {
+        margin-bottom: 15px;
+    }
+</style>
+<script>
+function extractVersion(browserName){
+    return navigator.userAgent.match(new RegExp(browserName+'/([\\d]+)'));
+}
+
+jQuery(document).ready(function(){
+    var chromeVersion = extractVersion('Chrome');
+    var firefoxVersion = extractVersion('Firefox');
+
+    console.log(chromeVersion);
+    console.log(firefoxVersion);
+
+    if( chromeVersion ){
+        jQuery('#firefox').hide();
+        if( chromeVersion.length > 0 && parseInt(chromeVersion[1]) < %%CHROME_MIN_VERSION%%){
+            jQuery('#chrome-download').attr('disabled', 'disabled');
+            jQuery('#chrome-note').show();
+            jQuery('#no-ff-or-chrome').show();
+        }
+    } else if( firefoxVersion ){
+        jQuery('#chrome').hide();
+        if( firefoxVersion.length > 0 && parseInt(firefoxVersion[1]) < %%FF_MIN_VERSION%%){
+            jQuery('#ff-download').attr('disabled', 'disabled');
+            jQuery('#ff-note').show();
+            jQuery('#no-ff-or-chrome').show();
+        }
+    } else {
+        jQuery('#no-ff-or-chrome').show();
+        jQuery('#firefox').hide();
+        jQuery('#chrome').hide();
+    }
+});
 
 
+</script>
 </head>
 <body>
 <div class="bodyWrapper">
@@ -39,28 +83,54 @@ Version: %%VERSION%%
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
 
-<h1>Downloading %%PROJECT_NAME%%</h1>
-<p>
-To use %%PROJECT_NAME%% on your desktop or laptop, you must:
-<ol>
-    <li>download <a href="http://www.google.com/chrome/">Google Chrome (v24+)</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox (v17+)</a></li>
-    <li>download the %%PROJECT_NAME%% extension for <a href="http://www.google.com/chrome/">Google Chrome</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a></li>
-</ol>
-</p>
-
-
-<span class="note">%%PROJECT_NAME%% is currently under construction! Version 2.0 will be out soon!</span>
-<br/>
-<br/>
-<span class="buttonPanel" style="height: 5em">
-    <span id="chrome_download" class="button disabled" onclick="return false; location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Chrome</b></span>
-    <span id="ff_download" class="button disabled" onclick="return false; if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download<br>%%PROJECT_NAME%% v%%VERSION%%<br>for<br><b>Firefox</b></span>
+<span class="note hidden" id="no-ff-or-chrome">
+To use %%PROJECT_NAME%% on your desktop or laptop, you must first have either
+<a href="http://www.google.com/chrome/">Google Chrome (v%%CHROME_MIN_VERSION%%+)</a> or <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox (v%%FF_MIN_VERSION%%+)</a> installed.
 </span>
-<br/>
 
 <p>
-After installing, the extension will open a configuration wizard that will guide you through setting things up.
+To install %%PROJECT_NAME%%, follow the instructions below. After installing, the extension will open a configuration wizard that will guide you through setting things up.
 </p>
+
+<div id="firefox">
+<h2>Installing %%PROJECT_NAME%% for Firefox</h2>
+
+<span id="chrome-note" class="note hidden">
+%%PROJECT_NAME%% only works from Firefox v.%%FF_MIN_VERSION%% or higher.
+</span>
+
+<p>
+Click the button and the installation will progress automatically:
+<button id="ff-download" onclick="return false; if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download for Firefox</button>
+</p>
+</div>
+
+
+
+<div id="chrome">
+<h2>Installing %%PROJECT_NAME%% for Chrome</h2>
+
+<span id="chrome-note" class="note hidden">
+%%PROJECT_NAME%% only works from Chrome v.%%MIN_CHROME_VERSION%% or higher.
+</span>
+
+<p>
+Installation for Chrome requires a few steps:
+<ol>
+  <li>Download the %%PROJECT_NAME%% extension:
+<button id="chrome-download" onclick="return false; location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download for Chrome</button>
+
+  <li>Navigate to the download (called <code>crowdlogger.crx</code>) in your downloads folder using, e.g.,  Windows Explorer (on Windows), Finder (on OSX), or whatever you'd like on Linux.
+
+  <li>In Chrome, open the Extensions page by clicking on the configuration icon on the far right side of the navigation bar and choosing "Tools"&rarr;"Extensions", as shown below.
+    <div align="center"><img src="images/chrome-extensions-menu.png" width="65%"/></div>
+
+  <li>Drag the <code>crowdlogger.crx</code> download from you Downloads folder onto the Chrome Extensions page, as shown below.
+    <div align="center"><img src="images/chrome-install.png" width="65%"/></div>
+</ol>
+
+
+
 
     <!-- Everything below here is for the footer. -->
     <div class="buffer">

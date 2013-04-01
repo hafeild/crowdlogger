@@ -3,7 +3,7 @@
 ## Global information
 LICENSE: Copyright (c) 2012 The CrowdLogger Project. University of Massachusetts.  All rights reserved. BSD Liscense (http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt).
 LICENSE_WEB: Copyright &copy; 2012 The CrowdLogger Project. &laquo; University of Massachusetts &laquo; All rights reserved. &laquo; <a href="http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt">BSD Liscense</a>
-VERSION: 1.7.3
+VERSION: 2.0
 PROJECT_NAME: CrowdLogger
 FULL_PROJECT_NAME: The CrowdLogger Project
 EXTENSION_FILE_NAME: CrowdLogger
@@ -12,8 +12,9 @@ CREATOR: CIIR
 HOMEPAGE: http://code.google.com/p/crowdlogger/
 ID: crowdlogger@myurl.org
 CONTACT_EMAIL: name@email
-FF_MIN_VERSION: 16
+FF_MIN_VERSION: 17
 FF_MAX_VERSION: 20.*
+CHROME_MIN_VERSION: 24
 
 
 ## Server info. The url does not need to be https.
@@ -54,7 +55,8 @@ EARTIFACT_WRITE_FILE: /eartifacts
 
 ## Database stuff
 DB_USER_NAME: cl
-DB_PASSWORD : cr0wd1ogger
+# CHANGE THIS!
+DB_PASSWORD : cr0wd1ogger 
 
 
 ## Files:
@@ -68,8 +70,4 @@ files :
     ## points. Use "YOUR_NAME_HERE" as a placeholder for the user's name. They will
     ## have the opportunity to copy this text and send the email themselves or send
     ## it automatically through the server.
-    EMAIL_BODY: email_body.txt
-
-    CONSENT_FORM: consent_form.html
-
     INDEX_BODY: index_body.html

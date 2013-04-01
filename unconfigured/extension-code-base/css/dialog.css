@@ -643,6 +643,7 @@ a:hover {
 #status_page_body .access .message {
     margin-left: 5px;
     margin-bottom: 10px;
+    line-height: 1.2;
 }
 
 #status_page_body .access .button {
@@ -659,8 +660,9 @@ a:hover {
     font-size: 90%;
 }
 
-.notifications .button {
+.notifications button {
     /*width: 100%;*/
+    margin-left: 3px;
 }
 
 
@@ -697,7 +699,7 @@ button.confirm:hover {
     border: 1px solid #903220; 
 }
 
-button.disabled, button.disabled:hover, button.disabled:active {
+button:disabled, button:disabled:hover, button:disabled:active {
 /*    background-image: -webkit-linear-gradient(top,#cecece,#bbbbbb);
     background-image: -moz-linear-gradient(top,#e95d3e,#a53925);
     background-image: linear-gradient(top,#e95d3e,#a53925);*/

@@ -23,10 +23,12 @@ Options:
     -o=<output>
         Uses <output> as the output directory. Defaults to 'configured/'.
 
-    -c=<config dir>
-        Uses <config dir> as the configuration directory (which should have a
-        file called 'default.conf.yaml' and optionally one called 
-        'override.conf.yaml').
+    -c=<config file>
+        Uses <config file> as the configuration file. This should be in YAML
+        or JSON format. Any referenced files should be specified relative to
+        the location of this file. You can specify more than one of these --
+        variables defined in a config files listed later will override earlier
+        definitions.
 "
 ################################################################################ 
 #require 'json'
@@ -36,8 +38,7 @@ require 'psych'
 INPUT_DIR = "unconfigured"
 OUTPUT_DIR = "configured"
 CONFIG_DIR = "config"
-DEFAULT_CONFIG = "defaults.conf.yaml"
-OPTIONAL_CONFIG = "override.conf.yaml"
+DEFAULT_CONFIG = "#{CONFIG_DIR}#{File::SEPARATOR}defaults.conf.yaml"
 
 ################################################################################
 ## Reads in a configuration file.
@@ -48,7 +49,16 @@ OPTIONAL_CONFIG = "override.conf.yaml"
 ################################################################################
 def readConfigFile( file )
     ## Loads the given file in as YAML and converts it into Ruby objects.
-    Psych.load(IO.read(file, {"open_args"=>"r:utf-8"}))
+    config = Psych.load(IO.read(file, {"open_args"=>"r:utf-8"}))
+
+    ## Replace file name with absolute paths.
+    if config.has_key? "files"
+        config["files"].each do |key,f|
+            config["files"][key] = File.expand_path(f, File.dirname(file))
+        end
+    end
+
+    config
 end
 
 ################################################################################
@@ -159,8 +169,8 @@ end
 ## Defaults...
 outputDir = OUTPUT_DIR
 inputDir  = INPUT_DIR
-configDir = CONFIG_DIR
 
+configFiles = []
 variableHash = nil
 
 ## Read in the options, if any were provided.
@@ -170,26 +180,28 @@ for arg in ARGV
     elsif arg =~ /^-o=/
         outputDir = arg.gsub( /^-o=/, "" )
     elsif arg =~ /^-c=/
-        configDir = arg.gsub( /^-c=/, "" )
+        configFiles << arg.gsub(/^-c=/, "")
     else
         die( "Invalid option: [#{arg}] #{usage}" )
     end
 end
 
-defaultConfigFile = "#{configDir}#{File::SEPARATOR}#{DEFAULT_CONFIG}"
-optionalConfigFile = "#{configDir}#{File::SEPARATOR}#{OPTIONAL_CONFIG}"
+if configFiles.size == 0
+    configFiles << DEFAULT_CONFIG
+end
 
 STDERR.puts "Input dir: #{inputDir}"
 STDERR.puts "Output dir: #{outputDir}"
-STDERR.puts "Config dir: #{configDir}"
-STDERR.puts "Default config file: #{defaultConfigFile}"
-STDERR.puts "Optional config file: #{optionalConfigFile}"
+STDERR.puts "Configs: #{configFiles.join(", ")}"
 
 
-## Check that all the directories exist.
-for d in [inputDir, configDir]
-    unless File.directory?( d )
-        die( "The following directory does not exist: [#{d}] #{usage}" )
+## Check that all the directories and files exist.
+unless File.directory?( inputDir )
+    die( "The following directory does not exist: [#{inputDir}] #{usage}" )
+end
+configFiles.each do |file|
+    unless File.exists?( file )
+        die( "The following files does not exist: [#{file}] #{usage}" )
     end
 end
 
@@ -199,15 +211,9 @@ if File.directory?( outputDir )
 end
 
 ## Read in the config files.
-unless File.file?( defaultConfigFile )
-    die( "The default config file does not exist: [#{defaultConfigFile}] " +
-         usage )
-end
-
-variableHash = readConfigFile( defaultConfigFile )
-if File.file?( optionalConfigFile )
-    variableHash = mergeHashes( variableHash, 
-        readConfigFile( optionalConfigFile ) )
+variableHash = {}
+configFiles.each do |file|
+    variableHash = mergeHashes( variableHash, readConfigFile( file ) )
 end
 
 
@@ -217,8 +223,11 @@ FileUtils.cp_r( inputDir, outputDir )
 ## Read in any of the files that have variable values.
 if variableHash.has_key? "files"
     variableHash["files"].each do |key,filename|
-        variableHash[key] = IO.read("#{configDir}/#{filename}", 
-            {"open_args"=>"r:utf-8"})
+        if File.exists?( filename )
+            variableHash[key] = IO.read(filename, {"open_args"=>"r:utf-8"})
+        else
+            STDERR.puts "Cannot find #{filename} (for variable files => #{key})"
+        end
     end
 end
 

@@ -81,6 +81,7 @@ e.g., more than one computer?
 
         <p>
 
+<div id="primary" class="hidden">
 <span name="required" class="required">*</span>
         Select one of your installation locations as your primary location. Is
 this your primary location? 
@@ -89,14 +90,15 @@ this your primary location?
 can get a more accurate count on the number of users signed up for this
 study. We do not keep track of this information in any logged data.</span>
         <ul>
-            <input type="radio" name="primary_location" value="yes"/>Yes<span class="note hidden" id="is_primary_message">&mdash;do not forget to use the same pass phrase (asked for later) on all of your computers!</span><br>
-            <input type="radio" name="primary_location" value="no"/>No<span class="note hidden" id="not_primary_message">&mdash;you don't have to complete the rest of the registration if this is not your primary location, but don't forget to set the pass phrase for this computer to be the same as your primary!</span><br>
+            <input type="radio" name="primary_location" value="yes"/>Yes<br/>
+            <input type="radio" name="primary_location" value="no"/>No<span class="note hidden" id="not_primary_message">&mdash;you don't have to complete the rest of the registration if this is not your primary location.</span><br>
             <input type="radio" name="primary_location" value="pna"/>I prefer not to answer <br>
             <input type="radio" name="primary_location" value="default" checked 
                 class='hidden' />
         </ul>
 
         <p></p>
+</div>
 
 <span id="primary_location_questions">
 
@@ -299,10 +301,9 @@ as specialty sites, such as Amazon, Wikipedia, and YouTube.
     </form>
         <span class="buttonPanel" id="register_button_panel">
 <!--            <input type="Submit" value="Register"  name="register" disabled  -->
-            <button class="disabled" id="register_button_disabled">
-                Register
+            <button disabled id="register-button">
+                Register and close
             </button>
-            <button id="register_button_enabled">Register</button>
         </span>
 
     <p>

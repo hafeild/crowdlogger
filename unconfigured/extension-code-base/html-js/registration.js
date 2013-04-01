@@ -25,9 +25,8 @@ function add_listeners() {
         return false;
     });
 
-    jQuery('#register_button_enabled').click(function(){
+    jQuery('#register-button').click(function(){
         CROWDLOGGER.study.registration.submit(document, window);
-        CROWDLOGGER.study.launch_refer_a_friend_dialog( true ); 
         return false;
     });
 }
