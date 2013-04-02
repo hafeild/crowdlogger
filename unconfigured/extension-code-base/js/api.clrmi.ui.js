@@ -27,7 +27,8 @@ CLRMI.prototype.UserInterface = function(api){
     var copyDefaults, onMessage, appendScript, init;
 
     // Public functions.
-    this.openWindow, this.dereferenceModuleResources, this.getFaviconURL;
+    this.openWindow, this.dereferenceModuleResources, this.getFaviconURL,
+    this.setMessageFlag;
 
 
     // Private function definitions.
@@ -249,4 +250,13 @@ CLRMI.prototype.UserInterface = function(api){
         }
     };
 
+    /**
+     * Sets the 'extension updates' notification.
+     */
+    this.setMessageFlag = function(){
+        api.base.invokeCLIFunction({
+            apiName: 'ui',
+            functionName: 'setMessageFlag'
+        });
+    };
 }

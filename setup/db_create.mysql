@@ -16,23 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `drawing`
---
-
-DROP TABLE IF EXISTS `drawing`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-CREATE TABLE `drawing` (
-  `reg_id` varchar(50) NOT NULL default '',
-  `date` varchar(50) default NULL,
-  `exp_date` varchar(50) default NULL,
-  `redeemed` varchar(3) default NULL,
-  `url` varchar(100) NOT NULL default '',
-  PRIMARY KEY  (`reg_id`,`url`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-SET character_set_client = @saved_cs_client;
-
---
 -- Table structure for table `ids`
 --
 
@@ -46,13 +29,13 @@ CREATE TABLE `ids` (
 SET character_set_client = @saved_cs_client;
 
 --
--- Table structure for table `messages`
+-- Table structure for table `feedback`
 --
 
-DROP TABLE IF EXISTS `messages`;
+DROP TABLE IF EXISTS `feedback`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-CREATE TABLE `messages` (
+CREATE TABLE `feedback` (
   `id` mediumint(9) NOT NULL auto_increment,
   `timestamp` varchar(50) default NULL,
   `message` blob,
@@ -95,9 +78,9 @@ CREATE TABLE `reg_info` (
   `country` varchar(50) default NULL,
   `state` varchar(50) default NULL,
   `education` varchar(15) default NULL,
-  `opt_out_of_payment` varchar(4) default NULL,
   `referal_id` varchar(50) default NULL,
-  `consent_date` varchar(50) default NULL,
+  `first_reg_date` varchar(50) default NULL,
+  `latest_reg_date` varchar(50) default NULL,
   `active_status` varchar(3) default NULL,
   `reg_number` int(5) NOT NULL auto_increment,
   `ir_community` varchar(3) default NULL,

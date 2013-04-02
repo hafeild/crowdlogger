@@ -9,7 +9,7 @@
  * All Rights Reserved
  */
 
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
 
 html {
     font-family: "Open Sans", times;
@@ -96,7 +96,18 @@ div.share-iframe:hover {
 }
 
 .copyright {
-    height:                 40px;
+    height:                 18px;
+}
+
+.copyright-frame  {
+    height: 18px;
+}
+
+.copyright-frame iframe {
+    height: 18px;
+    position: absolute;
+    bottom: 0px;
+    width: 800px;
 }
 
 .welcome table, .welcome tr, .welcome td{
@@ -180,7 +191,7 @@ div.share-iframe:hover {
 }
 
 .headerBuffer {
-    margin-bottom:          10px;
+    margin-bottom:          35px;
 }
 
 .content {
@@ -319,6 +330,8 @@ span.disabled:active {
     font-style:             italic;
     color:                  lightgray;
     text-align:             center;
+    height:                 35px;
+    vertical-align:         bottom;
 }
 
 h1, h2, h3, h4 {

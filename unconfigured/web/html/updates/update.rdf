@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <RDF:Description about="urn:mozilla:extension:%%ID%%">
+    <em:updates>
+      <RDF:Seq>
+
+        <RDF:li>
+          <RDF:Description>
+            <version>%%VERSION%%</version> 
+
+            <targetApplication>
+              <RDF:Description>
+                <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
+                <minVersion>%%FF_MIN_VERSION%%</minVersion>
+                <maxVersion>%%FF_MAX_VERSION%%</maxVersion>
+
+                <updateLink>%%SERVER_BASE_URL%%/updates/latest/%%EXTENSION_FILE_NAME%%.xpi</updateLink>
+
+                <updateInfoURL>%%SERVER_BASE_URL%%/updates/changelogs/all.html
+                </updateInfoURL>
+              </RDF:Description>
+            </targetApplication>
+            
+          </RDF:Description>
+        </RDF:li>
+
+      </RDF:Seq>
+    </em:updates>
+  </RDF:Description>
+</RDF:RDF>
+
+
+

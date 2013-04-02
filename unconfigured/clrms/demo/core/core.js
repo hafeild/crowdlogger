@@ -5,6 +5,7 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
 
     this.init = function(){
         demo = new that.Demo( clrmPackage, clrmAPI );
+        clrmAPI.ui.setMessageFlag();
     };
 
     this.unload = function(reason, oncomplete, onerror){

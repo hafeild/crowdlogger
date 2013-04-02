@@ -20,9 +20,7 @@
     <em:bootstrap>true</em:bootstrap>
 
     <!-- Where updates can be found. Ignoring this for now... -->
-    <!--
-    <em:updateURL>%%SERVER_BASE_URL%%/updates/ff/update.rdf<em:updateURL>
-    -->
+    <em:updateURL>%%SERVER_BASE_URL%%/updates/update.rdf</em:updateURL>
 
     <!-- Front End MetaData -->
     <em:name>%%PROJECT_NAME%%</em:name>
@@ -33,5 +31,6 @@
     <em:homepageURL>
        %%HOMEPAGE%%
     </em:homepageURL>
+    <em:iconURL>chrome://crowdlogger/content/css/img/crowdlogger-logo.001.48x48.png</em:iconURL>
   </Description>
 </RDF>

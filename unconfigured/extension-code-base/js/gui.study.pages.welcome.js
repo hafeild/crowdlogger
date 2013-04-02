@@ -153,13 +153,9 @@ CROWDLOGGER.gui.study.pages.welcome.modify_registration_page = function(
     // Listen for the original button to be enabled or disabled (the page
     // loads a script that checks whether the form is ready to submit, and that
     // changes the original button).
-    var myMutationObserver;
-    try {
-        myMutationObserver = regwin.WebKitMutationObserver;
-    // Otherwise, must be Firefox.
-    } catch(e) {
-        myMutationObserver = regwin.MutationObserver;
-    }
+    var myMutationObserver = 
+        regwin.WebKitMutationObserver || regwin.MutationObserver;
+   
     var observer = new myMutationObserver(function(mutations){
         if(orig_register_button.attr('disabled')){
             register_button.attr('disabled', 'disabled');

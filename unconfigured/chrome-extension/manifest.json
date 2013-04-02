@@ -17,7 +17,7 @@
         "default_popup": "html/menu.html",
         "default_title": "%%PROJECT_NAME%%"
     },
-    "update_url": "%%SERVER_BASE_URL%%/updates/chrome/update.xml",
+    "update_url": "%%SERVER_BASE_URL%%/updates/update.xml",
     "options_page": "html/preferences.html",
     "background": {
         "page": "html/background.html"

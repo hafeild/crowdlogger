@@ -101,7 +101,7 @@ To install %%PROJECT_NAME%%, follow the instructions below. After installing, th
 
 <p>
 Click the button and the installation will progress automatically:
-<button id="ff-download" onclick="return false; if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/ff/latest/%%EXTENSION_FILE_NAME%%.xpi'; return false; }" type=" application/x-xpinstall">Download for Firefox</button>
+<button id="ff-download" onclick="if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'; return false; }" type=" application/x-xpinstall">Download for Firefox</button>
 </p>
 </div>
 
@@ -118,14 +118,14 @@ Click the button and the installation will progress automatically:
 Installation for Chrome requires a few steps:
 <ol>
   <li>Download the %%PROJECT_NAME%% extension:
-<button id="chrome-download" onclick="return false; location.href='updates/chrome/latest/%%EXTENSION_FILE_NAME%%.crx'; return false;" type=" application/x-chrome-extension">Download for Chrome</button>
+<button id="chrome-download" onclick="location.href='updates/latest/%%EXTENSION_FILE_NAME%%.crx?v=%%VERSION%%'; return false;" type=" application/x-chrome-extension">Download for Chrome</button>
 
-  <li>Navigate to the download (called <code>crowdlogger.crx</code>) in your downloads folder using, e.g.,  Windows Explorer (on Windows), Finder (on OSX), or whatever you'd like on Linux.
+  <li>Navigate to the download (called <code>%%EXTENSION_FILE_NAME%%.crx</code>) in your downloads folder using, e.g.,  Windows Explorer (on Windows), Finder (on OSX), or whatever you'd like on Linux.
 
   <li>In Chrome, open the Extensions page by clicking on the configuration icon on the far right side of the navigation bar and choosing "Tools"&rarr;"Extensions", as shown below.
     <div align="center"><img src="images/chrome-extensions-menu.png" width="65%"/></div>
 
-  <li>Drag the <code>crowdlogger.crx</code> download from you Downloads folder onto the Chrome Extensions page, as shown below.
+  <li>Drag the <code>%%EXTENSION_FILE_NAME%%.crx</code> download from you Downloads folder onto the Chrome Extensions page, as shown below.
     <div align="center"><img src="images/chrome-install.png" width="65%"/></div>
 </ol>
 
@@ -136,7 +136,7 @@ Installation for Chrome requires a few steps:
     <div class="buffer">
     </div>
 
-<div id="iframe">
+<div class="copyright-frame">
    <iframe width="100%" src="copyright.html" scrolling=no 
            frameborder=0 marginheight=0 height=40px>
    </iframe>

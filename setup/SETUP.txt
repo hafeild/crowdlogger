@@ -359,7 +359,7 @@ There are four parts here:
 The database
 ------------
 
-On the serer, assuming you have sudo access, set up the database. First,
+On the server, assuming you have sudo access, set up the database. First,
 if there is no database, do:
 
     %> sudo mysql_install_db
@@ -618,7 +618,9 @@ Experiments are defined in the extension file:
 
     crowdlogger/unconfigured/extension-code-base/js/experiments.artifact_extractors.js
 
-There are currently 5 available experiments (see the CROWDLOGGER.experiments.artifact_extractors.extractors object in the file listed above to see if more have
+There are currently 5 available experiments (see the 
+CROWDLOGGER.experiments.artifact_extractors.extractors object in the file listed
+above to see if more have
 been added since this writing):
 
     query_pair

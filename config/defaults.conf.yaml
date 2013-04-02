@@ -6,15 +6,16 @@ LICENSE_WEB: Copyright &copy; 2012 The CrowdLogger Project. &laquo; University o
 VERSION: 2.0
 PROJECT_NAME: CrowdLogger
 FULL_PROJECT_NAME: The CrowdLogger Project
-EXTENSION_FILE_NAME: CrowdLogger
+EXTENSION_FILE_NAME: crowdlogger
 DESCRIPTION: An extension that logs user behavior in a privacy preserving manner.
 CREATOR: CIIR
 HOMEPAGE: http://code.google.com/p/crowdlogger/
 ID: crowdlogger@myurl.org
 CONTACT_EMAIL: name@email
 FF_MIN_VERSION: 17
-FF_MAX_VERSION: 20.*
+FF_MAX_VERSION: 30.*
 CHROME_MIN_VERSION: 24
+CHROME_APP_ID: yourappid
 
 
 ## Server info. The url does not need to be https.

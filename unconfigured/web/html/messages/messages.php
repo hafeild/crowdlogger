@@ -56,7 +56,9 @@ Version: %%VERSION%%
 <h1>Messages from the %%PROJECT_NAME%% researchers</h1>
 
 Below is a listing of important messages from the study researchers, sorted
-by date. You can get messages emailed to you by signing up with <a href="http://groups.google.com/group/crowdlogger-project-news?pli=1">this Google Group</a>.
+by date. You can get messages emailed to you by signing up with 
+<a href="http://groups.google.com/group/crowdlogger-project-news?pli=1">this 
+  Google Group</a>.
 
 <p>
 
@@ -103,7 +105,7 @@ fclose($f);
     <div class="buffer">
     </div>
 
-<div id="iframe">
+<div class="copyright-frame">
    <iframe width="100%" src="../copyright.html" scrolling=no 
            frameborder=0 marginheight=0 height=40px>
    </iframe>

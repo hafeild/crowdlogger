@@ -65,7 +65,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
     // first to make sure there is an internet connection. This is a precaution
     // in the event that the user's computer has pulled an ip address, but is
     // behind a firewall (e.g., at a hotel with a sign-in page).
-    if( bypass_firewall_check || url.match(/^https/) ){
+    if(  url.match(/^https/) && !bypass_firewall_check ){
         CROWDLOGGER.io.network.send_data( 
             CROWDLOGGER.preferences.get_char_pref( "ping_server_url", 
                                                    "http://www.google.com" ),

@@ -1,6 +1,6 @@
 <?php
 
-$update = "1.4.8";
+$update = "%%VERSION%%";
 //print "update";
 $clientVersion = $_GET['version'];
 

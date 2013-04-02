@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('America/New_York');
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -59,7 +59,7 @@ $referal_id = generateRandomID(
     $myHost, $myUser, $myPW, $myDB, $myReferTab, "referal_id" );
 
 // Insert the name into the database.
-$query = "update $myInfoTab set  consent_date = '".
+$query = "update $myInfoTab set  first_reg_date = '".
      date( "r" ) . "', referal_id = '{$referal_id}' where reg_id = '{$username}'";
 if( !(@ mysql_query( $query, $connection ) ) )
   print "Error inserting into table.";

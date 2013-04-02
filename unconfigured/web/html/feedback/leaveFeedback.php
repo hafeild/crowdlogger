@@ -9,24 +9,29 @@
     <!-- The header. -->
     <div class="header">
         <div class="title">
-            <span class="titleMain">Feedback Form</span><br>
-            <span id="subtitle">
-                <span class="titleSmall">for the</span><br>
-                <span class="titleSub">CrowdLogger Project</span>
+            <span class="logo-version">version %%VERSION%%</span>
+            <img class="logo" src="../images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">Feedback</span><br>
             </span>
         </div>
+
+        <div id="iframe" class="menu-frame">
+           <iframe src="../menu.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="70px">
+           </iframe>
+        </div>
+        <div id="share-iframe" class="share-iframe">
+           <iframe src="../share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+           </iframe>
+        </div>
+
     </div>
+
 
     <!-- Brings us down to just below the title. -->
     <div style="clear: both;"></div>
     <div class="headerBuffer"></div>
-
-
-<div id="iframe">
-   <iframe src="../menu.html" marginheight="0" width="100%" frameborder="0" scrolling="no"
-        height=70px>
-   </iframe>
-</div>
 
 <p>
 
@@ -36,7 +41,7 @@ Thank you for your feedback!
     <div class="buffer">
     </div>
 
-<div id="iframe">
+<div class="copyright-frame">
    <iframe width="100%" src="../copyright.html" scrolling=no 
            frameborder=0 marginheight=0 height=40px>
    </iframe>
@@ -52,7 +57,7 @@ Thank you for your feedback!
 </html>
 
 <?php
-
+date_default_timezone_set('America/New_York');
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -70,12 +75,12 @@ if( !mysql_select_db( $myDB, $connection ) )
 
 
 // Lock the myInfoTab table.
-$query = "LOCK TABLES $myMessageTab WRITE";
+$query = "LOCK TABLES $myFeedbackTab WRITE";
 if( !(@ mysql_query( $query, $connection) ) )
    die( "Couldn't lock." );
 
 
-$query = "insert into $myMessageTab set message = '{$message}', timestamp = '{$time}';";
+$query = "insert into $myFeedbackTab set message = '{$message}', timestamp = '{$time}';";
 if( !(@ mysql_query( $query, $connection) ) )
    die( "Couldn't insert." );
 

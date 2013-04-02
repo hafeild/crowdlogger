@@ -18,7 +18,7 @@ var CLI = function(crowdlogger){
      */
     init = function(){
         that.base = new that.Base(crowdlogger, that);
-        that.ui = null;
+        that.ui = new that.UserInterface(crowdlogger, that);
         that.user = new that.User(crowdlogger, that);
         that.storage = new that.Storage(crowdlogger, that);
         return that;

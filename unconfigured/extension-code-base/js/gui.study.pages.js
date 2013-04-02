@@ -117,8 +117,8 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
     // Get the elements we need to populate.
     var notification_elm = jq('#notifications').html('');
     var messages_elm     = doc.getElementById( 'messages' );
-    var experiments_elm  = doc.getElementById( 'experiments' );
-    var raffle_wins_elm  = doc.getElementById( 'raffleWins' );
+    // var experiments_elm  = doc.getElementById( 'experiments' );
+    // var raffle_wins_elm  = doc.getElementById( 'raffleWins' );
 
     // For the special update notifications (shown after an update is installed).
     var clear_update_notification_delay = 30*1000; // 30-seconds
@@ -202,6 +202,36 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
             );
 
         }
+
+
+        // Check for notifications about an available update.
+        if( note_board.study_updates > 0 ){
+            notifications_posted++;
+
+            attach_notification(
+                'study_updates_notification',
+                'There are new messages from one or more of your installed '+
+                'apps/studies. Check the apps and studies sections below.', [{
+                    id: 'dismiss_update_registration_notification',
+                    label: 'Dismiss',
+                    on_click: function(){
+                        CROWDLOGGER.notifications.unset_notification(
+                            'study_updates');
+                        jq('#study_updates_notification').hide();
+                        return false;
+                    }
+                }]
+            );
+
+            // Clear this after a minute.
+            setTimeout( 
+                function(){
+                    CROWDLOGGER.notifications.unset_notification(
+                        'study_updates' );
+                }, clear_update_notification_delay );
+
+        }
+
 
         // Register.
         if( note_board.register > 0 ) {
@@ -294,32 +324,32 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
         }
 
 
-        // Set a pass phrase.
-        if( note_board.set_passphrase > 0 ) {
-            notifications_posted++;
+        // // Set a pass phrase.
+        // if( note_board.set_passphrase > 0 ) {
+        //     notifications_posted++;
 
-            attach_notification(
-                'set_passphrase_notification',
-                'You have not set a pass phrase yet!', [{
-                    id: 'set_passphrase',
-                    label: 'Set pass phrase',
-                    on_click: function(){
-                        CROWDLOGGER.gui.preferences.launch_preference_dialog();
-                        jq('#set_passphrase_notification').hide();  
-                        return false;
-                    }
-                }, {
-                    id: 'dismiss_passphrase_notification',
-                    label: 'Dismiss',
-                    on_click: function(){
-                        CROWDLOGGER.notifications.unset_notification(
-                            'set_passphrase');
-                        jq('#set_passphrase_notification').hide();
-                        return false;
-                    }
-                }]
-            );
-        }
+        //     attach_notification(
+        //         'set_passphrase_notification',
+        //         'You have not set a pass phrase yet!', [{
+        //             id: 'set_passphrase',
+        //             label: 'Set pass phrase',
+        //             on_click: function(){
+        //                 CROWDLOGGER.gui.preferences.launch_preference_dialog();
+        //                 jq('#set_passphrase_notification').hide();  
+        //                 return false;
+        //             }
+        //         }, {
+        //             id: 'dismiss_passphrase_notification',
+        //             label: 'Dismiss',
+        //             on_click: function(){
+        //                 CROWDLOGGER.notifications.unset_notification(
+        //                     'set_passphrase');
+        //                 jq('#set_passphrase_notification').hide();
+        //                 return false;
+        //             }
+        //         }]
+        //     );
+        // }
 
         // Update settings.
         if( note_board.update_settings > 0 ) {
@@ -389,18 +419,18 @@ CROWDLOGGER.gui.study.pages.refresh_status_page = function( doc ){
         }, 5 );
     }
 
-    CROWDLOGGER.gui.study.pages.populate_experiments_status( doc,
-        experiments_elm );
+    // CROWDLOGGER.gui.study.pages.populate_experiments_status( doc,
+    //     experiments_elm );
 
-    // And now the raffle wins.
-    if( raffle_wins_elm ){
-        raffle_wins_elm.innerHTML = 
-            '<span class="loading">Loading ...</span>';
-        setTimeout( function(){
-            CROWDLOGGER.gui.study.pages.populate_raffle_wins( 
-                jq(raffle_wins_elm), jq );
-        }, 5 );
-    }
+    // // And now the raffle wins.
+    // if( raffle_wins_elm ){
+    //     raffle_wins_elm.innerHTML = 
+    //         '<span class="loading">Loading ...</span>';
+    //     setTimeout( function(){
+    //         CROWDLOGGER.gui.study.pages.populate_raffle_wins( 
+    //             jq(raffle_wins_elm), jq );
+    //     }, 5 );
+    // }
 
     // // This tells the page that it's been initialized.
     // init_elm.innerHTML = "initialized";

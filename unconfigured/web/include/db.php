@@ -10,6 +10,6 @@ $myInfoTab  = "reg_info";
 $myIDTab   = "ids";
 $myReferTab = "referal_id_lookup";
 $myDrawingTab = "drawing";
-$myMessageTab = "messages";
+$myFeedbackTab = "feedback";
 ?>
 

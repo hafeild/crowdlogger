@@ -182,7 +182,8 @@ CROWDLOGGER.study.registration.submit = function( doc, win ){
 
     // Handles any errors in connections.
     on_error = function( error ) {
-        alert( 'We apologize; the system encountered an error while '+
+        doc.defaultView.alert( 
+            'We apologize; the system encountered an error while '+
             'registering your information. Please try again later.' );
         CROWDLOGGER.io.log.write_to_error_log({data: [{
             f: 'CROWDLOGGER.study.registration.submit',

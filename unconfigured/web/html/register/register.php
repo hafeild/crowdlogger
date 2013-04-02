@@ -1,7 +1,7 @@
 <?php
 
 // REGISTER.PHP
-
+date_default_timezone_set('America/New_York');
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
@@ -24,7 +24,6 @@ $parameters['state']            = getParam( 'state' );
 $parameters['internet_usage']   = getParam( 'internet_usage' );
 $parameters['web_search_usage'] = getParam( 'web_search_usage' );
 $parameters['education']        = getParam( 'education' );
-$parameters['opt_out_of_payment']    = getParam( 'optOutPayment' );
 $parameters['referred_by']        = getParam( 'referrer' );
 $parameters['ir_community']        = getParam( 'ir_community' );
 $parameters['multiple_installs']        = getParam( 'multiple_installs' );
@@ -40,6 +39,7 @@ if( $reg_id == "" )
     print "false";
     exit;
 }
+
 
 /*
 if( $reg_id == "the_dev" )
@@ -57,6 +57,7 @@ if( !mysql_select_db( $myDB, $connection ) )
    die( "Could not connect to database." );
 
 
+
 // Check if the id passed in is valid.
 if( !reg_idIsValid( $reg_id, $myInfoTab, $connection ) )
 {
@@ -64,27 +65,23 @@ if( !reg_idIsValid( $reg_id, $myInfoTab, $connection ) )
    exit;
 }
 
-
-
-
 // Lock the myInfoTab table.
 $query = "LOCK TABLES $myInfoTab WRITE";
 if( !(@ mysql_query( $query, $connection) ) )
    die( "Couldn't lock." );
 
+// We're updating.
+// Get the referal id.
+$query = "select referal_id from $myInfoTab where reg_id = '{$reg_id}'";
+// Run the query.
+$result = @ mysql_query( $query, $connection );
 
-    // We're updating.
-    // Get the referal id.
-    $query = "select referal_id from $myInfoTab where reg_id = '{$reg_id}'";
-    // Run the query.
-    $result = @ mysql_query( $query, $connection );
-
-    // Translate the output to an array.
-    $row =  @ mysql_fetch_array( $result );
+// Translate the output to an array.
+$row =  @ mysql_fetch_array( $result );
 
 
-    // Keep track of the referal id -- it gets printed out at the end.
-    $parameters['referal_id'] = $row['referal_id'];
+// Keep track of the referal id -- it gets printed out at the end.
+$parameters['referal_id'] = $row['referal_id'];
 
 if( $parameters['referal_id'] == "NULL" || $parameters['referal_id'] == "" )
 {
@@ -92,7 +89,7 @@ if( $parameters['referal_id'] == "NULL" || $parameters['referal_id'] == "" )
         generateRandomID( 
            $myHost, $myUser, $myPW, $myDB, $myReferTab, "referal_id" );
 
-    if( $parameters['referal_id'] != null && $parameters['referal_id'] != "false" )
+    if($parameters['referal_id'] != null &&$parameters['referal_id'] != "false")
     {
         // Add the registrant's reg_id to the referal table.
 
@@ -118,8 +115,8 @@ if( $parameters['referal_id'] == "NULL" || $parameters['referal_id'] == "" )
     }
 }
 
-    // Create the query to update the registration
-    $query = createUpdateRegistrantQuery( $reg_id, $parameters, $myInfoTab );
+// Create the query to update the registration
+$query = createUpdateRegistrantQuery( $reg_id, $parameters, $myInfoTab );
 
 // FOR DEBUGGING
 //print "Query:<br><ul>$query</ul><br>";
@@ -139,7 +136,7 @@ if( !(@ mysql_query( $query, $connection ) ) )
    die( "Couldn't unlock." );
 
 // Print the referal_id to the screen.
-print "c:{$parameters['referal_id']}";
+print "c:${parameters['referal_id']}";
 
 
 /**
@@ -159,7 +156,7 @@ function reg_idIsValid( $reg_id, $table, $connection )
     if( !(@ mysql_query( $query, $connection) ) )
        die( "Couldn't lock." ); 
 */    
-    $query = "select * from {$table} where reg_id = \"{$reg_id}\"";
+    $query = "select * from {$table} where reg_id = '{$reg_id}'";
     // Run the query.
     $result = @ mysql_query( $query, $connection );
     
@@ -189,6 +186,7 @@ function reg_idIsValid( $reg_id, $table, $connection )
 function getParam( $name )
 {
    return isset($_POST[$name]) ? mysql_real_escape_string($_POST[$name]) : "";
+   // return isset($_GET[$name]) ? mysql_real_escape_string($_GET[$name]) : "";
 }
 
 /**
@@ -201,23 +199,19 @@ function getParam( $name )
  */
 function createUpdateRegistrantQuery( $reg_id, $parameters, $table )
 {
-    $query = "update {$table} set ";
-    $first = true;
+    $query = "update {$table} set latest_reg_date = '". date("r") ."'";
 
     foreach( $parameters as $key => $val )
     {
         // If the current value is blank or "default", skip it -- we don't
         // want to update that attribute.
-    if( $val == "" or $val == "default" )
+        if( $val == "" or $val == "default" )
             continue;
 
-        if( !$first )
-            $query .= ", ";
-        $query .= "$key = '$val'";
-        $first = false;
+        $query .= ", $key = '$val'";
     }
 
-    return $query . " where reg_id = '" . $reg_id . "';";
+    return $query . " where reg_id = '{$reg_id}';";
 }
 
 /**
@@ -229,16 +223,12 @@ function createUpdateRegistrantQuery( $reg_id, $parameters, $table )
  */
 function createNewRegistrantQuery( $reg_id, $parameters, $table )
 {
-    $query = "insert into {$table} set reg_id = '{$reg_id}'";
-
-    // We're using this to make sure we don't put a comma before the first
-    // parameter name.
-    $first = true;
+    $query = "insert into {$table} set reg_id = '{$reg_id}', ".
+        "first_reg_date = '". date("r") ."'";
 
     foreach( $parameters as $key => $val ) 
     {  
         $query .= ", $key = '$val'";
-        $first = false;
     }
 
     return $query . ";";

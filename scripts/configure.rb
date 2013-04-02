@@ -65,7 +65,8 @@ end
 ## Searches and replaces each of the key value pairs in the given hash over the
 ## hash values. This way one value can refer to another key.
 ##
-## @param searchAndReplacehash  The hash of key/value pairs to search and replace.
+## @param searchAndReplacehash  The hash of key/value pairs to search and 
+##                              replace.
 ################################################################################
 def searchAndReplaceInHash( searchAndReplaceHash )
     2.times do |i|
@@ -76,7 +77,8 @@ def searchAndReplaceInHash( searchAndReplaceHash )
 
                 ## If the value is an array, this serializes them. E.g., 
                 ##      [a,b,c] => '"a","b","c"'
-                replace = v.is_a?(Array) ? v.map{|x| "\"#{x}\""}.join(",") : v.to_s
+                replace = v.is_a?(Array) ? 
+                    v.map{|x| "\"#{x}\""}.join(",") : v.to_s
 
                 contents.gsub!( /#{find}/, replace )
             end
@@ -91,7 +93,8 @@ end
 ##
 ## @param file  The path of the file in which to perform the search and replace. 
 ##              This file is overwritten.
-## @param searchAndReplacehash  The hash of key/value pairs to search and replace.
+## @param searchAndReplacehash  The hash of key/value pairs to search and 
+##                              replace.
 ################################################################################
 def searchAndReplaceInFile( file, searchAndReplaceHash )
     contents = ""
@@ -114,7 +117,7 @@ def searchAndReplaceInFile( file, searchAndReplaceHash )
         fd = File.open( file, "w:utf-8" )
         fd.print( contents )
         fd.close
-    #else
+    # else
     #    puts "Couldn't process #{file}"
     end
 

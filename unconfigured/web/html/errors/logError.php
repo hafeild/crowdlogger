@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('America/New_York');
 
 $curtime = date("r") . "";
 $curtime = preg_replace( '/\s+/', "_", $curtime ); 
