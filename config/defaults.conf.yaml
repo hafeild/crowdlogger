@@ -3,7 +3,7 @@
 ## Global information
 LICENSE: Copyright (c) 2012 The CrowdLogger Project. University of Massachusetts.  All rights reserved. BSD Liscense (http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt).
 LICENSE_WEB: Copyright &copy; 2012 The CrowdLogger Project. &laquo; University of Massachusetts &laquo; All rights reserved. &laquo; <a href="http://code.google.com/p/crowdlogger/source/browse/LICENSE.txt">BSD Liscense</a>
-VERSION: 2.0
+VERSION: 2.0.1
 PROJECT_NAME: CrowdLogger
 FULL_PROJECT_NAME: The CrowdLogger Project
 EXTENSION_FILE_NAME: crowdlogger
