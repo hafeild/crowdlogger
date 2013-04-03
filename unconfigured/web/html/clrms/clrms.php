@@ -1,15 +1,13 @@
 <?php
+require( '../lib/util.php' );
 
 print "{";
+
+$crowdloggerVersion = array_key_exists('v', $_GET) ? $_GET['v'] : "2.0.1";
 
 $first = true;
 
 foreach(glob("*/metadata.json") as $filename) {
-    if($first){
-        $first = false;
-    } else {
-        print ",";
-    }
 
     $rawJSON = "";
 
@@ -19,9 +17,22 @@ foreach(glob("*/metadata.json") as $filename) {
     }
     fclose($f);
 
-    $parsedJSON = json_decode($rawJSON, true); 
 
-    // print 'hi!';
+    $parsedJSON = json_decode($rawJSON, true); 
+    $minCLVersion = array_key_exists('minCLVersion',$parsedJSON) ?
+        $parsedJSON['minCLVersion'] : "0";
+
+    // Check if we should even emit this one.
+    if( compareVersions($crowdloggerVersion, $minCLVersion) < 0 ){
+        continue;
+    }
+
+    if($first){
+        $first = false;
+    } else {
+        print ",";
+    }
+
     print "\"${parsedJSON["clrmid"]}\": ${rawJSON}";
 }
 

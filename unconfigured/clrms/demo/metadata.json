@@ -1,10 +1,11 @@
 {
     "clrmid": "demo1",
     "name": "Demo 1",
-    "version": "1.2",
+    "version": "1.4",
     "categories": ["app"],
     "description": "A simple CrowdLogger Remote Module demonstration. It shows off the ability to open windows, access user data, and use the storage API.",
     "packageURL": "https://crowdlogger.cs.umass.edu/clrms/demo/demo.json",
     "permissions": ["userdata", "ui", "storage"],
-    "logoURL": "https://crowdlogger.cs.umass.edu/clrms/demo/demo.jpg"
+    "logoURL": "https://crowdlogger.cs.umass.edu/clrms/demo/demo.jpg",
+    "minCLVersion": "2.0.2"
 }

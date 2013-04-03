@@ -51,7 +51,9 @@ var CLRM = function(crowdlogger){
     getAvailableCLRMListing = function( callback, onError ){
         crowdlogger.io.network.send_get_data(
             crowdlogger.io.network.get_server_url('clrm_listing_url'),    
-            'date='+ (new Date().getTime()), callback, onError );
+            'date='+ (new Date().getTime() +'&v='+ 
+                crowdlogger.version.info.get_extension_version()), 
+            callback, onError );
     };
 
     /**

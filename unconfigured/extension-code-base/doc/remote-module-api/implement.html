@@ -181,6 +181,10 @@ A CLRM Package is a JSON object with the following fields:
         <td>A list of the APIs this CLRM requires access to. This will be
             shown to users before they are able to install the CLRM.
         </td>
+    </tr><tr>
+        <td><code>minCLVersion</code></td>
+        <td>string</td>
+        <td>The minimum CrowdLogger version, e.g., <code>2.0.1</code></td>
     </tr>
 </table>
 
@@ -227,11 +231,32 @@ the CRLM Package. At a minimum, core modules must:
                         <li><code>'newversion'</code>&mdash;unloading as a 
                             precursor to installing a new version
                     </ul>
-                <li>{function} onComplete
+                <li>{function} oncomplete
                     <ul>Invoke when unloading has successfully completed.</ul>
-                <li>{function} onError
+                <li>{function} onerror
                     <ul>Invoke if a error is encountered.</ul>
             </ul>
+        </ul>
+        <li>{function} <code>configure</code>
+        <ul>
+            Takes no parameters; should open the settings/configuration window
+            for the CLRM.
+        </ul>
+        <li>{function} <code>open</code>
+        <ul>
+            Takes no parameters; should open the main interface for the CLRM.
+        </ul>
+        <li>{function} <code>getMessage</code>
+        <ul>
+            Takes no parameters; Should return a string which will be displayed
+            to users on the CrowdLogger Status Page. This string may contain 
+            HTML.
+        </ul>
+        <li>{function} <code>isOkayToUpdate</code>
+        <ul>
+            Takes no parameters; should return a boolean: <code>true</code>
+            if the CLRM is in a good spot to be updated, and <code>false</code>
+            otherwise.
         </ul>
 </ul>
 
@@ -270,17 +295,36 @@ var RemoteModule = function( clrmPackge, api ){
     this.id = "My Module";
     // <a href="http://stackoverflow.com/questions/4886632/what-does-var-that-this-mean-in-javascript">See this page for more info about var that = this.</a>
     var that = this;
-    var model;
+    var model, view;
     
-    this.unload = function(oncomplete){
+    this.init = function(){
+        model = new that.Model(api);
+        view = new that.View(api)
+    };
+
+    this.unload = function(oncomplete, onerror){
         // This save may happen asyncronously -- that is, when model.save
         // returns, the process of saving may still be occurring. So, we pass
         // oncomplete along so that whatever code uses it last can invoke it.
         model.save(oncomplete);
     };
 
-    this.init = function(){
-        model = new that.Model(api);
+    this.getMessage = function(){
+        return 'Version '+ clrmPackage.metadata.version +
+            '&lt;br/&gt;&lt;span style="color: red"&gt;This is just a demonstration message, '+
+            'please ignore.&lt;/span&gt;';
+    };
+
+    this.open = function(){
+        view.launchMain();
+    };
+
+    this.configure = function(){
+        view.launchSettings();
+    };
+
+    this.isOkayToUpdate = function(){
+        return model.isIdle;
     };
 }
 </pre>
@@ -290,11 +334,27 @@ var RemoteModule = function( clrmPackge, api ){
 
 RemoteModule.prototype.Model = function(api){
     ...
+    this.isIdle = false;
+    ...
     this.save = function(oncomplete){
         ...
         // Somewhere oncomplete() is invoked.
         ...
-    };<!--
+    };
+    ...
+}
+
+RemoteModule.prototype.View = function(api){
+    ...
+    this.launchMain = function(){
+        api.ui.launchWindow('main.html');
+    }; 
+    ...
+    this.launchSettings = function(){
+        api.ui.launchWindow('settings.html');
+    }
+    ...
+    <!--
     // Private variables.
     var that = this,
         DB_NAME = "mydb",
