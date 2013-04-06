@@ -28,6 +28,7 @@ var CLRMI = function(cli){
         this.user    = that.user;
         this.ui      = that.ui;
         this.storage = new that.Storage(that, clrmiPackage.metadata.clrmid);
+        this.util    = that.util;
     };
 };
 

@@ -404,9 +404,9 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
      */
     this.update_extension_log = function( opts ){
         opts = crowdlogger.util.copy_obj(opts);
-        if( !opts.foreach || !opts.db_version || !opts.db_name ){
+        if( !opts.foreach  || !opts.db_name ){
             return raise_error(
-                'Missing parameters in call to update_activity_log.',
+                'Missing parameters in call to update_extension_log.',
                 opts.on_error)
         }
         opts.on_upgrade = opts.on_upgrade || on_extension_db_upgraded;

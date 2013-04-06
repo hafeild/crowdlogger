@@ -250,7 +250,31 @@ CLRMI.prototype.User.prototype.RealTime = function( api ){
         for( i = 0; i < validListeners.length; i++ ){
             if( opts[validListeners[i]] ){
                 activityElm.on(validListeners[i], opts[validListeners[i]]);
-                console.log('Adding listener ['+ validListeners[i] +']');
+                api.ui.log('[clrmi.user.RealTime] '+
+                    'Adding listener ['+ validListeners[i] +']');
+            }
+        }
+    };
+
+    /**
+     * Removes listeners for log events, e.g. searches, clicks, page loads, etc.
+     *
+     * @param {object} opts     A map of events to callbacks. Valid events are:
+     * <ul>
+     *     <li>query-entered 
+     *     <li>page-loaded
+     *     <li>link-clicked
+     *     <li>page-focused
+     * </ul>
+     */
+    this.removeActivityListeners = function(opts){
+        opts = opts || {};
+        var i;
+        for( i = 0; i < validListeners.length; i++ ){
+            if( opts[validListeners[i]] ){
+                activityElm.off(validListeners[i], opts[validListeners[i]]);
+                api.ui.log('[clrmi.user.RealTime] '+
+                    'Removing listener ['+ validListeners[i] +']');
             }
         }
     };

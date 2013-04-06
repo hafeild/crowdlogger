@@ -98,6 +98,8 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
     httpReq.setRequestHeader(
         'Content-Type', 'application/x-www-form-urlencoded');
 
+    CROWDLOGGER.debug.log('Set '+ method +' request for: '+ url);
+
     // Create a listener function. As soon as the request has gone through
     // and we get a response back, fire up the on_success function passed in.
     httpReq.onreadystatechange = function() {
@@ -111,7 +113,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
                     ". Here's the response text: " + response + 
                     "\n" );
                 //E_DEBUG*/
-                on_success( response );
+                if(on_success){ on_success( response ) };
             } else {
                 //B_DEBUG
                 CROWDLOGGER.debug.log( "Error while posting data to  "+url+": "+
@@ -119,7 +121,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
                     "\n\ttext: " + httpReq.responseText +  
                     "\n\ttext: " + httpReq.responseXML + "\n" ); 
                 //E_DEBUG
-                on_error( "Status error connecting to " + url ); 
+                if(on_error){ on_error( "Status error connecting to " + url ); } 
             }
         }
     }

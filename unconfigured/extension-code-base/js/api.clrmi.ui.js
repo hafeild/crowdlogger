@@ -21,7 +21,8 @@ CLRMI.prototype.UserInterface = function(api){
         },
         that = this,
         ioService,
-        faviconService;
+        faviconService,
+        loggingWindow;
 
     // Private functions.
     var copyDefaults, onMessage, appendScript, init;
@@ -229,7 +230,7 @@ CLRMI.prototype.UserInterface = function(api){
     /**
      * Gets the URL of the favicon associated with the given page URL. The URL
      * of the default favicon will be returned if no favicon is found. The
-     * generated URL is a browser resource and can only access cached favicons.
+     * generated URL comes from the web service http://g.etfv.co/.
      *
      * @param {string} url  The URL of the page to get the favicon for.
      * @param {boolean} shorten  Default: true; uses just the domain of the URL.
@@ -242,12 +243,13 @@ CLRMI.prototype.UserInterface = function(api){
             url = url.match('[^/]*/[^/]*/[^/]*')[0];
         }
 
-        if( faviconService ){
-            return faviconService.getFaviconImageForPage(
-                ioService.newURI(url, null, null)).spec;
-        } else {
-            return 'chrome://favicon/'+ url;
-        }
+        // if( faviconService ){
+        //     return faviconService.getFaviconImageForPage(
+        //         ioService.newURI(url, null, null)).spec;
+        // } else {
+        //     return 'chrome://favicon/'+ url;
+        // }
+        return 'http://g.etfv.co/'+ url;
     };
 
     /**
@@ -259,4 +261,27 @@ CLRMI.prototype.UserInterface = function(api){
             functionName: 'setMessageFlag'
         });
     };
+
+    /**
+     * Logs a message to the logging window's console, if it's open.
+     *
+     * @param {anything} msg The thing to log.
+     */
+    this.log = function(msg){
+        if( loggingWindow && loggingWindow.console ){
+            loggingWindow.console.log(msg);
+        }
+    };
+
+    /**
+     * Opens a logging window.
+     */
+    this.openLoggingWindow = function(){
+        if( loggingWindow && !loggingWindow.closed ){
+            loggingWindow.focus();
+        } else {
+            loggingWindow = window.open('about:blank', 'loggingwindow', 
+                'width=800,height=300');
+        }
+    }
 }

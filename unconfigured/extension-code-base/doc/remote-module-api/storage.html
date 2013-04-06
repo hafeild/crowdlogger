@@ -26,7 +26,11 @@ Version: %%VERSION%%
         <li><a href="#storage:save">Save data</a>
         <li><a href="#storage:read">Read batches of saved data</a>
         <li><a href="#storage:update">Delete/update saved data</a>
+        <li><a href="#storage:remove">Delete saved data</a>
         <li><a href="#storage:removedb">Remove the database</a>
+        <li><a href="#storage:setpref">Set a preference</a>
+        <li><a href="#storage:getpref">Get a preference</a>
+
     </ul>
 </div>
 
@@ -55,7 +59,10 @@ shares that id in the store. The following functionalities are provided:
     <li><code><a href="#storage:save">api.storage.save</a></code>
     <li><code><a href="#storage:read">api.storage.read</a></code>
     <li><code><a href="#storage:update">api.storage.update</a></code>
+    <li><code><a href="#storage:remove">api.storage.remove</a></code>
     <li><code><a href="#storage:removedb">api.storage.removeDatabase</a></code>
+    <li><code><a href="#storage:setpref">api.storage.preferences.set</a></code>
+    <li><code><a href="#storage:getpref">api.storage.preferences.get</a></code>
 </ul>
 
 
@@ -450,7 +457,9 @@ CROWDLOGGER.io.log.write_to_activity_log({
                     <ul>
                         The name of the store to update.
                     </ul>
-                <li>{function} <code>foreach</code>
+                <li>One of:
+                <ul>
+                  <li>{function} <code>foreach</code>
                     <ul>
                         A function to run on each entry. It
                         should take a log entry as its
@@ -474,6 +483,31 @@ CROWDLOGGER.io.log.write_to_activity_log({
                                 </ul>
                         </ul>
                     </ul>
+                  <li>{array of objects} <code>entries</code>
+                    <ul>
+                        A map of entries to update. Each key
+                        should be an entry id and the value 
+                        should be an object with any of the
+                        following fields:
+                        <ul>
+                            <li>{object} <code>entry</code> 
+                                <ul>
+                                    If <code>entry.id</code> matches the id of
+                                    the original entry, the existing saved entry
+                                    is overwritten with <code>entry</code>.
+                                </ul>
+                            <li>{boolean} <code>stop</code> 
+                                <ul>
+                                    Stops the traversal if <code>true</code>.
+                                </ul>
+                            <li>{boolean} <code>delete</code>
+                                <ul>
+                                    Deletes the stored entry if 
+                                    <code>true</code>.
+                                </ul>
+                        </ul>
+                    </ul>
+                </ul>
             </ul>
             <span class="parameter-requirement">Optional</span>
             <ul>
@@ -509,10 +543,16 @@ CROWDLOGGER.io.log.write_to_activity_log({
 
     <h4>Description</h4>
     <p>
-        This function iterates over entries in a store, passing each to a
-        function you provide (see <code>foreach</code> above), where you can
+        This function performs one of two actions. If a <code>foreach</code>
+        parameter is provided, then this function iterates over entries in a 
+        store, passing each to the <code>foreach</code> method, where you can
         choose to update the entry, delete it, stop iterating, or ignore the
-        entry and move on.
+        entry and move on. 
+    </p>
+
+    <p>
+        If <code>foreach</code> is not provided, but <code>entries</code> is,
+        then each specified entry will be updated accordingly.
     </p>
 
     <h4>Examples</h4>
@@ -541,6 +581,35 @@ api.storage.update({
     foreach: addSessionField, 
     store: 'relevance-judgments' 
 });
+</pre>
+
+    <p>
+        As another example, suppose you want to update a handful of entries
+        and delete a few others. You might do:
+    </p>
+
+<pre class="prettyprint">
+// Updates a given judgment.
+function updateJudgment( judgment ){
+    api.storage.update({ 
+        store: 'relevance-judgments',
+        entries: {
+            judgment.id: {entry: judgment}
+        }
+    });
+}
+
+// You could also use the api.storage.remove function and pass in a list of ids.
+function deleteJudgments( judgments ){
+    var toDelete = {}, i;
+    for(i = 0; i &lt; judgments.length; i++){
+        toDelete[judgment[i].id] = {delete: true};
+    }
+    api.storage.update({
+        store: 'relevance-judgments',
+        entries: toDelete
+    });
+}
 </pre>
 
     <p>
@@ -621,8 +690,52 @@ CROWDLOGGER.io.log.read_extension_log({
 });
 </pre> -->
 
+<!-- Remove entries -->
+<a name="remove"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Remove entries from the database<br/>
+        <code>api.storage.remove</code></h3>
 
-<!-- Clear a store -->
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>{object} A list of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>store</code>
+                <ul>
+                    The name of the store from which to read data.
+                </ul>
+                <li>{array of ints} <code>ids</code>
+                <ul>
+                    The ids of entries to delete.
+                </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the traversal is complete and 
+                        everything has been successfully updated.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Deletes one or more entries from the given store. This is a shortcut
+        for using the <a href="#storage:update">api.storage.update</a> method.
+    </p>
+</div>
+
+<!-- Remove the database. -->
 <a name="removedb"></a>
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
@@ -637,11 +750,103 @@ CROWDLOGGER.io.log.read_extension_log({
 
     <h4>Description</h4>
     <p>
-        This deletes the database associated with your CLRM. If you decide you
+        This deletes the database associated with your CLRM (including 
+        <a href="#storage:getpref">preferences</a>). If you decide you
         want to save something later, that's fine&mdash;a new database will
         be created automatically. Its a good idea to delete your database if
         your CLRM is finished (e.g., it is for a study that has ended). This
         will help keep users' computers tidy.
+    </p>
+</div>
+
+<!-- Set a preference. -->
+<a name="setpref"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Set a preference<br/>
+        <code>api.storage.preferences.set</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>{object} A list of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>pref</code>
+                <ul>
+                    The name of the preference to set.
+                </ul>
+                <li>{anything} <code>value</code>
+                <ul>
+                    The value to set the preference to.
+                </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                <ul>
+                    Invoked when the preference has been successfully saved
+                    to the database.
+                </ul>
+                <li>{function} <code>on_error</code>
+                <ul>
+                    Invoked if there's an error.
+                </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Saves the given preference.
+    </p>
+</div>
+
+<!-- Get a preference. -->
+<a name="getpref"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Get a preference<br/>
+        <code>api.storage.preferences.get</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>{object} A list of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{string} <code>pref</code>
+                <ul>
+                    The name of the preference to set.
+                </ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{anything} <code>defaultValue</code>
+                <ul>
+                    The default value of the preference to return if the 
+                    preference is not yet set.
+                </ul>
+                <li>{function} <code>on_success</code>
+                <ul>
+                    Invoked when the preference has been retrieved from the
+                    database. The value (or default value) of the preference
+                    is passed as the only parameter to 
+                    <code>on_success</code>.
+                </ul>
+                <li>{function} <code>on_error</code>
+                <ul>
+                    Invoked if there's an error.
+                </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Retrieves the given preference.
     </p>
 </div>
 

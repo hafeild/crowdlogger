@@ -438,13 +438,16 @@ CLI.prototype.Storage = function(crowdlogger, cli){
      *                                    <li>entry (new data, ids must match)
      *                                    <li>delete (true or false)
      *                                 </ul>
+     *                                 e.g., {5: {delete: true}, 
+     *                                        10: {entry: {id:10, name:'foo'}}
+     *                                       }
      * </ul>
      * @throws CLIException if required options are missing.
      */
     this.updateEntries = function(opts){
         crowdlogger.util.check_args(opts,
             ['callbackID','dbName','storeName','entries'],
-            'api.cli.storage.save', cli.CLIException, true);
+            'api.cli.storage.updateEntries', cli.CLIException, true);
 
         var minID, maxID, isFirst = true, id;
 

@@ -21,18 +21,21 @@ CLRMI.prototype.Storage = function( api, id ){
 
 
     // Private function declarations.
-    var init, wrapCallback, addUpgradeCheck;
+    var init, wrapCallback, addUpgradeCheck, updateWithoutForeach, 
+        updateWithForeach;
 
     // Public variables.
     
 
     // Public function declarations.
     this.addStores, this.removeStores, this.clearStores, this.listStores,
-    this.save, this.read, this.update, this.removeDatabase, this.preferences; 
+    this.save, this.read, this.update, this.removeDatabase, this.preferences,
+    this.remove; 
 
     // Private function definitions.
 
     /**
+     * Initializes the preferences store for this CLRM.
      */
     init = function(){
         that.preferences = new that.Preferences(api, {
@@ -45,6 +48,30 @@ CLRMI.prototype.Storage = function( api, id ){
 
     };
 
+    /**
+     * Serves as a wrapper for callback. Given a set of options (e.g., to one
+     * of the public methods below), this function will create and register a
+     * callback wrapper that can support on_success, on_error, and on_chunk.
+     *
+     * @param {object} opts  A map of options.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success  Called if the event field of the object 
+     *                               passed to the callback is 'on_success'. The
+     *                               value of the 'data' field will be passed
+     *                               to this function.
+     *    <li>{function} on_error    Called if the event field of the object
+     *                               passed to the callback is 'on_error'. The
+     *                               value of the 'error' field will be passed
+     *                               to this function.
+     *    <li>{function} on_chunk    Called if the event field of the object
+     *                               passed to the callback is 'on_chunk'. The
+     *                               value of the 'data' field will be passed
+     *                               to this function as well as a 'next' and
+     *                               'abort' function.
+     * </ul>
+     * @return The id of the registered callback.
+     */
     wrapCallback = function(opts){
         var callbackID;
         var callback = function(params){
@@ -71,6 +98,9 @@ CLRMI.prototype.Storage = function( api, id ){
                         }
                     });
                 };
+
+                // Invoke the original on_chunk function.
+                opts.on_chunk(params.data, next, abort);
             } else {
                 if( params.event === 'on_error' && opts.on_error ){
                     opts.on_error(params.error);
@@ -85,12 +115,29 @@ CLRMI.prototype.Storage = function( api, id ){
         return callbackID;
     }
 
+    /**
+     * Poll's the 'upgrading' lock until its available, then checks it out.
+     * Creates intermediate functions to take care of removing the lock (either
+     * on error or success). The given function is then invoked.
+     *
+     * @param {function} func     The function to invoke once the lock has been
+     *                            acquired. It is assumed that this function
+     *                            takes an object as its only parameter and that
+     *                            it handles on_success and on_error keys in
+     *                            that parameter.
+     * @param {object} opts       A map of options to pass to func. Note that
+     *                            the on_success and on_error keys will be
+     *                            modified (replaced with intermediate functions
+     *                            that eventually invoke the original ones, if
+     *                            they exist).
+     */
     addUpgradeCheck = function(func, opts){ 
         if( upgrading ){
             setTimeout( function(){addUpgradeCheck(func, opts);}, 100 );
             return;
         }
-
+        opts = opts || {};
+        
         upgrading = true;
 
         api.base.log('Acquired lock for '+ func);
@@ -107,6 +154,131 @@ CLRMI.prototype.Storage = function( api, id ){
             if(opts.on_error){ opts.on_error(e); }
         }
         func(newOpts);
+    };
+
+    /**
+     * Updates entries in the given database/store.
+     * 
+     * @param {object} opts     A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} store:          The name of the store to update. 
+     *    <li>{function} foreach:      A function to run on each entry. It 
+     *                                 should take a log entry as its only 
+     *                                 parameter and optionally return an object
+     *                                 with three optional fields:
+     *                                 <ul>
+     *                                   <li>{object} entry: 
+     *                                       If entry.id matches the id of the 
+     *                                       original entry, the existing saved 
+     *                                       entry is overwritten with entry. 
+     *                                   <li>{boolean} stop
+     *                                       Stops the traversal if true. 
+     *                                   <li>{boolean} delete
+     *                                       Deletes the stored entry if true. 
+     *                                 </ul>
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *     <li>{function} on_success:  Invoked when the traversal is complete 
+     *                                 and everything has been successfully 
+     *                                 updated. 
+     *     <li>{function} on_error:    Invoked if there's an error. 
+     *     <li>{bool} reverse:         If true, the data will be read in reverse
+     *                                 order of id. Default is 'false'.
+     *     <li>{int} lower_bound:      The smallest id to retrieve; default: 0
+     *     <li>{int} upper_bound:      The largest id to retrieve; default: -1
+     *                                 (all ids >= lower_bound are retrieved).
+     * </ul>
+     */
+    updateWithForeach = function(opts){
+        // This will throw an exception if there are missing arguments.
+        api.util.checkArgs(opts, ['store','foreach'], 'clrmi.storage.update');
+
+        opts.on_chunk = function(data, next, abort){
+            var i, updatedEntries = {}, doAbort = false;
+            for(i = 0; i < data.length; i++){
+                var ret = opts.foreach(data[i]);
+                if( ret && ret.stop ){
+                    doAbort = true;
+                    break;
+                } else if( ret && (ret.delete || ret.entry) ){
+                    updatedEntries[data[i].id] = ret;
+                }
+            }
+
+            var updateOpts = {
+                on_success: function(){
+                    doAbort ? abort() : next();
+                },
+                on_error: opts.on_error,
+                entries: updatedEntries,
+                storeName: opts.store
+            };
+
+            var updateCallbackID = wrapCallback(opts);
+
+            api.base.invokeCLIFunction({
+                apiName: 'storage',
+                functionName: 'updateEntries',
+                options: {
+                    callbackID: callbackID,
+                    dbName: dbName,
+                    storeName: updateOpts.store,
+                    entries: updateOpts.entries
+                }
+            });
+        };
+
+        that.read(opts);
+    };
+
+    /**
+     * Updates the given entries.
+     * 
+     * @param {object} opts     A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} store:          The name of the store to update. 
+     *    <li>{map of objects} entries: A map of objects to update. Each key
+     *                                 should be an entry id and the value 
+     *                                 should be an object with any of the
+     *                                 following fields:
+     *                                 <ul>
+     *                                   <li>{object} entry: 
+     *                                       If entry.id matches the id of the 
+     *                                       original entry, the existing saved 
+     *                                       entry is overwritten with entry. 
+     *                                   <li>{boolean} stop
+     *                                       Stops the traversal if true. 
+     *                                   <li>{boolean} delete
+     *                                       Deletes the stored entry if true. 
+     *                                 </ul>
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *     <li>{function} on_success:  Invoked when the traversal is complete 
+     *                                 and everything has been successfully 
+     *                                 updated. 
+     *     <li>{function} on_error:    Invoked if there's an error. 
+     * </ul>
+     */
+    updateWithoutForeach = function(opts){
+        // This will throw an exception if there are missing arguments.
+        api.util.checkArgs(opts, ['store','entries'], 
+            'clrmi.storage.updateWithoutForeach');
+
+        // Pass the data one to the CLI.
+        api.base.invokeCLIFunction({
+            apiName: 'storage',
+            functionName: 'updateEntries',
+            options: {
+                callbackID: wrapCallback(opts),
+                dbName: dbName,
+                storeName: opts.store,
+                entries: opts.entries
+            }
+        });
     };
 
     // Public function definitions.
@@ -367,6 +539,7 @@ CLRMI.prototype.Storage = function( api, id ){
         });
     };
 
+
     /**
      * Updates entries in the given database/store.
      * 
@@ -374,7 +547,8 @@ CLRMI.prototype.Storage = function( api, id ){
      * REQUIRED:
      * <ul>
      *    <li>{string} store:          The name of the store to update. 
-     *    <li>{function} foreach:      A function to run on each entry. It 
+     *    <ul>One of: 
+     *       <li>{function} foreach:   A function to run on each entry. It 
      *                                 should take a log entry as its only 
      *                                 parameter and optionally return an object
      *                                 with three optional fields:
@@ -388,6 +562,21 @@ CLRMI.prototype.Storage = function( api, id ){
      *                                   <li>{boolean} delete
      *                                       Deletes the stored entry if true. 
      *                                 </ul>
+     *      <li>{map of objects} entries: A map of objects to update. Each key
+     *                                 should be an entry id and the value 
+     *                                 should be an object with any of the
+     *                                 following fields:
+     *                                 <ul>
+     *                                   <li>{object} entry: 
+     *                                       If entry.id matches the id of the 
+     *                                       original entry, the existing saved 
+     *                                       entry is overwritten with entry. 
+     *                                   <li>{boolean} stop
+     *                                       Stops the traversal if true. 
+     *                                   <li>{boolean} delete
+     *                                       Deletes the stored entry if true. 
+     *                                 </ul>
+     *    </ul>
      * </ul>
      * OPTIONAL:
      * <ul>
@@ -395,53 +584,55 @@ CLRMI.prototype.Storage = function( api, id ){
      *                                 and everything has been successfully 
      *                                 updated. 
      *     <li>{function} on_error:    Invoked if there's an error. 
-     *     <li>{bool} reverse:         If true, the data will be read in reverse
+     *     <ul> Only if 'foreach' is specified:
+     *        <li>{bool} reverse:      If true, the data will be read in reverse
      *                                 order of id. Default is 'false'.
-     *     <li>{int} lower_bound:      The smallest id to retrieve; default: 0
-     *     <li>{int} upper_bound:      The largest id to retrieve; default: -1
+     *        <li>{int} lower_bound:   The smallest id to retrieve; default: 0
+     *        <li>{int} upper_bound:   The largest id to retrieve; default: -1
      *                                 (all ids >= lower_bound are retrieved).
+     *     </ul>
      * </ul>
      */
     this.update = function(opts){
+        opts = opts || {};
+        opts.foreach ? updateWithForeach(opts) : updateWithoutForeach(opts);
+    };
+
+    /**
+     * Deletes one or more entries from the given database/store.
+     * 
+     * @param {object} opts     A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} store:          The name of the store to update. 
+     *    <li>{array of ints} ids:     The ids to delete.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *     <li>{function} on_success:  Invoked when the traversal is complete 
+     *                                 and everything has been successfully 
+     *                                 updated. 
+     *     <li>{function} on_error:    Invoked if there's an error. 
+     * </ul>
+     */
+    this.remove = function(opts){
         // This will throw an exception if there are missing arguments.
-        api.util.checkArgs(opts, ['store','foreach'], 'clrmi.storage.read');
+        api.util.checkArgs(opts, ['store','ids'], 'clrmi.storage.remove');
 
-        opts.on_chunk = function(data, next, abort){
-            var i, updatedEntries = {}, doAbort = false;
-            for(i = 0; i < data.length; i++){
-                var ret = opts.foreach(data[i]);
-                if( ret && ret.stop ){
-                    doAbort = true;
-                    break;
-                } else if( ret && (ret.delete || ret.entry) ){
-                    updatedEntries[data[i].id] = ret;
-                }
-            }
+        // Holds the entries to delete. 
+        var entries = {}, i;
 
-            var updateOpts = {
-                on_success: function(){
-                    doAbort ? abort() : next();
-                },
-                on_error: opts.on_error,
-                entries: updatedEntries,
-                storeName: opts.store
-            };
+        // We need a special map for the update function on the CLI side.
+        for(i = 0; i < opts.ids.length; i++){
+            entries[opts.ids[i]] = {'delete': true};
+        }
 
-            var updateCallbackID = wrapCallback(opts);
-
-            api.base.invokeCLIFunction({
-                apiName: 'storage',
-                functionName: 'updateEntries',
-                options: {
-                    callbackID: callbackID,
-                    dbName: dbName,
-                    storeName: updateOpts.store,
-                    entries: updateOpts.entries
-                }
-            });
-        };
-
-        that.read(opts);
+        updateWithoutForeach({
+            store: opts.store,
+            entries: entries,
+            on_success: opts.on_success,
+            on_error: opts.on_error
+        });
     };
 
     /**

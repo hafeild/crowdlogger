@@ -26,7 +26,7 @@ CLRMI.prototype.Base = function(api) {
         
     // Private function declarations.
     var init, extractData, onMessage, setExtensionPath, loadCLRM, unloadCLRM, 
-        invokeCLRMICallback, invokeCLRMMethod;
+        invokeCLRMICallback, invokeCLRMMethod, openLoggingWindow;
 
     // Public function declarations.
     this.postMessage, this.log, this.invokeCLIFunction;
@@ -44,6 +44,7 @@ CLRMI.prototype.Base = function(api) {
         messageHandlers.unloadCLRM = unloadCLRM;
         messageHandlers.setExtensionPath = setExtensionPath;
         messageHandlers.invokeCLRMMethod = invokeCLRMMethod;
+        messageHandlers.openLoggingWindow = openLoggingWindow;
 
         jQuery(window).bind( 'message', onMessage );
 
@@ -223,7 +224,12 @@ CLRMI.prototype.Base = function(api) {
         };
 
         // Check if the module is loaded.
-        if( !modules[data.clrmid] ){
+        try{
+            modules[data.clrmid].unload(data.reason, 
+                data.reason === 'uninstall' ? removeDB : onsuccess, 
+                onerror)
+        } catch(e) {
+        //if( !modules[data.clrmid] ){
             if( data.reason === 'uninstall' ){
                 removeDB();
             } else if( data.callbackID ){
@@ -231,16 +237,14 @@ CLRMI.prototype.Base = function(api) {
                     callbackID: data.callbackID,
                     options: {
                         event: 'on_error',
-                        errorMsg: '[clrmi.base.unloadCLRM] '+ data.clrmid +
-                        ' is not currently loaded and so cannot be unloaded.'}
+                        errorMsg: '[clrmi.base.unloadCLRM] '+ e
+                    }
                 });
             }
             return;
         }
 
-        modules[data.clrmid].unload(data.reason, 
-            data.reason==='uninstall' ? removeDB : onsuccess, 
-            onerror)
+
     };
 
     /**
@@ -338,6 +342,13 @@ CLRMI.prototype.Base = function(api) {
         }, 20);
 
         return true;
+    };
+
+    /**
+     * Opens a logging window for CLRMs.
+     */
+    openLoggingWindow = function(message){
+        api.ui.openLoggingWindow();
     };
 
     // Public function definitions.

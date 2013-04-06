@@ -79,7 +79,7 @@
 
 .clrm-container {
     position: static;
-    display: inline;
+    display: inline !important;
     margin: 5px;
 }
 

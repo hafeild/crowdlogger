@@ -69,7 +69,7 @@ CROWDLOGGER.preferences.defaults.default_prefs = {
     check_status_url: ['/checkStatus/checkStatus.php' , '1.7.4'],
     redeem_url: ['/checkStatus/redeem.php' , '1.7.4'],
     registration_id_verification_url: ['/register/verifyId.php', '1.7.4'],
-    clrm_listing_url: ['/clrms/clrms.php', '2.0'],
+    clrm_listing_url: ['/clrms/clrms.php', '%%VERSION%%'],
 
     // Client-side pages.
     registration_dialog_url: ['registration.html', '1.4.2'],

@@ -340,7 +340,8 @@ var CLRM = function(crowdlogger){
         }
 
         // Fetch the URL and save it.
-        crowdlogger.io.network.send_get_data(clrmMetadata.packageURL, null,
+        crowdlogger.io.network.send_get_data(clrmMetadata.packageURL, 
+            't='+ (new Date().getTime()),
             function(response){ 
                 var package = JSON.parse(response), field;
                 if(clrmMetadata.id){
@@ -354,7 +355,8 @@ var CLRM = function(crowdlogger){
                     data: [package],
                     on_success: onSuccess
                 });
-            }, function(e){}
+            }, 
+            onError
         );
     };
 
