@@ -22,7 +22,7 @@ foreach(glob("*/metadata.json") as $filename) {
     $minCLVersion = array_key_exists('minCLVersion',$parsedJSON) ?
         $parsedJSON['minCLVersion'] : "0";
 
-    // Check if we should even emit this one.
+    // Check if the CLRM is okay for the given CrowdLogger version.
     if( compareVersions($crowdloggerVersion, $minCLVersion) < 0 ){
         continue;
     }

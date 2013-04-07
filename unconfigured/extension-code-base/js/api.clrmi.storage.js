@@ -137,7 +137,7 @@ CLRMI.prototype.Storage = function( api, id ){
             return;
         }
         opts = opts || {};
-        
+
         upgrading = true;
 
         api.base.log('Acquired lock for '+ func);
@@ -193,7 +193,8 @@ CLRMI.prototype.Storage = function( api, id ){
      */
     updateWithForeach = function(opts){
         // This will throw an exception if there are missing arguments.
-        api.util.checkArgs(opts, ['store','foreach'], 'clrmi.storage.update');
+        api.util.checkArgs(opts, ['store','foreach'], 
+            'clrmi.storage.updateWithForeach');
 
         opts.on_chunk = function(data, next, abort){
             var i, updatedEntries = {}, doAbort = false;

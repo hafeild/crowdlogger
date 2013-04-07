@@ -467,13 +467,13 @@ CLI.prototype.Storage = function(crowdlogger, cli){
             db_name:     opts.dbName,
             store_name:  opts.storeName,
             foreach:  function(entry){
+                crowdlogger.debug.log('In updateEntries: id:'+ entry.id);
                 return opts.entries[entry.id] || {};
             },
-            data:        opts.data,
             on_success:  callbacks.on_success(opts.callbackID),
             on_error:    callbacks.on_error(opts.callbackID),
-            lower_bound: minID,
-            upper_bound: maxID
+            lower_bound: minID-1,
+            upper_bound: maxID+1
         });
     };
 

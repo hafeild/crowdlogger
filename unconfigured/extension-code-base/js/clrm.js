@@ -163,6 +163,12 @@ var CLRM = function(crowdlogger){
             elm.addClass('not-enabled');
         }
 
+        if( crowdlogger.preferences.get_bool_pref('dev_mode', false) ){
+            elm.addClass('dev-mode');
+        } else {
+            elm.addClass('not-dev-mode');
+        }
+
         elm.find('[data-id=clrm]').attr('data-clrmid', clrmMetadata.clrmid);
 
 

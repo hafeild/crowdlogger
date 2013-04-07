@@ -99,6 +99,10 @@
     display: none;
 }
 
+.clrm-container.not-dev-mode .dev-mode {
+    display: none;
+}
+
 #popup {
     position: fixed;
     top: 0;

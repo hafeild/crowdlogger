@@ -60,7 +60,7 @@ var add_listeners = function(){
                             addClass('enabled');
                     });
                 });
-                break
+                break;
             case 'enable':
                 CROWDLOGGER.clrm.enableCLRM(clrmid, function(){
                     container.removeClass('not-enabled').addClass('enabled');
@@ -105,6 +105,22 @@ var add_listeners = function(){
 
             case 'configure':
                 CROWDLOGGER.clrm.configure(clrmid);
+                break;
+
+
+            case 'update':
+                CROWDLOGGER.clrm.installCLRM(metadata, function(){
+                    container.removeClass('not-installed').
+                        addClass('installed');
+                    CROWDLOGGER.clrm.disableCLRM(clrmid, function(){
+                        container.removeClass('enabled').
+                            addClass('not-enabled');
+                        CROWDLOGGER.clrm.enableCLRM(clrmid, function(){
+                            container.removeClass('not-enabled').
+                                addClass('enabled');
+                        });
+                    });
+                });
                 break;
 
             // Dismiss.

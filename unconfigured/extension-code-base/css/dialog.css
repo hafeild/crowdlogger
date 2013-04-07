@@ -628,12 +628,12 @@ a:hover {
 }
 
 #status_page_body .access {
-    width: 265px;
+    width: 263px;
     display: inline-block;
     vertical-align: bottom;
     padding: 5px;
     font-size: 90%;
-    line-height: 32px;
+    line-height: 38px;
 
     box-sizing:border-box;
     -moz-box-sizing:border-box; 
@@ -652,6 +652,14 @@ a:hover {
     height: 17px;
 }
 
+#status_page_body .clrm-container {
+    display: inline-block !important;
+    background-color: rgb(247, 247, 247);
+}
+
+#status_page_body .clrm {
+    margin-left: 4px;
+}
 .templates {
     display: none;
 }

@@ -54,6 +54,11 @@ function add_listeners(){
         );
         return false;
     });
+
+    jQuery('#open-clrm-logging-window').click(function(){
+        CROWDLOGGER.api.cli.base.sendMessage({command: 'openLoggingWindow'});
+        return false;
+    });
 }
 
 /**
