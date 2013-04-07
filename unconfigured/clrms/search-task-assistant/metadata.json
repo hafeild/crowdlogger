@@ -1,0 +1,11 @@
+{
+    "clrmid": "sta",
+    "name": "Search Task Assistant",
+    "version": "1.0",
+    "categories": ["app"],
+    "description": "A tool for automatically clustering your browsing history into search tasks.",
+    "packageURL": "%%SERVER_BASE_URL%%/clrms/sta/sta.json",
+    "permissions": ["userdata", "ui", "storage"],
+    "logoURL": "%%SERVER_BASE_URL%%/clrms/sta/sta.png",
+    "minCLVersion": "2.0.1"
+}

@@ -1,16 +1,17 @@
+<!DOCTYPE html>
 <!--
- File:      search_task_assistant.html
+ File:      search-task-assistant.html
  Author:    Henry Feild
  Date:      27-Jul-2012
  Purpose:   A search task assistant for CrowdLogger.
 
- Copyright (c) 2010-2012
+ Copyright (c) 2010-2013
  University of Massachusetts
  All Rights Reserved
 -->
-
 <html>
 <head>
+    <title>Search Task Assistant</title>
     <link type="text/css" rel="stylesheet" href="jquery.jscrollpane.css"/>
     <link type="text/css" rel="stylesheet" href="search-task-assistant.css"/>
 
@@ -24,6 +25,18 @@
     <script language="javascript" src="view.js"></script>
 
     <script src="init.js"></script>
+
+    <script>
+    var start = function(){
+        sta.staWindow = window;
+        view = new View(sta, jQuery);
+        controller = new Controller(sta, view);
+        controller.init();
+        jQuery(window).unload(function(){
+            controller.destroy();
+        });
+    };
+    </script>
 </head>
 
 <body>
@@ -48,8 +61,8 @@
                 title="Show detail panel">&gt;&gt;</span>
 
             <!-- The current task and searches page. -->
-            <div id="current-view" class="">
-                <div class="">
+            <div id="current-view" class="fullpage">
+                <div class="fullpage">
                  
                 <!-- The user's most recent searches, grouped by task. -->
                 <div id="current-tasks-block" class="current-view-block">
@@ -105,11 +118,11 @@
             </div>
 
             <!-- Search page. -->
-            <div id="search" class="hide">
+            <div id="search" class="hide fullpage">
                 <h1>Search your history</h1>
                 <form id="search-box-form">
                     <input type="input" id="search-box" value=""/>
-                    <input type="submit" id="submit-search" value="Go"/>
+                    <button type="submit" id="submit-search">Find</button>
                 </form>
 
                 <div id="matched-tasks-block" class="search-block">

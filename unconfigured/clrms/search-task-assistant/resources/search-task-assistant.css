@@ -16,7 +16,6 @@ body {
     overflow: hidden;
 }
 
-
 .initialization-cover {
     position: absolute;
     top: 0;
@@ -94,7 +93,9 @@ body {
 }
 
 #inner-sidebar {
-    box-sizing: border-box;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box;
     overflow: hidden;
 }
 
@@ -138,7 +139,9 @@ h1 {
 }
 
 #inner-sidebar-content {
-     -webkit-box-sizing: border-box;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box; 
     width: 100%;
     padding-left: 5px;
     padding-right: 5px;
@@ -292,13 +295,16 @@ h1 {
 
 .task {
     margin-bottom: 2px;
-    width:           95%;
+    /*width:           95%;*/
     padding:          3px;
     /*background-color: #dbe3f5; /*#ddd;*/
     background-color: #dae1ea;
     border: 1px solid #eee;
     border-color:   #aaa #ddd #ddd #aaa;
     border-radius: 5px;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;    
 }
 
 .task.dragging {
@@ -319,8 +325,9 @@ h1 {
 .search {
     text-indent:    -5px;
     padding-left:   5px;
-    width: auto;
+    /*width: 100%;*/
     border: 1px solid transparent;
+    overflow: hidden;
 }
 
 
@@ -349,7 +356,9 @@ h1 {
     position: relative;
     top:0;
     bottom: 15px;
-    -webkit-box-sizing: border-box;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box; 
     height: 100%;
 }
 
@@ -439,7 +448,6 @@ h1 {
     color: orange;
 }
 
-
 #detail-panel {
     position: fixed;
     top: 0;
@@ -480,6 +488,7 @@ h1 {
     border: 1px solid transparent;
     border-radius: 5px;
 
+    position: relative;
     /* Disables highlighting. */
     -webkit-user-select:none;
     -moz-user-select:none;
@@ -578,4 +587,91 @@ h1 {
     padding-left: 3px;
     padding-right: 3px;
     width: 600px;
+}
+
+.fullpage {
+    height: 100%;
+}
+
+
+button {
+    background-image: -webkit-linear-gradient(top,#afc2df,#9db4d8);
+    background-image: -moz-linear-gradient(top,#afc2df,#9db4d8);
+    background-image: linear-gradient(top,#afc2df,#9db4d8);
+    border: 1px solid #8ba6d0;
+    color: #fff!important;
+    margin: 0 0;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 2px;
+    height: 18px;
+    font-size: 8pt;
+    line-height: 1;
+}
+
+button:hover {
+    background-image: -webkit-linear-gradient(top,#afc2df,#7898c9);
+    background-image: -moz-linear-gradient(top,#afc2df,#7898c9);
+    background-image: linear-gradient(top,#afc2df,#7898c9);
+    border: 1px solid #668ac2; 
+}
+
+button.confirm {
+    background-image: -webkit-linear-gradient(top,#e95d3e,#cf482e);
+    background-image: -moz-linear-gradient(top,#e95d3e,#cf482e);
+    background-image: linear-gradient(top,#e95d3e,#cf482e);
+    border: 1px solid #ba4129;
+}
+
+button.confirm:hover {
+    background-image: -webkit-linear-gradient(top,#e95d3e,#a53925);
+    background-image: -moz-linear-gradient(top,#e95d3e,#a53925);
+    background-image: linear-gradient(top,#e95d3e,#a53925);
+    border: 1px solid #903220; 
+}
+
+button:disabled, button:disabled:hover, button:disabled:active {
+/*    background-image: -webkit-linear-gradient(top,#cecece,#bbbbbb);
+    background-image: -moz-linear-gradient(top,#e95d3e,#a53925);
+    background-image: linear-gradient(top,#e95d3e,#a53925);*/
+    background-image: none;
+    background-color: #bbb;
+    border: 1px solid #a7a7a7; 
+    color: #e2e2e2 !important; 
+    webkit-box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.5); 
+    box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.5);    
+
+    text-shadow: 0px -1px 0px #aaa;
+    /*text-shadow: 0px -1px 0px #eee;*/
+}
+
+button:active {
+    webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Get rid of horizontal scrolling. */
+.jspHorizontalBar { display: none !important; }
+
+.endcap {
+    font-style: italic;
+    margin-left: 20px;
+    font-size: 90%;
+}
+
+.detail-panel .search button {
+    display: none;
+}
+.detail-panel .search:hover button {
+    display: block;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+}
+
+
+.ui-draggable-dragging  button{
+    display: none;
 }

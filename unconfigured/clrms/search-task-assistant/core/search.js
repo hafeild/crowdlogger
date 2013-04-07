@@ -6,138 +6,176 @@
  * <ul>
  *    <li>timestamp: -1
  *    <li>id: -1
- *    <li>task_id: -1
+ *    <li>taskId: -1
  *    <li>pages: []
  *    <li>url: ""
  *    <li>text: ""
- *    <li>is_query: false  (as opposed to a direct url access)
+ *    <li>isQuery: false  (as opposed to a direct url access)
  *    <li>se: ""
  * </ul>
  *
  *
- * @param {object} initial_data  An object that can include the initial data.
+ * @param {object} initialData  An object that can include the initial data.
  *    Missing fields will be populated with defaults.
- * @param {boolean} is_consistent_with_db Whether the initial data is consistent
- *    with what is stored in the DB for this object. Set this to 'true' if the
- *    initials data is directly from the DB.
+ * @param {SearchTaskAssistant} sta A reference to the Search Task Assistant.
+ * @param {boolean} isNew Whether this is a brand new, never been saved before
+ *    instance.
  */
-RemoteModule.prototype.Search = function(initial_data, is_consistent_with_db){
-    initial_data = !initial_data ? {} : initial_data;
+RemoteModule.prototype.SearchTaskAssistant.prototype.Search = 
+        function(initialData, sta, isNew){
+    'use strict';
+
+    initialData = initialData || {};
     var data = {
             timestamp: -1,
             id: -1,
-            task_id: -1,
+            taskId: -1,
             pages: [],
-            url: "",
-            text: "",
-            is_query: false,
-            se: "",
-            last_access: -1
+            url: '',
+            text: '',
+            isQuery: false,
+            se: '',
+            lastAccess: -1
         },
-        page_lookup = {},
+        pageLookup = {},
         i,
-        that = this;
-       
-    function init(){
+        that = this,
+        model = sta.searchTaskModel,
+        isDeleted = false,
+        init, update;
+
+    sta.log('[search.js] model:');
+    sta.log(model);
+    sta.log('[search.js] model.storage:');
+    sta.log(model.storage);
+
+    this.isNew = isNew;
+
+    init = function(){
+        var key;
         for( key in data ){
-            // CROWDLOGGER.debug.log('data['+ key +']: '+ data[key] +
-            //     '\ninitial_data['+key+']: '+ initial_data[key] );
-            data[key] = (initial_data[key] === undefined ? 
-                data[key] : initial_data[key]);
+            data[key] = (initialData[key] === undefined ? 
+                data[key] : initialData[key]);
         }
 
         // Make the lookup for the pages.
         for( i = 0; i < data.pages.length; i++ ){
-            page_lookup[data.pages[i].url] = data.pages[i];
+            pageLookup[data.pages[i].url] = data.pages[i];
         }
 
-        is_consistent_with_db = is_consistent_with_db === true;
-
-        if( data.timestamp > -1 && data.last_access === -1 ){
-            that.set_last_access(data.timestamp);
+        if( data.timestamp > -1 && data.lastAccess < 0 ){
+            that.setLastAccess(data.timestamp);
         }
-    }    
 
+        model.searches[data.id] = that;
+        model.sta.util.orderedInsert(
+            model.chronologicallyOrderedSearchIds, data.id, 
+            model.chronologicalSearchComp
+        );
+
+        if( isNew ){
+            sta.messages.trigger('new-search', {searchId: data.id});
+            update();
+        }
+    };   
+
+    update = function(){
+        model.storage.searchUpdated(that);
+    };
     
-    this.set_task_id = function(task_id){
-        data.task_id = task_id;
-        is_consistent_with_db = false;
+    this.setTaskId = function(taskId){
+        data.taskId = taskId;
+        update();
     };
 
-    this.get_task_id = function(){
-        return data.task_id;
+    this.getTaskId = function(){
+        return data.taskId;
     };
 
-    this.set_last_access = function(timestamp){
-        data.last_access = timestamp;
-        is_consistent_with_db = false;
-    }
+    this.setLastAccess = function(timestamp){
+        data.lastAccess = timestamp;
+        update();
+    };
 
-    this.get_last_access = function(){
-        return data.last_access;
-    }
+    this.getLastAccess = function(){
+        return data.lastAccess;
+    };
 
-    this.get_id = function(){
+    this.getId = function(){
         return data.id;
     };
 
-    this.get_pages = function(){
+    this.getPages = function(){
         return data.pages;
     };
 
-    this.get_text = function(){
-        return data.text;
+    this.getText = function(){
+        return data.text || data.url;
     };
 
-    this.get_url = function(){
+    this.getUrl = function(){
         return data.url;
     };
 
-    this.get_se = function(){
+    this.getSe = function(){
         return data.se;
     };
 
-    this.is_query = function(){
-        return data.is_query;
-    }
+    this.isQuery = function(){
+        return data.isQuery;
+    };
 
-    this.get_timestamp = function(){
+    this.getTimestamp = function(){
         return data.timestamp;
     };
 
-    this.add_pages = function(pages){
+    this.addPages = function(pages){
         for( i = 0; i < pages.length; i++ ){
-            var page = CROWDLOGGER.page(pages[i]);
+            var page = sta.makePage(pages[i]);
             data.pages.push(page);
-            page_lookup[page.url] = page;
-            if( page.last_access > data.last_access ){
-                that.set_last_access(page.last_access);
+            pageLookup[page.url] = page;
+            if( page.lastAccess > data.lastAccess ){
+                that.setLastAccess(page.lastAccess);
             }
-
+            sta.messages.trigger('new-page', {
+                pageUrl: page.url,
+                searchId: data.id
+            });
         }
-        is_consistent_with_db = false;
+        update();
     };
 
-    this.get_page = function(url){
-        return page_lookup[url];
+    this.getPage = function(url){
+        return pageLookup[url];
     };
 
-    this.update_page = function(url, updates){
-        var page = page_lookup[url];
+    this.updatePage = function(url, updates){
+        var page = pageLookup[url], key, updated = [];
         if( page !== undefined ){
             for( key in page ){
                 if( key !== 'url' && updates[key] !== undefined ){
                     page[key] = updates[key];
-                    is_consistent_with_db = false;
+                    updated.push(key);
                 }
             }
-            if( page.last_access > data.last_access ){
-                that.set_last_access(page.last_access);
+            if( page.lastAccess > data.lastAccess ){
+                that.setLastAccess(page.lastAccess);
+            }
+
+            if( updated.length > 0 ){
+                update();
+                sta.messages.trigger('updated-page', {
+                    pageUrl: page.url,
+                    searchId: data.id,
+                    taskId: data.taskId,
+                    updated: updated
+                });
             }
         }
+
     };
 
-    this.get_data = function(){
+    this.getData = function(){
         return data;
     };
 
@@ -146,23 +184,35 @@ RemoteModule.prototype.Search = function(initial_data, is_consistent_with_db){
     };
 
     this.matches = function(pattern){
-        var match_summary = {
-            search_matches: false,
-            page_matches: []
-        }
+        var matchSummary = {
+                searchMatches: false,
+                pageMatches: []
+            }, i, page;
 
         if( pattern.test(data.text) || pattern.test(data.url) ){
-            match_summary.search_matches = true;
+            matchSummary.searchMatches = true;
         }
 
-        CROWDLOGGER.jq.each(data.pages, function(i, page){
+        for(i = 0; i < data.pages; i++){
+            page = data.pages[i];
             if(pattern.test(page.url) || pattern.test(page.title) ){
-                match_summary.search_matches = true;
-                match_summary.page_matches.push(page);
+                matchSummary.searchMatches = true;
+                matchSummary.pageMatches.push(page);
             }
-        });
+        }
 
-        return match_summary;
+        return matchSummary;
+    };
+
+    this.isDeleted = function(){
+        return isDeleted;
+    };
+
+    this.delete = function(){
+        isDeleted = true;
+        model.tasks[data.taskId].removeSearch(data.id);
+        data = {id: data.id}
+        update();
     };
 
     init();

@@ -4,7 +4,7 @@
  * view and model. 
  *
  * <p><i>
- * Copyright (c) 2010-2012      <br>
+ * Copyright (c) 2010-2013      <br>
  * University of Massachusetts  <br>
  * All Rights Reserved
  * </i></p>
@@ -16,13 +16,14 @@
 /**
  * The controller. Use as follows:
  *
- *      var myController = new Controller(myView, myModel);
+ *      var myController = new Controller(mySta, myView);
  *
+ * @param {obj} sta    a pointer to the Search Task Assistant backend.
  * @param {obj} view     The view to use.
- * @param {obj} model    The model to use. Should have the same functionality
- *      as CROWDLOGGER.searchModel.
  */
-Controller = function(view, model){
+var Controller = function(sta, view){
+    'use strict';
+
     // Private variables.
     var EVENT = 0,
         FUNC = 1,
@@ -32,24 +33,26 @@ Controller = function(view, model){
         that = this,
         queryId = 0,
         messagesListeners = [],
-        doc = jQuery(document);
+        doc = jQuery(document),
+        model = sta.searchTaskModel;
 
     // Private function declarations.
     var initializeHistory, handleNewSearch, updateCurrentTasks, 
         updateRelatedQueriesAndTasks, updateRelatedSearches,
         updateRelatedTasks, handleNewTask, handleDeletedTask,
+        handleDeletedSearch,
         handleUpdatedTask, handleNewPage, handleUpdatedPage,
         processView, processQueryHistory, processTaskHistory,
-        deleteTask, queryHistory, mergeSearchAndTask, mergeTasks,
+        deleteTask, deleteSearch, queryHistory, mergeSearchAndTask, mergeTasks,
         onClose, addListeners, addMessageListener, removeListeners, 
-        showDetails, 
+        showDetails, initStorage; 
 
     // Public variables.
     this.MIN_SIM_SCORE = 0.4;
     this.T = 2;
 
     // Public function declarations.
-    this.init, this.destroy;
+    this.init; this.destroy;
 
     // Private function definitions.
 
@@ -64,10 +67,10 @@ Controller = function(view, model){
         //     chronologicallyOrderedSearchIds: model.chronologicallyOrderedSearchIds,
         //     tasks:      model.tasks,
         // }));
-    }
+    };
 
     handleNewSearch = function(event, data){
-        console.log('New search! '+ JSON.stringify(data));
+        sta.log('New search! '+ JSON.stringify(data));
 
         //'new-search', {searchId: data.id}
         view.processing();
@@ -80,45 +83,51 @@ Controller = function(view, model){
             format: "abbreviated",
             prepend: true
         });
-    }
+    };
+
+    handleDeletedSearch = function(event, data){
+        sta.log('Deleted task! '+ JSON.stringify(data));
+        view.removeSearch(data.searchId);
+    };
+
 
     updateCurrentTasks = function(){
         var tasks = [],
             taskLookup = {},
-            searches = model.getCurrentSearches(10);
+            searches = model.getCurrentSearches(10),
+            i, taskId;
 
         for( i = 0; i < searches.length; i++ ){
-            var taskId = 
-                model.searches[searches[i]].getTaskId();
+            taskId = model.searches[searches[i]].getTaskId();
 
-            if( taskLookup[taskId] === undefined ){
+            if( !taskLookup[taskId] ){
                 tasks.push(taskId);
                 taskLookup[taskId] = true;
             }
         }
 
-        // console.log('Adding the following tasks and searches:');
-        // console.log(tasks);
-        // console.log(searches);
+        // sta.log('Adding the following tasks and searches:');
+        // sta.log(tasks);
+        // sta.log(searches);
 
         view.addTasks(tasks, {
             currentTasks: true, 
             format: 'abbreviated',
-            searchWhitelist: CROWDLOGGER.util.objectifyArray(searches)
+            searchWhitelist: sta.util.arrayToObject(searches)
         });
-    }
+    };
 
     updateRelatedQueriesAndTasks = function(currentSearch){
         model.sti.rankSearchesBySameTaskness(currentSearch, model.searches, 
             function(relatedSearches){
-                console.log(relatedSearches);
+                sta.log(relatedSearches);
                 updateRelatedSearches(relatedSearches, function(){
                     model.sti.rankTasksBySameTaskness( currentSearch, 
                         relatedSearches, model.tasks, 
-                            updateRelatedTasks )
+                            updateRelatedTasks );
                 });
             });
-    }
+    };
 
     updateRelatedSearches = function(relatedSearches, callback){
         var searchesToShow = [];
@@ -135,7 +144,7 @@ Controller = function(view, model){
         if(callback){
             setTimeout(callback, that.T);
         }
-    }
+    };
 
     updateRelatedTasks = function(relatedTasks, callback){
         var tasksToShow = [];
@@ -152,69 +161,67 @@ Controller = function(view, model){
         if(callback){
             setTimeout(callback, that.T);
         }
-    }
+    };
 
     handleNewTask = function(event, data){
-        console.log('New task! '+ JSON.stringify(data));
+        sta.log('New task! '+ JSON.stringify(data));
         updateCurrentTasks();
         view.addTasks([data.taskId], {
             taskHistory: true, 
             format: "abbreviated",
             prepend: true
         });
-    }
+    };
 
     handleDeletedTask = function(event, data){
-        // CROWDLOGGER.messages.trigger('deleted-task', {
+        // sta.messages.trigger('deleted-task', {
         //                 taskId: deletedTask,
         //                 mergedWith: id
         //             });
-        console.log('Deleted task! '+ JSON.stringify(data));
+        sta.log('Deleted task! '+ JSON.stringify(data));
         view.updateTask(data.taskId, data);
-    }
+    };
 
     handleUpdatedTask = function(event, data){
-        // CROWDLOGGER.messages.trigger('updated-task', {
+        // sta.messages.trigger('updated-task', {
         //             taskId: id
         //         });
-        console.log('Updated task! '+ JSON.stringify(data));
+        sta.log('Updated task! '+ JSON.stringify(data));
 
         view.updateTask(data.taskId, data);
         updateCurrentTasks();
-    }
+    };
 
     handleNewPage = function(event, data){
-        // CROWDLOGGER.messages.trigger('new-page', {
+        // sta.messages.trigger('new-page', {
         //     pageUrl: data.targetUrl,
         //     searchId: search.getId()
         // });
-        console.log('New page! '+ JSON.stringify(data));
+        sta.log('New page! '+ JSON.stringify(data));
         view.updateTask(data.taskId, data);
         updateCurrentTasks();
-    }
+    };
 
     handleUpdatedPage = function(event, data){
-        // CROWDLOGGER.messages.trigger('updated-page', {
+        // sta.messages.trigger('updated-page', {
         //         pageUrl: data.url,
         //         searchId: search.getId(),
         //         updated: ['initialAccess', 'title', 'favicon', 'dwellTime']
         //     });
-        console.log('Updated page! '+ JSON.stringify(data));
+        sta.log('Updated page! '+ JSON.stringify(data));
         view.updateTask(data.taskId, data);
         updateCurrentTasks();
-
-    }
+    };
 
     processView = function(event, view){
-
         view.addSearch(view);
-    }
+    };
 
     processQueryHistory = function(){
         view.addSearches(
             model.chronologicallyOrderedSearchIds,
             {searchHistory:true, format:"abbreviated", prepend: false});
-    }
+    };
 
     processTaskHistory = function(){
         var tasks = [],
@@ -228,19 +235,23 @@ Controller = function(view, model){
                 }
             });
         view.addTasks(tasks, {taskHistory:true, format:"abbreviated"});
-    }
+    };
 
     deleteTask = function(event, data){
         model.tasks[data.taskId].delete();
-        CROWDLOGGER.messages.trigger('deleted-task', {taskId: data.taskId});
-    }
+        // sta.messages.trigger('deleted-task', {taskId: data.taskId});
+    };
+
+    deleteSearch = function(event, data){
+        model.searches[data.searchId].delete();
+        // sta.messages.trigger('deleted-task', {taskId: data.taskId});
+    };
 
     queryHistory = function(event, data){
-        var pattern = new RegExp(data.query, 'i');
-
-        var matchedSearches = [],
+        var pattern = new RegExp(data.query, 'i'),
+            matchedSearches = [],
             matchedTasks = [],
-            matchedSearchLookup = {}
+            matchedSearchLookup = {},
             seenTaskLookup = {};
 
         view.processing({queryHistory: true});
@@ -258,7 +269,7 @@ Controller = function(view, model){
                     }
 
                     if( matches.searchMatches.length > 0 ){
-                        //console.log(matches.searchMatches);
+                        //sta.log(matches.searchMatches);
 
                         jQuery.each(matches.searchMatches, function(i,sId){
                             matchedSearchLookup[sId] = true;
@@ -282,11 +293,11 @@ Controller = function(view, model){
             matchedTasks,
             {matchedTasks: true, format:"full", prepend: false});
 
-    }
+    };
 
     mergeSearchAndTask = function(event, data){
-        var srcTask= model.tasks[model.searches[data.searchId].getTaskId()];
-        var targetTask = model.tasks[data.taskId];
+        var srcTask= model.tasks[model.searches[data.searchId].getTaskId()],
+            targetTask = model.tasks[data.taskId];
 
         srcTask.removeSearch(data.searchId);
 
@@ -294,31 +305,34 @@ Controller = function(view, model){
 
         if(srcTask.getSearchIds().length === 0){
             srcTask.delete();
-            CROWDLOGGER.messages.trigger('deleted-task', {
-                taskId: srcTask.getId(), 
-                mergedWith: targetTask.getId()
-            });
-        } else {
-            CROWDLOGGER.messages.trigger('updated-task', 
-                {taskId: srcTask.getId()});
-        }
-        CROWDLOGGER.messages.trigger('updated-task', {
-            taskId: targetTask.getId() });
-    }
+            // sta.messages.trigger('deleted-task', {
+            //     taskId: srcTask.getId(), 
+            //     mergedWith: targetTask.getId()
+            // });
+        } //else {
+            // sta.messages.trigger('updated-task', 
+            //     {taskId: srcTask.getId()});
+        // }
+        // sta.messages.trigger('updated-task', {
+        //     taskId: targetTask.getId() });
+    };
 
     mergeTasks = function(event, data){
+        console.log('Merging; data:');
+        console.log(data);
+
         var task1 = model.tasks[data.task1Id];
         task1.mergeWith([data.task2Id]);
 
-        CROWDLOGGER.messages.trigger('deleted-task', {
+        sta.messages.trigger('deleted-task', {
             taskId: data.task2Id,
             mergedWith: data.task1Id
         });
 
-        CROWDLOGGER.messages.trigger('updated-task', {
+        sta.messages.trigger('updated-task', {
             taskId: data.task1Id
         });
-    }
+    };
 
     /**
      * Called whenever a window closes. Checks if the closed window is the
@@ -331,7 +345,7 @@ Controller = function(view, model){
         if( id === winId ){
             removeListeners();
         }
-    }
+    };
 
     /**
      * Adds listeners, e.g., for when the window changes, is resized, when
@@ -341,15 +355,16 @@ Controller = function(view, model){
         // Set the cleanup listener -- this will ensure that the listeners
         // we attach on resources external to this window are removed and
         // the user's most recent data is saved.
-        chrome.windows.getCurrent({}, function(win){
-            winId = win.id;
-            chrome.windows.onRemoved.addListener(onClose);
-        });
+        // chrome.windows.getCurrent({}, function(win){
+        //     winId = win.id;
+        //     chrome.windows.onRemoved.addListener(onClose);
+        // });
+        window.addEventListener('unload', removeListeners, false);
 
         // Listens for new queries.
-        //CROWDLOGGER.messages.bind('query-entered', processQuery);
-        addMessageListener('search-model-initialized', initializeHistory);
+        //sta.messages.bind('query-entered', processQuery);
         addMessageListener('new-search', handleNewSearch);
+        addMessageListener('deleted-search', handleDeletedSearch);
         addMessageListener('new-task', handleNewTask);
         addMessageListener('deleted-task', handleDeletedTask);
         addMessageListener('updated-task', handleUpdatedTask);
@@ -358,46 +373,51 @@ Controller = function(view, model){
 
         doc.delegate(document, 'details-requested', showDetails);
         doc.delegate(document, 'delete-task', deleteTask);
+        doc.delegate(document, 'delete-search', deleteSearch);
         doc.delegate(document, 'query-history', queryHistory);
         doc.delegate(document, 'merge-search-and-task', mergeSearchAndTask);
         doc.delegate(document, 'merge-tasks', mergeTasks);
-    }
+    };
 
     addMessageListener = function(event, func){
         messagesListeners.push([event, func]);
-        CROWDLOGGER.messages.bind(event, func);
-    }
+        sta.messages.bind(event, func);
+    };
 
     /**
      * Removes listeners.
      */
     removeListeners = function(){
-        chrome.windows.onRemoved.removeListener(onClose);
-        //CROWDLOGGER.messages.unbind('query-entered', processQuery);
+        //chrome.windows.onRemoved.removeListener(onClose);
+        //sta.messages.unbind('query-entered', processQuery);
         jQuery.each(messagesListeners, function(i,listener){
-            CROWDLOGGER.messages.unbind(listener[EVENT], listener[FUNC]);
+            sta.messages.unbind(listener[EVENT], listener[FUNC]);
         });
         messagesListeners = [];
-    }
+    };
 
     showDetails = function(event, data){
         view.showDetails(data);
-    }
+    };
+
 
     // Public definitions.
     
     /**
      * Initializes the data and sets the necessary listeners.
      */
-    this.init = function = function(){
-        //setTimeout( model.init, 1000 );
-        addListeners();
-
-        winId = CROWDLOGGER.searchTaskAssistant.windowId;
+    this.init = function(){
+        winId = sta.windowId;
         view.init(winId);
 
-        if( !model.hasInitializationLock() ){
+        if( model.hasInitializationLock() ){
+            addMessageListener('search-model-initialized', function(){
+                addListeners();
+                initializeHistory();
+            });
+        } else {
             initializeHistory();
+            addListeners();
         }
 
         //queryId = model.queries.length;
@@ -409,4 +429,4 @@ Controller = function(view, model){
         // Remove listeners.
         removeListeners();
     };
- }
+ };

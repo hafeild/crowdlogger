@@ -95,7 +95,7 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
                         prependTo(elmsToUpdateOnActivity[i]);
                     newElm.text( JSON.stringify(eventData) );
                 } catch(e) {
-                    delete elmsToUpdateOnActivity[i];
+                    elmsToUpdateOnActivity.slice(i,1);
                     i--;
                 }
             }

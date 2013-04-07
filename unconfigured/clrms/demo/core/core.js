@@ -25,7 +25,9 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
     };
 
     this.getMessage = function(){
-        return 'Version '+ clrmPackage.metadata.version +'; no messages.';
+        return 'Version '+ clrmPackage.metadata.version +
+            '<br/><span style="color: red">This is just a demonstration message, '+
+            'please ignore.</span>';
     };
 
     this.open = function(){

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--
+ File: configure.html
+ Author: Henry Feild
+ Date: 04-Apr-2013
+ Purpose: Exposes settings for the Search Task Assistant to users.
+ 
+ Copyright (c) 2010-2013
+ University of Massachusetts
+ All Rights Reserved
+-->
+<html>
+<head>
+<title>STA&mdash;Settings</title>
+
+    <link type="text/css" rel="stylesheet" href="jquery.jscrollpane.css"/>
+    <link type="text/css" rel="stylesheet" href="search-task-assistant.css"/>
+
+    <script language="javascript" src="jquery-1.7.1.min.js"></script> 
+
+    <script src="init.js"></script>
+
+    <script>
+    /**
+     * Called after the window has connected with the STA background script.
+     * The sta variable will be available when start is called.
+     */
+    var start = function(){
+
+    //     jQuery('#save-data').click(function(){
+    //         demoBackend.saveData([{
+    //                 timestamp: new Date().getTime(),
+    //                 userInput: jQuery('#data').val()
+    //             }], 
+    //             function(){displayAndFade(jQuery('#save-success'))},
+    //             function(){displayAndFade(jQuery('#save-error'))} 
+    //         );
+    //     });
+
+    //     jQuery('#read-data').click(function(){
+    //         var jqElm = jQuery('#user-input');
+    //         jqElm.html('');
+
+    //         demoBackend.readData({
+    //             on_chunk: function(data, next, abort){
+    //                 var i;
+    //                 for(i = 0; i < data.length; i++){
+    //                     var newElm = jQuery('<div>').prependTo(jqElm);
+    //                     newElm.text(JSON.stringify(data[i]));
+    //                 }
+    //                 next();
+    //             },
+    //             on_success: function(){displayAndFade(jQuery('#read-success'))},
+    //             on_error: function(){displayAndFade(jQuery('#read-error'))}
+    //         });
+    //     });
+
+
+    //     jQuery('#set-preference').click(function(){
+    //         var jqNameBox = jQuery('#pref-name');
+    //         var jqValueBox = jQuery('#pref-value');
+    //         //jqValueBox.val('');
+
+    //         demoBackend.clrmAPI.storage.preferences.set({
+    //             pref: jqNameBox.val(),
+    //             value: jqValueBox.val(),
+    //             on_success: function(){
+    //                 displayAndFade(jQuery('#preference-success'));
+    //             },
+    //             on_error: function(){
+    //                 displayAndFade(jQuery('#preference-error'));
+    //             }
+    //         });
+    //     });
+
+    //     jQuery('#get-preference').click(function(){
+    //         var jqNameBox = jQuery('#pref-name');
+    //         var jqValueBox = jQuery('#pref-value');
+    //         var jqDefaultValueBox = jQuery('#pref-default');
+    //         jqValueBox.val('...');
+
+    //         demoBackend.clrmAPI.storage.preferences.get({
+    //             pref: jqNameBox.val(),
+    //             value: jqValueBox.val(),
+    //             defaultValue: jqDefaultValueBox.val(),
+    //             on_success: function(value){
+    //                 displayAndFade(jQuery('#preference-success'));
+    //                 jqValueBox.val(value);
+    //             },
+    //             on_error: function(e){
+    //                 displayAndFade(jQuery('#preference-error'));
+    //                 jqValueBox.val(e);
+    //             }
+    //         });
+    //     });
+    // };
+
+    // var displayAndFade = function(jqElm){
+    //     jqElm.show().fadeOut(2000);
+    // };
+
+
+    };
+    </script>
+</head>
+<body>
+
+    <h1>Search Task Assistant Settings</h1>
+
+    <h2>Storage API Demo</h2>
+    <div>
+        <h3>Save data</h3>
+        Add any text you want to the field.
+        <input type="text" id="data"/>
+        <button id="save-data">Save data</button>
+        <span id="save-success" class="success notice">Saved</span>
+        <span id="save-error" class="error notice">Error!</span>
+    </div>
+
+    <div>
+        <h3>Display Saved data</h3>
+        <button id="read-data">Display saved data below</button>
+        <span id="read-success" class="success notice">Success</span>
+        <span id="read-error" class="error notice">Error!</span>
+        <div id="user-input">
+        </div>
+    </div>
+
+    <div>
+        <h3>Preferences</h3>
+        Pref name: <input type="text" id="pref-name"/><br/>
+        Pref value: <input type="text" id="pref-value"/><br/>
+        Default value: <input type="text" id="pref-default"/><br/>
+        <button id="set-preference">Set</button>
+        <button id="get-preference">Get</button>
+        <span id="preference-success" class="success notice">Success</span>
+        <span id="preference-error" class="error notice">Error!</span>
+    </div>
+</body>
+</html>

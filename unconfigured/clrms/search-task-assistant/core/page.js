@@ -1,19 +1,24 @@
 
 
-RemoteModule.prototype.makePage = function(page_data){
-    var page = {
-        is_serp_click: false,
-        url: "",
-        title: "",
-        favicon: "",
-        dwell_time: 0,
-        initial_access: -1,
-        last_access: -1
-    }; 
+RemoteModule.prototype.SearchTaskAssistant.prototype.makePage = 
+        function(pageData){
 
-    for( field in page){
-        page[field] = page_data[field] === undefined ? 
-            page[field] : page_data[field];
+    'use strict';
+    
+    var page = {
+            isSerpClick: false,
+            url: "",
+            title: "",
+            favicon: "",
+            dwellTime: 0,
+            initialAccess: -1,
+            lastAccess: -1
+        },
+        field; 
+
+    for(field in page){
+        page[field] = pageData[field] === undefined ? 
+            page[field] : pageData[field];
     }
     return page;
 };

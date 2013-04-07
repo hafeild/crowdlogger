@@ -3,7 +3,7 @@
  * identification. 
  *
  * <p><i>
- * Copyright ( c ) 2010-2012      <br>
+ * Copyright ( c ) 2010-2013      <br>
  * University of Massachusetts  <br>
  * All Rights Reserved
  * </i></p>
@@ -12,8 +12,10 @@
  */
 
 
+RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskIdentifier = 
+        function( sta ){
+    'use strict';
 
-RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
     // Private variables.
     var that = this,
         CHAR_NGRAM_SIZE     = 3,
@@ -22,18 +24,18 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
         TASK_FACTOR         = 20,
         QUERY_FACTOR        = 20,
         T                   = 2,
-        curClassifier       = 1;
+        curClassifier       = 1,
+        classifiers         = [];
 
     // Private functions declarations.
-    var classifiers = [];
 
     // Public function declarations.
-    this.extractFeatures, this.extractNormalizedDistances, 
-    this.extractDistritizedFeatures, this.classify, this.discritizeJaccardCoef,
-    this.getJaccardCoef, this.getTermSet, this.discritizeOverlappingCharNGrams,
-    this.getCharNGramsJaccard, this.getOverlappingCharNGrams, 
-    this.getCharNGrams, this.discritizeLevenshteinDist, 
-    this.getLevenshteinDistance, this.identifyTask;
+    this.extractFeatures; this.extractNormalizedDistances; 
+    this.extractDistritizedFeatures; this.classify; this.discritizeJaccardCoef;
+    this.getJaccardCoef; this.getTermSet; this.discritizeOverlappingCharNGrams;
+    this.getCharNGramsJaccard; this.getOverlappingCharNGrams; 
+    this.getCharNGrams; this.discritizeLevenshteinDist; 
+    this.getLevenshteinDistance; this.identifyTask;
 
     // Private function definitions.
 
@@ -46,10 +48,9 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      *                  1 (same task).
      */
     classifiers[0] = function( q1, q2 ){
-        var features = that.
-            extractDistritizedFeatures( q1, q2 );
-        var z = 2.0156 - 1.2243*features.overlap - 0.6781*features.jaccard;
-        var probNotSame = 1.0 / ( 1.0 + Math.exp( -z ) );
+        var features = that.extractDistritizedFeatures( q1, q2 ),
+            z = 2.0156 - 1.2243*features.overlap - 0.6781*features.jaccard,
+            probNotSame = 1.0 / ( 1.0 + Math.exp( -z ) );
         return 1 - probNotSame;
     };
 
@@ -137,9 +138,8 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
     this.classify = function( q1, q2 ){
         if( q1 === q2 ){
             return 1.0;
-        } else {
-            return classifiers[curClassifier]( q1,q2 );
-        }
+        } 
+        return classifiers[curClassifier]( q1,q2 );
     };
 
     /**
@@ -154,12 +154,9 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @return {int} One of {0, 1, 2}, depending on where the coefficient falls.
      */
     this.discritizeJaccardCoef = function( jaccardCoef ){
-        if( jaccardCoef < 0.3 )
-            return 0;
-        else if( jaccardCoef < 0.7 )
-            return 1;
-        else
-            return 2;
+        if( jaccardCoef < 0.3 ){ return 0; }
+        if( jaccardCoef < 0.7 ){ return 1; }
+        return 2;
     };
 
     /**
@@ -172,17 +169,17 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      *         extracted from <tt>s1</tt> and <tt>s2</tt>.
      */
     this.getJaccardCoef = function( s1, s2, areSets ) {
-        var s1Set = s1, s2Set = s2;
+        var s1Set = s1, s2Set = s2, sizeOfIntersection = 0.0, 
+            sizeOfUnion = 0.0, term;
+
         if( areSets !== true ){
             s1Set = that.getTermSet( s1 );
             s2Set = that.getTermSet( s2 );
         }
-        var sizeOfIntersection = 0.0, sizeOfUnion = 0.0;
-        var term;
-
+        
         // Get the intersection.
         for( term in s1Set ){
-            if( s2Set[term] !== undefined ){
+            if( s2Set[term] ){
                 sizeOfIntersection += 1.0;
             }
         }   
@@ -193,11 +190,8 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
                       sizeOfIntersection;
 
         // Compute the Jaccard coefficient.
-        if( sizeOfUnion > 0 ){
-            return sizeOfIntersection / sizeOfUnion;
-        } else {
-            return 0.0;
-        }
+        if( sizeOfUnion > 0 ){ return sizeOfIntersection / sizeOfUnion; }
+        return 0.0;
     };
 
     /**
@@ -207,13 +201,11 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @return {object} A set of terms extracted from <tt>str</tt>.
      */
     this.getTermSet = function( str ) {
-        var termSet = {};
-        var terms = str.split( /\s+/ );
-        var i;
+        var termSet = {}, terms = str.split( /\s+/ ), i;
+
         for( i = 0; i < terms.length; i++ ){
             termSet[terms[i]] = true;
         }
-
         return termSet;
     };
 
@@ -230,14 +222,10 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @return {int} One of {0, 1, 2, 3}, depending on where the overlap falls.
      */
     this.discritizeOverlappingCharNGrams = function( overlap ) {       
-        if( overlap < 2 )
-            return 0;
-        else if( overlap < 5 )
-            return 1;
-        else if( overlap < 10 )
-            return 2;
-        else
-            return 3;
+        if( overlap < 2 ){ return 0; }
+        if( overlap < 5 ){ return 1; }
+        if( overlap < 10 ){return 2; }
+        return 3;
     };
     
     /**
@@ -251,10 +239,10 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      *                 between the two strings.
      */
     this.getCharNGramsJaccard = function( s1,s2,n ){
-        var s1Grams = that.getCharNGrams( s1, n );
-        var s2Grams = that.getCharNGrams( s2, n );   
+        var s1Grams = that.getCharNGrams( s1, n ),
+            s2Grams = that.getCharNGrams( s2, n );   
         return that.getJaccardCoef( s1Grams, s2Grams,true );
-    }
+    };
 
     /**
      * Calculates the overlap between character n-grams extracted from the two 
@@ -269,16 +257,16 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @return {int} The number of n-grams that overlap.
      */
     this.getOverlappingCharNGrams = function( s1, s2, n ){
-        var s1Grams = that.getCharNGrams( s1, n );
-        var s2Grams = that.getCharNGrams( s2, n );
-        var overlap = 0;
+        var s1Grams = that.getCharNGrams( s1, n ),
+            s2Grams = that.getCharNGrams( s2, n ),
+            overlap = 0,
+            ngram;
 
         for( ngram in s1Grams ){
             if( s2Grams[ngram] !== undefined ){
                 overlap += Math.min( s1Grams[ngram], s2Grams[ngram] );
             }
         }
-
         return overlap;
     };
 
@@ -309,12 +297,11 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      */
     this.getCharNGrams = function( str, n ){
         // Will hold each distinct n-gram and its frequency.
-        var ngrams = {};
-
-        // Our n-grams are going to snake around this one array.
-        var curGram = [];
-        var curGramIndex = 0;
-        var i,j;
+        var ngrams = {},
+            // Our n-grams are going to snake around this one array.
+            curGram = [],
+            curGramIndex = 0,
+            i, j, k, ngram;
         
         for( i = 0; i < str.length; i++ ){
             // Add the current character.
@@ -323,11 +310,11 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
             // If enough characters have accumulated to make an n-gram,
             // emit the current one.
             if( i >= n-1 ){
-                var ngram = '';
+                ngram = '';
 
                 for( j = 0; j < n; j++ ){
                     // Get the index of the character to extract.
-                    var k = ( curGramIndex - j ) % n;
+                    k = ( curGramIndex - j ) % n;
                     if( k < 0 ){
                         k = n + k;
                     }
@@ -335,7 +322,7 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
                 }
 
                 // Store the ngram in the map.
-                if( ngrams[ngram] === undefined ){
+                if( !ngrams[ngram] ){
                     ngrams[ngram] = 0;
                 }
                 ngrams[ngram] += 1;
@@ -362,14 +349,10 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      */
     this.discritizeLevenshteinDist = function( levenshtein )
     {
-        if( levenshtein < 2 )
-            return 0;
-        else if( levenshtein < 5 )
-            return 1;
-        else if( levenshtein < 10 )
-            return 2;
-        else
-            return 3;
+        if( levenshtein < 2 ){ return 0; }
+        if( levenshtein < 5 ){ return 1; }
+        if( levenshtein < 10 ){ return 2; }
+        return 3;
     };
 
     /**
@@ -381,9 +364,9 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @return {float} The Levenshtein distance bewtween the two.
      */
     this.getLevenshteinDistance = function( s, t ){
-        var d, n, m, i, j, sI, tJ, cost;
+        var d, n, m, i, j, sI, tJ, cost, initMatrix;
 
-        var initMatrix = function( rows, columns ){
+        initMatrix = function( rows, columns ){
             var matrix = [], i, j;
             for( i = 0; i < rows; i++ ){
                 matrix[i] = [];
@@ -434,26 +417,90 @@ RemoteModule.prototype.SearchTaskIdentifier = function( sta ){
      * @param {function} A function to invoke after all related tasks have been 
      *                   identified. It should take an array of task ids.
      */
-    that.identifyTask = function( search, tasks, searches, callback ){
-        var relatedTasks = [], i, query = search.getText();
+    this.identifyTask = function( search, tasks, searches, callback ){
+        var relatedTasks = [], i, query = search.getText(), taskId;
 
         for( taskId in tasks ){
-            var searchIds = tasks[taskId].getSearchIds();
+            var searchIds = tasks[taskId].getSearchIds(), score;
 
             // Check if any of the searches in the current task as classified as
             // belonging in the same task as the target search.
             for( i = 0; i < searchIds.length; i++ ){        
-                var score = that.classify( 
+                score = that.classify( 
                     query, searches[searchIds[i]].getText() );
                 // We found a match, so there's no use looking at the rest of
                 // this task's searches.
                 if( score >= SAME_TASK_THRESHOLD ){
                     relatedTasks.push( taskId );
-                    continue;
+                    break;
                 }
             }
         }
 
         setTimeout( function(){callback( relatedTasks );}, T ); 
     };
-}
+
+    /**
+     * Calculates the similarity between the given search and every search in the
+     * given search lookup map.
+     * 
+     * @param {Search} search The search to rank other searches by.
+     * @param {map[String,Search]} searches A map of string ids to Searches.
+     * @param {function} callback A function to invoke upon completion. Should 
+     *                            expect one parameters: an array of [Search,
+     *                            classification score] pairs in non-decreasing
+     *                            order (note that means the mostly likely same-task
+     *                            searches are at the _end_ of the array).
+     */
+    this.rankSearchesBySameTaskness = function( search, searches, callback ){
+        var relatedSearches = [], j, text = search.getText(), curSearch, entry,
+            searchId;
+
+        for( searchId in searches ){
+            if( searchId === search.getId() ){ continue; }
+
+            curSearch = searches[searchId];
+
+            entry = [curSearch, that.classify(text, curSearch.getText())];
+
+            sta.util.orderedInsert(
+                relatedSearches, entry, sta.util.keyValueCompare(1) );
+        }
+
+        setTimeout(function(){ callback(relatedSearches); }, T);
+    };
+
+    /**
+     * Calculates the similarity between the given search and every search in the
+     * given search lookup map.
+     * 
+     * @param {Search} search The search to rank other searches by.
+     * @param {Array[Array[Search,Number]]} relatedSearches an array of [Search,
+     *                            classification score] pairs in non-decreasing
+     *                            order of score.
+     * @param {map[String,Task]} tasks A map of task ids to Tasks.
+     * @param {function} callback A function to invoke upon completion. Should 
+     *                            expect one parameters: an array of [Task,
+     *                            classification score] pairs in non-decreasing
+     *                            order (note that means the mostly likely tasks
+     *                            are at the _end_ of the array).
+     */
+    this.rankTasksBySameTaskness = function(
+            search, relatedSearches, tasks, callback ){
+
+        var relatedTasks = [], seenTasks = {}, i, taskId;
+
+        for( i = relatedSearches.length-1; i >= 0; i-- ){
+            taskId = relatedSearches[i][0].getTaskId();
+
+            if( !seenTasks[taskId] ){
+                relatedTasks.unshift( [tasks[taskId], relatedSearches[i][1]] );
+                seenTasks[taskId] = true;
+            }
+        }
+       
+        if(callback){ setTimeout(function(){ callback(relatedTasks); }, T ); }
+
+    };
+
+};
