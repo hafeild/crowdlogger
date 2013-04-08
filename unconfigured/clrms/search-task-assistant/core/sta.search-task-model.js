@@ -65,6 +65,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
     this.sta = sta;
     this.storage;
     this.pageLookup = pageLookup;
+    this.clrmAPI = clrmAPI;
 
     // Public function declarations.
     this.hasInitializationLock; this.getCurrentSearches; this.save; 
@@ -176,6 +177,14 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             sta.log('[sta.search-task-model.js] Queuing '+ e.e);
             overflowQueue.push([f,e,d,callback]);
             return true;
+        }
+        if( e.t ){
+            that.maxTimestamp = Math.max(that.maxTimestamp, e.t);
+            that.minTimestamp = Math.min(that.minTimestamp, e.t);
+            if( isNaN(that.maxTimestamp) ){
+                sta.log('Found NaN timestamp in queryEventIfNeeded: '+ 
+                    JSON.stringify(e));
+            }
         }
         return false;
     };
@@ -712,12 +721,9 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
      * processed to build the model.
      */
     this.init = function(){
+        var load, setMaxTimestamp, setMinTimestamp;
+        
         sta.log('[sta.search-task-model.js] Initializing Search Model...');
-
-        sta.log('[sta.search-task-model.js] >> focusedPage:');
-        sta.log(focusedPage);
-
-        var load;
 
         sta.log('[sta.search-task-model.js] Adding listeners...');
         // Add listeners.
@@ -754,9 +760,33 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             });
         };
 
+        setMinTimestamp = function(){
+            clrmAPI.storage.preferences.get({
+                pref: 'minTimestamp',
+                defaultValue: Number.MAX_VALUE,
+                on_success: function(val){
+                    that.minTimestamp = val || 0;
+                    load();
+                },
+                on_error: load
+            });
+        };
+
+        setMaxTimestamp = function(){
+            clrmAPI.storage.preferences.get({
+                pref: 'maxTimestamp',
+                defaultValue: 0,
+                on_success: function(val){
+                    that.maxTimestamp = val || 0;
+                    setMinTimestamp();
+                },
+                on_error: setMinTimestamp
+            });
+        };
+
         // Initialize the storage. Once that's done, we can worry about
         // loading the other data.
-        that.storage.initStorage(load);
+        that.storage.initStorage(setMaxTimestamp);
     };
 
     // Empty the queue when everything is finished being initialized.

@@ -47,10 +47,12 @@ var start = function(){
         var jqNameBox = jQuery('#pref-name');
         var jqValueBox = jQuery('#pref-value');
         //jqValueBox.val('');
+        var prefs = {};
 
+        prefs[jqNameBox.val()] = jqValueBox.val();
+        
         demoBackend.clrmAPI.storage.preferences.set({
-            pref: jqNameBox.val(),
-            value: jqValueBox.val(),
+            prefs: prefs,
             on_success: function(){
                 displayAndFade(jQuery('#preference-success'));
             },

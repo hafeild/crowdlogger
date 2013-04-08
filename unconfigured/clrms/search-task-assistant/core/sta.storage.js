@@ -26,7 +26,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Storage =
 
     // Private functions.
     var updateStoredTasks, updateStoredSearches, initStorage, parseSearches,
-        parseTasks, setUpdateTimeout;
+        parseTasks, setUpdateTimeout, updateTimestamps;
 
     // Public members.
     this.updatingLock = false;
@@ -68,6 +68,10 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Storage =
                 Math.max(model.maxTimestamp, entry.endTimestamp);
             model.minTimestamp =
                 Math.min(model.minTimestamp, entry.startTimestamp);
+
+            if( isNaN(model.maxTimestamp) ){
+                sta.log('Found NaN timestamp for task: '+ JSON.stringify(entry));
+            }
         }
     };
 
@@ -194,6 +198,20 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Storage =
         }
     };
 
+    /**
+     * Updates the timestamps.
+     */
+    updateTimestamps = function(onsuccess, onerror){
+        clrmAPI.storage.preferences.set({
+            prefs: {
+                maxTimestamp: model.maxTimestamp,
+                minTimestamp: model.minTimestamp
+            },
+            on_success: onsuccess,
+            on_error: onerror
+        });
+    };
+
     // Public function definitions.
     /**
      * Checks if we already have storage allocated; if not, allocates it.
@@ -309,8 +327,9 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Storage =
         tasksUpdated = {};
 
         updateStoredSearches(searchesToUpdate, function(){
-            updateStoredTasks(
-                tasksToUpdate, onsuccessIntermediate, onerrorIntermediate);
+            updateStoredTasks(tasksToUpdate, function(){
+                updateTimestamps(onsuccessIntermediate, onerrorIntermediate);
+            }, onerrorIntermediate);
         }, onerrorIntermediate);
     };
 
