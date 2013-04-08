@@ -773,13 +773,9 @@ CROWDLOGGER.io.log.read_extension_log({
             <li>{object} A list of options:<br/>
             <span class="parameter-requirement">Required</span>
             <ul>
-                <li>{string} <code>pref</code>
+                <li>{object} <code>prefs</code>
                 <ul>
-                    The name of the preference to set.
-                </ul>
-                <li>{anything} <code>value</code>
-                <ul>
-                    The value to set the preference to.
+                    A map of preferences and their values.
                 </ul>
             </ul>
             <span class="parameter-requirement">Optional</span>
@@ -801,6 +797,25 @@ CROWDLOGGER.io.log.read_extension_log({
     <p>
         Saves the given preference.
     </p>
+
+
+    <h4>Examples</h4>
+    <p>
+        The <code>prefs</code> option also multiple preferences to be set at
+        once, which is particularly useful given the underlying implementation,
+        which requires an asynchronous write for every batch of preferences.
+        It's easy to use:
+    </p>
+
+<pre class="prettyprint">
+// Save a couple of preferences.
+api.storage.preferences.set({
+    prefs: {
+        maxResultsToShow: 10,
+        judgmentFrequency: 1000*60*60*24*2 // Every two days.
+    }
+});
+</pre>    
 </div>
 
 <!-- Get a preference. -->

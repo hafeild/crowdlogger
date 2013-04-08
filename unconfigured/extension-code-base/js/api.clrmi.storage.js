@@ -684,7 +684,7 @@ CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
           PREFERENCE_INDEX_NAME = 'name';
 
     // Private method declarations.
-    var init;
+    var init, setMany;
 
     // Public method declarations.
     this.get, this.set;
@@ -713,6 +713,46 @@ CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
         });
     };
 
+    /**
+     * Sets a set of preference-value pairs.
+     *
+     * @param {object} opts A map of options:
+     * REQUIRED:
+     * <ul>
+     *    <li>{string} prefs         A map of preference names to values.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_success  The function to invoke when the value has
+     *                               been retrieved.
+     *    <li>{function} on_error    Called on error.
+     * </ul>
+     */
+    setMany = function(opts){
+        api.util.checkArgs(opts, ['prefs'], 
+            'clrmi.storage.preferences.get');
+        var callbackID = storage.wrapCallback(opts), data = [], pref;
+
+        for( pref in opts.prefs ){
+            data.push({});
+            data[data.length-1][PREFERENCE_KEY_NAME] = pref;
+            data[data.length-1][PREFERENCE_VALUE_NAME] = opts.prefs[pref];
+        }
+
+        return api.base.invokeCLIFunction({
+            apiName: 'storage',
+            functionName: 'save',
+            options: {
+                callbackID: callbackID,
+                dbName: storage.dbName,
+                storeName: PREFERENCE_STORE,
+                data: data
+            }
+        });
+    };
+
+
+
     // Public method definitions.
     /**
      * Sets a preference.
@@ -720,9 +760,16 @@ CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
      * @param {object} opts A map of options:
      * REQUIRED:
      * <ul>
-     *    <li>{string} pref          The name of the preference to set.
-     *    <li>{*} value              The value to set pref to. This can be
+     *    One of:
+     *    <ul>
+     *      <li>{string} pref        The name of the preference to set.
+     *      <li>{*} value            The value to set pref to. This can be
      *                               anything that can be serializable.
+     *    </ul>
+     *    OR
+     *    <ul>
+     *      <li>{object} prefs       A map of preferences to values.
+     *    </ul>
      * </ul>
      * OPTIONAL:
      * <ul>
@@ -732,25 +779,14 @@ CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
      * </ul>
      */
     this.set = function(opts) {
-        api.util.checkArgs(opts, ['pref','value'], 
-            'clrmi.storage.preferences.get');
-        var callbackID = storage.wrapCallback(opts);
-
-        var data = {};
-        data[PREFERENCE_KEY_NAME] = opts.pref;
-        data[PREFERENCE_VALUE_NAME] = opts.value;
-
-        return api.base.invokeCLIFunction({
-            apiName: 'storage',
-            functionName: 'save',
-            options: {
-                callbackID: callbackID,
-                dbName: storage.dbName,
-                storeName: PREFERENCE_STORE,
-                data: [data]
-            }
-        });
+        opts = opts || {};
+        if( opts.pref && opts.value ){
+            opts.prefs = opts.prefs || {};
+            opts.prefs[opts.pref] = opts.value;
+        } 
+        setMany(opts);
     };
+
 
     /**
      * Gets a preference value (or the default value if none is present.)
