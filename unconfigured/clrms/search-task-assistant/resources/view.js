@@ -507,7 +507,7 @@ function View(sta, jq, options){
             sta.log('Having issues with task:' );
         }
         sta.log('>>> task:');
-        sta.log(task);
+        sta.log(task ? JSON.stringify(task.getData()) : 'no task');
 
         searchIds = task ? removeDupSearches(task.getSearchIds()) : [];
         numSearches = searchIds.length;
@@ -972,6 +972,10 @@ function View(sta, jq, options){
         }
     };
 
+    this.removeTask = function(taskId, info){
+        jq('.task-'+taskId).remove();
+    };
+
     /**
      * Displays the details panel if not already and updates the content to
      * reflect the given task.
@@ -1007,7 +1011,7 @@ function View(sta, jq, options){
      * Removes a search.
      */
     this.removeSearch = function(searchId){
-        jq('[data-search-id='+ searchId).remove();
+        jq('[data-search-id='+ searchId+']').remove();
     };
 
     /**

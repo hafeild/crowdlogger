@@ -131,17 +131,19 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Task =
 
     this.delete = function(info){
         var i;
+        info = info || {};
         isDeleted = true; 
         if(info.mergedWith){
-            for(i = 0; i < data.searchIds.length; i++){
-                model.searches[data.searchIds[i]].delete();
-            }
             sta.messages.trigger('deleted-task', 
-                {taskId: data.taskId, mergedWith: info.mergedWIth});
+                {taskId: data.id, mergedWith: info.mergedWith});
         } else {
-            sta.messages.trigger('deleted-task', {taskId: data.taskId});
+            for(i = 0; i < data.searchIds.length; i++){
+                model.searches[data.searchIds[i]].delete(true);
+            }
+            sta.messages.trigger('deleted-task', {taskId: data.id});
         }
         data.searchIds = [];
+        delete model.tasks[data.id];
         update();
     };
 

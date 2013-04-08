@@ -208,10 +208,16 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Search =
         return isDeleted;
     };
 
-    this.delete = function(){
+    this.delete = function(taskRemoved){
         isDeleted = true;
-        model.tasks[data.taskId].removeSearch(data.id);
+        if( !taskRemoved ){
+            model.tasks[data.taskId].removeSearch(data.id);
+        }
         data = {id: data.id}
+        delete model.searches[data.id];
+        model.chronologicallyOrderedSearchIds.splice(
+            model.chronologicallyOrderedSearchIds.indexOf(data.id),1);
+        sta.messages.trigger('deleted-search', {searchId: data.id});
         update();
     };
 

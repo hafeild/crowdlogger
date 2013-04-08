@@ -86,7 +86,6 @@ var Controller = function(sta, view){
     };
 
     handleDeletedSearch = function(event, data){
-        sta.log('Deleted task! '+ JSON.stringify(data));
         view.removeSearch(data.searchId);
     };
 
@@ -179,7 +178,11 @@ var Controller = function(sta, view){
         //                 mergedWith: id
         //             });
         sta.log('Deleted task! '+ JSON.stringify(data));
-        view.updateTask(data.taskId, data);
+        if( data.mergedWith ){
+            view.updateTask(data.taskId, data);
+        } else {
+            view.removeTask(data.taskId, data);
+        }
     };
 
     handleUpdatedTask = function(event, data){
