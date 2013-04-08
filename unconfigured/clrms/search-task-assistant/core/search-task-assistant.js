@@ -21,6 +21,7 @@ RemoteModule.prototype.SearchTaskAssistant = function(clrmPackage, clrmAPI){
             height: 800,
             location: 'no',
             status: 'no',
+            resizable: 'yes',
             toolbar: 'no'
         },
         isRunning = true,
@@ -37,7 +38,8 @@ RemoteModule.prototype.SearchTaskAssistant = function(clrmPackage, clrmAPI){
             height: 800,
             location: 'no',
             status: 'no',
-            toolbar: 'no'
+            toolbar: 'no',
+            resizable: 'yes'
         };
 
     // Public function declarations.

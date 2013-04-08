@@ -473,6 +473,11 @@ h1 {
                                                     rgba(211, 215, 219, 1));*/
 }
 
+#detail-panel-contents {
+    width: 100%;
+    height: 100%;
+}
+
 .detail-panel {
     color: #444;
     font-family: "Trebuchet MS", Helvetica, sans-serif;
@@ -525,6 +530,34 @@ h1 {
 
 .dragging {
     opacity: 0.5;
+}
+
+#new-task-bucket {
+    background-color: steelblue;
+    padding: 10px;
+    border: 2px dashed orange;
+    position: absolute;
+    right: 5px;
+    left: 5px;
+    top: 2px;
+    text-align: center;
+    color: white;
+    /*width: 100%;*/
+}
+
+.new-task {
+    opacity: 0;
+    z-index: -1;
+}
+
+.new-task.ui-droppable-active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.new-task.ui-droppable-hover {
+    background-color: orange !important;
+    border-color: steelblue !important;
 }
 
 .detail-panel .pages {

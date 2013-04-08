@@ -610,6 +610,12 @@ function View(sta, jq, options){
         });
     }
 
+    function createNewTask(event, ui) {
+        jq(document).trigger('create-new-task', {
+            searchId: jq(ui.draggable).data('info').searchId
+        });
+        jq(ui.draggable).remove();
+    };
 
     /**
      * Handles dereferencing an array of tasks or task ids based on the format
@@ -994,7 +1000,7 @@ function View(sta, jq, options){
             options.searchToHighlight = search;
         }
 
-        jq('#detail-panel').html(
+        jq('#detail-panel-contents').html(
             //'<h2>Hovered over '+ task.id +'</h2>'
             formatTaskDetails( task, options )
         );
@@ -1023,8 +1029,15 @@ function View(sta, jq, options){
         winId = id;
         width = jq('#sidebar').width(); // Dictated by CSS.
         jq('.scroll-pane').jScrollPane();
-
         addListeners();
+        jq('.new-task').droppable({
+            drop: createNewTask,
+            activeClass: 'ui-droppable-active', 
+            hoverClass: 'ui-droppable-hover',
+            greedy: true,
+            tolerance: 'pointer',
+            accept: '.search'
+        });
         resize();
     };
 

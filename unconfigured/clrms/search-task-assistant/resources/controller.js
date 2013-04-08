@@ -45,7 +45,7 @@ var Controller = function(sta, view){
         processView, processQueryHistory, processTaskHistory,
         deleteTask, deleteSearch, queryHistory, mergeSearchAndTask, mergeTasks,
         onClose, addListeners, addMessageListener, removeListeners, 
-        showDetails, initStorage; 
+        showDetails, initStorage, createTask; 
 
     // Public variables.
     this.MIN_SIM_SCORE = 0.4;
@@ -245,6 +245,23 @@ var Controller = function(sta, view){
         // sta.messages.trigger('deleted-task', {taskId: data.taskId});
     };
 
+    createTask = function(event, data){
+        var search = model.searches[data.searchId];
+
+        // Remove the search from its current task.
+        model.tasks[search.getTaskId()].removeSearch(data.searchId);
+
+        // Create the new task.        
+        model.maxTaskId++;
+        new sta.Task({
+            startTimestamp: search.getTimestamp(),
+            endTimestamp: search.getTimestamp(),
+            id: model.maxTaskId,
+            searchIds: [search.getId()],
+            displayName: search.getText().toLowerCase()
+        }, sta, true);
+    };
+
     deleteSearch = function(event, data){
         model.searches[data.searchId].delete();
         // sta.messages.trigger('deleted-task', {taskId: data.taskId});
@@ -380,6 +397,7 @@ var Controller = function(sta, view){
         doc.delegate(document, 'query-history', queryHistory);
         doc.delegate(document, 'merge-search-and-task', mergeSearchAndTask);
         doc.delegate(document, 'merge-tasks', mergeTasks);
+        doc.delegate(document, 'create-new-task', createTask);
     };
 
     addMessageListener = function(event, func){
