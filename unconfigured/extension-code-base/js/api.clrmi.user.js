@@ -181,7 +181,7 @@ CLRMI.prototype.User.prototype.RealTime = function( api ){
             'query-entered', 
             'page-loaded',
             'link-clicked',
-            'page-focused'
+            'page-focused',
             'page-blurred'
         ],
         activityElm;

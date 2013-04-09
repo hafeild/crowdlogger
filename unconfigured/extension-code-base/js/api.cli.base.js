@@ -147,7 +147,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
         //     JSON.stringify(data) +"\n");
 
         if( data.from === 'CLRMI' && messageHandlers[command] ){
-            console.log('Received message from CLRMI: '+ JSON.stringify(data));
+            // console.log('Received message from CLRMI: '+ JSON.stringify(data));
             setTimeout( function(){messageHandlers[command](data)}, 2 );
         }
     };

@@ -29,9 +29,6 @@ CLI.prototype.Storage = function(crowdlogger, cli){
         // Called when each chunk is ready to be processed.
         on_chunk: function(callbackID){ 
             return function(data, next, abort){
-                console.log('(in cli.user.history) in on_chunk; data.length: '+
-                    data.length );
-
                 // Serves as a wrapper for the 'next' function. The wrapper is
                 // what gets registered in the function registry, not 'next'.
                 var nextWrapper = function(options, id){
@@ -467,7 +464,6 @@ CLI.prototype.Storage = function(crowdlogger, cli){
             db_name:     opts.dbName,
             store_name:  opts.storeName,
             foreach:  function(entry){
-                crowdlogger.debug.log('In updateEntries: id:'+ entry.id);
                 return opts.entries[entry.id] || {};
             },
             on_success:  callbacks.on_success(opts.callbackID),
