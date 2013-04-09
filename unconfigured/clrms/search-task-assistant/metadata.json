@@ -7,5 +7,5 @@
     "packageURL": "%%SERVER_BASE_URL%%/clrms/sta/sta.json",
     "permissions": ["userdata", "ui", "storage"],
     "logoURL": "%%SERVER_BASE_URL%%/clrms/sta/sta.png",
-    "minCLVersion": "2.0.1"
+    "minCLVersion": "2.0.2"
 }
