@@ -227,6 +227,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Storage =
             on_success: function(stores){
                 if( stores.indexOf(SEARCH_STORE) < 0 || 
                         stores.indexOf(TASK_STORE) < 0 ){
+                    sta.log('[sta.storage.js] Stores don\'t exist; upgrading.');
                     clrmAPI.storage.addStores({
                         stores: [SEARCH_STORE, TASK_STORE],
                         on_success: function(){

@@ -17,8 +17,8 @@ RemoteModule.prototype.SearchTaskAssistant = function(clrmPackage, clrmAPI){
     // Private variables.
     var that = this,
         windowSpecs = {
-            width: 200,
-            height: 800,
+            width: 500,
+            height: 500,
             location: 'no',
             status: 'no',
             resizable: 'yes',
@@ -120,7 +120,7 @@ RemoteModule.prototype.SearchTaskAssistant = function(clrmPackage, clrmAPI){
      * brought into focus.
      */
     this.launchSTAWindow = function(){ 
-        that.launchWindow('search-task-assistant.html');
+        that.launchWindow('search-task-assistant.html', that.staWindowSpecs);
     };
 
     /**
@@ -129,15 +129,16 @@ RemoteModule.prototype.SearchTaskAssistant = function(clrmPackage, clrmAPI){
      *
      * @param {string} url     The URL of the resource to open.
      */
-    this.launchWindow = function(url, callback){ 
+    this.launchWindow = function(url, specs, callback){ 
         if( openWindows[url] && !openWindows[url].closed ){
             openWindows[url].focus();
         } else {
+            specs = specs || windowSpecs;
             clrmAPI.ui.openWindow({
                 content: clrmPackage.html[url],
                 resources: clrmPackage,
                 name: url,
-                specsMap: windowSpecs,
+                specsMap: specs,
                 callback: function(win){
                     openWindows[win.name] = win;
                     if(callback){ callback(win); }

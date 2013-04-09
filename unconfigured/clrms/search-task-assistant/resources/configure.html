@@ -4,7 +4,7 @@
  Author: Henry Feild
  Date: 04-Apr-2013
  Purpose: Exposes settings for the Search Task Assistant to users.
- 
+
  Copyright (c) 2010-2013
  University of Massachusetts
  All Rights Reserved
@@ -14,7 +14,8 @@
 <title>STA&mdash;Settings</title>
 
     <link type="text/css" rel="stylesheet" href="jquery.jscrollpane.css"/>
-    <link type="text/css" rel="stylesheet" href="search-task-assistant.css"/>
+    <!-- <link type="text/css" rel="stylesheet" href="search-task-assistant.css"/> -->
+    <link type="text/css" rel="stylesheet" href="page.css"/>
 
     <script language="javascript" src="jquery-1.7.1.min.js"></script> 
 
@@ -104,37 +105,18 @@
     </script>
 </head>
 <body>
-
+<div id="content">
     <h1>Search Task Assistant Settings</h1>
 
-    <h2>Storage API Demo</h2>
-    <div>
-        <h3>Save data</h3>
-        Add any text you want to the field.
-        <input type="text" id="data"/>
-        <button id="save-data">Save data</button>
-        <span id="save-success" class="success notice">Saved</span>
-        <span id="save-error" class="error notice">Error!</span>
-    </div>
+    <p>
+        Currently, there are no options to configure. We will be adding 
+        settings such as: blacklisting page visit/search string patterns,
+        how much search history to keep in memory, and an option to parse
+        your %%PROJECT_NAME%% search history prior to installing the Search
+        Task Assistant app.
+    </p>
 
-    <div>
-        <h3>Display Saved data</h3>
-        <button id="read-data">Display saved data below</button>
-        <span id="read-success" class="success notice">Success</span>
-        <span id="read-error" class="error notice">Error!</span>
-        <div id="user-input">
-        </div>
-    </div>
-
-    <div>
-        <h3>Preferences</h3>
-        Pref name: <input type="text" id="pref-name"/><br/>
-        Pref value: <input type="text" id="pref-value"/><br/>
-        Default value: <input type="text" id="pref-default"/><br/>
-        <button id="set-preference">Set</button>
-        <button id="get-preference">Get</button>
-        <span id="preference-success" class="success notice">Success</span>
-        <span id="preference-error" class="error notice">Error!</span>
-    </div>
+    <button onclick="window.close()">Close</button>
+</div>
 </body>
 </html>
