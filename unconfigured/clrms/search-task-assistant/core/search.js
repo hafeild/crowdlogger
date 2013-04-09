@@ -113,6 +113,14 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Search =
         return data.text || data.url;
     };
 
+    this.updateTextIfNecessary = function(text){
+        if( !data.text ){
+            data.text = text;
+            model.tasks[data.taskId].updateTextIfNecessary(text, data.url);
+            update();
+        }
+    }
+
     this.getUrl = function(){
         return data.url;
     };
@@ -151,7 +159,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Search =
 
     this.updatePage = function(url, updates){
         var page = pageLookup[url], key, updated = [];
-        if( page !== undefined ){
+        if( page ){
             for( key in page ){
                 if( key !== 'url' && updates[key] !== undefined ){
                     page[key] = updates[key];

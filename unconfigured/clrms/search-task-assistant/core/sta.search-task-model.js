@@ -51,7 +51,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
 
     // Either don't need or requires some updating.
     var addListeners, parseSearches, parseTasks, populateFromActivityLog,
-        processClick, processSearch, processPageFocus;
+        processClick, processSearch, processPageFocus, processPageBlur;
 
     // Public variables.
     this.searches = searches; this.tasks = tasks;
@@ -81,7 +81,8 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             'query-entered': queueQuery,
             'page-loaded': processPageLoad,
             'link-clicked': processClick,
-            'page-focused': processPageFocus
+            'page-focused': processPageFocus,
+            'page-blurred': processPageBlur
         });
     };
 
@@ -138,6 +139,10 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
                     // Focus.
                     case 'pagefocus':
                         processPageFocus({overrideInitializationLock: true}, 
+                            entry, processNextEntry );
+                        break;
+                    case 'pageblur':
+                        processPageBlur({overrideInitializationLock: true}, 
                             entry, processNextEntry );
                         break;
                     // Search (well, query...).
@@ -471,19 +476,6 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
 
         if(queueEventIfNeeded(processPageLoad, event, data, callback)){return;}
 
-        // if(prevQuery){
-        //     flushQueuedQueries(function(){
-        //         processPageLoad(event, data, callback);
-        //     });
-        //     return;
-        // }
-
-        // // TODO: Add a load blacklist.
-        // if( data.url.match(/www.google.com\/url/) !== null ){
-        //     if(callback){ setTimeout(callback, TIMEOUT) };
-        //     return;
-        // }
-
         if( isUrlBlacklisted(data.url) ){
             sta.log('On blacklist :(');
             if(callback){ setTimeout(callback, TIMEOUT); }
@@ -537,16 +529,6 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
                 favicon: sta.util.getFaviconURL(data.url, true) //clrmAPI.ui.getFaviconURL(data.url, true)
             }]);
 
-            // // Send out a 'page updated' event.
-            // if( !initializationLock ){
-            //     setTimeout(function(){
-            //         sta.messages.trigger('new-page', {
-            //             pageUrl: data.url,
-            //             searchId: search.getId()
-            //         });
-            //     }, TIMEOUT);
-            // }
-
             // Classify the search and update the tasks.
             identifyTask(search, callback);
         } else {
@@ -564,14 +546,6 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
                     title: data.ttl,
                     favicon: sta.util.getFaviconURL(data.url, true) // clrmAPI.ui.getFaviconURL(data.url, true)
                 }]);
-                // if( !initializationLock ){
-                //     setTimeout(function(){
-                //         sta.messages.trigger('new-page', {
-                //             pageUrl: data.url,
-                //             searchId: search.getId()
-                //         });
-                //     }, TIMEOUT);
-                // }
             } else {
                 sta.log('Updating page');
                 search.updatePage(data.url, {
@@ -579,17 +553,6 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
                     title: data.ttl,
                     favicon: sta.util.getFaviconURL(data.url, true) //clrmAPI.ui.getFaviconURL(data.url, true)
                 });
-                // // Send out a 'page updated' event.
-                // if( !initializationLock ){
-                //     setTimeout(function(){
-                //         sta.messages.trigger('updated-page', {
-                //             pageUrl: data.url,
-                //             searchId: search.getId(),
-                //             taskId: search.getTaskId(),
-                //             updated: ['initialAccess', 'title', 'favicon']
-                //         });
-                //     }, TIMEOUT );
-                // }
             }
 
             // Updated the list of recently accessed searches.
@@ -609,15 +572,18 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
         return false;
     };
 
+    /**
+     * If another page was in focus, its dwell time is updated. Then updates the
+     * global <code>focusedPage</code> object to point to the page currently in
+     * focus.
+     *
+     * @param {DOM Event} event    The DOM event.
+     * @param {object} data        The interaction event data.
+     * @param {function} callback  The function to invoke when the everything
+     *                             has been processed.
+     */
     processPageFocus = function(event, data, callback){
         if(queueEventIfNeeded(processPageFocus, event, data, callback)){return;}
-
-        // if(prevQuery){
-        //     flushQueuedQueries(function(){
-        //         processPageFocus(event, data, callback);
-        //     });
-        //     return;
-        // }
 
         var page, search;
         sta.log('In page focus for '+ data.url);
@@ -627,21 +593,9 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             sta.log(focusedPage);
             page = focusedPage.search.getPage(focusedPage.url);
             if( page ){
-
                 focusedPage.search.updatePage(focusedPage.url, {
                     dwellTime: page.dwellTime + (data.t-focusedPage.startFocus)
                 });
-
-                // // Send out a 'page updated' event.
-                // if( !initializationLock ){
-                //     setTimeout(function(){
-                //         sta.messages.trigger('updated-page', {
-                //             pageUrl: data.url,
-                //             searchId: focusedPage.search.getId(),
-                //             updated: ['dwellTime']
-                //         });
-                //     }, TIMEOUT);
-                // }
             }
         }
 
@@ -652,6 +606,13 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             sta.log('>> search:');
             sta.log(search);
 
+            if( data.ttl ){
+                search.updateTextIfNecessary(data.ttl);
+                search.updatePage(data.url, {
+                    title: data.ttl
+                });
+            }
+
             focusedPage = {
                 url: data.url,
                 search: search,
@@ -659,19 +620,32 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             };
             // Updated the list of recently accessed searches.
             updateMostRencentlyAccessedSearchIds(search.getId());
-
-            // if( !initializationLock ){
-            //     setTimeout(function(){
-            //         sta.messages.trigger('updated-page', {
-            //             pageUrl: data.url,
-            //             searchId: search.getId()
-            //         });
-            //     }, TIMEOUT);
-            // }
         } else {
             sta.log('no :(');
             focusedPage = undefined;
         }
+
+        if( callback ){ setTimeout(callback, TIMEOUT); }
+    };
+
+    processPageBlur = function(event, data, callback){
+        if(queueEventIfNeeded(processPageBlur, event, data, callback)){return;}
+
+        var page, search;
+        sta.log('In page blur for '+ data.url);
+
+        if( focusedPage ){
+            sta.log('>> focusedPage:');
+            sta.log(focusedPage);
+            page = focusedPage.search.getPage(focusedPage.url);
+            if( page ){
+                focusedPage.search.updatePage(focusedPage.url, {
+                    dwellTime: page.dwellTime + (data.t-focusedPage.startFocus)
+                });
+            }
+        }
+
+        focusedPage = undefined;
 
         if( callback ){ setTimeout(callback, TIMEOUT); }
     };

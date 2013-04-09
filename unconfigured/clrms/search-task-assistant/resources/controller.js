@@ -277,32 +277,34 @@ var Controller = function(sta, view){
         view.processing({queryHistory: true});
 
         jQuery.each(model.chronologicallyOrderedSearchIds, 
-            function(i,searchId){try{
-                var search = model.searches[searchId],
-                    task = model.tasks[search.getTaskId()],
-                    matches;
-                if( seenTaskLookup[task.getId()] === undefined ){
-                    matches = task.matches(pattern);
+            function(i,searchId){
+                try{
+                    var search = model.searches[searchId],
+                        task = model.tasks[search.getTaskId()],
+                        matches;
+                    if( seenTaskLookup[task.getId()] === undefined ){
+                        matches = task.matches(pattern);
 
-                    if( matches.taskMatches ){
-                        matchedTasks.push(task);
+                        if( matches.taskMatches ){
+                            matchedTasks.push(task);
+                        }
+
+                        if( matches.searchMatches.length > 0 ){
+                            //sta.log(matches.searchMatches);
+
+                            jQuery.each(matches.searchMatches, function(i,sId){
+                                matchedSearchLookup[sId] = true;
+                            });
+                        }
                     }
 
-                    if( matches.searchMatches.length > 0 ){
-                        //sta.log(matches.searchMatches);
-
-                        jQuery.each(matches.searchMatches, function(i,sId){
-                            matchedSearchLookup[sId] = true;
-                        });
+                    if( matchedSearchLookup[searchId] ){
+                        matchedSearches.push(search);
                     }
-                }
-
-                if( matchedSearchLookup[searchId] ){
-                    matchedSearches.push(search);
-                }
-                seenTaskLookup[task.getId()] = true;
-                
-            } catch(e){} }
+                    seenTaskLookup[task.getId()] = true;
+                    
+                } catch(e){} 
+            }
         );
 
         view.addSearches(

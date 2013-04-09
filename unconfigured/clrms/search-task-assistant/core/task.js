@@ -125,6 +125,13 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.Task =
         return data.displayName || model.searches[data.searchIds[0]].getText();
     };
 
+    this.updateTextIfNecessary = function(newText, oldText){
+        if( data.displayName === oldText ){
+            data.displayName = newText;
+            update();
+        }
+    };
+
     this.getData = function(){
         return data;
     };

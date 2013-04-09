@@ -113,34 +113,22 @@ function View(sta, jq, options){
             return jq('<h1>No task to display</h1>');
         }
 
-        console.log('Formatting task details; task:');
-        console.log(task.getData());
-        console.log('options:');
-        console.log(options);
-
         var titleEditInProgress, html, header, titleEdit, deleteTask,
             searches = removeDupSearches(task.getSearchIds()), currentDay = '',
             currentDaySearches,  prevSearch, i, search, day;
 
-        console.log('Checkpoint 0');
 
         titleEditInProgress = false;
         html = jq('<div id="current-detailed-task" class="task-'+
                 task.getId() +'"></div>').data('task', task);
 
-        console.log('Checkpoint 0.1');
-
         html.data('info', {type: 'task', id: task.getId()});
-
-        console.log('Checkpoint 0.2');
 
         header = jq(
             '<div class="task-title">Task "<span class="task-name">'+
             task.getText() +
             //model.searches[task.getSearchIds()[0]].getText() +
             '</span>"</div>').appendTo(html);
-
-        console.log('Checkpoint 0.3');
 
         // titleEdit = jq('<span class="edit">[edit]</span>').click(
         titleEdit = jq('<button>Edit</button>').click(
@@ -160,8 +148,6 @@ function View(sta, jq, options){
             }
         ).css('margin-left', '10px');
 
-        console.log('Checkpoint 1');
-
         // deleteTask = jq('<span class="edit">[delete task]</span>').click(
         deleteTask = jq('<button class="confirm">Delete task</button>').click(
             function(e){
@@ -174,9 +160,6 @@ function View(sta, jq, options){
         titleEdit.appendTo(header);
         deleteTask.appendTo(header);
  
-        console.log('Checkpoint 2');
-
-
         for( i = searches.length-1; i >= 0; i-- ){
             search = model.searches[searches[i]];
             day = extractDate(search.getTimestamp(), "dddd, MMMM d, yyyy");
@@ -184,14 +167,14 @@ function View(sta, jq, options){
             // Ignore repeat searches.
             if( day !== currentDay ){
                 currentDay = day;
-                jq('<span class="date-header">'+currentDay+'</span>').
-                    appendTo(html);
+
                 currentDaySearches = jq('<div class="day"></div>').
-                    appendTo(html);
+                    insertAfter(header);
+                jq('<span class="date-header">'+currentDay+'</span>').
+                    insertBefore(currentDaySearches);
             }
-            currentDaySearches.append(formatSearchDetails(search));
+            currentDaySearches.prepend(formatSearchDetails(search));
         }
-        console.log('Checkpoint 3');
 
         html.droppable({
             drop: mergeTasks,
@@ -283,9 +266,10 @@ function View(sta, jq, options){
         pagesElm = jq('<ul class="pages">');
         pagesSorted = sta.util.copy(search.getPages());
         sta.log(pagesSorted);
+        // Reverse sort.
         pagesSorted.sort(
                 function(p1,p2){
-            return p1.initialAccess - p2.initialAccess;
+            return p2.initialAccess - p1.initialAccess;
         });
 
         sta.util.foreach(pagesSorted, function(i, page){
@@ -318,7 +302,8 @@ function View(sta, jq, options){
             pagesElm.append(pageElm);
         }, true);
 
-        searchElm = jq('<div class="detail-panel search ui-widget-content"></div>');
+        searchElm = 
+            jq('<div class="detail-panel search ui-widget-content"></div>');
         searchElm.data('info', {searchId: search.getId()});
         searchElm.draggable({
             revert: 'invalid', 
@@ -347,7 +332,6 @@ function View(sta, jq, options){
             append(linkElm).
             append(seElm).
             append(pagesElm).
-            append(deleteButton).
             append(deleteButton);
     }
 

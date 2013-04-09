@@ -7,9 +7,9 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.makePage =
     
     var page = {
             isSerpClick: false,
-            url: "",
-            title: "",
-            favicon: "",
+            url: '',
+            title: '',
+            favicon: '',
             dwellTime: 0,
             initialAccess: -1,
             lastAccess: -1
