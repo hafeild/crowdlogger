@@ -132,6 +132,10 @@ h1 {
     -moz-user-select:none;
     user-select: none;
     border: none;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box; 
+    -webkit-box-sizing:border-box;
+    overflow-x: hidden;
 }
 
 #search-history-view .scroll-pane {

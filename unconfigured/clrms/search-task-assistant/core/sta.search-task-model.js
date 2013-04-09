@@ -315,9 +315,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
             // search.setTaskId(id);
 
             // Invoke the callback with the task id if it exists.
-            if( callback ) {
-                setTimeout( function(){ callback(id); }, TIMEOUT );
-            }
+            if( callback ){ setTimeout( function(){ callback(id); }, TIMEOUT);}
 
             // Trigger whatever event is required.
             // if( !initializationLock ){
@@ -722,7 +720,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
      */
     this.init = function(){
         var load, setMaxTimestamp, setMinTimestamp;
-        
+
         sta.log('[sta.search-task-model.js] Initializing Search Model...');
 
         sta.log('[sta.search-task-model.js] Adding listeners...');

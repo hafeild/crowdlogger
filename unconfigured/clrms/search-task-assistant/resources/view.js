@@ -490,7 +490,7 @@ function View(sta, jq, options){
             }
 
             if( j < tasks.length){
-                setTimeout( addTask(j), T );
+                setTimeout( function(){addTask(j)}, T );
             } else {
                 jqElm.data('jsp').reinitialise();
             }
@@ -683,7 +683,7 @@ function View(sta, jq, options){
                 // prevSearch = curSearch;
             }
             if( j < searches.length){
-                setTimeout( addSearch(j), T );
+                setTimeout( function(){addSearch(j)}, T );
             } else {
                 jqElm.data('jsp').reinitialise();
                 sta.log("done!");
@@ -724,7 +724,9 @@ function View(sta, jq, options){
      * be known.
      */
     function resize(){
+
         try{
+            jq('.fullpage').height(window.innerHeight);
             jq('.scroll-pane').each(function(i,elm){
                 elm = jq(elm);
                 elm.height(elm.parent().height() - 
@@ -1028,7 +1030,9 @@ function View(sta, jq, options){
     this.init = function(id){
         winId = id;
         width = jq('#sidebar').width(); // Dictated by CSS.
-        jq('.scroll-pane').jScrollPane();
+        jq('.scroll-pane').jScrollPane({
+            contentWidth: 180
+        });
         addListeners();
         jq('.new-task').droppable({
             drop: createNewTask,

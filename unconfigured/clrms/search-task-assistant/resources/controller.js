@@ -277,7 +277,7 @@ var Controller = function(sta, view){
         view.processing({queryHistory: true});
 
         jQuery.each(model.chronologicallyOrderedSearchIds, 
-            function(i,searchId){
+            function(i,searchId){try{
                 var search = model.searches[searchId],
                     task = model.tasks[search.getTaskId()],
                     matches;
@@ -301,7 +301,8 @@ var Controller = function(sta, view){
                     matchedSearches.push(search);
                 }
                 seenTaskLookup[task.getId()] = true;
-            }
+                
+            } catch(e){} }
         );
 
         view.addSearches(
