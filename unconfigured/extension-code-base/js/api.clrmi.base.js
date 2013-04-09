@@ -26,7 +26,7 @@ CLRMI.prototype.Base = function(api) {
         
     // Private function declarations.
     var init, extractData, onMessage, setExtensionPath, loadCLRM, unloadCLRM, 
-        invokeCLRMICallback, invokeCLRMMethod, openLoggingWindow;
+        invokeCLRMICallback, invokeCLRMMethod, openLoggingWindow, onShutdown;
 
     // Public function declarations.
     this.postMessage, this.log, this.invokeCLIFunction;
@@ -46,12 +46,15 @@ CLRMI.prototype.Base = function(api) {
         messageHandlers.invokeCLRMMethod = invokeCLRMMethod;
         messageHandlers.openLoggingWindow = openLoggingWindow;
 
-        jQuery(window).bind( 'message', onMessage );
+        jQuery(window).on( 'message', onMessage );
 
         // Ask CLI for the extension path so we can open CrowdLogger pages.
         that.sendMessage({command:'getExtensionPath'})
 
         messageHandlers.clrmiCallback = invokeCLRMICallback;
+
+        //jQuery(window).on('beforeunload', onShutdown);
+        // window.onbeforeunload = onShutdown;
     };
 
     /**
@@ -85,6 +88,19 @@ CLRMI.prototype.Base = function(api) {
         if( data.from === 'CLI' && messageHandlers[command] ){
             setTimeout(function(){messageHandlers[command](data);}, 2);
         }
+    };
+
+    /**
+     * Unloads all of the CLRMs.
+     *
+     * @param {DOM Event} event   Ignored.
+     */
+    onShutdown = function(event){
+        alert('Being shut down!');
+        api.ui.closeLoggingWindow();
+        jQuery(clrmid, function(clrmid, clrm){
+            unloadCLRM({clrmid: clrmid, reason: 'shutdown'});
+        });
     };
 
     /**
@@ -216,6 +232,9 @@ CLRMI.prototype.Base = function(api) {
         }        
 
         var removeDB = function(){
+            if(modules[data.clrmid]){
+                delete modules[data.clrmid];
+            }
             var storage = new api.Storage(api, data.clrmid);
             storage.removeDatabase({
                 on_success: onsuccess,

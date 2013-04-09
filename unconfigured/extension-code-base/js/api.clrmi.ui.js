@@ -283,5 +283,14 @@ CLRMI.prototype.UserInterface = function(api){
             loggingWindow = window.open('about:blank', 'loggingwindow', 
                 'width=800,height=300');
         }
-    }
+    };
+
+    /**
+     * Closes the logging window.
+     */
+    this.closeLoggingWindow = function(){
+        if( loggingWindow && !loggingWindow.closed ){
+            loggingWindow.close();
+        }
+    };
 }
