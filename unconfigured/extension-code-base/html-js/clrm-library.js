@@ -7,7 +7,7 @@
  * @version %%VERSION%%
  */
 
-var CROWDLOGGER;
+var CROWDLOGGER, currentlyShownInfo = [undefined];
 
 /**
  * Called when the page loads, after the CROWDLOGGER object is found.
@@ -36,13 +36,27 @@ var show_popup = function(message){
     jQuery('#popup').show();
 }
 
+var show_info = function(clrmElm){
+    var info = clrmElm.parents('.clrm-container').find('.info');
+    if( info[0] !== currentlyShownInfo[0] ){
+        console.log('info !== currentlyShownInfo');
+        console.log(info);
+        console.log(currentlyShownInfo);
+        if(currentlyShownInfo[0]){ currentlyShownInfo.hide(); }
+        info.show({easing: 'clip', duration: 300});
+        currentlyShownInfo = info;
+    }
+};
+
 var add_listeners = function(){
     jQuery(document).on('click', '.clrm', function(e){
-        var target = jQuery(this);
-        jQuery('.info').hide();
-        target.parents('.clrm-container').find('.info').
-            show({easing: 'clip', duration: 300});
+        show_info(jQuery(this));
     });
+
+    jQuery(document).on('mouseover', '.clrm', function(e){
+        show_info(jQuery(this));
+    });
+
     jQuery(document).on('click', '.info button, .access button', function(e){
         var target = jQuery(this);
         var clrmid = target.parents('.clrm-container').attr('data-clrmid');
@@ -126,6 +140,7 @@ var add_listeners = function(){
             // Dismiss.
             case 'dismiss':
                 target.parent().hide({easing: 'slide', duration: 300});
+                currentlyShownInfo = [undefined];
                 break;
 
             default:
@@ -135,6 +150,7 @@ var add_listeners = function(){
     jQuery(document).on('click', function(e){
         if( jQuery(e.target).parents('.clrm-container').length === 0 ){
             jQuery('.info').hide({easing: 'slide', duration: 300});
+            currentlyShownInfo = [undefined];
         }
     });
 
