@@ -252,13 +252,12 @@ CLRMI.prototype.Base = function(api) {
             if( data.reason === 'uninstall' ){
                 removeDB();
             } else if( data.callbackID ){
-                that.invokeCLICallback({
-                    callbackID: data.callbackID,
-                    options: {
-                        event: 'on_error',
-                        errorMsg: '[clrmi.base.unloadCLRM] '+ e
-                    }
-                });
+                var options = {};
+                if( !modues[data.clrmid] ){
+                    onsuccess();
+                } else {
+                    onerror('[clrmi.base.unloadCLRM] '+ e);
+                }
             }
             return;
         }

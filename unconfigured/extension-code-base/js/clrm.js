@@ -388,8 +388,8 @@ var CLRM = function(crowdlogger){
             that.unloadCLRM({
                 clrmid: clrmid,
                 reason: 'uninstall',
-                onSuccess: uninstall,
-                onError: onError
+                on_success: uninstall,
+                on_error: onError
             });
         };
 
@@ -478,8 +478,8 @@ var CLRM = function(crowdlogger){
         that.unloadCLRM({
             clrmid: clrmid, 
             reason: 'disable', 
-            onSuccess: onSuccess, 
-            onError: onError
+            on_success: onSuccess, 
+            on_error: onError
         });
     };
 
@@ -495,9 +495,9 @@ var CLRM = function(crowdlogger){
      * </ul>
      * OPTIONAL:
      * <ul>
-     *     <li>{function} onSuccess Invoked when the CLRM has been successfully
+     *     <li>{function} on_success Invoked when the CLRM has been successfully
      *                              unloaded.
-     *     <li>{function} onError   Invoked when an error is encountered.
+     *     <li>{function} on_error   Invoked when an error is encountered.
      * </ul>
      */
     this.unloadCLRM = function( opts ){
@@ -523,11 +523,11 @@ var CLRM = function(crowdlogger){
                         package.metadata.loaded = false;
                         crowdlogger.io.log.write_to_clrm_db({
                             data: [package],
-                            on_success: opts.onSuccess
+                            on_success: opts.on_success
                         });
-                    }, opts.onError );
+                    }, opts.on_error );
             },
-            on_error: opts.onError
+            on_error: opts.on_error
         });
     };
 
@@ -558,8 +558,8 @@ var CLRM = function(crowdlogger){
                         that.unloadCLRM({
                             clrmid: batch[i].clrmid,
                             reason: reason,
-                            onSuccess: function(){ process(i+1); },
-                            onError: function(e){
+                            on_success: function(){ process(i+1); },
+                            on_error: function(e){
                                 if(onError){
                                     setTimeout(function(){onError(e)}, T);
                                 }
@@ -625,7 +625,7 @@ var CLRM = function(crowdlogger){
         };
 
         install = function(clrmMetadata, onSuccess, onError){
-            crowdlogger.debug.log('Updating '+ clrmid);
+            crowdlogger.debug.log('Updating '+ clrmMetadata.clrmid);
             that.installCLRM(clrmMetadata, function(){
                 enable(clrmMetadata.clrmid, onSuccess, onError);
             }, onError);
@@ -729,11 +729,12 @@ var CLRM = function(crowdlogger){
      */
     this.updateCLRM = function(clrmMetadata, onSuccess, onError){
         var install, unload;
-        install = function(){
-            crowdlogger.log('Installing '+ clrmMetadata.clrmid);
+        install = function(enable){
+            enable = enable === undefined ? clrmMetadata.enabled : enable;
+            crowdlogger.debug.log('Installing '+ clrmMetadata.clrmid);
             that.installCLRM(clrmMetadata, function(){
-                if( clrmMetadata.enabled ){
-                    crowdlogger.log('Enabling '+ clrmMetadata.clrmid);
+                if( enable ){
+                    crowdlogger.debug.log('Enabling '+ clrmMetadata.clrmid);
                     that.enableCLRM(clrmMetadata.clrmid, onSuccess, onError);
                 } else if(onSuccess) {
                     onSuccess();
@@ -742,25 +743,25 @@ var CLRM = function(crowdlogger){
         };
 
         unload = function(isOkayToUpdate){
-            crowdlogger.log('Unloading '+ clrmMetadata.clrmid);
             if( isOkayToUpdate ){
+                crowdlogger.debug.log('Unloading '+ clrmMetadata.clrmid);
                 that.unloadCLRM({
                     clrmid: clrmMetadata.clrmid, 
                     reason: 'newversion',
                     on_success: install,
                     on_error: install
                 });
-            } else if(onSuccess) {
-                onSuccess();
+            } else {
+                install(false);
             }
         };
 
         // Check that the CLRM is in a good spot to uninstall.
         crowdlogger.api.cli.base.invokeCLRMMethod({
-            clrmid: clrmMetadata, 
+            clrmid: clrmMetadata.clrmid, 
             method: 'isOkayToUpdate',
             on_success: unload,
-            on_error: onError
+            on_error: install
         });
     };
 
@@ -788,6 +789,8 @@ var CLRM = function(crowdlogger){
 
             processNext = function(){
                 if(updatableCLRMs.length > 0){
+                    crowdlogger.debug.log('Found update:');
+                    crowdlogger.debug.log(updatableCLRMs[0]);
                     that.updateCLRM(
                         updatableCLRMs.shift(), 
                         processNext, 
