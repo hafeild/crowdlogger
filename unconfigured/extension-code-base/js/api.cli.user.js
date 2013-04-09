@@ -155,7 +155,8 @@ CLI.prototype.User.prototype.RealTime = function(crowdlogger, cli){
             'query-entered', 
             'page-loaded',
             'link-clicked',
-            'page-focused'
+            'page-focused',
+            'page-blurred'
         ];
 
     // Private function declarations.
