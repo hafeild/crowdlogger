@@ -16,9 +16,9 @@ CLRMI.prototype.Storage = function( api, id ){
     // Private variables.
     var that = this,
         dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase(),
-        upgrading = true;
-
-
+        upgrading = true,
+        MIN_CHUNK_SIZE = 25,
+        MAX_CHUNK_SIZE = 100;
 
     // Private function declarations.
     var init, wrapCallback, addUpgradeCheck, updateWithoutForeach, 
