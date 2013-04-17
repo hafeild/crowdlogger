@@ -43,7 +43,7 @@ several sub namespaces:
 <ul>
     <li><code>api.user.history</code> for accessing a user's search interactions
         up until the current moment.
-    <li><code>api.user.realtime</code> to listen for new 
+    <li><code>api.user.realTime</code> to listen for new 
         interactions as they happen.
     <li><code>api.user.storage</code> for saving state.
 </ul>
@@ -657,26 +657,31 @@ need to?
 
 <a name="realtime"></a>
 <h2>Accessing Real-time User Activity</h2>
+<ul>
+    <li><code><a href="#user:addlisteners">api.user.realTime.addActivityListeners</a></code>
+        <li><code><a href="#user:removelisteners">api.user.realTime.removeActivityListeners</a></code>
+</ul>
 
+<a name="addlisteners"></a>
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
     <div class="top-bottom top-tag"><a href="#">top</a></div>
     <h3>Attaching listeners<br/>
-        <code>api.user.realtime.addActivityListeners</code></h3>
+        <code>api.user.realTime.addActivityListeners</code></h3>
 
     <h4>Parameters</h4>
     {object} A map of event listeners:
     <ul>
-        <li>{function} <code>search</code>
+        <li>{function} <code>query-entered</code>
             <ul>The callback for new search events.</ul>
 
-        <li>{function} <code>click</code>
+        <li>{function} <code>link-clicked</code>
             <ul>The callback for new click events.</ul>
 
-        <li>{function} <code>pageload</code>
+        <li>{function} <code>page-loaded</code>
             <ul>The callback for new page load events.</ul>
 
-        <li>{function} <code>pagefocus</code>
+        <li>{function} <code>page-focused</code>
             <ul>The callback for new page focus events.</ul>
     </ul>
     <p>
@@ -689,10 +694,44 @@ need to?
 
     <h4>Description</h4>
     <p>
-        You can use <code>api.user.realtime.addActivityListeners</code> to 
+        You can use <code>api.user.realTime.addActivityListeners</code> to 
         access new interactions as they happen.
     </p>
 </div>
+
+<a name="removelisteners"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Removing listeners<br/>
+        <code>api.user.realTime.removeActivityListeners</code></h3>
+
+    <h4>Parameters</h4>
+    {object} A map of event listeners:
+    <ul>
+        <li>{function} <code>query-entered</code>
+            <ul>The callback for new search events.</ul>
+
+        <li>{function} <code>link-clicked</code>
+            <ul>The callback for new click events.</ul>
+
+        <li>{function} <code>page-loaded</code>
+            <ul>The callback for new page load events.</ul>
+
+        <li>{function} <code>page-focused</code>
+            <ul>The callback for new page focus events.</ul>
+    </ul>
+
+    <h4>Description</h4>
+    <p>
+        It's a good idea to remove listeners when a CLRM is unloaded. You can
+        use <code>api.user.realTime.removeActivityListeners</code> exactly
+        as you used its <code>addActivityListeners</code> counterpart. Invoking
+        this function will prevent the given functions from receiving events
+        in the future.
+    </p>
+</div>
+
 
 
 
