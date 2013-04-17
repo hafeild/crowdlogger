@@ -24,6 +24,7 @@ Version: %%VERSION%%
             <ul>
                 <li><a href="#ui:openWindow">api.ui.openWindow</a>
                 <li><a href="#ui:getFaviconURL">api.ui.getFaviconURL</a>
+                <li><a href="#ui:setMessageFlag">api.ui.setMessageFlag</a>
             </ul>
         <li><a href="#ui:crowdlogger">CrowdLogger Widget API</a>
         <li><a href="#ui:page">Content Pages</a>
@@ -117,6 +118,59 @@ In the sections that follow, we assume that the CLRM API instance passed to your
         (<code>url</code>). The URL of the default favicon will be returned if no favicon is found. The generated URL is a browser resource and can only 
         access cached favicons.
     </p>
+</div>
+
+
+<a name="setMessageFlag"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3><code>api.ui.setMessageFlag</code></h3>
+    <h4>Parameters</h4>
+        <p>
+            None.
+        </p>
+
+    <h4>Description</h4>
+    <p>
+        Tells CrowdLogger that there is at least one CLRM with an important
+        message. This causes an alert badge to be placed over the CrowdLogger
+        toolbar icon and a notification at the top of the Status page asserting
+        that one or more Apps or Studies have pending messages.
+    </p>
+    <p>
+        The Status page displays messages from all CLRMs, whether or not there
+        is a message alert pending using the <code>getMessage</code> method
+        that each CLRM is required to have. If you have triggered the message
+        flag, update your <code>getMessage</code> method to return the pending
+        message.
+    </p>
+
+
+    <h4>Examples</h4>
+    <p>
+        Suppose we have a CLRM that periodically checks a server for messages.
+        Upon receiving a new message, the code below will update the message
+        to be displayed and notify CrowdLogger.
+    </p>
+
+<pre class="prettyprint">
+var curMessage = 'No messages.';
+
+// ...
+
+// Saves the message and alerts users that a message is pending.
+function onNewMessageFromServer(message){
+    curMessage = message;
+    clrmAPI.ui.setMessageFlag();
+}
+
+// This is the required getMessage method.
+this.getMessage = function(){
+    return curMessage;
+};
+</pre> 
+
 </div>
 
 

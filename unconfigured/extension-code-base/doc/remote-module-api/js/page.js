@@ -40,7 +40,7 @@ function expand_menu(name) {
 }
 
 function load_page(url) {
-    jQuery('#tmp-contents').attr('src', url)
+    jQuery('#tmp-contents').attr('src', url+'?t='+new Date().getTime());
 }
 
 function add_listeners(){

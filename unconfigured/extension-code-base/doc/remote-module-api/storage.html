@@ -19,23 +19,29 @@ Version: %%VERSION%%
     <h2>Contents</h2>
     <ul>
         <!-- <li><a href="#home">Home</a> -->
-        <li><a href="#storage:addstore">Add stores</a>
-        <li><a href="#storage:removestore">Remove stores</a>
-        <li><a href="#storage:clearstore">Clear stores</a>
-        <li><a href="#storage:liststores">List current stores</a>
-        <li><a href="#storage:save">Save data</a>
-        <li><a href="#storage:read">Read batches of saved data</a>
-        <li><a href="#storage:update">Delete/update saved data</a>
-        <li><a href="#storage:remove">Delete saved data</a>
-        <li><a href="#storage:removedb">Remove the database</a>
-        <li><a href="#storage:setpref">Set a preference</a>
-        <li><a href="#storage:getpref">Get a preference</a>
-
+        <li><a href="#storage:storage">Database Storage</a>
+        <ul>
+            <li><a href="#storage:addstore">Add stores</a>
+            <li><a href="#storage:removestore">Remove stores</a>
+            <li><a href="#storage:clearstore">Clear stores</a>
+            <li><a href="#storage:liststores">List current stores</a>
+            <li><a href="#storage:save">Save data</a>
+            <li><a href="#storage:read">Read batches of saved data</a>
+            <li><a href="#storage:update">Delete/update saved data</a>
+            <li><a href="#storage:remove">Delete saved data</a>
+            <li><a href="#storage:removedb">Remove the database</a>
+        </ul>
+        <li><a href="#preferences">Preferences</a>
+        <ul>
+            <li><a href="#storage:setpref">Set a preference</a>
+            <li><a href="#storage:getpref">Get a preference</a>
+        </ul>
     </ul>
 </div>
 
 
-<h1>Storage</h1>
+<a name="storage"></a>
+<h1>Database Storage</h1>
 
 <p>
 
@@ -61,8 +67,6 @@ shares that id in the store. The following functionalities are provided:
     <li><code><a href="#storage:update">api.storage.update</a></code>
     <li><code><a href="#storage:remove">api.storage.remove</a></code>
     <li><code><a href="#storage:removedb">api.storage.removeDatabase</a></code>
-    <li><code><a href="#storage:setpref">api.storage.preferences.set</a></code>
-    <li><code><a href="#storage:getpref">api.storage.preferences.get</a></code>
 </ul>
 
 
@@ -758,6 +762,25 @@ CROWDLOGGER.io.log.read_extension_log({
         will help keep users' computers tidy.
     </p>
 </div>
+
+
+
+
+<a name="preferences"></a>
+<h2>Preferences</h2>
+<p>
+    The storage API has a specialized sub class for storing and getting 
+    preferences. The key differences are that with preferences, the preference
+    name is the id and retrieval id done a bit quicker, using an index over the
+    database. Preferences access is available via 
+    <code>api.storage.preferences</code>. The following methods are available:
+</p>
+
+<ul>
+    <li><code><a href="#storage:setpref">api.storage.preferences.set</a></code>
+    <li><code><a href="#storage:getpref">api.storage.preferences.get</a></code>
+</ul>
+
 
 <!-- Set a preference. -->
 <a name="setpref"></a>
