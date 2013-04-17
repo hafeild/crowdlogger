@@ -17,7 +17,8 @@ CLRMI.prototype.Storage = function( api, id ){
     var that = this,
         dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase(),
         upgrading = true,
-        MIN_CHUNK_SIZE = 25,
+        MIN_CHUNK_SIZE = 1,
+        DEFAULT_CHUNK_SIZE = 25,
         MAX_CHUNK_SIZE = 100;
 
     // Private function declarations.
@@ -524,6 +525,8 @@ CLRMI.prototype.Storage = function( api, id ){
             chunk_size = opts.chunk_size;
         } else if( opts.chunk_size && opts.chunk_size > MAX_CHUNK_SIZE ){
             chunk_size = MAX_CHUNK_SIZE;
+        } else if( !opts.chunk_size || opts.chunk_size < MIN_CHUNK_SIZE ){
+            chunk_size = DEFAULT_CHUNK_SIZE;
         }
 
         return api.base.invokeCLIFunction({
@@ -535,7 +538,8 @@ CLRMI.prototype.Storage = function( api, id ){
                 storeName: opts.store,
                 reverse: opts.reverse,
                 lower_bound: opts.lower_bound,
-                upper_bound: opts.upper_bound
+                upper_bound: opts.upper_bound,
+                chunk_size: chunk_size
             }
         });
     };

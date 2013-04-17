@@ -40,9 +40,9 @@ CLRMI.prototype.User = function( api ){
 CLRMI.prototype.User.prototype.History = function( api ){
     // Private variables.
     var that = this;
-    const MAX_CHUNK_SIZE = 500,
+    const MAX_CHUNK_SIZE = 100,
           MIN_CHUNK_SIZE = 1,
-          DEFAULT_CHUNK_SIZE = 250;
+          DEFAULT_CHUNK_SIZE = 25;
 
 
     // Private function declarations.
