@@ -59,20 +59,22 @@ CROWDLOGGER.io.network.get_server_url = function( page_name, the_default ){
  *                        data.
  */
 CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error, 
-            method, bypass_firewall_check ){
+            method, bypass_firewall_check, ping_url ){
+
 
     // Check if this url is https -- if so, we need to ping the 'ping server'
     // first to make sure there is an internet connection. This is a precaution
     // in the event that the user's computer has pulled an ip address, but is
     // behind a firewall (e.g., at a hotel with a sign-in page).
     if(  url.match(/^https/) && !bypass_firewall_check ){
-        CROWDLOGGER.io.network.send_data( 
+        ping_url = ping_url ||
             CROWDLOGGER.preferences.get_char_pref( "ping_server_url", 
-                                                   "http://www.google.com" ),
-            "", function(){ 
-                CROWDLOGGER.io.network.send_data( 
-                    url, data, on_success, on_error, method, true ); 
-            }, on_error, "GET", true );
+                                                   "http://www.google.com" );
+
+        CROWDLOGGER.io.network.send_data( ping_url, "", function(){ 
+            CROWDLOGGER.io.network.send_data( 
+                url, data, on_success, on_error, method, true ); 
+        }, on_error, "GET", true );
         return true;
     }
 

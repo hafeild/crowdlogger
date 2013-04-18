@@ -347,14 +347,14 @@ var Controller = function(sta, view){
         var task1 = model.tasks[data.task1Id];
         task1.mergeWith([data.task2Id]);
 
-        sta.messages.trigger('deleted-task', {
-            taskId: data.task2Id,
-            mergedWith: data.task1Id
-        });
+        // sta.messages.trigger('deleted-task', {
+        //     taskId: data.task2Id,
+        //     mergedWith: data.task1Id
+        // });
 
-        sta.messages.trigger('updated-task', {
-            taskId: data.task1Id
-        });
+        // sta.messages.trigger('updated-task', {
+        //     taskId: data.task1Id
+        // });
     };
 
     /**
