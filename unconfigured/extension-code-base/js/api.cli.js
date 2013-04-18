@@ -21,6 +21,7 @@ var CLI = function(crowdlogger){
         that.ui = new that.UserInterface(crowdlogger, that);
         that.user = new that.User(crowdlogger, that);
         that.storage = new that.Storage(crowdlogger, that);
+        that.ssa = new that.ServerSideAccess(crowdlogger, that);
         return that;
     };
 

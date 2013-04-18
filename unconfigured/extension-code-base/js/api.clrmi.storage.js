@@ -12,7 +12,7 @@
  * Provides the storage API for the CrowdLogger Remote Modules (CLRMs)-side  
  * interface (CLRMI).
  */
-CLRMI.prototype.Storage = function( api, id ){
+CLRMI.prototype.Storage = function( api, id, forUninstall ){
     // Private variables.
     var that = this,
         dbName = 'db_'+id.replace(/\W/g, '_').toLowerCase(),
@@ -103,8 +103,13 @@ CLRMI.prototype.Storage = function( api, id ){
                 // Invoke the original on_chunk function.
                 opts.on_chunk(params.data, next, abort);
             } else {
-                if( params.event === 'on_error' && opts.on_error ){
-                    opts.on_error(params.error);
+                if( params.event === 'on_error' ){
+                    api.base.log('Error performing storage op:')
+                    api.base.log(params.error);
+                    
+                    if( opts.on_error ){
+                        opts.on_error(params.error);
+                    }
                 } else if( params.event === 'on_success' && opts.on_success ) {
                     opts.on_success(params.data);
                 }
@@ -672,7 +677,11 @@ CLRMI.prototype.Storage = function( api, id ){
     };
 
 
-    init();
+    if(forUninstall){ 
+        upgrading = false;
+    } else {
+        init(); 
+    }
 };
 
 /**

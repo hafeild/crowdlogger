@@ -196,6 +196,7 @@ CLRMI.prototype.Base = function(api) {
      * </ul>
      */
     unloadCLRM = function(data){
+        that.log('In CLRMI.unloadCLRM');
         // Check if we have all the necessary params.
         if( !data || !data.clrmid || !data.reason ){
             if( data.callbackID ){
@@ -213,6 +214,8 @@ CLRMI.prototype.Base = function(api) {
 
         // Invoked when the CLRM has been unloaded.
         var onsuccess = function(){
+            that.log(data.clrmid +' success');
+
             if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
@@ -223,6 +226,7 @@ CLRMI.prototype.Base = function(api) {
 
         // Invoked on an error.
         var onerror = function(error){
+            that.log(data.clrmid +' error: '+ error);
             if( data.callbackID ){
                 that.invokeCLICallback({
                     callbackID: data.callbackID,
@@ -232,10 +236,11 @@ CLRMI.prototype.Base = function(api) {
         }        
 
         var removeDB = function(){
+            that.log('Removing DB for '+ data.clrmid);
             if(modules[data.clrmid]){
                 delete modules[data.clrmid];
             }
-            var storage = new api.Storage(api, data.clrmid);
+            var storage = new api.Storage(api, data.clrmid, true);
             storage.removeDatabase({
                 on_success: onsuccess,
                 on_error: onerror
@@ -246,14 +251,14 @@ CLRMI.prototype.Base = function(api) {
         try{
             modules[data.clrmid].unload(data.reason, 
                 data.reason === 'uninstall' ? removeDB : onsuccess, 
-                onerror)
+                data.reason === 'uninstall' ? remvoeDB : onerror)
         } catch(e) {
         //if( !modules[data.clrmid] ){
             if( data.reason === 'uninstall' ){
                 removeDB();
             } else if( data.callbackID ){
                 var options = {};
-                if( !modues[data.clrmid] ){
+                if( !modules[data.clrmid] ){
                     onsuccess();
                 } else {
                     onerror('[clrmi.base.unloadCLRM] '+ e);
@@ -261,8 +266,6 @@ CLRMI.prototype.Base = function(api) {
             }
             return;
         }
-
-
     };
 
     /**

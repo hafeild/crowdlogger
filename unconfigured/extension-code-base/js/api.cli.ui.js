@@ -19,6 +19,14 @@ CLI.prototype.UserInterface = function(crowdlogger, cli){
     this.setMessageFlag;
      
     // Private function definitions.
+    init = function(){
+        if( crowdlogger.version.info.is_chrome ){
+            // This ensures that new popup windows are focused on creation.
+            chrome.windows.onCreated.addListener(function(win) { 
+                chrome.windows.update(win.id, {focused: true});  
+            });
+        }
+    };
 
     // Public function definitions.
 
@@ -29,4 +37,6 @@ CLI.prototype.UserInterface = function(crowdlogger, cli){
         crowdlogger.notifications.set_notification('study_updates');
     };
 
+
+    init();
 }

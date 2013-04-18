@@ -75,6 +75,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
             crowdlogger.jq(window).bind('message', onMessage);
             clrmi = frame[0].contentWindow;
         } else {
+
             var clrm_url = 'data:text/html,'+encodeURIComponent(
                 '<html>'+
                 '<head>'+
@@ -87,6 +88,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
                 '<script src="'+path+'js/api.clrmi.ui.js"></script>'+
                 '<script src="'+path+'js/api.clrmi.util.js"></script>'+
                 '<script src="'+path+'js/api.clrmi.storage.js"></script>'+
+                '<script src="'+path+'js/api.clrmi.ssa.js"></script>'+
                 '<!-- Gives us the api variable. -->'+
                 '<script src="'+path+'html-js/clrm.js"></script>'+
                 '</head>'+
@@ -110,6 +112,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
 
             attachContentWindow();
         }
+
 
         messageHandlers.cliRequest = invokeCLIFunction;
         messageHandlers.cliCallback = invokeCLICallback;
