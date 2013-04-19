@@ -707,23 +707,56 @@ CLRMI.prototype.Storage.prototype.Preferences = function(api, storage,callback){
      * Initializes the preference storage.
      */
     init = function() {
-        var callbackID = storage.wrapCallback({
+        var callbackIDForListStores, callbackIDForUpgrade;
+
+        callbackIDForUpgrade  = storage.wrapCallback({
             on_success: callback,
+            on_error: callback
+        });
+
+        callbackIDForListStores = storage.wrapCallback({
+            on_success: function(stores){
+                if( stores.indexOf(PREFERENCE_STORE) ){
+                    api.base.invokeCLIFunction({
+                        apiName: 'storage',
+                        functionName: 'upgradeDB',
+                        options: {
+                            callbackID: callbackIDForUpgrade,
+                            dbName: storage.dbName,
+                            storeNames: [PREFERENCE_STORE],
+                            keyName: PREFERENCE_KEY_NAME,
+                            indexName: PREFERENCE_INDEX_NAME,
+                            storeOp: 'createIndexStore'
+                        }
+                    });
+                } else {
+                    if(callback){ callback(); }
+                }
+            },
             on_error: callback
         });
 
         return api.base.invokeCLIFunction({
             apiName: 'storage',
-            functionName: 'upgradeDB',
+            functionName: 'listStores',
             options: {
-                callbackID: callbackID,
-                dbName: storage.dbName,
-                storeNames: [PREFERENCE_STORE],
-                keyName: PREFERENCE_KEY_NAME,
-                indexName: PREFERENCE_INDEX_NAME,
-                storeOp: 'createIndexStore'
+                callbackID: callbackIDForListStores,
+                dbName: storage.dbName
             }
         });
+
+        // return api.base.invokeCLIFunction({
+        //     apiName: 'storage',
+        //     functionName: 'upgradeDB',
+        //     options: {
+        //         callbackID: callbackID,
+        //         dbName: storage.dbName,
+        //         storeNames: [PREFERENCE_STORE],
+        //         keyName: PREFERENCE_KEY_NAME,
+        //         indexName: PREFERENCE_INDEX_NAME,
+        //         storeOp: 'createIndexStore'
+        //     }
+        // });
     };
 
     /**
