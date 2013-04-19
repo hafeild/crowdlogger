@@ -977,10 +977,11 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
             request.onsuccess = function(){
                 if(opts.on_success){ opts.on_success(); }
             };
-            request.onerror = function(event){
+            request.onerror = request.onblocked = function(event){
                 if(opts.on_error){ opts.on_error({
                     errorCode: event.target.errorCode}); }
             };
+
         //}
     }
 
@@ -2058,7 +2059,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 opts.on_error);
         }
 
-        crowdlogger.debug.log('Opening DB...');
+        crowdlogger.debug.log('Opening DB '+ opts.db_name +'...');
 
         // Open the database.
         var request = opts.db_version ?
@@ -2090,7 +2091,8 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         request.onsuccess = function(event){
             var db = request.result;
 
-            crowdlogger.debug.log('DB opened; version: '+ db.version);
+            crowdlogger.debug.log('DB '+ opts.db_name +' opened; version: '+ 
+                db.version);
             // For older versions of chrome.
             if( opts.db_version && 
                     parseInt(db.version) !== opts.db_version && db.setVersion ){
@@ -2112,14 +2114,16 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
 
         };
 
-        request.onblocked = function(event){
-            crowdlogger.debug.log('DB blocked!');
-        };
+        request.onblocked = request.onerror;
+
+        //  = function(event){
+        //     crowdlogger.debug.log('DB blocked!');
+        // };
 
         // Invoked if the database needs to be upgraded.
         request.onupgradeneeded = function(event){
-            crowdlogger.debug.log('Upgrading DB; current version: '+ 
-                request.result.version);
+            crowdlogger.debug.log('Upgrading DB '+ opts.db_name +
+                '; current version: '+ request.result.version);
             if( opts.on_upgrade ){ opts.on_upgrade(request.result); }
         }; 
 

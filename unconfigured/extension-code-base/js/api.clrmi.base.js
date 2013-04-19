@@ -378,7 +378,7 @@ CLRMI.prototype.Base = function(api) {
      * Sends a message to the CLI.
      */
     this.sendMessage = function(message){
-        console.log('CLRMI sending a message: '+ JSON.stringify(message) +'\n');
+        // console.log('CLRMI sending a message: '+ JSON.stringify(message) +'\n');
 
         message.from = 'CLRMI';
         parent.postMessage(message, '*');

@@ -426,8 +426,8 @@ CLI.prototype.Base = function(crowdlogger, cli){
     this.registerCallback = function(callback){
         var callbackID = nextFunctionID++;
         functionMap[callbackID] = callback;
-        crowdlogger.debug.log('Callback ID ['+ callbackID +'] given to: '+
-            callback);
+        // crowdlogger.debug.log('Callback ID ['+ callbackID +'] given to: '+
+            // callback);
         return callbackID;
     };
 
@@ -438,7 +438,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
      */
     this.unregisterCallback = function(callbackID){
         if( functionMap[callbackID] ){
-            crowdlogger.debug.log('Unregistering Callback ID ['+callbackID+']');
+            // crowdlogger.debug.log('Unregistering Callback ID ['+callbackID+']');
             delete functionMap[callbackID];
         }
     };
