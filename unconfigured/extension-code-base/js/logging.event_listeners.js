@@ -31,7 +31,9 @@ if( CROWDLOGGER.logging.event_listeners === undefined ){
  */
 CROWDLOGGER.logging.event_listeners = {
     placed_listeners: {},
-    id: 0
+    id: 0,
+    // I.e., {<clrmid>: {id: <clrmid>, script: <script>, callback: <callback> }}
+    clrm_script_details: {} 
 };
 
 CROWDLOGGER.logging.event_listeners.mk_listener_observer = function(on_unload){
@@ -108,7 +110,10 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
                         replace( /\s*\}\s*$/, "").
                         replace( /TAB_ID/, '"'+ tab_id +'"' ).
                         replace( /IS_CHROME/, 'true').
-                        replace( /IS_FOCUSED/, tab.selected.toString()),
+                        replace( /IS_FOCUSED/, tab.selected.toString()
+                    ) +'\n'+ 
+                    CROWDLOGGER.logging.event_listeners.
+                        inject_clrm_listeners_chrome(tab_id+"", tab.selected),
                 // We want to inject this script into all frames.
                 allFrames: true
             });
@@ -225,10 +230,16 @@ CROWDLOGGER.logging.event_listeners.add_page_load_listeners_firefox =
                 var tab_id = 
                     CROWDLOGGER.logging.event_listeners.extract_tab_id_ff(
                         the_window.gBrowser.getBrowserForTab( e.target ) );
-                
+                var is_focused = 
+                    CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id;
+                // Load the core CrowdLogger content script.
                 CROWDLOGGER.logging.event_listeners.inject_page_listeners(
-                    current_window, tab_id, false, 
-                    CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id);
+                    current_window, tab_id, false, is_focused);
+
+                // Load the CLRM content scripts.
+                CROWDLOGGER.logging.event_listeners.
+                    inject_clrm_listeners_firefox(
+                        current_window, tab_id, is_focused);
             }
         }, true );
     }, false);
@@ -368,6 +379,10 @@ CROWDLOGGER.logging.event_listeners.tab_addition_and_removal_listener =
 
         // Log the removal.
         CROWDLOGGER.logging.log_tab_removed(new Date().getTime(), tab_id); 
+
+        // Clear the corresponding tab's message passing listener.
+        CROWDLOGGER.logging.event_listeners.
+            firefox_tab_message_listeners[tab_id] = null;
     };
 
     // Logs that a tab was selected.
@@ -426,11 +441,16 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
                     nsIWebProgressListener.STATE_IS_WINDOW ) ) {
 
             var win = browser.contentWindow;
-
+            var is_focused = 
+                CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id;
             // Add the page listeners (for clicks and searches, etc.)
             CROWDLOGGER.logging.event_listeners.inject_page_listeners(
-                win, tab_id, false,
-                CROWDLOGGER.session_data.last_selected_tab.tab_id===tab_id);
+                win, tab_id, false, is_focused);
+
+            // Load the CLRM content scripts.
+            CROWDLOGGER.logging.event_listeners.
+                inject_clrm_listeners_firefox(
+                    current_window, tab_id, is_focused);
 
             // If this is a non 'clrm.html' extension page, set the CROWDLOGGER
             // variable so it can finish loading itself.
@@ -466,7 +486,158 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
         same_uri ) { return true; },
 
     onLinkIconAvailable : function( a_browser ) {}
-}
+};
+
+/**
+ * For use with Chrome, this function returns a string that can be injected into
+ * a content page. 
+ *
+ * @param {string} tabID     The id of the tab.
+ * @param {boolean} isFocused Whether or not the page is currently in focus.
+ */
+CROWDLOGGER.logging.event_listeners.inject_clrm_listeners_chrome = function(
+        tabID, isFocused ){
+    var clrmid,
+        scripts = CROWDLOGGER.logging.event_listeners.clrm_script_details,
+        output = '(function(){ '+
+            'var registerCallback; '+
+            '(function(){'+
+            '    var nextCallbackId = 0,'+
+            '        callbackRegistry = {};\n'+
+            '   registerCallback = '+ String(function(callback){
+                    var callbackID = nextCallbackId++;
+                    callbackRegistry[callbackID] = function(data){
+                        callback(data);
+                    };
+                }) +';n'+
+            '   chrome.runtime.onMessage.addListener('+
+            '       function(message, sender, sendResponse) {'+
+            '           if(callbackRegistry[message.callbackID]){ '+
+            '                callbackRegistry[message.callbackID]('+
+            '                    message.message);'+
+            '                delete callbackRegistry[message.callbackID];'+
+            '           } '+
+            '       }'+
+            '   );\n'+
+            '})()';
+        
+    for( clrmid in scripts ){
+        // Only inject the script if it is non-empty. Empty scripts are possible
+        // when a CLRM content script is de-registered.
+        if( script[clrmid].script ){
+            output += CROWDLOGGER.logging.event_listeners.
+                inject_clrm_listener_chrome(
+                    scripts[clrmid], tabID, isFocused) +'\n';
+        }
+    }
+
+    return output + '})()';
+};
+
+/**
+ * For use with Chrome, this function returns a string that can be injected into
+ * a content page. 
+ *
+ * @param {object} clrmScript Should consist of two fields: 
+ * <ul>
+ *     <li>{string} script    The script to run. Should be self executing.
+ *     <li>{string} id        The id of the CLRM. 
+ * </ul>
+ * @param {string} tabID      The id of the tab.
+ * @param {boolean} focusedAtLoad Whether or not the page is currently in focus.
+ */
+CROWDLOGGER.logging.event_listeners.inject_clrm_listener_chrome = function(
+        clrmScript, tabID, focusedAtLoad ){
+    var i;
+    var output = '(function(){'+
+        'var tabID = "'+ tabID +'",'+
+        '    focusedAtLoad = '+ focusedAtLoad +','+
+        '    sendMessage = '+ String(function(msg, callback){
+            chrome.extension.sendRequest({
+                name: "clrm",
+                version: clrmScript.version,
+                clrmid: clrmScript.id,
+                message: msg,
+                tabID: tabID,
+                callbackID: callback ? registerCallback(callback) : null
+            });
+        }) + ';\n';
+
+    return output + clrmScript.script +'\n})()';
+};
+
+/**
+ * Evaluates the given CLRMI scripts on the given window. This is only for 
+ * Firefox.
+ *
+ * @param {object} win       The window of the content page.
+ * @param {string} tabID     The id of the tab.
+ * @param {boolean} isFocused Whether or not the page is currently in focus.
+ */
+CROWDLOGGER.logging.event_listeners.inject_clrm_listeners_firefox = function(
+         win, tabID, isFocused){
+    var clrmid,
+        scripts = CROWDLOGGER.logging.event_listeners.clrm_script_details,
+        nextCallbackId = 0,
+        callbackRegistry = {},
+        registerCallback = function(callback){
+            var callbackID = nextCallbackId++;
+            callbackRegistry[callbackID] = function(data){
+                callback(data);
+            };
+        };
+
+    CROWDLOGGER.logging.event_listeners.
+            firefox_tab_message_listeners[tabID] = function(id, message){
+        if( callbackRegistry[id] ){
+            callbackRegistry[id](message);
+            delete callbackRegistry[id];
+        }
+    };
+
+    for( clrmid in scripts ){
+        // Only inject the script if it is non-empty. Empty scripts are possible
+        // when a CLRM content script is de-registered.
+        if( script[clrmid].script ){
+            CROWDLOGGER.logging.event_listeners.inject_clrm_listener_firefox(
+                scripts[clrmid], win, tabID, isFocused, registerCallback);
+        }
+    }
+};
+
+/**
+ * Evaluates a single CLRMI script on the given window. This is only for 
+ * Firefox.
+ *
+ * @param {object} clrmScript Should consist of two fields: 
+ * <ul>
+ *     <li>{string} script    The script to run. Should be self executing.
+ *     <li>{string} id        The id of the CLRM. 
+ * </ul>
+ * @param {object} win       The window of the content page.
+ * @param {string} tabID     The id of the tab.
+ * @param {boolean} focusedAtLoad Whether or not the page is currently in focus.
+ * @param {function} registerCallback Used to register a callback function.
+ */
+CROWDLOGGER.logging.event_listeners.inject_clrm_listener_firefox = function( 
+        clrmScript, win, tabID, focusedAtLoad, registerCallback){
+
+    var CL_SEND_MSG = CROWDLOGGER.logging.event_listeners.
+            on_content_script_message,
+        sendMessage = function(msg, callback){
+            CL_SEND_MSG({
+                name: "clrm",
+                version: clrmScript.version,
+                clrmid: clrmScript.id,
+                message: msg,
+                tabID: tabID,
+                callbackID: callback ? registerCallback(callback) : null
+            });
+        },
+        CROWDLOGGER = null,
+        window = win;
+    eval(clrmScript.script);
+};
 
 /**
  * This is a function that will attach the necessary listeners on a page,
@@ -1219,7 +1390,43 @@ CROWDLOGGER.logging.event_listeners.on_content_script_message =
     } else if( message.name === 'blur' ){
         CROWDLOGGER.logging.log_page_blur( message.time,
             message.tab_id, message.url, message.title );
+
+    // Forward message to CLRM.
+    } else if( message.name === 'clrm' ){
+        var scripts = CROWDLOGGER.logging.event_listeners.clrm_script_details;
+        if( scripts[message.clrmid] && 
+                scripts[message.clrmid].version === message.version &&
+                scripts[message.clrmid].on_message ){
+
+            scripts[message.clrmid].on_message( message.message,
+                message.callbackID ? CROWDLOGGER.logging.event_listeners.
+                    clrm_content_script_callback(
+                        message.tabID, message.callbackID) : null );
+        }
     }
 };
+
+CROWDLOGGER.logging.event_listeners.clrm_content_script_callback = 
+        function(tabID, callbackID) {
+    // Chrome.
+    if( chrome && chrome.tabs ){
+        return function(message){
+            chrome.tabs.sendMessage(tabID, {
+                callbackID: callbackID, 
+                message: message
+            });
+        };
+    // Firefox.
+    } else {
+        var callback = CROWDLOGGER.logging.event_listeners.
+                firefox_tab_message_listeners[tabID];
+
+        return function(message){
+            if( callback ){
+                callback(callbackID, message);
+            }
+        };
+    }
+}
 
 } // END CROWDLOGGER.logging.event_listeners NAMESPACE.

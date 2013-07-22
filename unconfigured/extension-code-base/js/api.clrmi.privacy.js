@@ -115,7 +115,7 @@ CLRMI.prototype.Privacy.prototype.SecretSharing = function(api,sharedFunctions){
             apiName: 'privacy.secretSharing',
             functionName: 'packAndSendArtifacts',
             options: {
-                callbackID: wrapCallback(opts),
+                callbackID: sharedFunctions.wrapCallback(opts),
                 artifacts: opts.artifacts,
                 id: opts.id,
                 n: opts.n,

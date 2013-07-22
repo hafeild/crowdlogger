@@ -12,7 +12,7 @@
  * Provides the UI API for the CrowdLogger Remote Modules (CRMs)-side interface 
  * (CRMI).
  */
-CLRMI.prototype.UserInterface = function(api){
+CLRMI.prototype.UserInterface = function(api, clrmid){
     // Private variables.
     var defaultWindowOptions = {
             url: '',
@@ -26,6 +26,9 @@ CLRMI.prototype.UserInterface = function(api){
 
     // Private functions.
     var copyDefaults, onMessage, appendScript, init;
+
+    // Public variables.
+    this.contentScripts = new this.ContentScripts(api, clrmid);
 
     // Public functions.
     this.openWindow, this.dereferenceModuleResources, this.getFaviconURL,
@@ -293,4 +296,132 @@ CLRMI.prototype.UserInterface = function(api){
             loggingWindow.close();
         }
     };
-}
+};
+
+
+CLRMI.prototype.UserInterface.prototype.ContentScripts = function(api, clrmid){
+    // Private variables.
+    var that = this;
+
+    // Private functions.
+    var wrapCallback;
+
+    // Public functions.
+    this.registerContentScript;
+    this.unregisterContentScript;
+
+    // Private function definitions.
+
+    /**
+     * Serves as a wrapper for callback. Given a set of options (e.g., to one
+     * of the public methods below), this function will create and register a
+     * callback wrapper that can support on_success and on_error.
+     *
+     * @param {object} opts  A map of options.
+     * OPTIONAL:
+     * <ul>
+     *    <li>{function} on_message  Called if the event field of the object
+     *                               passed to the callback is 'on_message'.
+     *                               The value of the 'message' field will be
+     *                               passed to this function.
+     *    <li>{function} on_success  Called if the event field of the object 
+     *                               passed to the callback is 'on_success'. The
+     *                               value of the 'data' field will be passed
+     *                               to this function.
+     *    <li>{function} on_error    Called if the event field of the object
+     *                               passed to the callback is 'on_error'. The
+     *                               value of the 'error' field will be passed
+     *                               to this function.
+     * </ul>
+     * @return The id of the registered callback.
+     */
+    wrapCallback = function(opts){
+        var callbackID;
+        var callback = function(params){
+            if( params.event === 'on_error' && opts.on_error ){
+                opts.on_error(params.error);
+            } else if( params.event === 'on_message' && opts.on_message ) {
+                var callback2 = params.callbackID ? function(data){
+                    api.base.invokeCLICallback({
+                        callbackID: params.callbackID,
+                        options: data
+                    });
+                } : undefined;
+                opts.on_message(params.message, callback2);
+            } else if( params.event === 'on_success' && opts.on_success ) {
+                opts.on_success(params.data);
+            }
+            api.base.unregisterCallback(callbackID);
+        };
+
+        callbackID = api.base.registerCallback(callback);
+        return callbackID;
+    };
+
+    // Public function definitions.
+
+    /**
+     * Registers a content script to be injected into every page. Any existing 
+     * content script for this CLRM module will be overwritten. If older content
+     * scripts exist and there are open pages, they will be deactivated; 
+     * however, the new script will not be added to already opened pages.
+     *
+     * @param {object} opts     A map of options:
+     * REQUIRED:
+     * <ul>
+     *     <li>{string} script       The script to inject.
+     * </ul>
+     * OPTIONAL:
+     * <ul>
+     *     <li>{function} on_message:   Invoked when the content script
+     *                                  sends a message via 
+     *                                  <code>sendMessage</code>.
+     *     <li>{function} on_success:   Invoked when the content script
+     *                                  has been registered.
+     *     <li>{function} on_error:     Invoked if there's an error.
+     * </ul>
+     */
+    this.registerContentScript = function(opts) {
+        // Checks that all of the required parameters are present.
+        // This will throw an exception if there are missing arguments.
+        api.util.checkArgs(opts, ['script'], 
+            'clrmi.ui.contentScripts.registerContentScript');
+
+
+        // Pass the data one to the CLI.
+        api.base.invokeCLIFunction({
+            apiName: 'ui.contentScripts',
+            functionName: 'registerContentScript',
+            options: {
+                callbackID: wrapCallback(opts),
+                clrmid: clrmid,
+                script: opts.script
+            }
+        });
+    };
+
+    /**
+     * Un-registers a content script. Any copies of the script injected into
+     * currently open pages will no longer be able to send messages (though
+     * they will continue to operate on those pages).
+     *
+     * @param {object} opts     A map of options:
+     * OPTIONAL:
+     * <ul>
+     *     <li>{function} on_success:   Invoked when the content script
+     *                                  has been registered.
+     *     <li>{function} on_error:     Invoked if there's an error.
+     * </ul>
+     */
+    this.unregisterContentScript = function(opts) {
+        // Pass the data one to the CLI.
+        api.base.invokeCLIFunction({
+            apiName: 'ui.contentScripts',
+            functionName: 'unregisterContentScript',
+            options: {
+                callbackID: wrapCallback(opts),
+                clrmid: clrmid
+            }
+        });
+    };
+};

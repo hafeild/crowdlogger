@@ -27,7 +27,11 @@ Version: %%VERSION%%
                 <li><a href="#ui:setMessageFlag">api.ui.setMessageFlag</a>
             </ul>
         <li><a href="#ui:crowdlogger">CrowdLogger Widget API</a>
-        <li><a href="#ui:page">Content Pages</a>
+        <li><a href="#ui:contentScripts">Content Scripts</a>
+            <ul>
+                <li><a href="#ui:contentScripts.registerContentScript">api.ui.contentScripts.&shy;registerContentScript</a>
+                <li><a href="#ui:contentScripts.unregisterContentScript">api.ui.contentScripts.&shy;unregisterContentScript</a>
+            </ul>
     </ul>
 </div>
 
@@ -43,7 +47,8 @@ In the sections that follow, we assume that the CLRM API instance passed to your
     such as parameter descriptions, an overview of how the function works,
     and examples.
 </p>
-
+<br/>
+<br/>
 <a name="#openWindow"></a>
 <div class="function">
     <div class="top-top top-tag"><a href="#">top</a></div>
@@ -177,9 +182,96 @@ this.getMessage = function(){
 <a name="crowdlogger"></a>
 <h2>CrowdLogger Widget API</h2>
 
-<a name="page"></a>
-<h2>Content Pages</h2>
+<a name="contentScripts"></a>
+<h2>Content Scripts</h2>
+<p>
+If the need arises to log something user behavior that is not already available via <code><a href="#user">api.user</a></code> (e.g., scrolling or mouse movements) or if an App or Study module must modify the content of pages viewed by a user (e.g., re-rank search results), the Content Scripts API is a great resource.  A content script is a stringified, self-executing function that is injected into pages viewed by the user (we call these <i>content pages</i>). The function can interact with the page's DOM, but does not have direct access to any of a CLRM's core code. Rather, it must communicate via messages using the <code>sendMessage</code> function. This function allows data and callbacks to be passed to the CLRM. 
+</p>
 
+<a name="contentScripts.registerContentScript"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3><code>api.ui.contentScripts.registerContentScript</code></h3>
+    <h4>Parameters</h4>
+        <p>
+        <ul>
+            <li>{object} <code>options</code></li>
+            <span class="parameter-requirement">Required</span>
+            <ul>  
+                <li>{string} <code>script</code> 
+                    <ul>The script to inject into each content page.</ul>
+            </ul>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_message</code>
+                    <ul>
+                        Invoked when the given content script invokes <code>sendMessage</code>. Should expect two arguments: <code>data</code> and <code>callback</code>. 
+                    </ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the script has been successfully registered.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+        </p>
+
+    <h4>Description</h4>
+    <p>
+        Registers a content script to be injected into each content page when the page is loaded.
+        The script has three global variables/functions at its disposal:
+    </p>
+        <ul>
+            <li>{function} <code>sendMessage(msg, callback)</code>
+                <ul>
+                    Causes the optional <code>on_message</code> function to be invoked with <code>msg</code> as its only parameter. <code>msg</code> may be any serializable data type. <code>callback</code> option is optional, and if provided, is only valid for one-time use. It should only take one parameter, which can be anything serializable.
+                </ul>
+            <li>{string} <code>tabID</code>
+                <ul>
+                    The id of the tab in which the current page is loaded. This
+                    may help link data collected with the content script and the data available in <code><a href="#user">api.user</a></code>.
+                </ul>
+            <li>{boolean} <code>focusedAtLoad</code>
+                <ul>
+                    Whether the page was focused when loaded.
+                </ul>
+        </ul>
+</div>
+
+<a name="contentScripts.unregisterContentScript"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3><code>api.ui.contentScripts.unregisterContentScript</code></h3>
+    <h4>Parameters</h4>
+        <p>
+        <ul>
+            <li>{object} <code>options</code></li>
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the script is successfully unregistered.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+        </p>
+
+    <h4>Description</h4>
+    <p>
+        Un-registers a content script. Any copies of the script injected into
+     currently open pages will no longer be able to send messages (though
+     they will continue to operate on those pages).
+    </p>
+</div>
 
 </body>
 </html>
