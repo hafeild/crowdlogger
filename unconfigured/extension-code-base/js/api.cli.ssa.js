@@ -1,8 +1,8 @@
 /**
- * @fileOverview Provides the Server Side Access API for CrowdLogger remote modules
- * (CLRMs). There are two parts -- the CrowdLogger-side interface (CLI) and
- * the sandbox- side interface (SBI). CRMs communicate with the SBI, which in
- * turn communicates with the CLI, which has access to the CROWDLOGGER
+ * @fileOverview Provides the Server Side Access API for CrowdLogger remote 
+ * modules (CLRMs). There are two parts -- the CrowdLogger-side interface (CLI)
+ * and the sandbox- side interface (SBI). CRMs communicate with the SBI, which
+ * in turn communicates with the CLI, which has access to the CROWDLOGGER
  * object.
  *
  * %%LICENSE%%
@@ -19,7 +19,6 @@ CLI.prototype.ServerSideAccess = function(crowdlogger, cli){
 
     // Public functions:
     this.sendData;
-
 
     // Provides several wrappers for common callback functions.
     callbacks = {

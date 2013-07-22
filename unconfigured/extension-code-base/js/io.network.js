@@ -86,9 +86,7 @@ CROWDLOGGER.io.network.send_data = function( url, data, on_success, on_error,
     }
 
     // Check if the user forgot to specify a method. Default to GET.
-    if( method === undefined ){
-        method = "GET";
-    }
+    method = method || "GET";
 
     if( method === "GET" && data !== null ){
         url = url + "?" + data;

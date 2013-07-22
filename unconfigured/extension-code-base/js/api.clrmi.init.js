@@ -15,21 +15,22 @@ var CLRMI = function(cli){
     //var api = {};
     var that = this;
     this.extensionPath = '';
-    this.base = new this.Base(that, cli);
-    this.user = new this.User(that);
-    this.ssa = new this.ServerSideAccess(that);
-    this.ui = new this.UserInterface(that);
-    this.util = new this.Util();
+    this.base     = new this.Base(that, cli);
+    this.user     = new this.User(that);
+    this.ssa      = new this.ServerSideAccess(that);
+    this.privacy  = new this.Privacy(that);
+    this.ui       = new this.UserInterface(that);
+    this.util     = new this.Util();
 
     // Serves as a conduit for the API. Each CRMI will be given an instance
     // of this.
     this.API = function(clrmiPackage){
-
         // Public functions -- what will be exposed to a CLRM.
         this.user    = that.user;
         this.ui      = that.ui;
         this.storage = new that.Storage(that, clrmiPackage.metadata.clrmid);
         this.ssa     = that.ssa;
+        this.privacy = that.privacy;
         this.util    = that.util;
     };
 };

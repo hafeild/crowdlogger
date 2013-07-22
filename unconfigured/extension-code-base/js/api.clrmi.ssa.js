@@ -22,7 +22,6 @@ CLRMI.prototype.ServerSideAccess = function(api){
     // Public functions.
     this.sendData; this.sendPostData; this.sendGetData;
 
-
     /**
      * Serves as a wrapper for callback. Given a set of options (e.g., to one
      * of the public methods below), this function will create and register a

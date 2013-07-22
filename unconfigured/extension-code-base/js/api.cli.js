@@ -17,11 +17,12 @@ var CLI = function(crowdlogger){
      * @returns A reference to itself.
      */
     init = function(){
-        that.base = new that.Base(crowdlogger, that);
-        that.ui = new that.UserInterface(crowdlogger, that);
-        that.user = new that.User(crowdlogger, that);
-        that.storage = new that.Storage(crowdlogger, that);
-        that.ssa = new that.ServerSideAccess(crowdlogger, that);
+        that.base     = new that.Base(crowdlogger, that);
+        that.ui       = new that.UserInterface(crowdlogger, that);
+        that.user     = new that.User(crowdlogger, that);
+        that.storage  = new that.Storage(crowdlogger, that);
+        that.ssa      = new that.ServerSideAccess(crowdlogger, that);
+        that.privacy  = new that.Privacy(crowdlogger, that);
         return that;
     };
 

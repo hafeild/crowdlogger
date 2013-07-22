@@ -31,13 +31,130 @@ Version: %%VERSION%%
 
 <a name="encryption"></a>
 <h2>Encryption API</h2>
+<i>Not yet implemented.</i>
 
 <a name="ss"></a>
 <h2>Secret Sharing API</h2>
 
+<p>
+The Secret Sharing API allows data&mdash;what we'll refer to as <i>artifacts</i>&mdash;to a server using <a href="http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing">Shamir's Secret Sharing Scheme</a>.  
+Secret sharing works like this: suppose you have a secret encrypted message shared among 20 (<code>n</code>) people. Each of these people own a partial key to unlock this secret message. In order to access the secret, you must have at least 10 (<code>k</code>) of these partial keys&mdash;any 10 will do. In our case, suppose that the secret message is a search query and the people who share the secret are all of the <code>n</code> users that have submitted that search query.  In order to reveal a search query, we may require that it have been submitted by at least <code>k</code> people. If each of the <code>n</code> users that have submitted that search query upload the encrypted query and their partial key, and if <code>n &geq; k</code>, then that search query will be decryptable.
+</p>
+
+<p>
+Now let's define what artifacts are. An artifact is an object with three fields: a primary field, a secondary field, and a count field. E.g.,
+</p>
+
+<pre class="prettyprint">
+{
+    primaryData: "how many calories in an oatmeal cookie",
+    secondaryData: "",
+    count: 1
+}
+</pre>
+
+<p>
+The primary and secondary data fields will be encrypted separately, but using the same key. The count is not encrypted. The encrypted fields and the count are then encrypted with the server's public key:
+</p>
+
+<pre class="prettyprint">
+serverPubKeyEncypted( [encrypted(primaryField), encrypted(secondaryField), count] )
+</pre>
+
+<p>
+The encrypted primary field is the "shared secret". That is, <code>k</code> users must share exactly the same primary field in order for the primary and secondary fields of the corresponding tuples to be decrypted. In the simple example above, the primary data field can only be decrypted if at least <code>k</code> users uploaded tuples with a primary field with the value "<code>how many calories in an oatmeal cookie</code>".
+</p>
+
+<p>
+The secondary field is a way of allowing additional information to be uploaded that is not required to be shared among <code>k</code> users, but can only be decrypted if the primary field is shared by <code>k</code> users. This is a slippery slope, so be careful using it. The motivation behind including it is to allow, e.g., the canonical and original form of a query phrase to be revealed, while only requiring the canonical form to be shared.  The canonical may be the original query converted to all lower-case and with non-alpha-numeric characters stripped. The secondary field may be the original query in it's complete form (e.g., mixed casing and with non-alpha-numeric characters), like this:
+</p>
+
+<pre class="prettyprint">
+{
+    primaryData: "how many calories in an oatmeal cookie",
+    secondaryData: "How many calories in an oatmeal cookie?",
+    count: 1
+}
+</pre>
+
+<p>
+Use the secondary field wisely and be clear with users if you intend to use the secondary field.
+</p>    
+
+<ul>
+    <li><code><a href="#privacy:ss.packAndSendArtifacts">api.privacy.secretSharing.packAndSendArtifacts</a></code>
+</ul>
+
+
+<!-- Add a store -->
+<a name="ss.packAndSendArtifacts"></a>
+<div class="function">
+    <div class="top-top top-tag"><a href="#">top</a></div>
+    <div class="top-bottom top-tag"><a href="#">top</a></div>
+    <h3>Packs and uploads a set of artifacts.<br/>
+        <code>api.privacy.secretSharing.packAndSendArtifacts</code></h3>
+
+    <h4>Parameters</h4>
+    <p>
+        <ul>
+            <li>A map of options:<br/>
+            <span class="parameter-requirement">Required</span>
+            <ul>
+                <li>{array} <code>artifacts</code>
+                    <ul>
+                        An array of artifacts. Each artifact has three fields: <code>primaryData</code>, <code>secondaryData</code>, and <code>count</code>.
+                    </ul>
+                <li>{int} <code>id</code>
+                    <ul>
+                        An id to attach to the uploaded data; this is used to distinguish through different experiments and should not be user specific.
+                    </ul>
+                <li>{int} <code>n</code>
+                    <ul>
+                        The number of possible keys.
+                    </ul>
+                <li>{int} <code>k</code>
+                    <ul>
+                        The number of keys required for decryption.
+                    </ul>
+            </ul>                
+            <span class="parameter-requirement">Optional</span>
+            <ul>
+                <li>{array} <code>anonymizers</code>
+                    <ul>
+                        An array of anonymizers to send the data through. This should be a list of URLs.  Default: the CrowdLogger anonymizers.
+                    </ul>
+                <li>{string} <code>serverPubKey</code>  
+                    <ul>
+                        The server public key to use. Default: use the CrowdLogger server's pub key.
+                    </ul>
+                <li>{string} <code>userId</code>
+                    <ul>
+                        An id for this user, preferably unique and constant across all of a user's instances. Default: <code>pass_phrase</code> preference, if set, or a random string.
+                    </ul>
+                <li>{function} <code>on_success</code>
+                    <ul>
+                        Invoked when the stores have been successfully created.
+                    </ul>
+                <li>{function} <code>on_error</code>
+                    <ul>
+                        Invoked if there's an error.
+                    </ul>
+            </ul>
+        </ul>
+    </p>
+
+    <h4>Description</h4>
+    <p>
+        Uploads a set of artifacts in batches, each batch being assigned randomly to one of the anonymizers. Artifacts are encrypted using the secret sharing scheme and then encrypted with the servers public key.
+    </p>
+</div>
+
+
+
+
 <a name="anonymization"></a>
 <h2>Anonymized Uploading API</h2>
-
+<i>Not yet implemented.</i>
 
 </body>
 </html>
