@@ -89,6 +89,7 @@ CLI.prototype.Base = function(crowdlogger, cli){
                 '<script src="'+path+'js/api.clrmi.util.js"></script>'+
                 '<script src="'+path+'js/api.clrmi.storage.js"></script>'+
                 '<script src="'+path+'js/api.clrmi.ssa.js"></script>'+
+                '<script src="'+path+'js/api.clrmi.privacy.js"></script>'+
                 '<!-- Gives us the api variable. -->'+
                 '<script src="'+path+'html-js/clrm.js"></script>'+
                 '</head>'+

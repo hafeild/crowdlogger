@@ -126,12 +126,12 @@ var CLRM = function(crowdlogger){
         getAvailableCLRMListing(function(d){
             crowdlogger.debug.log('Retrieved available CLRMs');
 
-            availableCLRMs=JSON.parse(d); 
+            availableCLRMs = JSON.parse(d); 
             combine();
         }, onError);
         getInstalledCLRMListing(function(d){
             crowdlogger.debug.log('Retrieved installed CLRMs');
-            installedCLRMs=d; 
+            installedCLRMs = d; 
             combine();
         }, onError);
     };

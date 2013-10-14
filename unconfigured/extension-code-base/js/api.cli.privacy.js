@@ -18,7 +18,7 @@ CLI.prototype.Privacy = function(crowdlogger, cli){
 
     // Public functions.
     this.callbacks;
-    this.secretSharing = new this.SecretSharing(crowdlogger, cli)
+    this.secretSharing = new this.SecretSharing(crowdlogger, cli, this);
 
     // Provides several wrappers for common callback functions.
     this.callbacks = {
@@ -50,12 +50,15 @@ CLI.prototype.Privacy = function(crowdlogger, cli){
             };
         }
     };
+
+
 };
 
-CLI.prototype.Privacy.prototype.SecretSharing = function(crowdlogger, cli) {
+CLI.prototype.Privacy.prototype.SecretSharing = 
+        function(crowdlogger, cli, privacy) {
     // Private variables.
     var that = this,
-        callbacks = cli.privacy.callbacks,
+        callbacks = privacy.callbacks,
         DEFAULT_ANONYMIZERS = %%ANONYMIZERS%%,
         MAX_BUNDLE_SIZE = 50;
 

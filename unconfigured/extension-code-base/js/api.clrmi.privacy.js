@@ -18,7 +18,7 @@ CLRMI.prototype.Privacy = function(api){
         sharedFunctions = {};
 
     // Public variables.
-    this.secretSharing = new this.SecretSharing(api, sharedFunctions)
+    this.secretSharing = new this.SecretSharing(api, sharedFunctions);
 
     /**
      * Serves as a wrapper for callback. Given a set of options (e.g., to one
@@ -125,6 +125,7 @@ CLRMI.prototype.Privacy.prototype.SecretSharing = function(api,sharedFunctions){
                 serverPubKey: opts.serverPubKey
             }
         });
+    };
 };
 
 CLRMI.prototype.Privacy.prototype.Anonymization = function(api,sharedFunctions){
