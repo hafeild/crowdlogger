@@ -728,3 +728,44 @@ button:active {
     -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
+
+#installed-repositories {
+/*    background-color: #eee;
+    border: #ddd;
+    padding: 10px;
+    border-radius: 3px;*/
+}
+
+#installed-repositories button {
+    border-radius: 8px;
+    width: 15px;
+    height: 15px; 
+    padding: 0px;
+    vertical-align: middle;
+    font-size: 9pt;
+}
+
+.repository {
+    padding-left: 0px;
+}
+.remove-repository-button-container {
+    width: 25px;
+    display: inline-block;    
+}
+
+button.add-repository {
+    height: 20px;
+}
+
+.new-repository .url {
+    width: 400px;
+}
+
+.repository-name {
+    font-size: 90%;
+    font-family: monospace;
+    background-color: #eee;
+    border: #bbb;
+    padding: 3px;
+    border-radius: 3px;
+}

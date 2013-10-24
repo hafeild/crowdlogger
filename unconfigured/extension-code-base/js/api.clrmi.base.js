@@ -137,10 +137,11 @@ CLRMI.prototype.Base = function(api) {
             var load = function(){
                 that.log('Calling init on the clrm...');
 
-                modules[clrm.id] = clrm.module;
+                //modules[clrm.id] = clrm.module;
+                modules[package.clrmid] = clrm.module;
                 clrm.module.init();
 
-                that.log('Module '+ clrm.id +' loaded!');
+                that.log('Module '+ package.clrmid +' loaded!');
                 if( data.callbackID ){
                     that.invokeCLICallback({
                         callbackID: data.callbackID,
@@ -150,10 +151,12 @@ CLRMI.prototype.Base = function(api) {
             };
 
             // Check if it already exists. If so, unload the previous version.
-            if( modules[clrm.id] ){
+            // if( modules[clrm.id] ){
+            if( modules[package.clrmid] ){
                 try{
-                    that.log('Unloading module '+ clrm.id);
-                    modules[clrm.id].unload('newversion', load);
+                    that.log('Unloading module '+ package.clrmid);
+                    // modules[clrm.id].unload('newversion', load);
+                    modules[package.clrmid].unload('newversion', load);
                 } catch(e){
                     that.log('There was an error unloading the old module: '+ 
                         e.toString());
@@ -512,7 +515,11 @@ CLRMI.prototype.Base = function(api) {
  */
 var CLRM = function(clrmPackage, CrowdLoggerAPI, log){
     log('In CLRM, about to run eval...');
-    eval(clrmPackage.module);
+    try{
+        eval(clrmPackage.module);
+    } catch(e) {
+        log('Caught error loading package: '+ e);
+    }
     log('Finished running eval...');
 
     // Every module should have a Module function defined.

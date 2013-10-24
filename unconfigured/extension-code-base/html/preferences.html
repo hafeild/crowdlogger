@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
- File:      registration.html
+ File:      preferences.html
  Author:    Henry Feild
  Date:      01-Apr-2011
  Purpose:   Provides a registration GUI for the user.
@@ -68,22 +68,55 @@ Version: %%VERSION%%
 
     <form name="settings">
 
-<!--         <p>
+    <!--         
+        <p>
             <h3>Search history</h3>
             How 
             On <input type="radio" name="dev_mode" data-type='bool' value="true"/> <br/>
             Off <input type="radio" name="dev_mode" data-type='bool' value="false" checked="checked"/> 
 
-        </p> -->
+        </p>
+    -->
 
+
+        <!-- 
+            Displays the repositories that the user has registered. Allows
+            the user to add and remove repositories.    
+        -->
+        <div id="repositories">
+            <h3>App/Study repositories</h3>
+            Below are listed the repositories currently loaded.
+            <div id="installed-repositories">
+            </div>
+
+            <p>
+            </p>
+
+            <div class="new-repository">
+                <input class="url" type="text" name="repository-url" value=""/>
+                <button class="add-repository">Add</button>
+            </div>
+
+            <div id="template-repository-entry" class="hidden repository">
+                <div class="remove-repository-button-container">
+                    &nbsp;
+                    <button class="remove-repository confirm hidden"
+                        ><sup>&times;</sup></button>
+                </div>
+                <span class="repository-name"></span> 
+            </div>
+        </div>
+
+        <p>
+        </p>
 
         <div>
             <h3>Developer mode</h3>
-            <p>
             Adds a link to the Welcome Wizard in the main menu and a link to developer tools in the "Tools" section of the status page.
-            </p>
+            <p>
             On <input type="radio" name="dev_mode" value="true"/> <br/>
             Off <input type="radio" name="dev_mode" value="false" checked="checked"/> 
+            </p>
         </div>
 
         <p>

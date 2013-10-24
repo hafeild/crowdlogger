@@ -39,9 +39,6 @@ var show_popup = function(message){
 var show_info = function(clrmElm){
     var info = clrmElm.parents('.clrm-container').find('.info');
     if( info[0] !== currentlyShownInfo[0] ){
-        console.log('info !== currentlyShownInfo');
-        console.log(info);
-        console.log(currentlyShownInfo);
         if(currentlyShownInfo[0]){ currentlyShownInfo.hide(); }
         info.show({easing: 'clip', duration: 300});
         currentlyShownInfo = info;
@@ -72,6 +69,9 @@ var add_listeners = function(){
                     CROWDLOGGER.clrm.enableCLRM(clrmid, function(){
                         container.removeClass('not-enabled').
                             addClass('enabled');
+                    }, function(error){
+                        console.log('There was an error:');
+                        console.log(error);
                     });
                 });
                 break;
@@ -80,6 +80,8 @@ var add_listeners = function(){
                     container.removeClass('not-enabled').addClass('enabled');
                 }, function(e){
                     show_popup('There was an error enabling the CLRM: '+ e);
+                    console.log('There was an error:');
+                    console.log(error);
                 });
 
                 break;

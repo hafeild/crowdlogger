@@ -15,7 +15,8 @@ var CLRM = function(crowdlogger){
     var that = this;
 
     // Private functions.
-    var getAvailableCLRMListing, // I.e., from the server.
+    var getAvailableCLRMListing, // I.e., from a given repository.
+        getAvailableCLRMListings,// I.e., from all registered repositories.
         getInstalledCLRMListing, // Some of these will be local.
         getOverviewCLRMListings, // Includes available and installed.
         generateCLRMElement,
@@ -24,12 +25,13 @@ var CLRM = function(crowdlogger){
         trackUpdates;
 
     // Public functions.
-    this.init, this.populateCLRMLibraryPage, this.launchCLRMLibraryPage,
-    this.installLocalCLRM, this.installCLRM, this.uninstallCLRM, 
-    this.removeCLRMFromDB, this.enableCLRM, this.disableCLRM,
-    this.unloadCLRM, this.unloadAllCLRMs, this.loadCLRMIfNecessary,
-    this.loadAllEnabledCLRMs, this.open, this.configure, this.getMessage,
-    this.updateCLRM, this.updateAllCLRMs;
+    this.init; this.populateCLRMLibraryPage; this.launchCLRMLibraryPage;
+    this.installLocalCLRM; this.installCLRM; this.uninstallCLRM; 
+    this.removeCLRMFromDB; this.enableCLRM; this.disableCLRM;
+    this.unloadCLRM; this.unloadAllCLRMs; this.loadCLRMIfNecessary;
+    this.loadAllEnabledCLRMs; this.open; this.configure; this.getMessage;
+    this.updateCLRM; this.updateAllCLRMs; this.addRepository; 
+    this.removeRepository;
 
     // Private function definitions.
 
@@ -48,12 +50,68 @@ var CLRM = function(crowdlogger){
      *
      * @param {function} callback  Called when the listing has been made. 
      */
-    getAvailableCLRMListing = function( callback, onError ){
-        crowdlogger.io.network.send_get_data(
-            crowdlogger.io.network.get_server_url('clrm_listing_url'),    
+    // getAvailableCLRMListing = function( callback, onError ){
+    //     crowdlogger.io.network.send_get_data(
+    //         crowdlogger.io.network.get_server_url('clrm_listing_url'),    
+    //         'date='+ (new Date().getTime() +'&v='+ 
+    //             crowdlogger.version.info.get_extension_version()), 
+    //         callback, onError );
+    // };
+    getAvailableCLRMListing = function( url, callback, onError ){
+        crowdlogger.io.network.send_get_data( url,
             'date='+ (new Date().getTime() +'&v='+ 
                 crowdlogger.version.info.get_extension_version()), 
             callback, onError );
+    };
+
+    /**
+     * Fetches the metadata list of available CLRMs from the registered 
+     * repositories. These are then merged into a single listed. The listing is
+     * a map of clrmid's to their meta data objects (maps).
+     *
+     * @param {function} callback  Called when the listing has been made. 
+     */
+    getAvailableCLRMListings = function( callback, onError, urls ){
+        if( !urls ) {
+            urls = [crowdlogger.io.network.get_server_url(
+                'clrm_listing_url')].concat(
+                    JSON.parse(crowdlogger.preferences.get_char_pref(
+                        'clrm_repositories')));
+        }
+
+        var i = 0, 
+            metadata = {};
+
+        // Merges the metadata between repositories.
+        var addMetadata = function(i, data){
+            var name,
+                urlParts = urls[i].split(/\//),
+                domain = urlParts.length > 1 ? urlParts[2] : urls[i];
+            data = JSON.parse(data);
+
+
+            // For each of the names in the metadata, prepend the domain.
+            for( name in data ){
+                var newName = domain +'__'+ name;
+                metadata[newName] = data[name];
+                metadata[newName].clrmid = newName;
+            } 
+
+            i++;
+
+            // Process the next url.
+            if( i < urls.length ){
+                getAvailableCLRMListing(urls[i], function(data){
+                    addMetadata(i, data)
+                }, onError);
+            } else {
+                callback(metadata);
+            }
+        };
+        
+        getAvailableCLRMListing(urls[i], function(data){
+            addMetadata(i, data)
+        }, onError);
     };
 
     /**
@@ -123,10 +181,11 @@ var CLRM = function(crowdlogger){
                 setTimeout(function(){callback(availableCLRMs);}, T);
             }
         }
-        getAvailableCLRMListing(function(d){
+        getAvailableCLRMListings(function(metadata){
             crowdlogger.debug.log('Retrieved available CLRMs');
 
-            availableCLRMs = JSON.parse(d); 
+            //availableCLRMs = JSON.parse(d); 
+            availableCLRMs = metadata;
             combine();
         }, onError);
         getInstalledCLRMListing(function(d){
@@ -356,6 +415,8 @@ var CLRM = function(crowdlogger){
                 for( field in fields ){
                     package.metadata[field] = fields[field];
                 }
+
+                package.metadata.clrmid = clrmMetadata.clrmid;
                 package.clrmid = package.metadata.clrmid;
                 crowdlogger.io.log.write_to_clrm_db({
                     data: [package],
@@ -435,10 +496,12 @@ var CLRM = function(crowdlogger){
      */
     this.enableCLRM = function( clrmid, onSuccess, onError ){
         // Get the associated package.
+        crowdlogger.debug.log('Enabling package '+ clrmid);
         crowdlogger.io.log.get_clrm_entry({
             clrmid: clrmid,
             on_success: function(package){
                 // Load the package.
+                crowdlogger.debug.log('Loading package '+ package.clrmid +'...');
                 crowdlogger.api.cli.base.loadCLRMFromString(
                     JSON.stringify(package), function(){
                         // Once loaded, save the state as enabled.
@@ -449,6 +512,8 @@ var CLRM = function(crowdlogger){
                             on_success: onSuccess
                         });
                     }, function(){
+                        crowdlogger.debug.log('Package '+ package.clrmid +
+                            ' loaded; marking as enabled.');
                         // Once loaded, save the state as enabled.
                         package.metadata.enabled = true;
                         package.metadata.loaded = false;
@@ -808,4 +873,40 @@ var CLRM = function(crowdlogger){
 
         getOverviewCLRMListing(update, onError);
     };
+
+    /**
+     * Adds the given URL to the list of CLRM repositories. Repository URLs
+     * should point to a page that will produce a JSON listing of CLRMs
+     * available from that repository.
+     *
+     * @param {string} url   The URL of the repository.
+     */
+    this.addRepository = function(url){
+        var urls = JSON.parse(
+            crowdlogger.preferences.get_char_pref('clrm_repositories'));
+        urls.push(url);
+        crowdlogger.preferences.set_char_pref('clrm_repositories', 
+            JSON.stringify(urls));
+    };
+
+    /**
+     * Removes the given URL from the list of CLRM repositories (if it is 
+     * found). 
+     *
+     * @param {string} url   The URL of the repository.
+     */
+    this.removeRepository = function(url){
+
+        var i, newURLs = [],
+            origURLs = JSON.parse(
+                crowdlogger.preferences.get_char_pref('clrm_repositories'));
+        for(i = 0; i < origURLs.length; i++){
+            if( origURLs[i] !== url ){
+                newURLs.push(origURLs[i]);
+            }
+        }
+        crowdlogger.preferences.set_char_pref('clrm_repositories', 
+            JSON.stringify(newURLs));
+    };
+
 }
