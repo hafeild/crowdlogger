@@ -347,8 +347,7 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskIdentifier =
      * @param {string} levenshtein   The Levenshtein distance to convert. 
      * @return {int} One of {0, 1, 2}, depending on where the distance falls.
      */
-    this.discritizeLevenshteinDist = function( levenshtein )
-    {
+    this.discritizeLevenshteinDist = function( levenshtein ) {
         if( levenshtein < 2 ){ return 0; }
         if( levenshtein < 5 ){ return 1; }
         if( levenshtein < 10 ){ return 2; }

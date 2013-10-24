@@ -15,7 +15,7 @@ var RemoteModule = function(clrmPackage, clrmAPI ) {
 
     var that = this, sta, initialized = false;
 
-    this.id = "sta";
+    this.id = clrmPackage.clrmid;
 
     this.init = function(){
         if(initialized){ return; }

@@ -54,7 +54,8 @@ RemoteModule.prototype.SearchTaskAssistant.prototype.SearchTaskModel =
         processClick, processSearch, processPageFocus, processPageBlur;
 
     // Public variables.
-    this.searches = searches; this.tasks = tasks;
+    this.searches = searches; 
+    this.tasks = tasks;
     this.sti = sta.searchTaskIdentifier;
     this.chronologicallyOrderedSearchIds = chronologicallyOrderedSearchIds;
     this.mostRecentlyAccessedSearchIds = mostRecentlyAccessedSearchIds;

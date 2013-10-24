@@ -22,7 +22,7 @@
  *    instance.
  */
 RemoteModule.prototype.SearchTaskAssistant.prototype.Search = 
-        function(initialData, sta, isNew){
+        function(initialData, sta, isNew) {
     'use strict';
 
     initialData = initialData || {};
