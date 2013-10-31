@@ -106,14 +106,15 @@ CROWDLOGGER.logging.event_listeners.initialize_for_chrome = function(){
                 // and '}' parts.
                 code: String(
                     CROWDLOGGER.logging.event_listeners.inject_page_listeners).
-                        replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, "" ).
-                        replace( /\s*\}\s*$/, "").
+                        replace( /^\s*function\s*\(\s*[^)]*\s*\)\s*\{/, '' ).
+                        replace( /\s*\}\s*$/, '').
                         replace( /TAB_ID/, '"'+ tab_id +'"' ).
                         replace( /IS_CHROME/, 'true').
                         replace( /IS_FOCUSED/, tab.selected.toString()
-                    ) +'\n'+ 
-                    CROWDLOGGER.logging.event_listeners.
-                        inject_clrm_listeners_chrome(tab_id+"", tab.selected),
+                    ),
+                    //  +'\n'+ 
+                    // CROWDLOGGER.logging.event_listeners.
+                    //     inject_clrm_listeners_chrome(tab_id+"", tab.selected),
                 // We want to inject this script into all frames.
                 allFrames: true
             });
@@ -888,7 +889,9 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
                     // Ignore mail urls (e.g., gmail, yahoo mail, etc.).
                     search_engine_match[1].indexOf('mail') < 0 ){
                 search_page_info.search_engine = search_engine_match[0];
+                log('This appears to be a search page (maybe!)...');
             } else {
+                log('This DOES NOT appear to be a search page.');
                 return false;
             }
 
@@ -933,6 +936,9 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             if( search_page_info.search_box ){
                 search_page_info.is_search_page = true;
             }
+
+            // DEBUG.
+            log('Search page: '+ search_page_info.is_search_page);
 
             log('search_page_info.result_list_elm:');
             log(search_page_info.result_list_elm);
@@ -1077,7 +1083,7 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             search_page_info.results = [];
             // The results elm here points to an <div> tag. We want the <ul> and
             // all its <li> entries.
-            result_list_elm = result_list_elm.getElementsByTagName('UL')[0];
+            //result_list_elm = result_list_elm.getElementsByTagName('OL')[0];
             for( i = 0; i < result_list_elm.childNodes.length; i++ ){
                 result_node =  result_list_elm.childNodes[i];
                 if( result_node.tagName === 'LI' ){
@@ -1128,6 +1134,7 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             if( search_box_elm ){
                 search_page_info.query = search_box_elm.value;
             }
+            log('Logging search result.');
             log_search( search_page_info.query );
         };
 
@@ -1328,7 +1335,7 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
             },
             bing: {
                 search_box_name: 'q',
-                result_list_id: 'results',
+                result_list_id: 'b_results',
                 result_count_id: 'count',
                 first_result_offset_param: 'first',
                 traverse_results: traverse_bing_results
