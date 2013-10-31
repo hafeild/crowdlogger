@@ -106,21 +106,32 @@ function refreshExperimentStats() {
     setTimeout( refreshExperimentStats, experimentRefreshInterval );
 }
 
-
+/**
+ * Re-organizes the sections so they fit nicely into two sections.
+ */
 function refreshLayout(){
     console.log('In refreshLayout');
     var rcol = jQuery('#right-column');
     var lcol = jQuery('#left-column');
-    jQuery('.section').each(function(i, elm){
-        console.log('-------')
-        console.log('rcol.height: '+ rcol.height());
-        console.log('lcol.height: '+ lcol.height());
-        if( rcol.height() < lcol.height() ){
-            jQuery(elm).appendTo(rcol);
-        } else {
-            jQuery(elm).appendTo(lcol);
+
+    var sections = jQuery('.section');
+    var i = 0;
+
+    // Appends the next section to the shortest column.
+    var append = function(){
+        if( i < sections.length ){
+            if( rcol.height() < lcol.height() ){
+                jQuery(sections[i]).appendTo(rcol);
+            } else {
+                jQuery(sections[i]).appendTo(lcol);
+            }
+            i++;
+            // A little delay just to let the UI update.
+            setTimeout(append, 100);
         }
-    });
+    };
+
+    append();
 }
 
 // Initialize the search for the CROWDLOGGER variable.
