@@ -101,7 +101,7 @@ To install %%PROJECT_NAME%%, follow the instructions below. After installing, th
 
 <p>
 Click the button and the installation will progress automatically:
-<button id="ff-download" onclick="if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'; return false; }" type=" application/x-xpinstall">Download for Firefox</button>
+<button class="cl-button" id="ff-download" onclick="if(typeof(InstallTrigger)!='undefined') {var InstallXPI = {'%%PROJECT_NAME%% Installation':'updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'}; InstallTrigger.install(InstallXPI); return false;} else { location.href='updates/latest/%%EXTENSION_FILE_NAME%%.xpi?v=%%VERSION%%'; return false; }" type=" application/x-xpinstall">Download for Firefox</button>
 </p>
 </div>
 
@@ -118,7 +118,7 @@ Click the button and the installation will progress automatically:
 Installation for Chrome requires a few steps:
 <ol>
   <li>Download the %%PROJECT_NAME%% extension:
-<button id="chrome-download" onclick="location.href='updates/latest/%%EXTENSION_FILE_NAME%%.crx?v=%%VERSION%%'; return false;" type=" application/x-chrome-extension">Download for Chrome</button>
+<button class="cl-button" id="chrome-download" onclick="location.href='updates/latest/%%EXTENSION_FILE_NAME%%.crx?v=%%VERSION%%'; return false;" type=" application/x-chrome-extension">Download for Chrome</button>
 
   <li>Navigate to the download (called <code>%%EXTENSION_FILE_NAME%%.crx</code>) in your downloads folder using, e.g.,  Windows Explorer (on Windows), Finder (on OSX), or whatever you'd like on Linux.
 
