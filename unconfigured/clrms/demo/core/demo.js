@@ -173,6 +173,9 @@ RemoteModule.prototype.Demo = function( clrmPackage, clrmAPI ){
         var onChunk = function(data, next, abort){
             var i = 0;
             for(i = 0; i < data.length && searchesSeen < n; i++){
+                clrmAPI.ui.log('['+ clrmPackage.id +'] Analyzing type: '+
+                    data[i].e );
+                
                 if( data[i].e === 'search' ){
                     searchesSeen++;
                     var newElm = jQuery('<div>').appendTo(jqElm);
