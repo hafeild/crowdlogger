@@ -31,8 +31,13 @@ CLRMI.prototype.UserInterface = function(api, clrmid){
     this.contentScripts = new this.ContentScripts(api, clrmid);
 
     // Public functions.
-    this.openWindow, this.dereferenceModuleResources, this.getFaviconURL,
-    this.setMessageFlag;
+    this.openWindow; 
+    this.dereferenceModuleResources;
+    this.getFaviconURL;
+    this.setMessageFlag; 
+    this.log; 
+    this.openLoggingWindow;
+    this.closeLoggingWindow;
 
 
     // Private function definitions.
