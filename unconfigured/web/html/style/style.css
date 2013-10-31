@@ -9,10 +9,28 @@
  * All Rights Reserved
  */
 
-@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+/*@import url(https://fonts.googleapis.com/css?family=Open+Sans);*/
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('fonts/open-sans/OpenSans-Regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'OpenSansCondensed';
+    src: url('fonts/open-sans-condensed/OpenSans-CondLight.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
 
 html {
-    font-family: "Open Sans", times;
+    font-family: "OpenSans", times;
+}
+
+h1,h2,h3,h4 {
+    font-family: "OpenSansCondensed", "OpenSans";
 }
 
 body {
@@ -72,7 +90,8 @@ body.share {
 .menu-frame {
     z-index: 10;*/
     position: absolute;
-    top: 65px;
+    /*top: 100px;*/
+    padding-top: 15px;
     margin-left: auto;
     margin-right:auto;
 }
@@ -156,11 +175,13 @@ div.share-iframe:hover {
     padding: 0;
     margin: 0;
     color: #555;
-    font-size: 265%;
+    /*font-size: 265%;*/
     position: absolute;
     right: 15px;
     top: 10px;
-    font-weight: lighter;
+    /*font-weight: lighter;*/
+    font-family: "OpenSansCondensed";
+    font-size: 38pt;
 }
 
 .titleSub {
@@ -335,12 +356,15 @@ span.disabled:active {
 }
 
 h1, h2, h3, h4 {
-    font-weight: normal;
+    /*font-weight: normal;*/
+    margin-bottom: 0px;
+    line-height: 100%;
 }
 
 h1 {
     /*margin-top: 20px;*/
-    font-size: 180%;
+    /*font-size: 180%;*/
+    font-size: 32pt;
     color: #666;
     border: none;
 }
@@ -349,22 +373,25 @@ h2, h3 {/*
     margin-top: 25px;
     margin-bottom: 0px;*/
     padding: 0px;
-    font-size: 130%;
+    /*font-size: 130%;*/
+    font-size: 28pt;
     color: steelblue;
     border: none;
 }
 
 h3 {
     color: #97bad7;
-    font-weight: normal;
+    /*font-weight: normal;*/
     /*margin-top: 20;*/
-    font-size: 120%;
+    /*font-size: 120%;*/
+    font-size: 24pt;
     /*font-style: italic;*/
 }
 
 h4 {
-    font-weight: normal;
-    font-size: 115%;
+    /*font-weight: normal;*/
+    font-size: 22pt;
+    /*font-size: 115%;*/
 /*    margin-top: 15;
     margin-bottom: 15;*/
     color: #3b709a;
