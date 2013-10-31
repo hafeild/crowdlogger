@@ -21,6 +21,7 @@ CLI.prototype.UserInterface = function(crowdlogger, cli){
     // Public function declarations.
     this.setMessageFlag;
     this.injectContentScript;
+    this.openLoggingWindow;
      
     // Private function definitions.
     init = function(){
@@ -41,7 +42,14 @@ CLI.prototype.UserInterface = function(crowdlogger, cli){
         crowdlogger.notifications.set_notification('study_updates');
     };
 
-
+    /**
+     * Opens a logging window so CLRMs can log to it.
+     */
+    this.openLoggingWindow = function(){
+        cli.base.sendMessage({
+            command: "openLoggingWindow"
+        });
+    };
 
     init();
 }

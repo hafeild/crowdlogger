@@ -56,6 +56,9 @@ function set_click_listeners(){
             case 'register_button':
                 CROWDLOGGER.study.launch_registration_dialog(); 
                 break;
+            case 'launch-logging-window':
+                CROWDLOGGER.api.cli.ui.openLoggingWindow();
+                break;
             case '':
                 return true;
         }
@@ -82,6 +85,9 @@ function check_if_initialized(){
     if( jQuery('#init').html() === '' ){
         CROWDLOGGER.debug.log('Initializing from status.js\n');
         CROWDLOGGER.gui.study.pages.refresh_status_page( document );
+        if( CROWDLOGGER.preferences.get_bool_pref('dev_mode', false) ){
+            jQuery('.dev').removeClass('hidden');
+        }
     }
 
     // if( !experimentRefreshActivated ) {
