@@ -1,0 +1,36 @@
+/*
+ * Author:  Henry Feild
+ * File:    dialog.css
+ * Date:    27-Oct-2013
+ * Purpose: Provides style definitions specific to app builder.
+ *
+ * Copyright (c) 2010-2011
+ * University of Massachusetts
+ * All Rights Reserved
+ */
+
+.app-input {
+    background-color: #fbfbfb;
+    padding: 10px;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+/*.app-input td {
+    text-justify: none;
+}*/
+
+.app-input table input[type=text] {
+    width: 400px;
+    font-size: 105%;
+    color: #3b3b3b;
+}
+
+.app-input table textarea{
+    width: 400px;
+    height: 100px;
+    font-size: 105%;
+    color: #3b3b3b;
+}

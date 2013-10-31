@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+%%LICENSE%%
+Version: %%VERSION%%
+-->
+<html>
+<head>
+    <link rel="shortcut icon" type="image/png"
+        href="../images/crowdlogger-logo.001.16x16.png"/>
+    <title>%%PROJECT_NAME%% App Builder</title>
+    <link rel="stylesheet" type="text/css" media="screen" 
+        href="../style/style.css">
+    <link rel="stylesheet" type="text/css" media="screen" 
+        href="../style/app-builder.css">
+    <script src="../lib/jquery.min.js"></script>
+    <script src="../lib/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector:'.editor',
+            //theme : "modern",
+            toolbar: "save | undo redo | styleselect | fontsizeselect | fontselect | table | bold italic | code",
+            plugins: "code,,table,save,print,paste,fullscreen,,visualchars",
+            save_enablewhendirty: true,
+            save_onsavecallback: function() {console.log("Save");}
+        });
+    </script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="bodyWrapper">
+
+    <!-- The header. -->
+    <div class="header">
+        <div class="title">
+            <span class="logo-version">version %%VERSION%%</span>
+            <img class="logo" src="../images/crowdlogger-logo.002.png"/>
+            <span class="titleMain">App Builder</span><br>
+        </div>
+
+        <div id="iframe" class="menu-frame">
+           <iframe src="../menu.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="70px">
+           </iframe>
+        </div>
+        <div id="share-iframe" class="share-iframe">
+           <iframe src="../share.html" marginheight="0" width="100%" 
+           frameborder="0" scrolling="no" height="80px">
+           </iframe>
+        </div>
+
+    </div>
+
+    <!-- Brings us down to just below the title. -->
+    <div style="clear: both;"></div>
+    <div class="headerBuffer"></div>
+
+
+<h2>Overview</h2>
+
+<p>
+Welcome to the %%PROJECT_NAME%% App Builder!
+</p>
+
+<h3>What is the App Builder?</h3>
+<p>
+The App Builder is a set of tools that assist you in creating study and tool apps that can be installed by %%PROJECT_NAME%%.  There are three processes:
+</p>
+
+<ol>
+    <li>create a base app with all of the relevant metadata</li>
+    <li>add or modify the app content</li>
+    <li>deploy the app</li>
+</ol>
+
+<h3>Once I build an app, how do I deploy it?</h3>
+<p>
+You have two choices:
+</p>
+
+<ol>
+    <li>apply to have your completed app hosted on the %%PROJECT_NAME%% 
+        repository (which is seen by all users of %%PROJECT_NAME%%)</li>
+    
+    <li>create your very own repository on a private server and distribute the 
+        web address of your repository to perspective users/participants</li>
+</ol>
+
+<p>
+Further instructions can be found during the building process, or from our
+<a href="hosting.html">App Hosting Submission page</a>.
+</p>
+
+<a name="step1"></a>
+<h2>Step 1: Create an app</h2>
+
+<p>
+If you have an existing app, you can upload it now and continue on to 
+<a href="step2">Step 2: modify app</a>.
+</p>
+
+<div class="app-input">
+Upload app package (.json) if you have one: <input id="app-upload" type="file"/>
+</div>
+
+<p>
+Otherwise, please fill out the following information about your app:
+</p>
+
+<div class="app-input">
+    <form>
+    <table>
+        <tr>
+            <td>App id:</td>
+            <td><input name="app-id" type="text"/></td>
+        </tr><tr>
+            <td>App name:</td>
+            <td><input name="app-name" type="text"/></td>
+        </tr><tr>
+            <td>App type:</td><td>
+                <input type="checkbox" name="app-type" 
+                    value="app"/>Tool <br/>
+                <input type="checkbox" name="app-type" 
+                    value="study"/>Study
+            </td>
+        </tr><tr>
+            <td>Description:</td>
+            <td><textarea id="app-description"></textarea></td>
+        </tr><tr>
+            <td>Package URL:</td>
+            <td><input name="package-url" type="text"/></td>
+        </tr><tr>
+            <td>Logo URL:</td><td><input name="logo-url" type="text"/></td>
+        </tr><tr>
+            <td>Minimum %%PROJECT_NAME%% version<br/>
+            (current version: %%VERSION%%):</td>
+            <td><input name="minCLVersion" type="text"/></td>
+        </tr><tr>
+            <td>Permissions:</td>
+            <td>
+                <input type="checkbox" name="permissions" 
+                    value="user-data"/>Access user data<br/>
+                <input type="checkbox" name="permissions" 
+                    value="global-data"/>Access global data/Initiate global 
+                        collection<br/>
+                <input type="checkbox" name="permissions" 
+                    value="local-storage"/>Store data locally<br/>
+                <input type="checkbox" name="permissions" 
+                    value="server-collection"/>Collect data on on or more servers<br/>
+                <input type="checkbox" name="permissions" 
+                    value="server-computation"/>Use servers to process data (no storage)<br/>
+                <input type="checkbox" name="permissions" 
+                    value="manipulate-web-pages"/>Manipulate web pages
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+
+
+<a name="step1"></a>
+<h2>Step 2: Modify your app</h2>
+
+<textarea class="editor"></textarea>
+
+
+<!-- Everything below here is for the footer. -->
+<div class="buffer">
+</div>
+
+<div class="copyright-frame">
+   <iframe width="100%" src="../copyright.html" scrolling=no 
+           frameborder=0 marginheight=0 height=40px>
+   </iframe>
+</div>
+
+</div>
+
+<div class="emptyFooter">
+</div>
+
+</body>
+</html>
