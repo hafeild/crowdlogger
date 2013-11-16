@@ -57,7 +57,7 @@ var add_listeners = function(){
     jQuery(document).on('click', '.info button, .access button', function(e){
         var target = jQuery(this);
         var clrmid = target.parents('.clrm-container').attr('data-clrmid');
-        var container = jQuery('.clrm-container[data-clrmid='+clrmid+']');
+        var container = jQuery('.clrm-container[data-clrmid="'+clrmid+'"]');
         var metadata = JSON.parse(container.attr('data-metadata')); 
         //JSON.parse(target.parent().attr('data-metadata'));
         switch( target.attr('data-type') ){

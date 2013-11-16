@@ -1,6 +1,6 @@
 
 ## Args: location of xpi/crx (should be named "%%EXTENSION_FILE_NAME%%.(xpi)|(crx)"), current version number, new version number
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then
     echo
     echo "Usage: updateWebForExtensions.sh <publicDir> <inDir> <oldVer> <newVer>"
