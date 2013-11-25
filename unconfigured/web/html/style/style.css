@@ -21,7 +21,7 @@
 @font-face {
     font-family: 'OpenSansCondensed';
     src: url('fonts/open-sans-condensed/OpenSans-CondLight.ttf');
-    font-weight: normal;
+    font-weight: lighter;
     font-style: normal;
 }
 
@@ -356,7 +356,7 @@ span.disabled:active {
 }
 
 h1, h2, h3, h4 {
-    /*font-weight: normal;*/
+    font-weight: lighter;
     margin-bottom: 0px;
     line-height: 100%;
 }
