@@ -37,7 +37,7 @@ Where:
             description: {string} 
                 A long description of the CLRM; this will be displayed to users.
             packageURL: {string} 
-                The URL where the CLRM package can be found
+                The URL where the CLRM package can be found.
             permissions: {array of strings}
                 The APIs this CRLM requires access to. These are:
                     userdata
@@ -46,6 +46,9 @@ Where:
                     privacy
                     serveraccess
                     globaldata
+            minCLVersion: {string}
+                The minimum CrowdLogger version -- should consist of only digits
+                and dots.
 
         OPTIONAL FIELDS:
             logoURL: {string}
@@ -123,6 +126,9 @@ VALID_PERMISSION_VALS = Set.new([
     :storage,
     :privacy,
     :serveraccess,
+    :servercomputation,
+    :servercollection,
+    :pagemanipulation,
     :globaldata
 ])
 
