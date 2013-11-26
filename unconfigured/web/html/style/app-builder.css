@@ -34,3 +34,12 @@
     font-size: 105%;
     color: #3b3b3b;
 }
+
+.editor{
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    min-height: 150px;
+}
+
+

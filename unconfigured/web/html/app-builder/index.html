@@ -15,18 +15,9 @@ Version: %%VERSION%%
     <script src="../lib/jquery.min.js"></script>
     <script src="../lib/tinymce/js/tinymce/tinymce.min.js"></script>
     <script>
-        tinymce.init({
-            selector:'.editor',
-            //theme : "modern",
-            toolbar: "save | undo redo | styleselect | fontsizeselect | fontselect | table | bold italic | code",
-            plugins: "code,,table,save,print,paste,fullscreen,,visualchars",
-            save_enablewhendirty: true,
-            save_onsavecallback: function() {console.log("Save");}
-        });
+        var appBuilder;
     </script>
-    <style>
-
-    </style>
+    <script src="app-builder.js"></script>
 </head>
 <body>
 <div class="bodyWrapper">
@@ -113,25 +104,28 @@ Otherwise, please fill out the following information about your app:
     <table>
         <tr>
             <td>App id:</td>
-            <td><input name="app-id" type="text"/></td>
+            <td><input name="clrmid" type="text"/></td>
         </tr><tr>
             <td>App name:</td>
-            <td><input name="app-name" type="text"/></td>
+            <td><input name="name" type="text"/></td>
+        </tr><tr>
+            <td>Version:</td>
+            <td><input name="version" type="text"/></td>
         </tr><tr>
             <td>App type:</td><td>
-                <input type="checkbox" name="app-type" 
+                <input type="checkbox" name="categories" 
                     value="app"/>Tool <br/>
-                <input type="checkbox" name="app-type" 
+                <input type="checkbox" name="categories" 
                     value="study"/>Study
             </td>
         </tr><tr>
             <td>Description:</td>
-            <td><textarea id="app-description"></textarea></td>
+            <td><textarea id="description"></textarea></td>
         </tr><tr>
             <td>Package URL:</td>
-            <td><input name="package-url" type="text"/></td>
+            <td><input name="packageURL" type="text"/></td>
         </tr><tr>
-            <td>Logo URL:</td><td><input name="logo-url" type="text"/></td>
+            <td>Logo URL:</td><td><input name="logoURL" type="text"/></td>
         </tr><tr>
             <td>Minimum %%PROJECT_NAME%% version<br/>
             (current version: %%VERSION%%):</td>
@@ -140,18 +134,18 @@ Otherwise, please fill out the following information about your app:
             <td>Permissions:</td>
             <td>
                 <input type="checkbox" name="permissions" 
-                    value="user-data"/>Access user data<br/>
+                    value="userdata"/>Access user data<br/>
                 <input type="checkbox" name="permissions" 
-                    value="global-data"/>Access global data/Initiate global 
+                    value="globaldata"/>Access global data/Initiate global 
                         collection<br/>
                 <input type="checkbox" name="permissions" 
-                    value="local-storage"/>Store data locally<br/>
+                    value="storage"/>Store data locally<br/>
                 <input type="checkbox" name="permissions" 
-                    value="server-collection"/>Collect data on on or more servers<br/>
+                    value="servercollection"/>Collect data on on or more servers<br/>
                 <input type="checkbox" name="permissions" 
-                    value="server-computation"/>Use servers to process data (no storage)<br/>
+                    value="servercomputation"/>Use servers to process data (no storage)<br/>
                 <input type="checkbox" name="permissions" 
-                    value="manipulate-web-pages"/>Manipulate web pages
+                    value="pagemanipulation"/>Manipulate web pages
             </td>
         </tr>
     </table>
@@ -163,26 +157,35 @@ Otherwise, please fill out the following information about your app:
 <h2>Step 2: Modify your app</h2>
 <!-- List what files/resources they currently have. -->
 <div id="core-files">
-    <h3>Core files&mdash;click to edit:</h3>
-    <ul id="core-file-listing">
+    <h3>Core classes&mdash;click to edit:</h3>
+    <ul id="core-class-listing">
     </ul>
-    <button class="cl-button">Add core file</button>
+    <button class="cl-button">+ core file</button>
+
+    <div class="editor-container hidden">
+        <textarea class="editor js-editor"></textarea>
+        <button id="save-js">Save</button>
+    </div>
 </div>
 
 <div id="resource-files">
     <h3>Resource files&mdash;click to edit:</h3>
     <ul id="resource-file-listing">
     </ul>
-    <button class="cl-button">Add resource file</button>
+    <button class="cl-button">+ resource file</button>
+    <br/><br/>
+
+<!--     <div class="currently-editing">
+        <span class="title">Current editing:</span>
+        <span class="file"></span>
+    </div> -->
+    <div class="editor-container hidden">
+        <textarea class="editor html-editor"></textarea>
+    </div>
 </div>
 
-<br/>
-<br/>
-<br/>
 
-<textarea class="editor"></textarea>
-
-
+<button id="export" class="cl-button">Export</button>
 
 
 <!-- Everything below here is for the footer. -->
