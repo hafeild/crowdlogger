@@ -14,6 +14,11 @@ Version: %%VERSION%%
         href="../style/app-builder.css">
     <script src="../lib/jquery.min.js"></script>
     <script src="../lib/tinymce/js/tinymce/tinymce.min.js"></script>
+    <script src="../lib/codemirror-3.20/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="../lib/codemirror-3.20/lib/codemirror.css">
+    <script src="../lib/codemirror-3.20/mode/javascript/javascript.js"></script>
+    <script src="../lib/codemirror-3.20/mode/xml/xml.js"></script>
+    <script src="../lib/codemirror-3.20/mode/css/css.js"></script>
     <script>
         var appBuilder;
     </script>
@@ -56,12 +61,11 @@ Welcome to the %%PROJECT_NAME%% App Builder!
 
 <h3>What is the App Builder?</h3>
 <p>
-The App Builder is a set of tools that assist you in creating study and tool apps that can be installed by %%PROJECT_NAME%%.  There are three processes:
+The App Builder is a set of tools that assist you in creating study and tool apps that can be installed by %%PROJECT_NAME%%.  There are two steps:
 </p>
 
 <ol>
-    <li>create a base app with all of the relevant metadata</li>
-    <li>add or modify the app content</li>
+    <li>create an app from scratch or modify an existing one</li>
     <li>deploy the app</li>
 </ol>
 
@@ -83,23 +87,14 @@ Further instructions can be found during the building process, or from our
 <a href="hosting.html">App Hosting Submission page</a>.
 </p>
 
-<a name="step1"></a>
-<h2>Step 1: Create an app</h2>
-
-<p>
-If you have an existing app, you can upload it now and continue on to 
-<a href="step2">Step 2: modify app</a>.
-</p>
+<h2>Building an app</h2>
 
 <div class="app-input">
-Upload app package (.json) if you have one: <input id="app-upload" type="file"/>
+Load existing app package (.json): <input id="app-upload" type="file"/>
 </div>
 
-<p>
-Otherwise, please fill out the following information about your app:
-</p>
-
 <div class="app-input">
+    <h3>Metadata</h3>
     <form>
     <table>
         <tr>
@@ -153,37 +148,62 @@ Otherwise, please fill out the following information about your app:
 </div>
 
 
-<a name="step1"></a>
-<h2>Step 2: Modify your app</h2>
-<!-- List what files/resources they currently have. -->
-<div id="core-files">
-    <h3>Core classes&mdash;click to edit:</h3>
-    <ul id="core-class-listing">
-    </ul>
-    <button class="cl-button">+ core file</button>
+<div class="file-editor">
+    <h3>File editor</h3>
+    <!-- List what files/resources they currently have. -->
+    <div class="files">
+        <h4>Core</h4>
+        <div class="category" data-type="module">
+            <span class="file module"><span class="name">module.js</span></span>
+        </div>
 
-    <div class="editor-container hidden">
-        <textarea class="editor js-editor"></textarea>
-        <button id="save-js">Save</button>
+        <div class="category" data-type="html">
+            <h4>
+                HTML files
+                <button class="cl-button add"><sup>+</sup></button>
+            </h4>
+        </span>
+
+        </div>
+
+        <div class="category" data-type="js">
+            <h4>
+                JavaScript files 
+                <button class="cl-button add"><sup>+</sup></button>
+            </h4>
+        </div>
+        
+        <div class="category" data-type="css">
+            <h4>
+                CSS files
+                <button class="cl-button add"><sup>+</sup></button>
+            </h4>
+        </div>
+
+        <div class="hidden file" id="file-template">
+            <span class="remove-button-container">
+                    &nbsp;
+                    <button class="cl-button remove confirm hidden"
+                        ><sup>&times;</sup></button>
+            </span>
+            <span class="name"></span>
+        </div>
+    </div>
+
+    <div class="editors">
+        <div class="editor-container hidden">
+            <textarea class="editor js-editor"></textarea>
+        </div>
+
+        <div class="editor-container hidden">
+            <textarea class="editor css-editor"></textarea>
+        </div>
+
+        <div class="editor-container hidden">
+            <textarea class="editor html-editor"></textarea>
+        </div>
     </div>
 </div>
-
-<div id="resource-files">
-    <h3>Resource files&mdash;click to edit:</h3>
-    <ul id="resource-file-listing">
-    </ul>
-    <button class="cl-button">+ resource file</button>
-    <br/><br/>
-
-<!--     <div class="currently-editing">
-        <span class="title">Current editing:</span>
-        <span class="file"></span>
-    </div> -->
-    <div class="editor-container hidden">
-        <textarea class="editor html-editor"></textarea>
-    </div>
-</div>
-
 
 <button id="export" class="cl-button">Export</button>
 

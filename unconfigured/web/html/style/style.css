@@ -591,7 +591,9 @@ a:active {
     margin: 0 0;
     border-radius: 2px;
     height: 29px;
+    outline: none;
 }
+
 
 .cl-button:hover {
     background-image: -webkit-linear-gradient(top,#afc2df,#7898c9);
