@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Query Questionnaire</title>
+    <!-- This pull jQuery down from Google. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+    var clrmBackend, ready = false;
+    jQuery(document).ready(start);
+
+    function start(){
+        if(!(clrmBackend && ready)){
+            setTimeout(start, 50);
+            return;
+        }
+
+        // Add the query and search engine everywhere we need it on the page.
+        jQuery('code.query').html(clrmBackend.currentQueryInfo.q);
+        jQuery('input.query').val(clrmBackend.currentQueryInfo.q);
+        jQuery('code.search-engine').html(clrmBackend.currentQueryInfo.se);
+        jQuery('input.search-engine').val(clrmBackend.currentQueryInfo.se);
+
+        jQuery('form').on('submit', function(){
+            clrmBackend.uploadData(jQuery(this).serialize(), success, error);
+        });
+
+        jQuery('#close-window').click(clrmBackend.closeWindow);
+    }
+
+    function success(){
+        alert('Your data was successfully uploaded!');
+        clrmBackend.closeWindow();
+    }
+
+    function error(err){
+        alert('There was an error uploading your data to the server: '+ err);
+    }
+    </script>
+</head>
+<body>
+<h1>Post Query Questionnaire</h1>
+<p>
+It looks like you just submitted the query <code class="query"></code> to <code class="search-engine"></code>. Please answer the following questions about that search.
+</p>
+
+<form name="questionnaire">
+    <input type="hidden" name="query" class="query"/>
+    <input type="hidden" name="search-engine" class="search-engine"/>
+    Is this the start of a new information need? <br/>
+    <ul>
+        <input type="radio" name="new-info-need" value="true"> Yes <br/>
+        <input type="radio" name="new-info-need" value="false"> No
+    </ul>
+
+    Are you issuing this query because a previous query was unsuccessful?
+    <ul>
+        <input type="radio" name="prev-query-unsuccessful" value="true"> Yes <br/>
+        <input type="radio" name="prev-query-unsuccessful" value="false"> No
+    </ul>
+    
+    Please describe the intent of your current query:<br/>
+    <textarea rows=10 cols=50 name="intent"></textarea>
+
+    <input type="submit"/>
+</form>
+
+<button id="close-window">Close</button>
+
+
+</body>
+</html>
