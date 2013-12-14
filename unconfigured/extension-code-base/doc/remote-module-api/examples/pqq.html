@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!--
+File:      pqq.html
+Author:    Henry Feild
+Date:      December 2013
+Purpose:   Provides an overview of the Search Task Assistant CrowdLogger Remote 
+           Module.
+
+%%COPYRIGHT%%
+
+Version: %%VERSION%%
+-->
+<html>
+<head>
+    <script src="../js/external/jquery.min.js"></script>
+    <script src="../js/content-page.js"></script>
+</head>
+<body>
+<h1>Example Module: Post query questionnaire</h1>
+<p>
+   This module serves as a demonstration for how to prompt the user for feedback when an event occurs. Specifically, every time a query is detected, a popup will be created with a questionnaire the user must fill out. That data will then be sent to a server (right now, it's just a dummy server). There are several stages to this:
+</p>
+<ol start="0">
+    <li><a href="#examples/pqq:setup">setup</a></li>
+    <li><a href="#examples/pqq:create-metadata">create metadata file (JSON)</a></li>
+    <li><a href="#examples/pqq:create-background">create the background module script</a></li>
+    <li><a href="#examples/pqq:create-resources">create the resource files (e.g., the popups)</a></li>
+    <li><a href="#examples/pqq:package">package the files into a CLRM package (<code>.json</code> file)</a></li>
+    <li><a href="#examples/pqq:publish">publish the CLRM</a></li>
+</ol>
+
+<a name="setup"></a>
+<h2>Step 0: Setup</h2>
+<p>
+The first thing you'll have to do is create a directory somewhere to put all your files. The rest of these instructions assume that you are in that directory. All new files and subdirectories will be added to this one.
+</p>
+
+<a name="create-metadata"></a>
+<h2>Step 1: Create metadata file (JSON)</h2>
+<p>
+First thing we need to do is create a metadata file. Create a new file called <code>metadata.json</code>. Open it with a text editor and paste the following code:
+</p>
+<pre class="prettyprint">
+{
+    "clrmid": "pqq",
+    "name": "Post query questionnaire",
+    "version": "1.0",
+    "categories": ["study"],
+    "description": "A simple CrowdLogger Remote Module demonstration. It generates a popup box with questions ever time a search is issued.",
+    "packageURL": "http://localhost:8080/pqq.json",
+    "permissions": ["ui", "userdata", "servercollection"],
+    "logoURL": "http://localhost:8080/pqq.jpg",
+    "minCLVersion": "2.0.2"
+}
+</pre>
+<p>
+The urls used for the <code>packageURL</code> and <code>logoURL</code>code> will need to change depending on <a href="#examples/pqq:publish">how you publish</a> your package.
+</p>
+
+<a name="create-background"></a>
+<h2>Step 2: Create background module script (JavaScript)</h2>
+<p>
+Create a new file called <code>background.js</code> and open it in a text editor. This is the JavaScript file that will contain all of the code to execute in the background. This is where we'll add code for what to do when the CLRM starts, stops, and to monitor when the user has performed an action.
+</p>
+
+<p>
+We're going to pack a couple of different JavaScript objects into this file. The first is the required <code>RemoteModule</code> class (see <a href="#implement:core-module-structure">The Structure of the Core Module Code</a>).
+</p>
+
+<pre class="prettyprint">
+// This is a required class. CrowdLogger will make an instance of this when
+// the module is loaded.
+var RemoteModule = function( clrmPackage, clrmAPI ){
+    var pqq,
+        that = this;
+
+    // Required. Called when the CLRM first starts up.
+    this.init = function(){
+        // We will use the PostQueryQuestionnaire object to perform most of 
+        // the core tasks.
+        pqq = new that.PostQueryQuestionnaire( clrmPackage, clrmAPI );
+    };
+
+    // Required. Called when the CLRM is unloaded for any of the reasons
+    // listed below.
+    this.unload = function(reason, oncomplete, onerror){
+        // You can change what gets called for each of the reasons.
+        switch(reason){
+            case 'uninstall':
+            case 'newversion':
+            case 'shutdown':
+            case 'disable': 
+            default:
+                pqq.unload(oncomplete, onerror);
+        }
+    };
+
+    // Required. This is periodically called by CrowdLogger to see if you have
+    // any pending messages for the user. These messages are displayed next
+    // to the CLRM on the status page.
+    this.getMessage = function(){
+    };
+
+    // Required. This is called when the user clicks the "Open" button for this
+    // CLRM. You could, e.g., open a window with a set of options, etc.
+    this.open = function(){
+    };
+
+    // Required. This is called when the user clicks the "Configure" button for
+    // this CLRM. 
+    this.configure = function(){
+    };
+
+    // Required. This is called when CrowdLogger or the User wants to update
+    // the current install. If you are in the middle of processing something,
+    // you'll want this to return false.
+    this.isOkayToUpdate = function(){
+        return true;
+    };
+};
+</pre>
+
+<p>
+This code references a <code>PostQueryQuestionnaire</code> object, which we'll create next. That piece will take care of listening for an event, launching the questionnaire, and uploading the responses. Paste the following just below he code from above.
+</p>
+
+<pre class="prettyprint">
+// This class is where all the important logic is.
+RemoteModule.prototype.PostQueryQuestionnaire = function(clrmPackage, clrmAPI){
+    // Private members.
+    var that = this,
+        windowSpecs = {
+            width: 600,
+            height: 500,
+            location: 'no',
+            status: 'no',
+            toolbar: 'no',
+            resizable: 'yes',
+            scrollbars: 'yes'
+        },
+        openedWindow;
+    const QUESTIONNAIRE_PAGE = "questionnaire.html",
+          UPLOAD_SERVER_URL = "http://localhost:8080/upload.php";
+
+    // Private function names.
+    var init, addListeners, onSearch, openQuestionnaire;
+
+    // Public variables.
+    this.currentQueryInfo;        
+
+    // Private functions definitions.
+
+    // Initializes everything, including setting up listeners.
+    init = function(){
+        addListeners();
+    };
+
+    // Adds listeners for search events.
+    addListeners = function(){
+        clrmAPI.user.realTime.addActivityListeners({
+                'query-entered': onSearch
+        });
+    };
+
+    // Defines what to do when a search is detected.
+    onSearch = function(eventName, eventData){
+        that.currentQueryInfo = eventData;
+        clrmAPI.ui.openWindow({
+            content: clrmPackage.html[QUESTIONNAIRE_PAGE],
+            resources: clrmPackage,
+            name: QUESTIONNAIRE_PAGE,
+            specsMap: windowSpecs,
+            callback: openQuestionnaire
+        });
+    };
+
+    // Opens the questionnaire dialog.
+    openQuestionnaire = function(win){
+        // clrmBackend is defined in the JavaScript within questionnaire.html.
+        // This will allow the questionnaire code to access this object.
+        win.clrmBackend = that;
+        win.start();
+        win.focus();
+        openedWindow = win;
+        win.addEventListener('unload', function(){
+            openedWindow = undefined;
+        });
+    };
+
+    // Public functions.
+
+    // De-registers our listeners and closes open windows.
+    this.unload = function(oncomplete, onerror){
+        // Close the questionnaire window if it's open.
+        that.closeWindow();
+        oncomplete();
+    };
+
+    // Uploads the given information to the server.
+    this.uploadData = function(data, onsuccess, onerror){
+        clrmAPI.ssa.sendPostData({
+            url: UPLOAD_SERVER_URL,
+            data: data,
+            on_success: function(response){
+                response = JSON.parse(response);
+                if(response.accepted &amp;&amp; onsuccess){
+                    onsuccess();
+                } else if(!response.accepted &amp;&amp; onerror){
+                    onerror(response.error || 'No error reported.');
+                }
+            },
+            on_error: onerror
+        });
+    };
+
+    // Closes the open window.
+    this.closeWindow = function(){
+        try{
+            if(openedWindow){ 
+                openedWindow.close(); 
+                openedWindow = undefined;
+            }
+        } catch(e) {}
+    };
+
+    // Invoked on creation.
+    init();
+};
+</pre>
+
+<a name="create-resources"></a>
+<h2>Step 3: Create resource files (HTML/JavaScript/CSS)</h2>
+<p>
+We just wrote the background script. Now we need to write the resources that we'll use to display windows, like the questionnaire that pops up after each query is entered. The first thing we need to do is create a subdirectory named <code>resources</code>.  This will contain all of our resources&mdash;HTML, JavaScript, and CSS files. For this example, we'll use an HTML file with embedded JavaScript to display the questionnaire. We'll ignore CSS and external JavaScript files. We're also including the jQuery JavaScript library to help us out with page manipulation. Add the following HTML to a new file named <code>questionnaire.html</code> (this matches what we called the file in our background script).
+</p>
+
+<pre class="prettyprint">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Post Query Questionnaire&lt;/title&gt;
+    &lt;!-- During packaging, this library will be downloaded and added to the 
+         final CLRM. --&gt;
+    &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script&gt;
+    var clrmBackend, ready = false;
+    jQuery(document).ready(function(){
+        ready = true;
+    });
+
+    function start(){
+        if(!(clrmBackend &amp;&amp; ready)){
+            setTimeout(start, 50);
+            return;
+        }
+
+        // Add the query and search engine everywhere we need it on the page.
+        jQuery('code.query').html(clrmBackend.currentQueryInfo.q);
+        jQuery('input.query').val(clrmBackend.currentQueryInfo.q);
+        jQuery('code.search-engine').html(clrmBackend.currentQueryInfo.se);
+        jQuery('input.search-engine').val(clrmBackend.currentQueryInfo.se);
+
+        jQuery('form').on('submit', function(event){
+            clrmBackend.uploadData(jQuery(this).serialize(), success, error);
+            event.preventDefault();
+        });
+
+        jQuery('#close-window').click(function(){
+            console.log("Closing...");
+            window.close();
+        });
+    }
+
+    function success(){
+        alert('Your data was successfully uploaded!');
+        clrmBackend.closeWindow();
+    }
+
+    function error(err){
+        alert('There was an error uploading your data to the server: '+ err);
+    }
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Post Query Questionnaire&lt;/h1&gt;
+&lt;p&gt;
+It looks like you just submitted the query &lt;code class="query"&gt;&lt;/code&gt; to &lt;code class="search-engine"&gt;&lt;/code&gt;. Please answer the following questions about that search.
+&lt;/p&gt;
+
+&lt;form name="questionnaire"&gt;
+    &lt;input type="hidden" name="query" class="query"/&gt;
+    &lt;input type="hidden" name="search-engine" class="search-engine"/&gt;
+    Is this the start of a new information need? &lt;br/&gt;
+    &lt;ul&gt;
+        &lt;input type="radio" name="new-info-need" value="true"&gt; Yes &lt;br/&gt;
+        &lt;input type="radio" name="new-info-need" value="false"&gt; No
+    &lt;/ul&gt;
+
+    Are you issuing this query because a previous query was unsuccessful?
+    &lt;ul&gt;
+        &lt;input type="radio" name="prev-query-unsuccessful" value="true"&gt; Yes &lt;br/&gt;
+        &lt;input type="radio" name="prev-query-unsuccessful" value="false"&gt; No
+    &lt;/ul&gt;
+    
+    Please describe the intent of your current query:&lt;br/&gt;
+    &lt;textarea rows=10 cols=50 name="intent"&gt;&lt;/textarea&gt;
+
+    &lt;input type="submit"/&gt;
+&lt;/form&gt;
+
+&lt;button id="close-window"&gt;Close&lt;/button&gt;
+
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<a name="package"></a>
+<h2>Step 4: Package the files into a CLRM (JSON)</h2>
+<p>
+To package the CLRM, use the <a href="#implement:auto-packaging">auto-packaging</a> command line script. Here's what the command looks like for our example:
+</p>
+<pre class="prettyprint">
+ruby clrm-package.rb \
+    background.js \
+    --resource-dir=resources \
+    --metadata-file=metadata.json \
+    > pqq.json
+</pre>
+
+<a name="publish"></a>
+<h2>Step 5: Publish the CLRM</h2>
+<p>
+For publishing your CLMR, take a look at <a href="#execute:self-publish">self publishing</a>. 
+</p>
+
+<h2>That's it!</h2>
+<p>
+You should now have a working CLRM that will prompt the user to respond to a questionnaire on every query submitted.
+</p>
+
+</body>
+</html>

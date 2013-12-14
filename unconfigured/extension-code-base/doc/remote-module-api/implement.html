@@ -141,7 +141,7 @@ A CLRM Package is a JSON object with the following fields:
             carry and that they are divided on the CLRM Library page.
             Can be any and all of the following: 
             <ul>
-                <li><code>'app'</code>
+                <li><code>app</code>
                     <ul>
                         an app; this should not be tied to an IRB protocol or
                         other study-like aspects. Examples of apps include
@@ -149,7 +149,7 @@ A CLRM Package is a JSON object with the following fields:
                         will not require uploading information (unless an
                         algorithm requires it).
                     </ul>
-                <li><code>'study'</code>
+                <li><code>study</code>
                     <ul>
                         a study module; this will likely involve an IRB 
                         informed consent form and will need to upload certain
@@ -178,8 +178,16 @@ A CLRM Package is a JSON object with the following fields:
     </tr><tr>
         <td><code>permissions</code></td>
         <td>array of strings</td>
-        <td>A list of the APIs this CLRM requires access to. This will be
-            shown to users before they are able to install the CLRM.
+        <td>A list of the APIs this CLRM requires access to. This will eventually be
+            shown to users before they are able to install the CLRM (currently, it's ignored). Valid values are:
+            <ul>
+                <li><code>userdata</code></li>
+                <li><code>ui</code></li>
+                <li><code>storage</code></li>
+                <li><code>privacy</code></li>
+                <li><code>serveraccess</code></li>
+                <li><code>globaldata</code></li>
+            </ul>
         </td>
     </tr><tr>
         <td><code>minCLVersion</code></td>
@@ -469,7 +477,7 @@ references are made in HTML content in the following way:
 <p>
 It's tedious and error prone to have to package a CLRM manually. Rather than
 do that, you can feed the core CLRM script and a set of resources&mdash;HTML,
-JavaScript, and CSS files&mdash;to the <code>clrm-package.rb</code> script.
+JavaScript, and CSS files&mdash;to the <code>clrm-package.rb</code> script (you can <a href="">download the latest version from Google code</a>.
 This naive script does the following: 
 </p>
 

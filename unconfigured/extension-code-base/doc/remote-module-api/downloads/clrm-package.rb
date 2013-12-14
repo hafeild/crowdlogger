@@ -1,0 +1,1 @@
+../../../../../scripts/clrm-package.rb

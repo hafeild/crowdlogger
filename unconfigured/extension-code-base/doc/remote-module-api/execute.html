@@ -19,63 +19,96 @@ Version: %%VERSION%%
     <h2>Contents</h2>
     <ul>
         <!-- <li><a href="#execute">Using a CrowdLogger Remote Module</a> -->
-        <li><a href="#execute:which-crowdlogger">Which Crowdlogger</a>
-        <li><a href="#execute:development">Development/LocalMode</a>
-        <li><a href="#execute:published">Published Mode</a>
+        <li><a href="#execute:which-publishing-method">Which publishing method</a>
+        <li><a href="#execute:crowdlogger-server">Publish on a CrowdLogger server</a>
+        <li><a href="#execute:self-publish">Self publish</a>
     </ul>
 </div>
 
-<h1>Using a CrowdLogger Remote Module</h1>
+<h1>Publishing a CrowdLogger Remote Module</h1>
 
-<p> 
-<a name="which-crowdlogger"></a>
-<h2>Which CrowdLogger</h2>
-
-If you want to program a CLRM for use with a large network of users via,
-e.g., the UMass CrowdLogger Project or one you are hosting, then you can <a
-href="#execute/published">publish your module</a>. This basically means your
-module gets placed on a server and is loaded from there. Note that publishing
-within the UMass CrowdLogger Project requires having your module inspected in
-much the same way as an app submitted to the Apple App Store or Google Market
-Place would be. </p>
-
-<p> If your developing or only need a module for a local clone of CrowdLogger,
-then you can also use the <a href="#execute/published">CLRM development or local
-mode</a>. Your modules will look exactly the same, but they are stored
-locally on your computer rather than a server. </p>
+<a name="which-publishing-method"></a>
+<h2>Which publishing method</h2>
 
 <p>
-<a name="development"></a>
-<h2>Development/Local Mode</h2>
+You have two options for making your CLRM available: publish it on the CrowdLogger server or self publish. Use the latter when developing or when you'd rather not wait to have your CLRM placed on the CrowdLogger server. 
+</p>
 
-When just developing or using CrowdLogger in a lab setting, we don't want to
-worry about setting up a server&mdash;even a local one. All you need to do 
-to use a CLRM in local or development mode is to set the <code>CLRM_LOCAL_DIR</code>
-to the path of the directory containing your CLRM&mdash;that's it! 
-CrowdLogger will make all CLRMs in that directory available to the user.
+<a name="crowdlogger-server"></a>
+<h2>Publish on a CrowdLogger server</h2>
+<p>
+If you want to publish your CLRM to the UMass CrowdLogger server, then send your CLRM package, along with a description of who you are and what your app does to <a mailto="crowdlogger@crowdlogger.org">crowdlogger@crowdlogger.org</a>.
+</p>
+
+<p>
+If you are hosting your own instance of a CrowdLogger server, then follow these steps:
+</p>
+<ol>
+    <li>navigate to the <tt>html/clrms/</tt> directory of your CrowdLogger server</li>
+    <li>create a new directory for your CLRM (e.g., you might name this after the CLRM id)</li>
+    <li>update the metadata for your package so that the <code>packageURL</code> and <code>logoURL</code> point to this location (use absolute urls)</li>
+    <li>in the directory you just created, copy:</li>
+    <ul>
+        <li>the CLRM package</li>
+        <li>a copy of the metadata stored in a file called <code>metadata.json</code></li>
+        <li>the logo image for your CLRM if you have one</li>
+    </ul>
+</ol>
+
+<a name="self-publish"></a>
+<h2>Self publish</h2>
+<p>
+For this step, you will need some sort of server running. Python provides a nice built-in server, so use that if you do not have a full blown server like Apache running.
+</p>
+
+<h3>Step 1: Create a directory to house your CLRM</h3>
+<p>
+If you are using a web server, create a directory in a location that is accessible via your web server. If you do not have a web server, create a directory wherever you'd like, then start up a Python server in that directory with the command: <code>python -m SimpleHTTPServer 8080</code>
+</p>
+
+<h3>Step 2: Update your CLRM metadata</h3>
+<p>
+Each CLRM you plan to self publish in the location above should be updated such that the URLs point to that location. If using the Python server, use <code>localhost:8080</code> as the url base, followed by the name of your JSON package (for <code>packageURL</code>) or logo (for <code>logoURL</code>).
+</p>
+
+<h3>Step 3: Create a meta-metadata file</h3>
+<p>
+You need to create a JSON file that consists of key value pairs where there is one key for each CLRM that you would like to publish (the key should be its <code>clrmid</code>) and the value should be its metadata (as a JSON object). E.g.:
 </p>
 
 <pre class="prettyprint">
 {
-    "CLRM_LOCAL_DIR": "/path/to/dir"
+    "demo1": {
+        "clrmid": "demo1",
+        "name": "Demo 1",
+        "version": "1.5",
+        "categories": ["app"],
+        "description": "A simple CrowdLogger Remote Module demonstration.",
+        "packageURL": "http://localhost:8080/demo.json",
+        "permissions": ["userdata", "ui", "storage"],
+        "logoURL": "http://localhost:8080/demo.jpg",
+        "minCLVersion": "2.0.2"
+    }
 }
 </pre>
-
-
-<p> TODO: discuss how to refresh this, or will CrowdLogger take care of that
-automatically? </p>
-
 <p>
-<a name="published"></a>
-<h2>Published Mode</h2>
+You can call this file whatever you want. For the purposes of this tutorial, I'll assume you've named it <code>clrms.json</code>.
+</p>
 
-To make your CLRM available to a large user base and avoid the need to constantly push out extension updates, you can use the published mode. This involves placing your CLRM's directory in the <tt>web/remote-modules/</tt> directory in the web server.</p>
+<h3>Step 4: Copy your CLRMs to the directory from Step 1</h3>
+<p>
+For each CLRM you have listed in <code>clrms.json</code>, copy over the CLRM package. These should be named according to how they are referenced in the <code>packageURL</code> fields in the metadata/<code>clrms.json</code> file. If you have logos, copy them over to this directory, as well.
+</p>
 
-<p>If you are hosting your own CrowdLogger server, this is easy. However,
-if you want to publish your CLRM in the UMass CrowdLogger Network, then you will
-need to have it inspected to ensure that your CLRM meets our security and
-privacy standards. <a href="http://www.crowdlogger.org">See the CrowdLogger
-website for more information</a>.</p>
+<h3>Step 5: Add your server URL to a CrowdLogger browser installation's repositories</h3>
+<p>
+Open up your browser that has CrowdLogger installed and go to Settings and add your URL, including the name of the file you created in Step 2, as a new repository. E.g., for the example above, I would add: <code>http://localhost:8080/clrms.json</code>.
+</p>
 
+<h3>Step 5: Load module</h3>
+<p>
+If you visit the Apps &amp; Studies page from the CrowdLogger Status page, you should now see your app in the library. You can force your CLRM to be reloaded from the URL if you are in developer mode (you can toggle this mode in the CrowdLogger Settings). If you have the CLRM installed, then hovering over the module's icon will produce a popup with an <code>Update</code>
+button. Press that to download the current package from the repository.
+</p>
 </body>
 </html>
