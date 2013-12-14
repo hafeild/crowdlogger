@@ -5,7 +5,7 @@
     "categories": ["study"],
     "description": "A simple CrowdLogger Remote Module demonstration. It generates a popup box with questions ever time a search is issued.",
     "packageURL": "http://localhost:8080/pqq.json",
-    "permissions": ["ui", "user", "serveraccess"],
+    "permissions": ["ui", "userdata", "servercollection"],
     "logoURL": "http://localhost:8080/pqq.jpg",
     "minCLVersion": "2.0.2"
 }

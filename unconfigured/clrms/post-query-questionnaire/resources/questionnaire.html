@@ -2,11 +2,14 @@
 <html>
 <head>
     <title>Post Query Questionnaire</title>
-    <!-- This pull jQuery down from Google. -->
+    <!-- During packaging, this library will be downloaded and added to the 
+         final CLRM. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
     var clrmBackend, ready = false;
-    jQuery(document).ready(start);
+    jQuery(document).ready(function(){
+        ready = true;
+    });
 
     function start(){
         if(!(clrmBackend && ready)){
@@ -20,11 +23,15 @@
         jQuery('code.search-engine').html(clrmBackend.currentQueryInfo.se);
         jQuery('input.search-engine').val(clrmBackend.currentQueryInfo.se);
 
-        jQuery('form').on('submit', function(){
+        jQuery('form').on('submit', function(event){
             clrmBackend.uploadData(jQuery(this).serialize(), success, error);
+            event.preventDefault();
         });
 
-        jQuery('#close-window').click(clrmBackend.closeWindow);
+        jQuery('#close-window').click(function(){
+            console.log("Closing...");
+            window.close();
+        });
     }
 
     function success(){

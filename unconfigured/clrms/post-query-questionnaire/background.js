@@ -55,7 +55,7 @@ var RemoteModule = function( clrmPackage, clrmAPI ){
 // ========================================================================== //
 
 // This class is where all the important logic is.
-var PostQueryQuestionnaire = function( clrmPackage, clrmAPI ){
+RemoteModule.prototype.PostQueryQuestionnaire = function(clrmPackage, clrmAPI){
     // Private members.
     var that = this,
         windowSpecs = {
@@ -108,7 +108,7 @@ var PostQueryQuestionnaire = function( clrmPackage, clrmAPI ){
         // clrmBackend is defined in the JavaScript within questionnaire.html.
         // This will allow the questionnaire code to access this object.
         win.clrmBackend = that;
-        win.init();
+        win.start();
         win.focus();
         openedWindow = win;
         win.addEventListener('unload', function(){
@@ -121,7 +121,7 @@ var PostQueryQuestionnaire = function( clrmPackage, clrmAPI ){
     // De-registers our listeners and closes open windows.
     this.unload = function(oncomplete, onerror){
         // Close the questionnaire window if it's open.
-        closeWindow();
+        that.closeWindow();
         oncomplete();
     };
 
