@@ -143,12 +143,14 @@ REQUIRED_METADATA_FIELDS = {
     :version    => ParamVerifier.new("".class, Proc.new{|v| v=~/^[\d\.]*$/}),
     :categories => ParamVerifier.new([].class, 
         Proc.new{|a| 
-            a.select{|e| !VALID_CATEGORY_VALS.member?(e.to_sym)}.size==0}),
+            a.select{|e| !VALID_CATEGORY_VALS.member?(e.to_sym)}.size==0
+        }),
     :description=> ParamVerifier.new("".class),
     :packageURL => ParamVerifier.new("".class),
     :permissions=> ParamVerifier.new([].class, 
         Proc.new{|a| 
-            a.select{|e| !VALID_PERMISSION_VALS.member?(e.to_sym)}.size==0})
+            a.select{|e| !VALID_PERMISSION_VALS.member?(e.to_sym)}.size==0
+        })
 }
 
 OPTIONAL_METADATA_FIELDS = {
@@ -218,7 +220,7 @@ end
 ## @param clrmPackage  The package to update.
 ## @return A pointer back to the clrmPackage passed in.
 def downloadWebResource(url, clrmPackage)
-    clrmPackage[ext(url)][File.basename(url)] = NET::HTTP.get(URI(url))
+    clrmPackage[ext(url)][File.basename(url)] = Net::HTTP.get(URI(url))
     clrmPackage
 end
 
