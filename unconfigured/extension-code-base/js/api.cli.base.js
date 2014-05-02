@@ -314,12 +314,12 @@ CLI.prototype.Base = function(crowdlogger, cli){
     /**
      * Loads a CLRM Package from a string.
      *
-     * @param {string} package     The CLRM Package as serialized JSON.
+     * @param {string} thePackage     The CLRM Package as serialized JSON.
      */
-    this.loadCLRMFromString = function(package, onsuccess, onerror){
+    this.loadCLRMFromString = function(thePackage, onsuccess, onerror){
         that.sendMessage({
             command: 'loadCLRM', 
-            package: package,
+            'package': thePackage,
             callbackID: that.simpleCallbackWrapper(onsuccess, onerror)
         });
     };
@@ -327,7 +327,12 @@ CLI.prototype.Base = function(crowdlogger, cli){
     /**
      * Unloads a CLRM Package by id.
      *
-     * @param {string} package     The CLRM Package as serialized JSON.
+     * @param {string} clrmid     The id of the CLRM to unload.
+     * @param {string} reason     The reason for unloading the CLRM.
+     * @param {function} onsuccess The function to invoke upon successfully
+     *                            unloading the CLRM.
+     * @param {function} onerror  The function to invoke if problems are 
+     *                            encountered.
      */
     this.unloadCLRM = function(clrmid, reason, onsuccess, onerror){
         that.sendMessage({
