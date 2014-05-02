@@ -94,7 +94,7 @@ function load_xul(){
     // Loop through each of the open windows and update the buttons.
     while(enumerator.hasMoreElements()) {
         var win = enumerator.getNext();
-        dump('Calling load_xul_for_window on current window.\n')
+        dump('Calling load_xul_for_window on current window.\n');
         load_xul_for_window(win);
     }
     dump('Done with open windows.\n');
@@ -223,6 +223,20 @@ function setTimeout(callback, delay) {
 }
 
 function initHiddenWindow(callback, addon){
+    // var addonPrincipal = Cc["@mozilla.org/systemprincipal;1"].
+    //     createInstance(Ci.nsIPrincipal);
+    // var docShell = Cc["@mozilla.org/appshell/appShellService;1"].
+    //     getService(Ci.nsIAppShellService).
+    //     createWindowlessBrowser().
+    //     QueryInterface(Ci.nsIInterfaceRequestor).
+    //     getInterface(Ci.nsIDocShell);
+     
+    // docShell.createAboutBlankContentViewer(addonPrincipal);
+     
+    // var hiddenWindow = docShell.contentViewer.DOMDocument.defaultView;
+
+
+
     var hiddenWindow = APP_SHELL_SERVICE.hiddenDOMWindow;
     dump( 'hiddenWindow: '+ hiddenWindow +'\n' );
     if( hiddenWindow && hiddenWindow.document ){
@@ -230,9 +244,16 @@ function initHiddenWindow(callback, addon){
             hiddenWindow.document.readyState +'\n' );
     }
     if( hiddenWindow && hiddenWindow.document && 
-            hiddenWindow.document.readyState === "complete" ){
-        that.win = hiddenWindow;
-        that.win.location.href = BACKGROUND_PAGE;
+            hiddenWindow.document.readyState === 'complete' ){
+
+        var frame = hiddenWindow.document.createElement('iframe');
+        frame.setAttribute('id', 'CrowdLogger');
+        frame.setAttribute('src', BACKGROUND_PAGE);
+        hiddenWindow.document.documentElement.appendChild(frame);
+
+        that.win = frame.contentWindow;
+
+        // that.win.location.href = BACKGROUND_PAGE;
         callback();
     } else {
         setTimeout(function(){ initHiddenWindow(callback,addon); }, 20);

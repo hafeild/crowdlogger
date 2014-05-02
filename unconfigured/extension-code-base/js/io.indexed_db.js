@@ -63,10 +63,12 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         PREVUNIQUE = 'prevunique',
         MAX_CHUNK_SIZE = 200,
         T = 5, // Default timeout.
-        IndexedDB = window.indexedDB || window.mozIndexedDB || 
-            window.webkitIndexedDB,
-        IDBKeyRange = window.IDBKeyRange || window.mozIDBKeyRange || 
-            window.webkitIDBKeyRange;
+        IndexedDB = crowdlogger.window.indexedDB || 
+            crowdlogger.window.mozIndexedDB || 
+            crowdlogger.window.webkitIndexedDB,
+        IDBKeyRange = crowdlogger.window.IDBKeyRange || 
+            crowdlogger.window.mozIDBKeyRange || 
+            crowdlogger.window.webkitIDBKeyRange;
 
     // Some globals.
     var that = this,
