@@ -120,15 +120,15 @@ CLRMI.prototype.Base = function(api) {
     /**
      * Loads a CrowdLogger Remote Module. 
      *
-     * @param {string} data   Should contain a 'package' field whose value is
+     * @param {string} data   Should contain a 'thePackage' field whose value is
      *                        the JavaScript module code to load.
      */
     loadCLRM = function(data){
         that.log('In loadCLRM');
         try{
-            var package = JSON.parse(data.package);
+            var thePackage = JSON.parse(data['package']);
             that.log('Finished parsing the clrm...');
-            var clrm = new CLRM(package, api.API, that.log);
+            var clrm = new CLRM(thePackage, api.API, that.log);
             that.log('Finished instantiating the clrm...');
 
             // Wrapping this in a function in case we need to unload an existing
@@ -138,10 +138,10 @@ CLRMI.prototype.Base = function(api) {
                 that.log('Calling init on the clrm...');
 
                 //modules[clrm.id] = clrm.module;
-                modules[package.clrmid] = clrm.module;
+                modules[thePackage.clrmid] = clrm.module;
                 clrm.module.init();
 
-                that.log('Module '+ package.clrmid +' loaded!');
+                that.log('Module '+ thePackage.clrmid +' loaded!');
                 if( data.callbackID ){
                     that.invokeCLICallback({
                         callbackID: data.callbackID,
@@ -152,11 +152,11 @@ CLRMI.prototype.Base = function(api) {
 
             // Check if it already exists. If so, unload the previous version.
             // if( modules[clrm.id] ){
-            if( modules[package.clrmid] ){
+            if( modules[thePackage.clrmid] ){
                 try{
-                    that.log('Unloading module '+ package.clrmid);
+                    that.log('Unloading module '+ thePackage.clrmid);
                     // modules[clrm.id].unload('newversion', load);
-                    modules[package.clrmid].unload('newversion', load);
+                    modules[thePackage.clrmid].unload('newversion', load);
                 } catch(e){
                     that.log('There was an error unloading the old module: '+ 
                         e.toString());
@@ -518,7 +518,7 @@ var CLRM = function(clrmPackage, CrowdLoggerAPI, log){
     try{
         eval(clrmPackage.module);
     } catch(e) {
-        log('Caught error loading package: '+ e);
+        log('Caught error loading thePackage: '+ e);
     }
     log('Finished running eval...');
 

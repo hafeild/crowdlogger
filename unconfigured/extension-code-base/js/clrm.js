@@ -376,10 +376,10 @@ var CLRM = function(crowdlogger){
         // See if there's already a version of this saved.
         crowdlogger.io.log.get_clrm_entry({
             clrmid: clrmPackage.metadata.clrmid,
-            on_success: function(package){
+            on_success: function(thePackage){
                 crowdlogger.debug.log('Heard back from database; package: '+ 
-                    package);
-                if(package && package.id){ clrmPackage.id = package.id; }
+                    thePackage);
+                if(thePackage && thePackage.id){ clrmPackage.id = thePackage.id; }
                 install();
             },
             on_error: onError
@@ -408,18 +408,18 @@ var CLRM = function(crowdlogger){
         crowdlogger.io.network.send_get_data(clrmMetadata.packageURL, 
             't='+ (new Date().getTime()),
             function(response){ 
-                var package = JSON.parse(response), field;
+                var thePackage = JSON.parse(response), field;
                 if(clrmMetadata.id){
-                    package.id = clrmMetadata.id;
+                    thePackage.id = clrmMetadata.id;
                 }
                 for( field in fields ){
-                    package.metadata[field] = fields[field];
+                    thePackage.metadata[field] = fields[field];
                 }
 
-                package.metadata.clrmid = clrmMetadata.clrmid;
-                package.clrmid = package.metadata.clrmid;
+                thePackage.metadata.clrmid = clrmMetadata.clrmid;
+                thePackage.clrmid = thePackage.metadata.clrmid;
                 crowdlogger.io.log.write_to_clrm_db({
-                    data: [package],
+                    data: [thePackage],
                     on_success: onSuccess
                 });
             }, 
@@ -499,26 +499,26 @@ var CLRM = function(crowdlogger){
         crowdlogger.debug.log('Enabling package '+ clrmid);
         crowdlogger.io.log.get_clrm_entry({
             clrmid: clrmid,
-            on_success: function(package){
+            on_success: function(thePackage){
                 // Load the package.
-                crowdlogger.debug.log('Loading package '+ package.clrmid +'...');
+                crowdlogger.debug.log('Loading package '+ thePackage.clrmid +'...');
                 crowdlogger.api.cli.base.loadCLRMFromString(
-                    JSON.stringify(package), function(){
+                    JSON.stringify(thePackage), function(){
                         // Once loaded, save the state as enabled.
-                        package.metadata.enabled = true;
-                        package.metadata.loaded = true;
+                        thePackage.metadata.enabled = true;
+                        thePackage.metadata.loaded = true;
                         crowdlogger.io.log.write_to_clrm_db({
-                            data: [package],
+                            data: [thePackage],
                             on_success: onSuccess
                         });
                     }, function(){
-                        crowdlogger.debug.log('Package '+ package.clrmid +
+                        crowdlogger.debug.log('Package '+ thePackage.clrmid +
                             ' loaded; marking as enabled.');
                         // Once loaded, save the state as enabled.
-                        package.metadata.enabled = true;
-                        package.metadata.loaded = false;
+                        thePackage.metadata.enabled = true;
+                        thePackage.metadata.loaded = false;
                         crowdlogger.io.log.write_to_clrm_db({
-                            data: [package],
+                            data: [thePackage],
                             on_success: onSuccess
                         });
                     }
@@ -577,17 +577,17 @@ var CLRM = function(crowdlogger){
         // Get the associated package.
         crowdlogger.io.log.get_clrm_entry({
             clrmid: opts.clrmid,
-            on_success: function(package){
+            on_success: function(thePackage){
                 // Unload the package
                 crowdlogger.api.cli.base.unloadCLRM(opts.clrmid, opts.reason, 
                     function(){
                         // Once unloaded, save the state as disabled.
                         if( opts.reason.match(/(uinstall)|(disable)/) ){
-                            package.metadata.enabled = false;
+                            thePackage.metadata.enabled = false;
                         }
-                        package.metadata.loaded = false;
+                        thePackage.metadata.loaded = false;
                         crowdlogger.io.log.write_to_clrm_db({
-                            data: [package],
+                            data: [thePackage],
                             on_success: opts.on_success
                         });
                     }, opts.on_error );
@@ -650,18 +650,18 @@ var CLRM = function(crowdlogger){
         // Get the associated package.
         crowdlogger.io.log.get_clrm_entry({
             clrmid: clrmid,
-            on_success: function(package){
+            on_success: function(thePackage){
                 // Unload the package
-                if(package.metadata.loaded){
+                if(thePackage.metadata.loaded){
                     if(onSuccess){ onSuccess() };
                 } else {
                     crowdlogger.api.cli.base.loadCLRMFromString(
-                        JSON.stringify(package), function(){
+                        JSON.stringify(thePackage), function(){
                             // Once loaded, save the state as enabled.
-                            package.metadata.enabled = true;
-                            package.metadata.loaded = true;
+                            thePackage.metadata.enabled = true;
+                            thePackage.metadata.loaded = true;
                             crowdlogger.io.log.write_to_clrm_db({
-                                data: [package],
+                                data: [thePackage],
                                 on_success: onSuccess
                             });
                         }, onError );
