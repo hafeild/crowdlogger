@@ -23,7 +23,7 @@ CLI.prototype.User.prototype.History = function(crowdlogger, cli){
     // Public variables.
 
     // Public function declarations.
-    this.getInteractionHistory;
+    // this.getInteractionHistory;
 
     // Private function definitions.
 
@@ -164,7 +164,7 @@ CLI.prototype.User.prototype.RealTime = function(crowdlogger, cli){
     // Public variables.
 
     // Public function declarations.
-    this.addActivityListener;
+    // this.addActivityListener;
 
     // Private function definitions.
 

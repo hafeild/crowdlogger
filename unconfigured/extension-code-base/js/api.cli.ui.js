@@ -19,9 +19,9 @@ CLI.prototype.UserInterface = function(crowdlogger, cli){
     this.contentScripts = new this.ContentScripts(crowdlogger, cli);
     
     // Public function declarations.
-    this.setMessageFlag;
-    this.injectContentScript;
-    this.openLoggingWindow;
+    // this.setMessageFlag;
+    // this.injectContentScript;
+    // this.openLoggingWindow;
      
     // Private function definitions.
     init = function(){
@@ -61,8 +61,8 @@ CLI.prototype.UserInterface.prototype.ContentScripts =function(crowdlogger,cli){
         callbacks;
 
     // Public function declarations.
-    this.registerContentScript;
-    this.unregisterContentScript;
+    // this.registerContentScript;
+    // this.unregisterContentScript;
 
     // Provides several wrappers for common callback functions.
     callbacks = {

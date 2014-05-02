@@ -84,6 +84,7 @@ CROWDLOGGER.gui.notifications.init = function(){
 
     CROWDLOGGER.gui.notifications.un_notify = function(){
         // Copy the defaults.
+        var x;
         for( x in CROWDLOGGER.gui.buttons.defaults ) {
             CROWDLOGGER.gui.buttons.current[x] = 
                 CROWDLOGGER.gui.buttons.defaults[x];

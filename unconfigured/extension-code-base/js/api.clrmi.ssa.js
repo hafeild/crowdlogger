@@ -20,7 +20,7 @@ CLRMI.prototype.ServerSideAccess = function(api){
     var wrapCallback;
 
     // Public functions.
-    this.sendData; this.sendPostData; this.sendGetData;
+    // this.sendData; this.sendPostData; this.sendGetData;
 
     /**
      * Serves as a wrapper for callback. Given a set of options (e.g., to one

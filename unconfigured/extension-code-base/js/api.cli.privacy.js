@@ -17,7 +17,7 @@ CLI.prototype.Privacy = function(crowdlogger, cli){
     var that = this;
 
     // Public functions.
-    this.callbacks;
+    // this.callbacks;
     this.secretSharing = new this.SecretSharing(crowdlogger, cli, this);
 
     // Provides several wrappers for common callback functions.

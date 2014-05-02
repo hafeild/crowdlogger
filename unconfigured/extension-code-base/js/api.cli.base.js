@@ -40,9 +40,9 @@ CLI.prototype.Base = function(crowdlogger, cli){
     var onMessage, init, extractData, invokeCLIFunction, invokeCLICallback;
 
     // Public function declarations.
-    this.loadCLRM, this.unloadCLRM, this.sendMessage, this.registerCallback, 
-    this.unregisterCallback, this.invokeCLRMICallback, 
-    this.simpleCallbackWrapper, this.invokeCLRMMethod; 
+    // this.loadCLRMs, this.unloadCLRM, this.sendMessage, this.registerCallback, 
+    // this.unregisterCallback, this.invokeCLRMICallback, 
+    // this.simpleCallbackWrapper, this.invokeCLRMMethod; 
 
 
     // Private function definitions.

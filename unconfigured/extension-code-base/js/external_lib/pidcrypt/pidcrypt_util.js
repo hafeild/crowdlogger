@@ -33,7 +33,7 @@
  *                   otherwise string is assumed to be 8-bit characters
  * @return coded     base64-encoded string
  */
-pidCryptUtil = {};
+var pidCryptUtil = {};
 pidCryptUtil.encodeBase64 = function(str,utf8encode) {  // http://tools.ietf.org/html/rfc4648
   if(!str) str = "";
   var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";

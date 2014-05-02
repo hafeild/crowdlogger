@@ -37,17 +37,18 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
         write_to_log, read_log, run_transaction, foreach_entry,
         raise_error, on_crowlogger_db_upgraded, on_extension_db_upgraded,
         create_store, truncate_store, update_log, get_range, read_log_cursor,
-        db_cursor_chunk, get_entry_from_index;
+        db_cursor_chunk, get_entry_from_index, is_database_opened, 
+        add_database_connection;
 
     // Some constants
-    const DATABASE_NAME = 'crowdlogger',
+    var DATABASE_NAME = 'crowdlogger',
         EXTENSION_DATABASE_NAME = 'crowdlogger_extensions',
         EXTENSION_STORE_NAME = 'data',
         ACTIVITY_LOG_STORE_NAME = 'activity_log',
         ERROR_LOG_STORE_NAME = 'error_log',
         CLRM_STORE_NAME = 'clrms',
-        CLRM_INDEX_NAME = 'clrmid'
-        CLRM_INDEX_KEY = 'clrmid'
+        CLRM_INDEX_NAME = 'clrmid',
+        CLRM_INDEX_KEY = 'clrmid',
         DATABASE_SIZE = 10 * 1024 * 1024, // 10 MB
         VERSION = 2,
         VERSIONCHANGE = //IDBTransaction ? IDBTransaction.VERSION_CHANGE : 
@@ -74,39 +75,39 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
     // Public functions. These will all be defined later, just listing them
     // out for now.
     // Writers. For appending individual entries.
-    this.write_to_error_log;
-    this.write_to_activity_log;
-    this.log;
-    this.write_to_extension_log;
-    this.write_to_clrm_db;
+    // this.write_to_error_log;
+    // this.write_to_activity_log;
+    // this.log;
+    // this.write_to_extension_log;
+    // this.write_to_clrm_db;
 
     // Updaters. For modifying or deleting batches of entries.
-    this.update_error_log;
-    this.update_activity_log;
-    this.update_extension_log;
-    this.update_clrm_db;
+    // this.update_error_log;
+    // this.update_activity_log;
+    // this.update_extension_log;
+    // this.update_clrm_db;
 
     // Readers. For reading all or subsets of entries.
-    this.read_error_log;
-    this.read_activity_log;
-    this.read_extension_log;
-    this.read_clrm_db;
-    this.get_clrm_entry;
+    // this.read_error_log;
+    // this.read_activity_log;
+    // this.read_extension_log;
+    // this.read_clrm_db;
+    // this.get_clrm_entry;
 
     // Clearers. For dropping entire tables.
-    this.clear_error_log;
-    this.clear_activity_log;
-    this.clear_extension_log
-    this.clear_clrm_db;
+    // this.clear_error_log;
+    // this.clear_activity_log;
+    // this.clear_extension_log
+    // this.clear_clrm_db;
 
     // Accessors.
-    this.get_version;
-    this.list_stores;
-    this.remove_database;
-    this.remove_cl_database;
-    this.upgrade_db;
+    // this.get_version;
+    // this.list_stores;
+    // this.remove_database;
+    // this.remove_cl_database;
+    // this.upgrade_db;
 
-    this.IOLogException;
+    // this.IOLogException;
 
     // Public variables.
     this.version = VERSION;
@@ -1651,7 +1652,7 @@ CROWDLOGGER.io.IndexedDB = function(crowdlogger){
                 opts.on_error);
         }
 
-        const FORWARD = 0,
+        var FORWARD = 0,
               BACKWARD = 1,
               JUMP = 2;
 

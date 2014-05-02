@@ -25,19 +25,19 @@ CLRMI.prototype.UserInterface = function(api, clrmid){
         loggingWindow;
 
     // Private functions.
-    var copyDefaults, onMessage, appendScript, init;
+    var copyDefaults, onMessage, appendScript, init, extractData;
 
     // Public variables.
     this.contentScripts = new this.ContentScripts(api, clrmid);
 
     // Public functions.
-    this.openWindow; 
-    this.dereferenceModuleResources;
-    this.getFaviconURL;
-    this.setMessageFlag; 
-    this.log; 
-    this.openLoggingWindow;
-    this.closeLoggingWindow;
+    // this.openWindow; 
+    // this.dereferenceModuleResources;
+    // this.getFaviconURL;
+    // this.setMessageFlag; 
+    // this.log; 
+    // this.openLoggingWindow;
+    // this.closeLoggingWindow;
 
 
     // Private function definitions.
@@ -312,8 +312,8 @@ CLRMI.prototype.UserInterface.prototype.ContentScripts = function(api, clrmid){
     var wrapCallback;
 
     // Public functions.
-    this.registerContentScript;
-    this.unregisterContentScript;
+    // this.registerContentScript;
+    // this.unregisterContentScript;
 
     // Private function definitions.
 

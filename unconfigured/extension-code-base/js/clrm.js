@@ -18,20 +18,20 @@ var CLRM = function(crowdlogger){
     var getAvailableCLRMListing, // I.e., from a given repository.
         getAvailableCLRMListings,// I.e., from all registered repositories.
         getInstalledCLRMListing, // Some of these will be local.
-        getOverviewCLRMListings, // Includes available and installed.
+        getOverviewCLRMListing, // Includes available and installed.
         generateCLRMElement,
         populateCLRMElement, 
         init,
         trackUpdates;
 
     // Public functions.
-    this.init; this.populateCLRMLibraryPage; this.launchCLRMLibraryPage;
-    this.installLocalCLRM; this.installCLRM; this.uninstallCLRM; 
-    this.removeCLRMFromDB; this.enableCLRM; this.disableCLRM;
-    this.unloadCLRM; this.unloadAllCLRMs; this.loadCLRMIfNecessary;
-    this.loadAllEnabledCLRMs; this.open; this.configure; this.getMessage;
-    this.updateCLRM; this.updateAllCLRMs; this.addRepository; 
-    this.removeRepository;
+    // this.populateCLRMLibraryPage; this.launchCLRMLibraryPage;
+    // this.installLocalCLRM; this.installCLRM; this.uninstallCLRM; 
+    // this.removeCLRMFromDB; this.enableCLRM; this.disableCLRM;
+    // this.unloadCLRM; this.unloadAllCLRMs; this.loadCLRMIfNecessary;
+    // this.loadAllEnabledCLRMs; this.open; this.configure; this.getMessage;
+    // this.updateCLRM; this.updateAllCLRMs; this.addRepository; 
+    // this.removeRepository;
 
     // Private function definitions.
 
@@ -680,7 +680,7 @@ var CLRM = function(crowdlogger){
      * @param {function} onError        A function to invoke upon error.    
      */
     this.loadAllEnabledCLRMs = function(onSuccess, onError){
-        var update, install, enable;
+        var update, install, enable, onErr;
 
         crowdlogger.debug.log('Loading all enabled CLRMs');
 
@@ -725,9 +725,9 @@ var CLRM = function(crowdlogger){
         onErr = function(e){
             if(onError){ setTimeout(function(){onError(e)}, T);}
             processNext();
-        }
+        };
 
-        getOverviewCLRMListing(update, onError);
+        getOverviewCLRMListing(update, onErr);
     };
 
 

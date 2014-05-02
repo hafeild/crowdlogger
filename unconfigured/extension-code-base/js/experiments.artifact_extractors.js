@@ -33,7 +33,7 @@ CROWDLOGGER.experiments.artifact_extractors = {};
  */
 CROWDLOGGER.experiments.artifact_extractors.process_artifact_histogram =
         function( histogram, on_complete ){
-    var histogram, artifacts = [], i = 0;
+    var artifacts = [], i = 0;
 
     histogram = CROWDLOGGER.experiments.artifact_extractors.add_dummy_artifact(
         histogram );

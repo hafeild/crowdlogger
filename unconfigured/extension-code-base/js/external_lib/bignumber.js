@@ -1,7 +1,7 @@
 //+ Jonas Raoni Soares Silva
 //@ http://jsfromhell.com/classes/bignumber [rev. #4]
 
-BigNumber = function(n, p, r){
+var BigNumber = function(n, p, r){
 	var o = this, i;
 	if(n instanceof BigNumber){
 		for(i in {precision: 0, roundType: 0, _s: 0, _f: 0}) o[i] = n[i];
@@ -23,7 +23,8 @@ with({$: BigNumber, o: BigNumber.prototype}){
 		if(this._s != (n = new BigNumber(n))._s)
 			return n._s ^= 1, this.subtract(n);
 		var o = new BigNumber(this), a = o._d, b = n._d, la = o._f,
-		lb = n._f, n = Math.max(la, lb), i, r;
+		lb = n._f, i, r;
+		n = Math.max(la, lb);
 		la != lb && ((lb = la - lb) > 0 ? o._zeroes(b, lb, 1) : o._zeroes(a, -lb, 1));
 		i = (la = a.length) == (lb = b.length) ? a.length : ((lb = la - lb) > 0 ? o._zeroes(b, lb) : o._zeroes(a, -lb)).length;
 		for(r = 0; i; r = (a[--i] = a[i] + b[i] + r) / 10 >>> 0, a[i] %= 10);

@@ -18,7 +18,7 @@ CLI.prototype.ServerSideAccess = function(crowdlogger, cli){
         callbacks;
 
     // Public functions:
-    this.sendData;
+    // this.sendData;
 
     // Provides several wrappers for common callback functions.
     callbacks = {

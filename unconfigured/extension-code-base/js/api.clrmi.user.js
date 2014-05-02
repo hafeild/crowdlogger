@@ -20,7 +20,7 @@ CLRMI.prototype.User = function( api ){
     var init;
 
     // Public variables.
-    this.history, this.realTime;
+    // this.history, this.realTime;
 
     // Public function declarations.
 
@@ -50,7 +50,7 @@ CLRMI.prototype.User.prototype.History = function( api ){
     // Public variables.
 
     // Public function declarations.
-    this.getInteractionHistory;
+    // this.getInteractionHistory;
 
     // Private function definitions.
 
@@ -193,7 +193,7 @@ CLRMI.prototype.User.prototype.RealTime = function( api ){
     // Public variables.
 
     // Public function declarations.
-    this.addActivityListeners, this.removeActivityListeners;
+    // this.addActivityListeners, this.removeActivityListeners;
 
     // Private function definitions.
 

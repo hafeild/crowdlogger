@@ -33,7 +33,8 @@ CROWDLOGGER.logging.event_listeners = {
     placed_listeners: {},
     id: 0,
     // I.e., {<clrmid>: {id: <clrmid>, script: <script>, callback: <callback> }}
-    clrm_script_details: {} 
+    clrm_script_details: {},
+    firefox_tab_message_listeners: {}
 };
 
 CROWDLOGGER.logging.event_listeners.mk_listener_observer = function(on_unload){
@@ -451,7 +452,7 @@ CROWDLOGGER.logging.event_listeners.tab_listener_firefox = {
             // Load the CLRM content scripts.
             CROWDLOGGER.logging.event_listeners.
                 inject_clrm_listeners_firefox(
-                    current_window, tab_id, is_focused);
+                    win, tab_id, is_focused);
 
             // If this is a non 'clrm.html' extension page, set the CROWDLOGGER
             // variable so it can finish loading itself.

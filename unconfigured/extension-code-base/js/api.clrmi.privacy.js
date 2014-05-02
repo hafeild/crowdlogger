@@ -71,7 +71,7 @@ CLRMI.prototype.Privacy.prototype.SecretSharing = function(api,sharedFunctions){
     var that = this;
 
     // Public functions.
-    this.packAndSendArtifacts;
+    // this.packAndSendArtifacts;
 
     /**
      * Encrypts, bundles, and sends off a list of artifacts to a set of 

@@ -29,7 +29,7 @@ CLRMI.prototype.Base = function(api) {
         invokeCLRMICallback, invokeCLRMMethod, openLoggingWindow, onShutdown;
 
     // Public function declarations.
-    this.postMessage, this.log, this.invokeCLIFunction;
+    // this.postMessage, this.log, this.invokeCLIFunction;
 
     // Private function definitions.
     /**
