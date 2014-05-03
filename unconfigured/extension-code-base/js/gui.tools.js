@@ -726,6 +726,9 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
             entries_elm.empty();
 
+            // Set the scroll on the panel to be a the top.
+            entries_elm.scrollTop(0);
+
             // Populate the screen.
             while( info.batch.length > 0 ){
                 var entry = info.batch.shift();
