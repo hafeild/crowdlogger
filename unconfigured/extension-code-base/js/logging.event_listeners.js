@@ -679,7 +679,8 @@ CROWDLOGGER.logging.event_listeners.inject_page_listeners = function(the_win,
 
         // A logging interface.
         var log = function( message ){
-            win.console.log( message );  
+            //win.console.log( message );  
+            CROWDLOGGER.debug.log(message);
         };
 
         // Contains information regarding this page in terms of it being

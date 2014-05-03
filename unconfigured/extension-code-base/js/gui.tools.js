@@ -442,34 +442,49 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
             listeners.push({jqelm: jqelm, event: event, callback: callback});
         };
 
+        // Returns a jQuery object.
         get_description = function(entry){
+            var elm = jq('<span>');
+
             if( entry.__deleted__ ){
-                return 'Removed';
+                return elm.html('Removed');
             }
             switch(entry.e){
                 case 'search':
-                    return CROWDLOGGER.util.to_search_url(
-                        entry.q, entry.se, true) +' '+
-                        CROWDLOGGER.util.getFaviconHTML(entry.url, false);
+
+                    elm.html(CROWDLOGGER.util.to_search_url(
+                        entry.q, entry.se, true) +' ');
+                    CROWDLOGGER.util.getFaviconHTML(elm, entry.url, false);
+                    return elm;
+
                 case 'pagefocus':
                 case 'pageblur':
                 case 'pageload':
-                    return CROWDLOGGER.util.gen_link(entry.url, 
-                        entry.ttl ? entry.ttl : entry.url, 25) +' '+
-                        CROWDLOGGER.util.getFaviconHTML(entry.url, false); 
+                    elm.html(CROWDLOGGER.util.gen_link(entry.url, 
+                        entry.ttl ? entry.ttl : entry.url, 25) +' ');
+                    CROWDLOGGER.util.getFaviconHTML(elm, entry.url, false); 
+                    return elm;
+
                 case 'tabremove':
                 case 'tabselect':
-                    return 'Tab id: '+ entry.tid;
+                    return elm.html('Tab id: '+ entry.tid);
                 case 'tabadd':
-                    return CROWDLOGGER.util.gen_link(entry.turl, entry.turl,25)+
-                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,false); 
+                    elm.html(
+                        CROWDLOGGER.util.gen_link(entry.turl, entry.turl,25)+
+                        ' ');
+                    CROWDLOGGER.util.getFaviconHTML(elm, entry.turl,false); 
+                    return elm;
                 case 'click':
-                    return CROWDLOGGER.util.gen_link(entry.turl, entry.anc,25)+
-                        ' '+ CROWDLOGGER.util.getFaviconHTML(entry.turl,false); 
+                    elm.html(
+                        CROWDLOGGER.util.gen_link(entry.turl, entry.anc,25)+
+                        ' ');
+                    CROWDLOGGER.util.getFaviconHTML(elm, entry.turl,false); 
+                    return elm;
                 case 'loggingstatuschange':
-                    return entry.le ? 'Logging enabled' : 'Logging disabled';
+                    return elm.html(
+                        entry.le ? 'Logging enabled' : 'Logging disabled');
                 default: 
-                    return "?";
+                    return elm.html("?");
             };
         };
 
@@ -492,8 +507,9 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 text(event_display_names[entry.e]).appendTo(entry_elm);
 
             // Event Summary.
-            var summary = jq('<span>').addClass('event-summary').html(
-                '<span>'+get_description(entry)+'</span>');
+            var summary = jq('<span>').addClass('event-summary').append(
+                get_description(entry));
+
             jq('<span>').addClass('date').text(
                     CROWDLOGGER.util.format_date(entry.t)).appendTo(summary);
             summary.appendTo(entry_elm);
@@ -574,6 +590,8 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
         };
 
         load = function(id){
+            // CROWDLOGGER.debug.log('In load...id='+ id);
+
             CROWDLOGGER.io.log.cursor_activity_log( {
                 on_chunk: display_entries,
                 chunk_size: 100,
@@ -659,7 +677,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                     //blob = new Blob([blob, ']'], {type: FILE_TYPE});
                     data.push(']');
                     blob = new Blob(data, {type: FILE_TYPE});
-                    console.log("Writing file!");
+                    CROWDLOGGER.debug.log("Writing file!");
                     // saveAs(
                     //     new Blob([blob,']'], {type: FILE_TYPE}), 
                     //     'log.'+oldestDate+'-'+newestDate+'.json');
@@ -699,7 +717,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
         // Called when the activity log has been parsed.
         display_entries = function( info ){
-            CROWDLOGGER.debug.log('Displaying results');
+            // CROWDLOGGER.debug.log('Displaying results');
 
             clear_listeners();
 

@@ -37,8 +37,11 @@ CROWDLOGGER.debug.init = function(){
     // For Firefox.
     if( CROWDLOGGER.version.info.is_firefox ){
         /** @ignore */
-        CROWDLOGGER.debug.logging_function = function( message ) { 
-            dump( message.replace(/\n$/,'')+ '\n' );
+        CROWDLOGGER.debug.logging_function = //console.log;
+
+        function( message ) { 
+            console.log(message);
+            // dump( message.replace(/\n$/,'')+ '\n' );
         };
     // For Chrome.
     } else if( CROWDLOGGER.version.info.is_chrome ) {

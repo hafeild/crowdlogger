@@ -813,7 +813,7 @@ CROWDLOGGER.util.to_search_url = function( query, search_engine, html ){
  * @param {boolean} shorten  Default: true; uses just the domain of the URL.
  * @return The URL of the favicon associated with the given URL.
  */
-CROWDLOGGER.util.getFaviconURL = function(url, shorten){
+CROWDLOGGER.util.getFaviconURL = function(url, shorten, callback){
     shorten = shorten === undefined || shorten;
     url = url || 'about:blank';
 
@@ -823,10 +823,16 @@ CROWDLOGGER.util.getFaviconURL = function(url, shorten){
     }
 
     if( CROWDLOGGER.faviconService ){
-        return CROWDLOGGER.faviconService.getFaviconImageForPage(
-            CROWDLOGGER.ioService.newURI(url, null, null)).spec;
+        CROWDLOGGER.faviconService.getFaviconDataForPage(
+            CROWDLOGGER.ioService.newURI(url,null,null), function(uri){
+                callback(uri ? uri.spec : null);
+            });
+
+        // return CROWDLOGGER.faviconService.getFaviconImageForPage(
+        // return CROWDLOGGER.faviconService.getFaviconLinkForIcon(
+        //     CROWDLOGGER.ioService.newURI(url, null, null)).spec;
     } else {
-        return 'chrome://favicon/'+ url;
+        callback('chrome://favicon/'+ url);
     }
 };
 
@@ -840,9 +846,15 @@ CROWDLOGGER.util.getFaviconURL = function(url, shorten){
  * @param {boolean} shorten  Default: true; uses just the domain of the URL.
  * @return The URL of the favicon associated with the given URL.
  */
-CROWDLOGGER.util.getFaviconHTML = function(url, shorten){
-    return '<img src="'+
-        CROWDLOGGER.util.getFaviconURL(url, shorten) +'"/>';
+CROWDLOGGER.util.getFaviconHTML = function(jqElm, url, shorten){
+    CROWDLOGGER.util.getFaviconURL(url, shorten, function(url){
+        if(url) {
+            jqElm.append('<img src="'+ url +'"/>');
+        }
+    });
+
+    // return '<img src="'+
+    //     CROWDLOGGER.util.getFaviconURL(url, shorten) +'"/>';
 }
 
 /**
