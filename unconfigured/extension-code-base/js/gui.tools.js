@@ -419,6 +419,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 tabselect: 'Tab selected',
                 pageload: 'Page loaded'
             },
+            saving_message = jq('#saving-message'),
             refresh_elm = jq('#refresh'),
             save_elm = jq('#save-log'),
             forward_elm = jq('#forward'),
@@ -629,13 +630,15 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
             save_elm.addClass('disabled');
             save_elm.off('click', save);
-            save_elm.html('');
+            // save_elm.html('');
+            saving_message.show();
+            saving_message.html('Saving');
 
             append_entries_to_save = function( entries, next, abort ){
-                if(save_elm.html().length === 3){
-                    save_elm.html('');
+                if(saving_message.html().length === "Saving...".length){
+                    saving_message.html('Saving');
                 } else {
-                    save_elm.html( save_elm.html()+'.');
+                    saving_message.html( saving_message.html()+'.');
                 }
 
                 var i, size;
@@ -656,7 +659,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                 }
 
                 // Serialize the entries.
-                while( entries.length > 0 && (limit>0 || data.length < limit)){
+                while( entries.length > 0 && (limit===0 || data.length < limit)){
                     data.push(',');
                     data.push(JSON.stringify(entries.shift(), null, '\t'));
                 }
@@ -693,7 +696,7 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
 
                     e.click(function(){
                         var link = jq(this);
-                        save_elm.html('Save');
+                        // save_elm.html('Save');
                         save_elm.removeClass('disabled');
                         save_elm.on('click', save); 
                         setTimeout(function(){
@@ -702,8 +705,10 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
                         }, 50);
                     })[0].click();
                     //.trigger('click');
-                    delete blob;
+                    //delete blob;
                 }
+
+                saving_message.hide();
             };
 
             CROWDLOGGER.io.log.read_activity_log( {
@@ -767,6 +772,8 @@ CROWDLOGGER.gui.tools.export_log = function( doc, refresh ){
             load();
         });
         jump_elm.on('click', jump);
+
+        saving_message.hide();
 
         // Attach the code that forms the blob to download to the 'Save' button.
         save_elm.on('click', save); 
